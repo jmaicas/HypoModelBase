@@ -18,6 +18,8 @@ MainFrame *mainwing;
 
 
 
+// Main window base class
+
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
