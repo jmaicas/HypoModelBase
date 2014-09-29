@@ -1,0 +1,354 @@
+
+
+#include <hypobase.h>
+//#include "hypomods.h"
+//#include "hypopanels.h"
+#include "wx/utils.h"
+//#include "osmopanels.h"
+//#include "hypograph.h"
+#include <hypotools.h>
+
+
+
+//IMPLEMENT_APP(HypoApp)
+
+
+MainFrame *mainwing;
+//wxCommandEvent *blankevent;
+
+
+
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
+: wxFrame((wxFrame *)NULL, -1, title, pos, size)
+{
+	ostype = GetSystem();
+	mainwin = this;
+	CreateStatusBar();
+
+  diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
+	diagbox->Write("Diagnostic Box OK\n\n");
+
+	toolset = new ToolSet();
+	toolset->AddBox(diagbox, false, true);
+}
+
+
+void MainFrame::MainLoad()
+{
+	long numdat;
+	int i, check, boxindex;
+
+	wxString filename, filepath;
+	wxString readline, numstring;
+
+	TextFile infile;
+	wxPoint pos;
+  wxSize size;
+
+	//filepath = GetPath();
+	filepath = "Init//";
+
+	// Box Load
+	filename = "mainbox.ini";
+
+	check = infile.Open(filepath + filename);
+	if(!check) return;
+	readline = infile.ReadLine();
+	//tofp.WriteLine(readline);
+	while(!readline.IsEmpty()) {
+		numstring = readline.BeforeFirst(' ');
+		numstring.ToLong(&numdat);
+		boxindex = numdat;
+		if(boxindex >= toolset->numtools) break;
+
+		pos.x = ReadNextData(&readline);
+		pos.y = ReadNextData(&readline);
+		size.x = ReadNextData(&readline);
+		size.y = ReadNextData(&readline);
+		if(toolset->box[boxindex]->servant) toolset->box[boxindex]->visible = (bool)ReadNextData(&readline);
+		else toolset->box[boxindex]->visible = true;
+
+		if(pos.x >= -5000 && pos.x < 5000 && pos.y >= -5000 && pos.y < 5000) toolset->box[boxindex]->mpos = pos;
+		if(size.x >= 50 && size.x < 2000 && size.y >= 50 && size.y < 2000) toolset->box[boxindex]->boxsize = size;
+
+		readline = infile.ReadLine();          // Read next line
+		//tofp.WriteLine(readline);
+	}
+	infile.Close();
+
+	for(i=0; i<toolset->numtools; i++) {
+		toolset->box[i]->ReSize();
+		toolset->box[i]->Show(toolset->box[i]->visible);
+	}
+}
+
+
+void MainFrame::MainStore()
+{
+	int i;
+	wxString filename, filepath;
+	wxString outline, text;
+
+	TextFile outfile, opfile;
+
+	//filepath = GetPath();
+	filepath = "Init//";
+
+	// box store
+	filename = "mainbox.ini";
+	outfile.New(filepath + filename);
+	
+	for(i=0; i<toolset->numtools; i++)
+		if(toolset->box[i]) {
+			outfile.WriteLine(text.Format("%d %d %d %d %d %d", i, 
+			toolset->box[i]->mpos.x, toolset->box[i]->mpos.y, toolset->box[i]->boxsize.x, toolset->box[i]->boxsize.y, toolset->box[i]->IsVisible()));
+		}
+	outfile.Close();
+}
+
+
+long ReadNextData(wxString *readline)
+{
+	long numdat;
+	wxString numstring;
+
+	*readline = readline->AfterFirst(' ');
+	numstring = readline->BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+
+	return numdat;
+}
+
+
+wxString numtext(double number, int places)
+{
+	wxString text, format;
+	
+	format.Printf("%%.%df", places);
+	text.Printf(format, number);
+
+	return text;
+}
+
+
+wxString numchar(int number)
+{
+	char text[10];
+	wxString newtext;
+	
+	text[0] = number + 64;
+	
+	newtext.Printf("%s", text);
+	return newtext;
+}
+
+
+int numplaces(double range)
+{
+	int places = 0;
+	
+	if(range <= 100) places = 1;
+	if(range <= 10) places = 2;	
+	if(range <= 1) places = 3;
+	if(range <= 0.1) places = 4;	
+	
+	return places;
+}
+
+
+wxString numstring(double number, int places=0)
+{
+	wxString snum;
+	
+	if(places == 1) snum.Printf("%.1f", number);
+	else if(places == 2) snum.Printf("%.2f", number);
+	else if(places == 3) snum.Printf("%.3f", number);
+	else if(places == 4) snum.Printf("%.4f", number);
+	else if(places == 5) snum.Printf("%.5f", number);
+	else if(places == 6) snum.Printf("%.6f", number);
+	else if(places == 7) snum.Printf("%.7f", number);
+	else if(places == 8) snum.Printf("%.8f", number);
+	else if(places == 9) snum.Printf("%.9f", number);
+	else snum.Printf("%.0f", number);
+	
+	return snum;
+}
+
+
+TextFile::TextFile()
+{
+	file = NULL;
+	readonly = true;
+}
+
+
+TextFile::~TextFile()
+{
+	if(file != NULL) delete file;
+}
+
+
+bool TextFile::End()
+{
+	return file->Eof();
+}
+
+
+int TextFile::Exists(wxString name)
+{
+	int check = 0;
+
+	file = new wxTextFile(name);
+	if(file->Exists()) check = 1;
+	delete file;
+	file = NULL;
+	return check;
+}
+
+
+void TextFile::New(wxString name)
+{
+	file = new wxTextFile(name);
+	if(!file->Exists()) file->Create();
+	file->Open();
+	file->Clear();
+	readonly = false;
+}
+
+
+int TextFile::Open(wxString name, bool read)
+{
+	readonly = read;
+	file = new wxTextFile(name);
+	if(!file->Exists()) return 0;
+	file->Open();
+	unread = true;
+	return 1;
+}
+
+
+void TextFile::Flush()
+{
+	file->Write();
+}
+
+
+void TextFile::WriteLine(wxString text)
+{
+	file->AddLine(text);
+}
+
+
+wxString TextFile::ReadLine()
+{
+	if(unread) {
+		unread = false;
+		return file->GetFirstLine();
+	}
+	else return file->GetNextLine();	
+}
+
+
+void TextFile::Close()
+{
+	if(!readonly) file->Write();
+	file->Close();
+	delete file;
+	file = NULL;
+}
+
+
+datint::datint()
+{
+	zero = 0;
+}
+
+
+datdouble::datdouble(wxTextCtrl *text)
+{
+	zero = 0;
+	textbox = text;
+}
+
+
+datdouble::datdouble(int size)
+{
+	zero = 0;
+	data.resize(size * 1.1);
+	max = size;
+	textbox = NULL;
+}
+
+
+double *initfarray(int size)
+{
+  return (double *)malloc(size * sizeof(double));
+}
+
+
+double gaussian(double mean, double sd)
+{
+	double u1, u2;
+	double v1, v2;
+	double s;
+	double g1, g2;
+
+	v1 = 0;
+	v2 = 0;
+	s = 1;
+	while(s>=1) {
+		u1 = mrand01();                    /* U1=[0,1] */
+		u2 = mrand01();										/* U2=[0,1] */          
+		v1 = 2 * u1 - 1;								/* V1=[-1,1] */
+		v2 = 2 * u2 - 1;								/* V2=[-1,1] */
+		s = v1 * v1 + v2 * v2;
+	}	
+	g1 = sqrt(-2 * log(s) / s) * v1;
+	g2 = sqrt(-2 * log(s) / s) * v2;
+	
+	g1 = mean + sd * g1;
+	g2 = mean + sd * g2;
+	
+	return g1;
+}
+
+
+double uniform(double mean, double range)
+{
+	double r1, r2;
+	
+	r1 = mrand01();
+	r2 = (mean - range) + (range * 2 * r1);
+	
+	return r2;
+}
+
+
+int iuniform(int base, int range)
+{
+	double r1, r2;
+	
+	r1 = mrand01();
+	r2 = base + (range+1) * r1;
+	
+	return (int)r2;
+}
+
+
+int randint(int range)
+{
+	double num;
+
+	num = mrand01();
+	return (int)(num * range);
+}
+
+
+int GetSystem()
+{
+	wxString oslabel = wxGetOsDescription();
+	if(oslabel.StartsWith("Windows")) return 1;
+	if(oslabel.StartsWith("Mac")) return 2;
+	if(oslabel.StartsWith("Linux")) return 3;
+	return 0;
+}
