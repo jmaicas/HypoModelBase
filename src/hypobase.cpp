@@ -12,8 +12,6 @@
 
 //IMPLEMENT_APP(HypoApp)
 
-
-MainFrame *mainwing;
 //wxCommandEvent *blankevent;
 
 
