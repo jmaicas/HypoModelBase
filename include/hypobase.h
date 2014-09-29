@@ -30,7 +30,7 @@
 //#define _CRTDBG_MAP_ALLOC_NEW
 //#include <stdlib.h>
 //#include <crtdbg.h>
-#include <vld.h>
+//#include <vld.h>
 
 
 //using namespace stk;
