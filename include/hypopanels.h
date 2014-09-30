@@ -1,3 +1,18 @@
+//	**********************************************************************************************************************
+//					*****************************				hypopanels. h			  ****************************************
+//
+//	Classes included:
+//	1. OptionPanel. Use a Hypomain class to show Option Menu ?
+//	2. histqueue. History of something?
+//	3. ParamBox. Toolbox based class that use a Hypomain Window and add Menues, static text and Running, Reset buttons.
+//	4. ModGenBox. Derived from ToolBox adding parameters and enriched text.
+//	5. OutBox. Use a ParamBox Class and allow history, storing and loading. 
+//	6. InfoBox. Derived from ToolBox, has a Hypomain window to manage, storing and loading, different parameters.
+//	7. ProtocolBox.	Derived from ParamBox. Tell what to do when a running box receives an event.
+//	8. BurstPanel	Defines a basic Panel with different signal measurements for further classes
+//	9. BurstBox. Derived from ToolBox. Use HypoMain and BurstPanel classes to show SpikeData
+//
+//	**********************************************************************************************************************
 
 
 #ifndef HYPOPANELS_H
@@ -15,7 +30,7 @@
 class Model;
 class HypoMain;
 
-
+//	1. OptionPanel. Use a Hypomain class to show Option Menu ?
 class OptionPanel : public wxDialog
 {
 public:
@@ -37,7 +52,7 @@ public:
 	void OnModRadio(wxCommandEvent& event);
 };
 
-
+//	2. histqueue. History of something?
 class histqueue
 {
 public:
@@ -57,7 +72,7 @@ public:
 	};
 };
 
-
+//	3. ParamBox. Toolbox based class that use a Hypomain Window and add Menues, static text and Running, Reset buttons.
 class ParamBox: public ToolBox
 {
 public:
@@ -151,7 +166,7 @@ public:
 	wxBoxSizer *RunBox();
 };
 
-
+//	4. ModGenBox. Derived from ToolBox adding parameters and enriched text.
 class ModGenBox : public ToolBox
 {
 public:
@@ -174,7 +189,7 @@ public:
 	void PageRead(int index, wxString name, wxString path);
 };
 
-
+//	5. OutBox. Use a ParamBox Class and allow history, storing and loading. 
 class OutBox: public ParamBox
 {
 public:
@@ -196,7 +211,7 @@ public:
 	void OnCopy(wxCommandEvent& event);
 };
 
-
+//	6. InfoBox. Derived from ToolBox, has a Hypomain window to manage, storing and loading, different parameters.
 class InfoBox : public ToolBox
 {
 public:
@@ -223,7 +238,7 @@ public:
 	void OnClose(wxCloseEvent& event);
 };
 
-
+//	7. ProtocolBox.	Derived from ParamBox. Tell what to do when a running box receives an event.
 class ProtocolBox : public ParamBox
 {
 public:
@@ -248,7 +263,7 @@ public:
 };
 
 
-
+//	8. BurstPanel	Defines a basic Panel with different signal measurements for further classes
 class BurstPanel
 {
 public:
@@ -274,7 +289,7 @@ public:
 };
 
 
-
+//	9. BurstBox. Derived from ToolBox. Use HypoMain and BurstPanel classes to show SpikeData
 class BurstBox: public ToolBox
 {
 public:

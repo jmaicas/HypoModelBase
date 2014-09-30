@@ -1,3 +1,20 @@
+// *************************************************************************************************
+// *********************************      hypocontrols.h         ***********************************
+//
+//  Classes included:
+//	1. TextBox that depends on a parent Window. 
+//	2. TagBox for interacting with diferent Combo Options?
+//	3. ToolPanel of a Window with a Toolbox and answering to diferent mouse gestures
+//	4. ToolBox Generator with many charactericts. 
+//	5. ToolSet for adding Tools to a ToolBox
+//	6. ParamText. Parameter Box for showing a text
+//	7. ParamNum. Parameter Box for showing a number with decimals.
+//	8. ParamCon. Panel for changing a Parameter defining the step of change, if up or down, min and max
+//	9. FlagSet for adding flags
+//	10. CheckSet ?
+//	11. ParamSet Offer the opportunity of Adding parameters, numbers or/and text to a panel. 
+//
+// *************************************************************************************************
 
 #ifndef HYPOCONTROLS_H
 #define HYPOCONTROLS_H
@@ -21,7 +38,7 @@ class Model;
 class ToolSet;
 
 
-
+//	1. TextBox that depends on a parent Window. 
 class TextBox: public wxTextCtrl
 {
 public:
@@ -32,7 +49,7 @@ public:
 
 };
 
-
+//	2. TagBox for interacting with diferent Combo Options?
 class TagBox: public wxComboBox
 {
 public:
@@ -44,7 +61,7 @@ public:
 	~TagBox();
 };
 
-
+//	3. ToolPanel of a Window with a Toolbox and answering to diferent mouse gestures
 class ToolPanel: public wxPanel
 {
 public:
@@ -62,7 +79,7 @@ public:
   ToolPanel(MainFrame *main, wxWindow *parent);
 };
 
-
+//	4. ToolBox Generator with many charactericts. 
 class ToolBox: public wxFrame
 {
 public:
@@ -129,9 +146,7 @@ public:
 };
 
 
-
-
-
+//	5. ToolSet for adding Tools to a ToolBox
 class ToolSet
 {
 public:
@@ -155,7 +170,7 @@ public:
 
 };
 
-
+//	6. ParamText. Parameter Box for showing a text
 class ParamText: public wxControl
 {
 public:
@@ -178,7 +193,7 @@ protected:
 	virtual wxSize DoGetBestSize() const;
 };
 
-
+//	7. ParamNum. Parameter Box for showing a number with decimals.
 class ParamNum: public wxControl
 {
 public:
@@ -200,7 +215,7 @@ protected:
 	virtual wxSize DoGetBestSize() const;
 };
 
-
+//	8. ParamCon. Panel for changing a Parameter defining the step of change, if up or down, min and max
 class ParamCon: public wxControl
 {
 public:
@@ -238,7 +253,7 @@ protected:
 	virtual void DoMoveWindow(int x, int y, int width, int height);
 };
 
-
+//	9. FlagSet for adding flags
 class FlagSet
 {
 public:
@@ -250,7 +265,7 @@ public:
 	void AddFlag(wxString fname, int fid) { name[numflags] = fname; id[numflags] = fid; numflags++; };
 };
 
-
+//	10. CheckSet ?
 class CheckSet
 {
 public:
@@ -262,7 +277,7 @@ public:
 	void Add(wxCheckBox *cbox, int cid) { box[numchecks] = cbox; id[numchecks] = cid; numchecks++; };
 };
 
-
+//	11. ParamSet Offer the opportunity of Adding parameters, numbers or/and text to a panel. 
 class ParamSet
 {
 public:

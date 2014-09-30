@@ -1,3 +1,11 @@
+// *************************************************************************************************
+// *****************************				hypotools. h			  ****************************************
+//
+//	Classes included
+//	1. DiagBox. Simple Dialog Box derived from ToolBox.
+//	2. TextGrid. Derived from wxGrid, create a Grid/table with a menu included.
+//
+// *************************************************************************************************
 
 
 #ifndef HYPOTOOLS_H
@@ -12,7 +20,7 @@
 #include <wx/grid.h>
 
 
-
+//	1. DiagBox. Simple Dialog Box derived from ToolBox.
 class DiagBox: public ToolBox
 {
 public:
@@ -22,7 +30,7 @@ public:
 	DiagBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size);
 };
 
-
+//	2. TextGrid. Derived from wxGrid, create a Grid/table with a menu included.
 class TextGrid : public wxGrid
 {
 public:

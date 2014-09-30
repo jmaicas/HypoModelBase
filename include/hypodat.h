@@ -1,3 +1,24 @@
+// *************************************************************************************************
+// *********************************      hypodat.h              ***********************************
+//
+// Defines classes for managing data of different measures, signals and graphs
+//	1. ModDat ?
+//	2. EvoDat ?
+//	3. FitDat	Fitness state and its parameters.
+//	4. NeuroDat	Basic data for neurosignal
+//	5. SpikeDat Data for a spike signal with statistical measurements, AHP, KHP, DAP, ISIS, and burst for graphing.  
+//	6. CurrentDat Concrete values AHP, DAP, Interval? for a spike?
+//	7. VarDat	tau, k and halflife values for a spike
+//	8. burst basic values for a burst
+//	9. BurstDat	Complete data for a burst including SpikeDat class
+//	10. AnaDat Analysis of Spike Data
+//	11. GraphScale Time and Frequency scales for 2-D graphs
+//	12. GraphDat	Collect data before drawing the graph
+//	13. GraphSet	Offer the possibility of having a set of graphs ?
+//	14. GraphBase	Basic Set of Graphs? Allow to Save and Load saved configurations of graphs?
+//	15. graphdisp	Display a single graph?
+//
+// *************************************************************************************************
 
 
 #ifndef HYPODAT_H
@@ -8,18 +29,18 @@
 #include "hypobase.h"
 #include <vector>
 
-
+//	1. ModDat ?
 class ModDat{
 public:
 	int model;
 };
 
-
+//	2. EvoDat ?
 class EvoDat{
 	float *params;
 };
 
-
+//	3. FitDat	Fitness state and its parameters.
 class FitDat{
 public:
 	double haz5chisq;
@@ -42,7 +63,7 @@ public:
 	double weightsum;
 };
 
-
+//	4. NeuroDat	Basic data for neurosignal
 class NeuroDat{
 public:
 	double times[100000];
@@ -62,7 +83,7 @@ public:
 	void ratecalc();
 };
 
-
+//	5. SpikeDat Data for a spike signal with statistical measurements, AHP, KHP, DAP, ISIS, and burst for graphing.  
 class SpikeDat{
 public:
 	SpikeDat();
@@ -135,7 +156,7 @@ public:
 	void ReSize(int);
 };
 
-
+//	6. CurrentDat Concrete values AHP, DAP, Interval? for a spike?
 class CurrentDat{
 public:
 	datdouble AHP;
@@ -147,7 +168,7 @@ public:
 	CurrentDat();
 };
 
-
+//	7. VarDat	tau, k and halflife values for a spike
 class VarDat{
 public:
 	double halflife;
@@ -156,8 +177,7 @@ public:
 	//datdouble store;
 };
 
-
-
+//	8. burst basic values for a burst
 class burst{
 public:
 	int start;
@@ -169,7 +189,7 @@ public:
 	int length;
 };
 
-
+//	9. BurstDat	Complete data for a burst including SpikeDat class
 class BurstDat{
 public:
 	SpikeDat *spikedata;
@@ -219,7 +239,7 @@ public:
 	//void Scan(BurstBox *);
 };
 
-
+//	10. AnaDat Analysis of Spike Data
 class AnaDat{
 public:
 	SpikeDat *spikedata;
@@ -231,7 +251,7 @@ public:
 	void autocalc(SpikeDat *);
 };
 
-
+//	11. GraphScale Time and Frequency scales for 2-D graphs
 class GraphScale
 {
 public:
@@ -243,7 +263,7 @@ public:
 	GraphScale(double newxf, double newxt, double newyf, double newyt) { xf = newxf; xt = newxt; yf = newyf; yt = newyt; };
 };
 
-
+//	12. GraphDat	Collect data before drawing the graph
 class GraphDat{
 public:
 	GraphDat();
@@ -286,7 +306,7 @@ public:
 class GraphBase;
 class graphdisp;
 
-
+//	13. GraphSet	Offer the possibility of having a set of graphs ?
 class GraphSet{
 public:
 	int sdex;
@@ -323,7 +343,7 @@ public:
 	wxString Display();
 };
 
-
+//	14. GraphBase	Basic Set of Graphs? Allow to Save and Load saved configurations of graphs?
 class GraphBase{
 public:
 	int numsets;
@@ -401,7 +421,7 @@ public:
 	void BaseLoad(wxString, wxString, wxTextCtrl *textbox = NULL);
 };
 
-
+//	15. graphdisp	Display a single graph?
 class graphdisp{
 public:
 	/*int data;

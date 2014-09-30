@@ -1,4 +1,12 @@
-//******************************************************
+// *************************************************************************************************
+// *********************************      hypograph.h              *********************************
+//
+//	Define classes for:
+//	1. GraphWindow3	Window for graphs. Use scalebox. Allow add and different mouse gestures. 
+//	2. ScaleBox. Basic window for representing graphs. GraphWindow3 depends on it. 
+//	3. DispWin Display a Windows with Graphs
+//
+// *************************************************************************************************
 
 #ifndef HYPOGRAPH_H
 #define HYPOGRAPH_H
@@ -11,7 +19,7 @@
 #include "hypodat.h"
 #include "hypomods.h"
 
-
+//	1. GraphWindow3	Window for graphs. Use scalebox. Allow add and different mouse gestures. 
 class GraphWindow3: public wxPanel
 {
 public:
@@ -79,7 +87,7 @@ public:
 	wxRealPoint GraphPos(wxPoint);
 };
 
-
+//	2. ScaleBox. Basic window for representing graphs. GraphWindow3 depends on it. 
 class ScaleBox: public wxPanel
 {
 public:
@@ -191,7 +199,7 @@ public:
 	int CheckValue();
 };
 
-
+//	3. DispWin Display a Windows with Graphs
 class DispWin: public wxFrame
 {
 public:

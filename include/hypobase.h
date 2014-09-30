@@ -1,3 +1,15 @@
+// *************************************************************************************************
+// *********************************      hypobase.h             ***********************************
+//
+//	Classes included:
+//	1. MainFrame. Define the Main Window, its size, position, OS, header text
+//	2. TextFile. Interacting with a Text File. 
+//	3. datdouble. Storage a vector of double overloading operator []
+//	4. datint. Storage a vector of integer overloading operator []
+//	5. ParamStore. Storage of struct of parameters ?
+//	6. NewToolbar. Derived from wxToolBar. Define a new Toolbar based on the standard one. 
+//
+// *************************************************************************************************
 
 #ifndef HYPOBASE_H
 #define HYPOBASE_H
@@ -356,7 +368,7 @@ class ToolSet;
 
 
 
-
+//	1. MainFrame. Define the Main Window, its size, position, OS, header text
 class MainFrame: public wxFrame
 {
 public:
@@ -388,8 +400,7 @@ public:
 };
 
 
-// Text File 
-
+//	2. TextFile. Interacting with a Text File. 
 class TextFile{
 public:
 	wxTextFile *file;
@@ -413,8 +424,7 @@ public:
 long ReadNextData(wxString *readline);
 
 
-// Storage
-
+//	3. datdouble. Storage a vector of double overloading operator []
 class datdouble{
 public:
 	datdouble(wxTextCtrl *text = NULL);
@@ -448,7 +458,7 @@ public:
 	//}
 };
 
-
+//	4. datint. Storage a vector of integer overloading operator []
 class datint{
 public:
 	datint();
@@ -472,7 +482,7 @@ public:
 
 double *initfarray(int size);
 
-
+//	5. ParamStore. Storage of struct of parameters ?
 class ParamStore{
 	struct ParamData{
 		wxString indexName;
@@ -587,7 +597,7 @@ public:
 
 // Interface
 
-
+//	6. NewToolbar. Derived from wxToolBar. Define a new Toolbar based on the standard one. 
 class NewToolBar: public wxToolBar
 {
 public:
