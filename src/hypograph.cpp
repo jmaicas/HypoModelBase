@@ -85,7 +85,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	if(mainwin->diagnostic) menuPlot->Append(ID_GraphRemove, "Delete Graph");
 	for(i=0; i<mod->graphbase->numsets; i++) {
 		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
-		if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("menu set Index %d Name %s\n", 1000+i, mod->graphbase->setstore[i].name));
+		//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("menu set Index %d Name %s\n", 1000+i, mod->graphbase->setstore[i].name));
 		/*graphset = mod->graphbase->GetSet(i);
 		if(graphset->single) 
 			menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
