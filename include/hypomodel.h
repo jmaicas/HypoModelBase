@@ -13,7 +13,7 @@
 #include "hypopanels.h"
 #include "hypomods.h"
 #include "hypodat.h"
-#include "hypodef.h"
+#include <hypodef.h>
 
 #ifdef HYPOSOUND
 #include "hyposound.h"
