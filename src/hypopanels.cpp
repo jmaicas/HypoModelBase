@@ -312,6 +312,8 @@ void ParamBox::OnFlag(wxCommandEvent& event)
 	
 	if((*modflags)[flag] == 0) (*modflags)[flag] = 1;
 	else (*modflags)[flag] = 0;
+
+	if(autorun) OnRun(event);
 }
 
 
@@ -319,6 +321,8 @@ void ParamBox::InitMenu()
 {
 	menuControls = new wxMenu;
 	menuControls->Append(ID_autorun, "Auto Run", "Toggle Autorun", wxITEM_CHECK);
+	menuControls->Check(ID_autorun, autorun);
+	
 	menuModel = new wxMenu;
 	
 	//menuParamSet = new wxMenu;
