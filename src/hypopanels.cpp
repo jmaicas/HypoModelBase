@@ -148,7 +148,7 @@ void ParamBox::OnClose(wxCloseEvent& event)
 
 void ParamBox::ParamLayout(int columns)
 {
-	int colsize;
+	int colsize = 0;
 
 	if(columns != 2) colsize = paramset->numparams;
 	if(columns == 2) {
@@ -532,8 +532,10 @@ void ParamBox::ParamLoad(wxString tag)
 		readline.Trim();
 		//storetag->SetValue(readline);
 		readline.ToDouble(&datval);
-		id = paramset->ref[datname];
-		if(paramset->ref.check(datname)) paramset->con[id]->SetValue(datval);
+		if(paramset->ref.check(datname)) {
+			id = paramset->ref[datname];
+			paramset->con[id]->SetValue(datval);
+		}
 		//if(diagnostic) ofp.WriteLine(text.Format("Model Param ID %d, Value %.4f\n", id, datval)); 
 		if(paramfile.Eof()) return;
 		readline = paramfile.GetNextLine();	
