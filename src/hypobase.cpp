@@ -29,7 +29,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	diagbox->Write("Diagnostic Box OK\n\n");
 
 	toolset = new ToolSet();
-	toolset->AddBox(diagbox, false, true);
+	toolset->AddBox(diagbox, true);
 }
 
 
