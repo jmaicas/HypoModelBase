@@ -148,7 +148,7 @@ void ParamBox::OnClose(wxCloseEvent& event)
 
 void ParamBox::ParamLayout(int columns)
 {
-	int colsize;
+	int colsize = 0;
 
 	if(columns != 2) colsize = paramset->numparams;
 	if(columns == 2) {
@@ -312,6 +312,8 @@ void ParamBox::OnFlag(wxCommandEvent& event)
 	
 	if((*modflags)[flag] == 0) (*modflags)[flag] = 1;
 	else (*modflags)[flag] = 0;
+
+	if(autorun) OnRun(event);
 }
 
 
@@ -319,6 +321,8 @@ void ParamBox::InitMenu()
 {
 	menuControls = new wxMenu;
 	menuControls->Append(ID_autorun, "Auto Run", "Toggle Autorun", wxITEM_CHECK);
+	menuControls->Check(ID_autorun, autorun);
+	
 	menuModel = new wxMenu;
 	
 	//menuParamSet = new wxMenu;
@@ -532,8 +536,10 @@ void ParamBox::ParamLoad(wxString tag)
 		readline.Trim();
 		//storetag->SetValue(readline);
 		readline.ToDouble(&datval);
-		id = paramset->ref[datname];
-		if(paramset->ref.check(datname)) paramset->con[id]->SetValue(datval);
+		if(paramset->ref.check(datname)) {
+			id = paramset->ref[datname];
+			paramset->con[id]->SetValue(datval);
+		}
 		//if(diagnostic) ofp.WriteLine(text.Format("Model Param ID %d, Value %.4f\n", id, datval)); 
 		if(paramfile.Eof()) return;
 		readline = paramfile.GetNextLine();	
