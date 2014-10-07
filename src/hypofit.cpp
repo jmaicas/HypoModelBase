@@ -4,7 +4,7 @@
 #include "hypopanels.h"
 
 
-
+// SpikeDat:FitScore. It shows how much it fits with diferent values for bin?
 void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat)
 {
 	int i;
@@ -14,23 +14,26 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat)
 	TextFile ofp;
 
 	ofp.New("fitscore-diag.txt");
-
+	
 	fitweights = new ParamStore();
-	(*fitweights)["ISImode"] = 5;
-	(*fitweights)["ISImean"] = 5;
-	(*fitweights)["RMSFirstNBins"] = 100;
-	(*fitweights)["RMSBinRange"] = 100;
-	(*fitweights)["RMSHaz"] = 60;
 
+	// Statistic Parameters for ISI: Inter Spike Intervals. What is happening between consecutive Spikes.
+	(*fitweights)["ISImode"] = 5; // Inter Spike Intervals Mode - most appeared value
+	(*fitweights)["ISImean"] = 5;	// Inter Spike Intervals Mean
+	(*fitweights)["RMSFirstNBins"] = 100;	// Root Mean Square that is similar to Standard Deviation. 
+	(*fitweights)["RMSBinRange"] = 100;	// Chosen width interval -Bin- to make comparisons
+	(*fitweights)["RMSHaz"] = 60;
+	
+	// Statistic Parameters for Burst of Spikes. How many spikes in a row, or absence of them, are we going to have. 
 	(*fitweights)["RMSFirstNBinsBurst"] = 30;
-	(*fitweights)["burstmode"] = 20;
-	(*fitweights)["burstlengthmean"] = 30;
-	(*fitweights)["burstlengthsd"] = 5;
-	(*fitweights)["burstsilencemean"] = 15;
+	(*fitweights)["burstmode"] = 20;	// Mode
+	(*fitweights)["burstlengthmean"] = 30;	// Mean
+	(*fitweights)["burstlengthsd"] = 5;		// Standard Deviation
+	(*fitweights)["burstsilencemean"] = 15;	// For Silence intervals
 	(*fitweights)["burstsilencesd"] = 5;
 	(*fitweights)["burstintrafreq"] = 20;
 
-
+	//	Bin variation. 
 	fitcon = new ParamStore();
 	(*fitcon)["RMSFirstNBins"] = 30;
 	(*fitcon)["RMSBinRangeStart"] = 30;
@@ -39,7 +42,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat)
 	(*fitcon)["RMSFirstNBinsBurst"] = 20;
 	
 	double chisum = 0;
-	int bincount = 300;
+	int bincount = 300;	// number of bins 
 	int sumcount = 0;
 
 	/*

@@ -46,8 +46,8 @@ public:
 	double haz5chisq;
 	double burstheadchisq;
 	double intrafreq;
-	double ISImode;
-	double ISImean;
+	double ISImode;		//InterSpikeIntervals 
+	double ISImean;		//InterSpikeIntervals Mean
 	double RMSFirstNBins;
 	double RMSBinRange;
 	double RMSHaz;
@@ -92,12 +92,12 @@ public:
 	datdouble isis;
 	BurstDat *burstdata;
 	
-	datdouble haz1;
-	datdouble haz5;
+	datdouble haz1; // hazard 
+	datdouble haz5;	// hazard with 5x resolution
 	datdouble hazquad;
-	datdouble hist1;
-	datdouble hist5;
-	datdouble histquad;
+	datdouble hist1;	// histogram
+	datdouble hist5;	
+	datdouble histquad;		//ISI Histogram Quad
 	datdouble histquadx;
 	datdouble histquadsm;
 	datdouble histquadlin;
@@ -197,19 +197,19 @@ public:
 	int burstdisp;
 	double maxtime;
 	
-	datdouble haz1;
-	datdouble hist1;
+	datdouble haz1;		// Burst Hazard 1 ms
+	datdouble hist1;	// Burst Histogram 1 ms
 	datdouble haz5;
 	datdouble hist5;
 	burst bustore[20000];
 	datdouble spikes;
 	datdouble times;
 	datdouble profile;
-	datdouble tailprofile;
-	datdouble bursthaz;
+	datdouble tailprofile;	//Burst Tail Profile
+	datdouble bursthaz;			//Burst Haz?
 	datdouble length;
-	datdouble profilesm;
-	datdouble tailprofilesm;
+	datdouble profilesm;		//Burst Profile Smooth
+	datdouble tailprofilesm;	//Burst Tail Profile Smooth
 
 	//datdouble tailspikesum;
 	datdouble tailmean;
