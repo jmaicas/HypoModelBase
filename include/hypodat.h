@@ -40,15 +40,16 @@ class EvoDat{
 	float *params;
 };
 
-//	3. FitDat	Fitness state and its parameters.
+//	3. FitDat	To Fit Model Data with discrete distribution
+//		Whe distinguish between ISI - Inter Spike Intervals - and Burst of Spikes or silences. 
 class FitDat{
 public:
-	double haz5chisq;
+	double haz5chisq; // hazard 5ms Chi Square. -> sth like [(Bin content - function value )/binError]^2
 	double burstheadchisq;
 	double intrafreq;
 	double ISImode;		//InterSpikeIntervals 
 	double ISImean;		//InterSpikeIntervals Mean
-	double RMSFirstNBins;
+	double RMSFirstNBins;	// RMS -> sd when it fits perfectly. 
 	double RMSBinRange;
 	double RMSHaz;
 	double RMSFirstNBinsBurst;
@@ -92,15 +93,15 @@ public:
 	datdouble isis;
 	BurstDat *burstdata;
 	
-	datdouble haz1; // hazard 
-	datdouble haz5;	// hazard with 5x resolution
-	datdouble hazquad;
+	datdouble haz1; // hazard 1ms
+	datdouble haz5;	// hazard 5ms
+	datdouble hazquad; // 
 	datdouble hist1;	// histogram
 	datdouble hist5;	
-	datdouble histquad;		//ISI Histogram Quad
+	datdouble histquad;		//ISI Histogram Quadratic
 	datdouble histquadx;
-	datdouble histquadsm;
-	datdouble histquadlin;
+	datdouble histquadsm;	// ISI Histogram Quadratic Smooth
+	datdouble histquadlin; // ISI Histogram  Quadratic Linear
 	datint srate;
 	datint srate1;
 	datint srate100;

@@ -626,7 +626,7 @@ void AnaDat::autocalc(SpikeDat *data)
 	fclose(ofp);
 }
 
-
+// Makes Calculation for histograms and hazard
 void SpikeDat::neurocalc(NeuroDat *datneuron) 
 {
 	int i;
@@ -774,7 +774,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 		NumBinnedEvents += histquadsm[i];
 	}
 
-	// normalise
+	// normalise, dividing by a constant. 
 	for(i=0; i<histmax; i++) histquadsm[i] = histquadsm[i] / NumBinnedEvents;
 
 
