@@ -12,6 +12,7 @@
 class ModDat{
 public:
 	int model;
+	//Model *mod;
 };
 
 
