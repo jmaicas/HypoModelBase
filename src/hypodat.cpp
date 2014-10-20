@@ -410,7 +410,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 {
 	int sdex;
 	wxString text;
-	GraphSet *graphset;
+	GraphSet *graphset = NULL;
 
 	// If single graph, create new single graph set, otherwise add to set 'settag'
 	if(set) {
@@ -432,7 +432,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	tagindex[tag] = numgraphs;
 	indextag[numgraphs] = tag;
 
-	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
+	if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
 	
 	numgraphs++;
 	return numgraphs-1; 
