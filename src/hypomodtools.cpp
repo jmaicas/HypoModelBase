@@ -863,7 +863,9 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 		if(spikeint > filterthresh) loaddata->isis[s++] = spikeint;
 	}
 
-	for(i=0; i<count; i++) loaddata->times[i] = rawdata[i];                // February 2014  interval recode
+	// 
+
+	for(i=0; i<count; i++) loaddata->times[i] = rawdata[i];                // February 2014  interval recode, need to fix filtering
 
 	loaddata->spikecount = count;
 	loaddata->start = rawdata[0];

@@ -356,7 +356,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	// Burst Scan (Based on Nancy's algorithm)
   for(i=0; i<numspikes-1; i++) {
 
-    isi = isis[i+1];
+    isi = isis[i];        
 		tpoint = times[i];
 	
 		if(tpoint < startspike) continue;
@@ -451,10 +451,10 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	for(i=1; i<=burstdata->numbursts; i++) {
     intracount = intracount + burstdata->bustore[i].count;
     intratime = intratime + burstdata->bustore[i].time;
-		intravar += pow((burstdata->bustore[i].time - burstdata->meantime) / 1000, 2);
+		//intravar += pow((burstdata->bustore[i].time - burstdata->meantime) / 1000, 2);          // OMG Idiot!
 		if(i < burstdata->numbursts) {
 			silencetime += (times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end]) / 1000;
-			silencevar += pow(silencetime - burstdata->meansilence, 2);
+			//silencevar += pow(silencetime - burstdata->meansilence, 2);                                       // Ditto!
 		}
 		if(scandiag) fprintf(ofp, "Burst %d Silence %.2f\n", i, times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end]);
   }
@@ -468,15 +468,15 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 
 	if(scandiag) fprintf(ofp, "\ntotal time %.2f  burst time %.2f\n\n", intratime, times[spikecount-1]);
 
-	/*
+	
 	for(i=1; i<burstdata->numbursts; i++) {
 		intravar += pow((burstdata->bustore[i].time - burstdata->meantime) / 1000, 2);
 		if(i < burstdata->numbursts) {
-			silencetime = times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end];
+			//silencetime = times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end];
 			silencevar += pow(silencetime - burstdata->meansilence, 2);
 			if(scandiag) fprintf(ofp, "Burst %d  Silence Var %.2f  Square %.2f\n", i, (silencetime - burstdata->meansilence), pow(silencetime - burstdata->meansilence, 2));
 		}
-	}*/
+	}
 
 	intravar = intravar / burstdata->numbursts;
 	silencevar = silencevar / burstdata->numbursts-1;
