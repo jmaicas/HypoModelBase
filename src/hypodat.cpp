@@ -177,6 +177,28 @@ BurstDat::BurstDat()
 
 	profilesm.setsize(500);
 	tailprofilesm.setsize(500);
+
+	maxbursts = 1000;
+	//bustore = new burst[maxbursts];
+	bustore.resize(maxbursts);
+}
+
+
+BurstDat::~BurstDat()
+{
+	//delete[] bustore;
+}
+
+
+int BurstDat::spikeburst(int spike)
+{
+	int bindex = 1;
+
+	for(bindex = 1; bindex <= numbursts; bindex++) {
+		if(spike <= bustore[bindex].end && spike >= bustore[bindex].start) return bindex;
+	}
+
+	return 0;
 }
 
 

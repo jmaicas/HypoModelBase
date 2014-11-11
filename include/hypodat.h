@@ -128,6 +128,7 @@ public:
 	void inputsim(double);
 	void BurstScan(BurstBox *);
 	void IntraBurstAnalysis();
+	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *);
 	void BurstProfile();
 	int GraphSet(GraphBase *, wxString, int, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
@@ -176,13 +177,13 @@ public:
 	SpikeDat *spikedata;
 	wxString snum;
 	int burstdisp;
+	int maxbursts;
 	double maxtime;
 	
 	datdouble haz1;
 	datdouble hist1;
 	datdouble haz5;
 	datdouble hist5;
-	burst bustore[20000];
 	datdouble spikes;
 	datdouble times;
 	datdouble profile;
@@ -191,6 +192,9 @@ public:
 	datdouble length;
 	datdouble profilesm;
 	datdouble tailprofilesm;
+
+	//burst *bustore;
+	std::vector <burst> bustore;
 
 	//datdouble tailspikesum;
 	datdouble tailmean;
@@ -217,6 +221,8 @@ public:
 	int pnzcount;
 	
 	BurstDat();
+	~BurstDat();
+	int spikeburst(int);
 	//void Scan(BurstBox *);
 };
 

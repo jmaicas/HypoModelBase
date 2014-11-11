@@ -221,6 +221,122 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->haz5[i] = 0;
 	}
 
+	for(i=0; i<spikecount-1; i++) {
+		if(burstdata->spikes[i] > 0 && isis[i] < maxspikes) {
+			if(i == burstdata->bustore[bindex].end) {
+				//fprintf(ofp, "New burst %d, time total %.2f\n", bindex, inttime);
+				bindex++;
+				if(scandiag) outfile.WriteLine(text.Format("i %d burstend", i));
+			}
+			else {
+				intcount++;
+				if(burstdata->hist1.max < (int)isis[i]) burstdata->hist1.max = (int)isis[i];
+				if(burstdata->hist1.data.size() < burstdata->hist1.max + 1) burstdata->hist1.data.resize(burstdata->hist1.max + 1);
+				burstdata->hist1[(int)isis[i]]++;	
+				inttime = inttime + isis[i];
+				//if(spikedata->isis[i] > maxint) fprintf(ofp, "burst %d index %d isi %.2f total %.2f\n", 
+				//	bindex-1, i, spikedata->isis[i], inttime);  
+				mean = mean + isis[i];
+				if(scandiag) outfile.WriteLine(text.Format("i %d isi %.4f", i, isis[i]));
+				variance = variance + isis[i] * isis[i];
+			}
+		}
+	}
+
+	//mean = mean / (scount - burstdata->numbursts);
+	//variance = variance / (scount - burstdata->numbursts);
+	mean = mean / intcount;
+	variance = variance / intcount;
+
+	burstdata->intraspikes = intcount + burstdata->numbursts;
+	if(intcount > 0) {
+		burstdata->isisd = sqrt(variance - mean * mean);
+		burstdata->freq = 1000/mean;
+		burstdata->meanisi = mean;
+	}
+	else {
+		burstdata->isisd = 0;
+		burstdata->freq = 0;
+		burstdata->meanisi = 0;
+	}
+
+	//burstdata->intraspikes = intracount;
+	//burstdata->intraspikes = scount;
+	//burstdata->isisd = sqrt(variance - mean * mean);
+	//burstdata->freq = 1000/mean;
+	//burstdata->meanisi = mean;
+	//fprintf(ofp, "\nIntra burst time total = %.2f\n", inttime);
+	burstdata->burstdisp = 1;
+	burstdata->times = times;
+	burstdata->maxtime = times[spikecount-1];
+	//burstbox->BurstDataDisp();
+	//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
+	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
+	//fprintf(ofp, "maxtime %.2f\n", burstdata->maxtime);
+	//for(i=0; i<spikecount; i++) burstdata->times[i] = times[i];
+
+	// Hazard
+
+	double hazcount = 0;
+	//double haznorm = 10/freq;
+	burstdata->haz1.max = burstdata->hist1.max;
+	if(burstdata->haz1.data.size() < burstdata->haz1.max + 1) burstdata->haz1.data.resize(burstdata->haz1.max + 1);
+
+  for(i=0; i<=burstdata->hist1.max; i++) {
+    burstdata->haz1.data[i] = burstdata->hist1.data[i] / (burstdata->intraspikes - hazcount); 	
+    hazcount = hazcount + burstdata->hist1.data[i];
+	}
+
+  for(i=0; i<=burstdata->hist1.max; i++) {
+		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
+		if(i/binsize > burstdata->haz5.max) burstdata->haz5.max = i/binsize;
+		if(burstdata->haz5.data.size() < burstdata->haz5.max + 1)	burstdata->haz5.data.resize(burstdata->haz5.max + 1);
+		burstdata->haz5.data[i/binsize] = burstdata->haz5.data[i/binsize] + burstdata->haz1.data[i]; // * haznorm;	
+	}
+
+	for(i=0; i<=burstdata->hist1.max; i++) {
+    //hist[i] = hist[i] / norm;
+		if(i/binsize > burstdata->hist5.max) burstdata->hist5.max = i/binsize;
+		if(burstdata->hist5.data.size() < burstdata->hist5.max + 1)	burstdata->hist5.data.resize(burstdata->hist5.max + 1);
+		burstdata->hist5.data[i/binsize] = burstdata->hist5.data[i/binsize] + burstdata->hist1.data[i];		
+	}
+
+	if(scandiag) outfile.Close();
+}
+
+
+void SpikeDat::IntraSelectAnalysis()
+{
+	int i;
+	//int numspikes, 
+  int intracount;
+	int bindex;
+	bool scandiag;
+
+	TextFile outfile;
+	wxString filename, filetag, text;
+
+	scandiag = false;
+
+	if(scandiag) outfile.New("intradat.txt");
+
+	 // Intraburst Re-Analysis  
+
+	int hazdex = 0;
+  int binsize = 5;
+	int intcount = 0;
+	double mean = 0;
+	double variance = 0;
+	double inttime = 0;
+	bindex = 1;
+
+	for(i=0; i<10000; i++) {
+		burstdata->hist1[i] = 0;
+		burstdata->hist5[i] = 0;
+		burstdata->haz1[i] = 0;
+		burstdata->haz5[i] = 0;
+	}
+
 	for(i=1; i<spikecount; i++) {
 		if(burstdata->spikes[i] > 0 && isis[i] < maxspikes) {
 			if(i == burstdata->bustore[bindex].start) {
@@ -324,7 +440,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 
 	scandiag = false;
 
-  FILE *ofp;
+  FILE *ofp = NULL;
 
 	// Parameter transfer
 	ParamStore *burstparams = burstbox->GetParams();
@@ -346,12 +462,15 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 
   numspikes = spikecount;
 
+	if(numspikes == 0) scandiag = false;
+
 	if(scandiag) {
 		ofp = fopen("burstscan.txt", "w");
 		fprintf(ofp, "scan data %d spikes\n", numspikes);
 		fprintf(ofp, "maxint %d  minspikes %d   maxspikes %d  startspike %d   endspike %d\n\n",
 			maxint, minspikes, maxspikes, startspike, endspike);
 	}
+	
 	
 	// Burst Scan (Based on Nancy's algorithm)
   for(i=0; i<numspikes-1; i++) {
@@ -371,17 +490,17 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 				burston = 1;
 				bcheck = 0;
     }
-
+		
     if(burston) {
       if(isi > maxint) {
         burston = 0;
         if(bcheck) {
 					if(!maxspikes || bcount <= maxspikes) { 
-						bindex++;
+						bindex++;		
 						burstdata->bustore[bindex].start = bstart;
 						burstdata->bustore[bindex].end = i;
 						burstdata->bustore[bindex].count = bcount;
-						burstdata->bustore[bindex].time = btime;
+						burstdata->bustore[bindex].time = btime;					
 						tstart = times[bstart];
 						tend = times[i];
 						if(scandiag) {
@@ -410,6 +529,8 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
   }
 	burstdata->numbursts = bindex;
   
+	
+	
   // Burst Analysis
 
 	if(burstdata->numbursts == 0) {
@@ -463,7 +584,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	burstdata->meanlength = burstdata->meantime / 1000;
 	burstdata->meansilence = (double)silencetime / burstdata->numbursts-1;
   burstfreq = intracount / (intratime / 1000);
-	burstdata->actQ = (double)intratime / 1000 / times[spikecount-1];  
+	burstdata->actQ = intratime / times[spikecount-1];  
 	if(burstdata->numbursts == 0) burstdata->actQ = 1;
 
 	if(scandiag) fprintf(ofp, "\ntotal time %.2f  burst time %.2f\n\n", intratime, times[spikecount-1]);
@@ -472,7 +593,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	for(i=1; i<burstdata->numbursts; i++) {
 		intravar += pow((burstdata->bustore[i].time - burstdata->meantime) / 1000, 2);
 		if(i < burstdata->numbursts) {
-			//silencetime = times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end];
+			silencetime = (times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end]) / 1000;
 			silencevar += pow(silencetime - burstdata->meansilence, 2);
 			if(scandiag) fprintf(ofp, "Burst %d  Silence Var %.2f  Square %.2f\n", i, (silencetime - burstdata->meansilence), pow(silencetime - burstdata->meansilence, 2));
 		}
@@ -495,8 +616,8 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	}
 
 	IntraBurstAnalysis();
-
-	if(scandiag) fclose(ofp);
+	
+	if(ofp) fclose(ofp);
 }
 
 
