@@ -33,12 +33,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 }
 
 
-MainFrame::~MainFrame()
-{
-	delete toolset;
-}
-
-
 void MainFrame::MainLoad()
 {
 	long numdat;
