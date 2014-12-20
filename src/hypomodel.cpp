@@ -422,7 +422,7 @@ void HypoMain::OnClose(wxCloseEvent& event)
 	OptionStore();
 	//ViewStore();
 	MainStore();
-	//mod->ModStore();
+	mod->ModStore();
 	mod->GHistStore();
 	CleanUp();
 	Destroy();
