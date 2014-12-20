@@ -281,7 +281,7 @@ void HypoMain::RemoveGraph(int gindex)
 void HypoMain::CleanUp() {
 	int i;
 
-	for(i=0; i<numdraw; i++) delete graphwin[i];
+	//for(i=0; i<numdraw; i++) delete graphwin[i];
 
 	delete[] gpos;
 	//delete wxofp;
@@ -422,7 +422,7 @@ void HypoMain::OnClose(wxCloseEvent& event)
 	OptionStore();
 	//ViewStore();
 	MainStore();
-	mod->ModStore();
+	//mod->ModStore();
 	mod->GHistStore();
 	CleanUp();
 	Destroy();
