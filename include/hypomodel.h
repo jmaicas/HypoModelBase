@@ -14,6 +14,8 @@
 #include "hypomods.h"
 #include "hypodat.h"
 #include <hypodef.h>
+#include "wx/generic/printps.h"
+#include "wx/generic/prntdlgg.h"
 
 #ifdef HYPOSOUND
 #include "hyposound.h"
@@ -100,6 +102,8 @@ public:
 	wxString modpath;
 	wxBoxSizer *graphsizer;
 	ParamStore prefstore;
+	wxPrintData *printdata;
+	wxPageSetupDialogData *pageSetupData;
 
 	int moddex;
 	//ModelDat moddata[20];

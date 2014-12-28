@@ -195,6 +195,8 @@ enum {
 	ID_Graph,
 	ID_GraphAdd,
 	ID_GraphRemove,
+	ID_GraphPrint,
+	ID_GraphEPS,
 	ID_Go,
 	ID_Stop, 
 	ID_Wave,

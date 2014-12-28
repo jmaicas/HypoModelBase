@@ -3,6 +3,7 @@
 //#include "hypomodel.h"
 //#include "hypopanels.h"
 #include "wx/graphics.h"
+#include <hypoprint.h>
 #include <hypomodel.h>
 
 
@@ -82,7 +83,11 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
 
 	menuPlot = new wxMenu;
-	if(mainwin->diagnostic) menuPlot->Append(ID_GraphRemove, "Delete Graph");
+	if(mainwin->diagnostic) {
+		menuPlot->Append(ID_GraphRemove, "Delete Graph");
+		menuPlot->Append(ID_GraphPrint, "Print Graph");
+		menuPlot->Append(ID_GraphEPS, "Graph EPS");
+	}
 	for(i=0; i<mod->graphbase->numsets; i++) {
 		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
 		//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("menu set Index %d Name %s\n", 1000+i, mod->graphbase->setstore[i].name));
@@ -176,6 +181,8 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	//Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph), 1000, 1050);
 	Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph));
 	Connect(ID_GraphRemove, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphRemove));
+	Connect(ID_GraphPrint, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphPrint));
+	Connect(ID_GraphEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphEPS));
 }
 
 
@@ -193,6 +200,47 @@ void GraphWindow3::OnGraphRemove(wxCommandEvent& event)
 	//this->Destroy();
 }
 
+
+void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
+{
+	wxString text; 
+	TextFile outfile;
+	GraphDat *graph;
+
+	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
+
+	graph = graphset[0]->plot[0];
+
+	//outfile.New("C:/Users/Duncan/Desktop/test.ps");
+	//outfile.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
+	//outfile.Close();
+
+	wxPrintDialogData printDialogData(*mainwin->printdata);
+	wxPostScriptPrinter printer(&printDialogData);
+  GraphPrint printout(mainwin, graph, "Graph EPS");
+  printer.Print(this, &printout, true);
+}
+
+
+void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
+{
+	wxString text; 
+	GraphDat *graph;
+
+	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Print Graph %d\n", graphindex));
+
+	graph = graphset[0]->plot[0];
+
+	// Pass two printout objects: for preview, and possible printing.
+  wxPrintDialogData printDialogData(*mainwin->printdata);
+  wxPrintPreview *preview = new wxPrintPreview(new GraphPrint(mainwin, graph), new GraphPrint(mainwin, graph), &printDialogData);
+  wxPreviewFrame *frame = new wxPreviewFrame(preview, this, "Graph Preview", wxPoint(100, 100), wxSize(600, 650));
+  frame->Centre(wxBOTH);
+  frame->Initialize();
+  frame->Show();	
+
+  //(*g_printData) = printer.GetPrintDialogData().GetPrintData();
+}
 
 
 void GraphWindow3::OnGraph(wxCommandEvent& event)
@@ -488,7 +536,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	//wxFont smallfont(6, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("MS Sans Serif"));
 
 	xlabels = 10;
-	ylabels = mod->mainwin->ylabels;
+	ylabels = mainwin->ylabels;
 
 	for(gplot=0; gplot<numgraphs; gplot++) {
 		//graph = gpos->plot[gplot];
