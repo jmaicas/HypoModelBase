@@ -36,6 +36,7 @@ public:
 	wxOverlay *overlay;
 	wxFont textfont, smallfont;
 	wxColour colourpen[10];
+	wxString colourstring[10];
 	wxBufferedPaintDC *dc;
 
 	wxMenu *menuPlot;
