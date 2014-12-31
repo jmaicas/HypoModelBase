@@ -271,6 +271,12 @@ void TextFile::DrawText(wxString text, double x, double y)
 }
 
 
+void TextFile::SetColour(wxString col)
+{
+	WriteLine(txt.Format("%s setrgbcolor", col)); 
+}
+
+
 wxString TextFile::ReadLine()
 {
 	if(unread) {

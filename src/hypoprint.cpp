@@ -6,6 +6,279 @@
 #include <hypomodel.h>
 
 
+void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
+{
+	TextFile out;
+	GraphDat *graph;
+
+	int i, j, k;
+	wxString snum, gname, text;
+
+	int ylabels, xlabels;
+	double xval, xscale, xdis, xtime;
+	double xfrom, xto, yfrom, yto;
+	double srangex, srangey;
+	double binsize;
+	int gtype, colour, sample, gpar;
+	int xbase, ybase, xplot, yplot, xstretch;
+	wxSize textsize;
+	int xylab, res;
+	datint *gdatav;
+	datdouble *gdatadv;
+	double timepoint, maxtime;
+	double y, xrange, yrange, xnum;
+	double xpos, ypos;
+	int xoffset, xindex;
+	double oldx, oldy, mpoint, preval;
+
+	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
+
+	// General plot parameters
+	xbase = 100; 
+	ybase = 100;
+	yplot = 200;
+	xplot = 500;
+	xstretch = mainwin->xstretch;
+	xlabels = 10;
+	ylabels = mainwin->ylabels;
+	xoffset = 1;
+
+	// Get Graph parameters
+	graph = graphset[0]->plot[0];
+	gpar = graph->gparam;
+	xscale = graph->xscale;
+	xdis = graph->xdis;
+	yfrom = graph->yfrom;
+	yto = graph->yto;
+	xfrom = graph->xfrom * xscale;
+	xto = graph->xto * xscale;
+	gname = graph->gname;
+	binsize = graph->binsize;
+	gtype = graph->type;
+	colour = graph->colour;
+	sample = graph->samprate;
+	xtime = xto - xfrom;
+
+	// Set graph data pointers
+	if(gpar == -3) gdatav = graph->gdatav;
+	if(gpar == -4) gdatadv = graph->gdatadv;
+	if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
+	else burstdata = NULL;
+
+	// Initialise postscript file and write header
+	out.New("C:/Users/Duncan/Desktop/plot.eps");
+	out.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
+	out.WriteLine("%%BoundingBox: 0 0 1000 500");
+	out.WriteLine("/pu {1 mul} def");                        // pu = plot units, set scaling to points
+	out.WriteLine("/Myriad findfont 10 scalefont setfont");
+	out.WriteLine("1 setlinecap");
+	out.WriteLine("1 setlinejoin");
+	out.WriteLine("");
+
+	// Draw Axes
+
+	out.WriteLine("0.75 setlinewidth");
+	out.WriteLine("newpath");
+	/*
+	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
+	out.WriteLine(text.Format("%d pu %d pu lineto", xbase, ybase + yplot));
+	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
+	out.WriteLine(text.Format("%d pu %d pu lineto", xbase + xplot + xstretch, ybase));*/
+	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
+	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
+	//out.WriteLine("stroke");
+
+	out.WriteLine("");
+	out.WriteLine("");
+
+	// Draw labels
+
+	for(i=0; i<=xlabels; i++) {
+		out.DrawLine(xbase + i*xplot/xlabels, ybase, xbase + i*xplot/xlabels, ybase - 5);
+		xval = ((double)(xto - xfrom) / 10*i + xfrom) / xscale;
+		srangex = (xto - xfrom) / xscale;
+		snum.Printf("%.0f", xval + xdis);	
+		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
+		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
+		if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
+		out.MoveTo(xbase + i*xplot/xlabels, ybase - 17);
+		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
+	}
+
+	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
+	xylab = 8;
+
+	for(i=0; i<=ylabels; i+=1) {
+		out.DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
+		if(yto - yfrom < 0.1) snum.Printf("%.3f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		else if(yto - yfrom < 1) snum.Printf("%.2f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		else if(yto - yfrom < 10) snum.Printf("%.1f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		else snum.Printf("%.0f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		out.MoveTo(xbase - xylab, ybase + i*yplot/ylabels - 2.75);
+		out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));
+	}
+	out.WriteLine("stroke");
+
+	//if(yplot < 150) dc.SetFont(textfont);
+
+	//textsize = dc->GetTextExtent(gname);
+	//dc->DrawText(gname, xplot + 50 - textsize.GetWidth(), 30);
+
+	out.MoveTo(xbase + xplot, ybase + yplot - 30);
+	out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", gname));
+
+
+	//dc->SetPen(colourpen[colour]);   // fix
+	
+	out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour]));   
+
+	// Set drawing scales
+	xto /= binsize;
+	xfrom /= binsize;
+
+	yrange = (double)yplot / (yto - yfrom);
+	xrange = (double)xplot / (xto - xfrom); 
+	xnum = (double)(xto - xfrom) / xplot;
+
+	// Draw graph data
+
+	if(gtype == 7) {                             // scaled width bars
+		out.WriteLine("newpath");
+		for(i=0; i<(xto - xfrom); i++) {
+			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+			xpos = i * xrange + xbase;
+			out.MoveTo(xpos, ybase);
+			out.LineTo(xpos, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase);
+			out.WriteLine("closepath");
+		}
+		out.WriteLine("fill");
+	}
+
+	if(gtype == 3) {                             // spike rate data with optional burst colouring
+		int spikestep = 0;
+		int burstcolour = 0;
+
+		for(i=0; i<(xto - xfrom); i++) {
+			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+
+			if(binsize == 1) res = 0;
+			if(binsize == 0.1) res = 1;
+			if(binsize == 0.01) res = 2;
+			if(binsize == 0.001) res = 3;
+
+			if(burstdata == NULL || burstdata->burstdisp == 0) out.SetColour(colourstring[red]);
+
+			else {                  // burst colouring
+				burstcolour = 0;
+				if(res > 0 && res < 3) burstcolour = 0;
+				if(res == 0) {
+					timepoint = (xfrom + i + 1) * binsize * 1000;
+					while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+						if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
+						spikestep++;
+					}
+				}
+				if(res == 3) {
+					timepoint = (xfrom + i) * binsize * 1000;
+					while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+						burstcolour = burstdata->spikes[spikestep];
+						spikestep++;
+					}
+				}			
+				if(burstcolour == 0)
+					out.SetColour(colourstring[red]);
+				else if(burstcolour % 2 == 0)
+					out.SetColour(colourstring[blue]);
+				else if(burstcolour % 2 == 1)
+					out.SetColour(colourstring[green]);
+			}
+
+			/*
+			xpos = i * xrange + xbase;
+			if(xrange <= 1) out.DrawLine(xpos, ybase + yplot, xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
+			else {
+				for(k=0; k<xrange-1; k++) 
+					dc->DrawLine(xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom))); 
+			}	*/
+
+			xpos = i * xrange + xbase;
+			out.WriteLine("newpath");
+			out.MoveTo(xpos, ybase);
+			out.LineTo(xpos, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase);
+			out.WriteLine("closepath");
+			out.WriteLine("stroke");	
+
+			out.WriteLine("newpath");
+			out.MoveTo(xpos, ybase);
+			out.LineTo(xpos, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase);
+			out.WriteLine("closepath");
+			out.WriteLine("fill");	
+			//out.WriteLine("stroke");	
+		}	
+	}
+
+	if(gtype == 8) {                         // scatter with sampling
+		out.WriteLine("newpath");
+		oldx = xbase + xoffset;
+		xindex = (int)xfrom / sample;
+		if(xfrom > 0) {
+			if((int)xfrom % sample != 0) {
+				double sydiff = (*gdatadv)[xindex] - (*gdatadv)[xindex - 1];
+				double sxdiff = (xfrom - xindex * sample) / sample;
+				preval = sydiff * sxdiff + (*gdatadv)[xindex - 1];
+			}
+			else preval = (*gdatadv)[xindex - 1];
+		}
+		else preval = (*gdatadv)[0];
+		oldy = ybase + yrange * (preval - yfrom);
+
+		//dc.SetPen(colourpen[colour]);
+		out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour])); 
+		for(i=0; i<=(xto - xfrom) / sample; i++) {		
+			xindex = i + ceil(xfrom / sample);
+			xpos = (int)(xindex * sample - xfrom) * xrange;
+			mpoint = (*gdatadv)[xindex];
+			y = mpoint;
+			//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
+			out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
+			//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
+			oldx = xpos + xbase + xoffset;
+			oldy = ybase + yrange * (y - yfrom);
+		}
+
+		//dc.SetPen(colourpen[black]);
+		out.WriteLine(text.Format("%s setrgbcolor", colourstring[black])); 
+		for(i=0; i<=(xto - xfrom) / sample; i++) {		
+			xindex = i + ceil(xfrom / sample);
+			xpos = (xindex * sample - xfrom) * xrange;
+			mpoint = (*gdatadv)[xindex];
+			y = mpoint;
+			//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
+			//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+			//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
+			out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), 2));
+			oldx = xpos + xbase + xoffset;
+			oldy = ybase + yrange * (y - yfrom);
+		}
+		out.WriteLine("stroke");
+	}
+
+
+
+	
+
+	out.Close();
+}
+
+
 
 GraphPrint::GraphPrint(HypoMain *main, GraphDat *graphdat, const wxString &title)
 	: wxPrintout(title)
