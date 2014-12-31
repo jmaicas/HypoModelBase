@@ -1,6 +1,7 @@
 
 
 #include <hypomodel.h>
+#include <wx/print.h>
 //#include <hypodef.h>
 //#include "hypomods.h"
 //#include "hypopanels.h"
@@ -52,6 +53,17 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	
 	//blankevent = new wxCommandEvent();
 	screensize = wxGetDisplaySize();
+	printdata = new wxPrintData;
+	pageSetupData = new wxPageSetupDialogData;
+	printdata->SetPaperId(wxPAPER_A5);
+	printdata->SetOrientation(wxLANDSCAPE);
+
+	// copy over initial paper size from print record
+  *pageSetupData = *printdata;
+
+  // Set some initial page margins in mm.
+  pageSetupData->SetMarginTopLeft(wxPoint(15, 15));
+  pageSetupData->SetMarginBottomRight(wxPoint(15, 15));
 	
 	numgraphs = 8;
 	numdraw = 3;

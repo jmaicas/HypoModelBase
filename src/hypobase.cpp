@@ -245,6 +245,32 @@ void TextFile::WriteLine(wxString text)
 }
 
 
+void TextFile::MoveTo(double x, double y)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu moveto", x, y));
+}
+
+
+void TextFile::LineTo(double x, double y)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu lineto", x, y));
+}
+
+
+void TextFile::DrawLine(double xf, double yf, double xt, double yt)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu moveto", xf, yf));
+	WriteLine(txt.Format("%.2f pu %.2f pu lineto", xt, yt));
+}
+
+
+void TextFile::DrawText(wxString text, double x, double y)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu moveto", x, y));
+	WriteLine(txt.Format("(%s) show", text));
+}
+
+
 wxString TextFile::ReadLine()
 {
 	if(unread) {

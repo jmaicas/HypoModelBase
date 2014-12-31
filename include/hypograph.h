@@ -36,6 +36,7 @@ public:
 	wxOverlay *overlay;
 	wxFont textfont, smallfont;
 	wxColour colourpen[10];
+	wxString colourstring[10];
 	wxBufferedPaintDC *dc;
 
 	wxMenu *menuPlot;
@@ -75,6 +76,8 @@ public:
 	void OnRightClick(wxMouseEvent& event);
 	void OnGraph(wxCommandEvent& event);
 	void OnGraphRemove(wxCommandEvent& event);
+	void OnGraphPrint(wxCommandEvent& event);
+	void OnGraphEPS(wxCommandEvent& event);
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
 	wxRealPoint GraphPos(wxPoint);
 };
