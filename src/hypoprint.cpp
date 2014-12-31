@@ -70,7 +70,8 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	out.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
 	out.WriteLine("%%BoundingBox: 0 0 1000 500");
 	out.WriteLine("/pu {1 mul} def");                        // pu = plot units, set scaling to points
-	out.WriteLine("/Myriad findfont 10 scalefont setfont");
+	out.WriteLine("/Helvetica findfont 10 scalefont setfont");
+	out.WriteLine("0 0 0 setrgbcolor");
 	out.WriteLine("1 setlinecap");
 	out.WriteLine("1 setlinejoin");
 	out.WriteLine("");
@@ -86,7 +87,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	out.WriteLine(text.Format("%d pu %d pu lineto", xbase + xplot + xstretch, ybase));*/
 	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
 	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
-	//out.WriteLine("stroke");
+	out.WriteLine("stroke");
 
 	out.WriteLine("");
 	out.WriteLine("");
@@ -94,6 +95,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	// Draw labels
 
 	for(i=0; i<=xlabels; i++) {
+		out.WriteLine("newpath");
 		out.DrawLine(xbase + i*xplot/xlabels, ybase, xbase + i*xplot/xlabels, ybase - 5);
 		xval = ((double)(xto - xfrom) / 10*i + xfrom) / xscale;
 		srangex = (xto - xfrom) / xscale;
@@ -103,11 +105,13 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
 		out.MoveTo(xbase + i*xplot/xlabels, ybase - 17);
 		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
+		out.WriteLine("stroke");
 	}
 
 	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
 	xylab = 8;
 
+	out.WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
 		out.DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
 		if(yto - yfrom < 0.1) snum.Printf("%.3f", (double)(yto - yfrom) / ylabels*i + yfrom);
@@ -226,7 +230,6 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	}
 
 	if(gtype == 8) {                         // scatter with sampling
-		out.WriteLine("newpath");
 		oldx = xbase + xoffset;
 		xindex = (int)xfrom / sample;
 		if(xfrom > 0) {
@@ -241,6 +244,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		oldy = ybase + yrange * (preval - yfrom);
 
 		//dc.SetPen(colourpen[colour]);
+		out.WriteLine("newpath");
 		out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour])); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
 			xindex = i + ceil(xfrom / sample);
@@ -253,6 +257,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 			oldx = xpos + xbase + xoffset;
 			oldy = ybase + yrange * (y - yfrom);
 		}
+		out.WriteLine("stroke");
 
 		//dc.SetPen(colourpen[black]);
 		out.WriteLine(text.Format("%s setrgbcolor", colourstring[black])); 
@@ -264,11 +269,12 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 			//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
 			//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
 			//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
-			out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), 2));
+			out.WriteLine("newpath");
+			out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 350 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), 2.0));
+			out.WriteLine("stroke");
 			oldx = xpos + xbase + xoffset;
 			oldy = ybase + yrange * (y - yfrom);
 		}
-		out.WriteLine("stroke");
 	}
 
 
