@@ -17,10 +17,12 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	int ylabels, xlabels;
 	double xval, xscale, xdis, xtime;
 	double xfrom, xto, yfrom, yto;
+	double xfromAxis, xtoAxis;
 	double srangex, srangey;
-	double binsize;
+	double binsize, bargap;
 	int gtype, colour, sample, gpar;
-	int xbase, ybase, xplot, yplot, xstretch;
+	int xplot, yplot, xstretch;
+	double xbase, ybase;
 	wxSize textsize;
 	int xylab, res;
 	datint *gdatav;
@@ -76,67 +78,11 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	out.WriteLine("1 setlinejoin");
 	out.WriteLine("");
 
-	// Draw Axes
-
-	out.WriteLine("0.75 setlinewidth");
-	out.WriteLine("newpath");
-	/*
-	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
-	out.WriteLine(text.Format("%d pu %d pu lineto", xbase, ybase + yplot));
-	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
-	out.WriteLine(text.Format("%d pu %d pu lineto", xbase + xplot + xstretch, ybase));*/
-	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
-	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
-	out.WriteLine("stroke");
-
-	out.WriteLine("");
-	out.WriteLine("");
-
-	// Draw labels
-
-	for(i=0; i<=xlabels; i++) {
-		out.WriteLine("newpath");
-		out.DrawLine(xbase + i*xplot/xlabels, ybase, xbase + i*xplot/xlabels, ybase - 5);
-		xval = ((double)(xto - xfrom) / 10*i + xfrom) / xscale;
-		srangex = (xto - xfrom) / xscale;
-		snum.Printf("%.0f", xval + xdis);	
-		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
-		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
-		if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
-		out.MoveTo(xbase + i*xplot/xlabels, ybase - 17);
-		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
-		out.WriteLine("stroke");
-	}
-
-	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
-	xylab = 8;
-
-	out.WriteLine("newpath");
-	for(i=0; i<=ylabels; i+=1) {
-		out.DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
-		if(yto - yfrom < 0.1) snum.Printf("%.3f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		else if(yto - yfrom < 1) snum.Printf("%.2f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		else if(yto - yfrom < 10) snum.Printf("%.1f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		else snum.Printf("%.0f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		out.MoveTo(xbase - xylab, ybase + i*yplot/ylabels - 2.75);
-		out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));
-	}
-	out.WriteLine("stroke");
-
-	//if(yplot < 150) dc.SetFont(textfont);
-
-	//textsize = dc->GetTextExtent(gname);
-	//dc->DrawText(gname, xplot + 50 - textsize.GetWidth(), 30);
-
-	out.MoveTo(xbase + xplot, ybase + yplot - 30);
-	out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", gname));
-
-
-	//dc->SetPen(colourpen[colour]);   // fix
-	
 	out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour]));   
 
 	// Set drawing scales
+	xtoAxis = xto;
+	xfromAxis = xfrom;
 	xto /= binsize;
 	xfrom /= binsize;
 
@@ -147,27 +93,75 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	// Draw graph data
 
 	if(gtype == 7) {                             // scaled width bars
-		out.WriteLine("newpath");
+		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 7, scaled bars\n"));
 		for(i=0; i<(xto - xfrom); i++) {
 			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
 			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+			if(y == 0) continue;
 			xpos = i * xrange + xbase;
+			out.WriteLine("newpath");
 			out.MoveTo(xpos, ybase);
 			out.LineTo(xpos, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange, ybase);
 			out.WriteLine("closepath");
+			out.WriteLine("fill");
+			out.WriteLine("newpath");
+			out.MoveTo(xpos, ybase);
+			out.LineTo(xpos, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange, ybase);
+			out.WriteLine("closepath");
+			out.WriteLine("stroke");
 		}
-		out.WriteLine("fill");
 	}
 
-	if(gtype == 3) {                             // spike rate data with optional burst colouring
-		int spikestep = 0;
-		int burstcolour = 0;
+	if(gtype == 1) {                             // scaled width bars, Histogram    
+		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 0, histogram\n"));
+		bargap = 1.5;
+		if(xrange < 3) bargap = 0;
+		if(xrange < 5) bargap = 1;
+		out.WriteLine("0.5 setlinewidth");
 
 		for(i=0; i<(xto - xfrom); i++) {
 			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
 			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+			xpos = i * xrange + xbase;
+
+			//if(xrange <= 1) DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
+			//else for(k=0; k<xrange-1; k++) DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));	
+
+			out.WriteLine("newpath");
+			out.MoveTo(xpos, ybase);
+			out.LineTo(xpos, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange - bargap, ybase);
+			out.WriteLine("closepath");
+			out.WriteLine("fill");
+			
+			out.WriteLine("newpath");
+			out.MoveTo(xpos, ybase);
+			out.LineTo(xpos, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange - bargap, ybase);
+			out.WriteLine("closepath");
+			out.WriteLine("stroke");
+		}
+	}
+
+	if(gtype == 3) {                             // spike rate data with optional burst colouring
+		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 3, spike rate\n"));
+		int spikestep = 0;
+		int burstcolour = 0;
+		bargap = 1.5;
+		if(xrange < 3) bargap = 0;
+		if(xrange < 5) bargap = 1;
+		out.WriteLine("0.5 setlinewidth");
+
+		for(i=0; i<(xto - xfrom); i++) {
+			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+			if(y == 0) continue;
 
 			if(binsize == 1) res = 0;
 			if(binsize == 0.1) res = 1;
@@ -201,31 +195,22 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 					out.SetColour(colourstring[green]);
 			}
 
-			/*
-			xpos = i * xrange + xbase;
-			if(xrange <= 1) out.DrawLine(xpos, ybase + yplot, xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
-			else {
-				for(k=0; k<xrange-1; k++) 
-					dc->DrawLine(xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom))); 
-			}	*/
-
 			xpos = i * xrange + xbase;
 			out.WriteLine("newpath");
 			out.MoveTo(xpos, ybase);
 			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase);
+			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange - bargap, ybase);
 			out.WriteLine("closepath");
 			out.WriteLine("stroke");	
 
 			out.WriteLine("newpath");
 			out.MoveTo(xpos, ybase);
 			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase);
+			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+			out.LineTo(xpos + xrange - bargap, ybase);
 			out.WriteLine("closepath");
 			out.WriteLine("fill");	
-			//out.WriteLine("stroke");	
 		}	
 	}
 
@@ -243,7 +228,6 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		else preval = (*gdatadv)[0];
 		oldy = ybase + yrange * (preval - yfrom);
 
-		//dc.SetPen(colourpen[colour]);
 		out.WriteLine("newpath");
 		out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour])); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
@@ -259,7 +243,6 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		}
 		out.WriteLine("stroke");
 
-		//dc.SetPen(colourpen[black]);
 		out.WriteLine(text.Format("%s setrgbcolor", colourstring[black])); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
 			xindex = i + ceil(xfrom / sample);
@@ -277,7 +260,95 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		}
 	}
 
+	if(gtype == 4 || gtype == 5) {                         // line graph
+		xoffset = 1;
+		out.WriteLine("newpath");
+		out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour])); 
 
+		oldx = xbase;
+		oldy = ybase;                         // TODO proper start coordinates
+
+		for(i=0; i<=(xto - xfrom); i++) {		
+			xindex = i + xfrom;
+			xpos = (xindex - xfrom) * xrange;
+			y = (*gdatadv)[xindex];
+			out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
+			oldx = xpos + xbase + xoffset;
+			oldy = ybase + yrange * (y - yfrom);
+		}
+		out.WriteLine("stroke");
+	}
+
+
+	// Draw Axes
+
+	xto = xtoAxis;
+	xfrom = xfromAxis;
+
+	ybase = ybase - (0.75 / 2);    // offset to account for line width
+
+	out.WriteLine(text.Format("%s setrgbcolor", colourstring[black])); 
+
+	out.WriteLine("0.75 setlinewidth");
+	out.WriteLine("newpath");
+	/*
+	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
+	out.WriteLine(text.Format("%d pu %d pu lineto", xbase, ybase + yplot));
+	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
+	out.WriteLine(text.Format("%d pu %d pu lineto", xbase + xplot + xstretch, ybase));*/
+	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
+	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
+	//out.WriteLine("stroke");
+
+	out.WriteLine("");
+	out.WriteLine("");
+
+	// Draw ticks
+
+	for(i=0; i<=xlabels; i++) out.DrawLine(xbase + i*xplot/xlabels, ybase, xbase + i*xplot/xlabels, ybase - 5);
+	for(i=0; i<=ylabels; i+=1) out.DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
+
+	out.WriteLine("stroke");
+	
+
+	// Draw labels
+
+	for(i=0; i<=xlabels; i++) {
+		out.WriteLine("newpath");
+		xval = ((double)(xto - xfrom) / 10*i + xfrom) / xscale;
+		srangex = (xto - xfrom) / xscale;
+		snum.Printf("%.0f", xval + xdis);	
+		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
+		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
+		if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
+		out.MoveTo(xbase + i*xplot/xlabels, ybase - 17);
+		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
+		out.WriteLine("stroke");
+	}
+
+	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
+	xylab = 8;
+
+	out.WriteLine("newpath");
+	for(i=0; i<=ylabels; i+=1) {
+		if(yto - yfrom < 0.1) snum.Printf("%.3f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		else if(yto - yfrom < 1) snum.Printf("%.2f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		else if(yto - yfrom < 10) snum.Printf("%.1f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		else snum.Printf("%.0f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		out.MoveTo(xbase - xylab, ybase + i*yplot/ylabels - 2.75);
+		out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));
+	}
+	out.WriteLine("stroke");
+
+	//if(yplot < 150) dc.SetFont(textfont);
+
+	//textsize = dc->GetTextExtent(gname);
+	//dc->DrawText(gname, xplot + 50 - textsize.GetWidth(), 30);
+
+	out.MoveTo(xbase + xplot, ybase + yplot - 30);
+	out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", gname));
+
+	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("EPS Written OK\n"));
 
 	
 
