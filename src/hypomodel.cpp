@@ -293,7 +293,7 @@ void HypoMain::RemoveGraph(int gindex)
 void HypoMain::CleanUp() {
 	int i;
 
-	for(i=0; i<numdraw; i++) delete graphwin[i];
+	//for(i=0; i<numdraw; i++) delete graphwin[i];
 
 	delete[] gpos;
 	//delete wxofp;

@@ -33,6 +33,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 }
 
 
+MainFrame::~MainFrame()
+{
+	delete toolset;
+}
+
+
 void MainFrame::MainLoad()
 {
 	long numdat;
@@ -262,6 +268,12 @@ void TextFile::DrawText(wxString text, double x, double y)
 {
 	WriteLine(txt.Format("%.2f pu %.2f pu moveto", x, y));
 	WriteLine(txt.Format("(%s) show", text));
+}
+
+
+void TextFile::SetColour(wxString col)
+{
+	WriteLine(txt.Format("%s setrgbcolor", col)); 
 }
 
 

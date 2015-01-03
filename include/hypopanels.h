@@ -159,7 +159,7 @@ public:
 	wxString modname, modtag, modnum;
 	int modindex, platecount;
 	wxNotebook *notebook;
-	wxRichTextCtrl *page[10];
+	wxRichTextCtrl **page;
 	wxString plate[10];
 	//wxTextCtrl *page[10];
 

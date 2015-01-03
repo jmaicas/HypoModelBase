@@ -30,7 +30,7 @@
 //#define _CRTDBG_MAP_ALLOC_NEW
 //#include <stdlib.h>
 //#include <crtdbg.h>
-//#include <vld.h>
+#include <vld.h>
 
 
 //using namespace stk;
@@ -296,6 +296,7 @@ public:
 	int ostype;
     
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+	~MainFrame();
 	virtual void MainLoad();
 	virtual void MainStore();
 };
@@ -325,10 +326,13 @@ public:
 	int Open(wxString name, bool read=true);
 	int Exists(wxString name);
 	void WriteLine(wxString);
+
 	void MoveTo(double x, double y);
 	void LineTo(double x, double y);
 	void DrawLine(double xf, double yf, double xt, double yt);
 	void DrawText(wxString, double x, double y);
+	void SetColour(wxString);
+
 	void Flush();
 	wxString ReadLine();
 	void Close();
