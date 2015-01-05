@@ -87,6 +87,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 		menuPlot->Append(ID_GraphRemove, "Delete Graph");
 		menuPlot->Append(ID_GraphPrint, "Print Graph");
 		menuPlot->Append(ID_GraphEPS, "Graph EPS");
+		menuPlot->Append(ID_Scale, "Adjust Axes");
 	}
 	for(i=0; i<mod->graphbase->numsets; i++) {
 		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
@@ -196,6 +197,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	Connect(ID_GraphRemove, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphRemove));
 	Connect(ID_GraphPrint, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphPrint));
 	Connect(ID_GraphEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphEPS));
+	Connect(ID_Scale, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnScale));
 }
 
 
@@ -232,6 +234,18 @@ void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
 	frame->Show();	
 
 	//(*g_printData) = printer.GetPrintDialogData().GetPrintData();
+}
+
+
+void GraphWindow3::OnScale(wxCommandEvent& event)
+{
+	//SetStatus("Sys Panel");
+	
+	//int ID = event->GetId;
+	
+	//if(event.GetId() == ID_IGFPanel) {}
+	ScalePanel *scalepanel = new ScalePanel(this, "Axis Panel");
+	scalepanel->Show(true);
 }
 
 
@@ -545,6 +559,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		yto = graph->yto;
 		xfrom = graph->xfrom * xscale;
 		xto = graph->xto * xscale;
+		if(!graph->xlabels) graph->xlabels = 10; 
+		if(!graph->ylabels) graph->ylabels = mainwin->ylabels; 
+		xlabels = graph->xlabels;
+		ylabels = graph->ylabels;
 		gname = graph->gname;
 		binsize = graph->binsize;
 		gtype = graph->type;
@@ -575,9 +593,22 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		dc.SetFont(textfont);
 
+		//int ticks;
+
+		int xcoord;
+		double xplotstep;
+
+		if(graph->xtickmode && graph->xstep > 0) {
+			xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
+			xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
+		}
+
 		for(i=0; i<=xlabels; i++) {
-			dc.DrawLine(xbase + i*xplot/xlabels, ybase + yplot, xbase + i*xplot/xlabels, ybase + yplot + 5);
-			xval = ((double)(xto - xfrom) / 10*i + xfrom) / xscale;
+			xcoord = i * xplot / xlabels;
+			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
+			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
+			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale;
+			if(graph->xtickmode) xval = graph->xstep * i;
 			srangex = (xto - xfrom) / xscale;
 			snum.Printf("%.0f", xval + xdis);	
 			//if(xto - xfrom < 10) snum.Printf(wxT("%.1f"), xval);	
@@ -588,9 +619,9 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
 			textsize = dc.GetTextExtent(snum);
 			if(ostype == Mac)
-				dc.DrawText(snum, xbase + i*xplot/xlabels - textsize.GetWidth()/2, ybase + yplot + 10);
+				dc.DrawText(snum, xbase + xcoord - textsize.GetWidth()/2, ybase + yplot + 10);
 			else
-				dc.DrawText(snum, xbase + i*xplot/xlabels - textsize.GetWidth()/2, ybase + yplot + 10);
+				dc.DrawText(snum, xbase + xcoord - textsize.GetWidth()/2, ybase + yplot + 10);
 		}
 
 		if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);

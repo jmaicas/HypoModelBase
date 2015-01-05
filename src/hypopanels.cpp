@@ -14,6 +14,186 @@
 #include <wx/scopedarray.h>
 
 
+ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
+//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
+: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 300),
+		wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
+{
+	int i;
+	int labelwidth;
+	graphwin = graphw; 
+	
+	wxRadioButton *xrad[2];
+	wxString text;
+
+	ostype = GetSystem();
+
+	buttonheight = 23;
+	boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+	if(ostype == Mac) {
+		buttonheight = 25;
+		boxfont = wxFont(12, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+		confont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+	}
+	column = 0;
+
+	panel = new ToolPanel(this, wxDefaultPosition, wxDefaultSize);
+  panel->SetFont(boxfont);
+	mainbox = new wxBoxSizer(wxVERTICAL);
+	panel->SetSizer(mainbox);
+
+	paramset = new ParamSet(panel);
+	boxout = new BoxOut(NULL, graphwin->mainwin->diagbox, "Axis Panel"); 
+	parambox = new wxBoxSizer(wxHORIZONTAL);
+
+	labelwidth = 40;
+	graph = graphwin->graphset[0]->plot[0];
+	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth);
+	paramset->AddNum("xstep", "X Step", graph->xstep, 0, labelwidth);
+	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth);
+	paramset->AddNum("ystep", "Y Step", graph->ystep, 0, labelwidth);
+	ParamLayout(2);
+	
+	//paramset->AddCon("pspheight", "PSP mag", 4, 0.1, 2);
+	//paramset->AddCon("psphalflife", "PSP halflife", 7.5, 0.01, 3);
+	
+	//wxBoxSizer *panelhbox = new wxBoxSizer(wxHORIZONTAL);
+	//wxBoxSizer *prefbox = new wxBoxSizer(wxVERTICAL);
+	//wxBoxSizer *pathbox = new wxBoxSizer(wxVERTICAL);
+
+	wxStaticBoxSizer *radbox = new wxStaticBoxSizer(wxHORIZONTAL, panel, "X Mode");
+	xrad[0] = new wxRadioButton(panel, 0, "Count");
+	xrad[1] = new wxRadioButton(panel, 1, "Step");
+	radbox->Add(xrad[0], 1, wxTOP | wxBOTTOM, 3);
+	radbox->Add(xrad[1], 1, wxTOP | wxBOTTOM, 3);
+	xrad[graph->xtickmode]->SetValue(true);
+
+	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
+	wxButton *okButton = new wxButton(panel, wxID_OK, "Ok", wxDefaultPosition, wxSize(70, 30));
+	wxButton *closeButton = new wxButton(panel, wxID_CANCEL, "Close", wxDefaultPosition, wxSize(70, 30));
+	buttonbox->Add(okButton, 1);
+	buttonbox->Add(closeButton, 1, wxLEFT, 5);
+
+	//status = StatusBar();
+	status = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE|wxBORDER_DOUBLE|wxST_NO_AUTORESIZE);
+	status->SetFont(confont);
+	wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
+	statusbox->Add(status, 1, wxEXPAND);
+	
+	mainbox->AddSpacer(5);
+	mainbox->Add(parambox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 10);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(buttonbox, 0, wxALIGN_CENTRE | wxTOP | wxBOTTOM, 10);
+	mainbox->Add(statusbox, 0, wxEXPAND);
+
+	panel->Layout();
+	
+	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(ScalePanel::OnRadio));
+	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnOK));
+	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScalePanel::OnOK));
+	
+	ShowModal();
+	Destroy(); 
+}
+
+
+void ScalePanel::OnRadio(wxCommandEvent& event)
+{
+	//if(event.GetId() == ID_BlankPanel) mainwin->startmod = 0;
+	//if(event.GetId() == ID_IGFPanel) mainwin->startmod = 1;
+	//if(event.GetId() == ID_VasoPanel) mainwin->startmod = 2;
+	//if(event.GetId() == ID_VMHPanel) mainwin->startmod = 3;
+	//if(event.GetId() == ID_CortPanel) mainwin->startmod = 4;
+	//if(event.GetId() == ID_OsmoPanel) mainwin->startmod = 5;
+	//if(event.GetId() == ID_HeatMod) mainwin->startmod = modHeat;
+	//if(event.GetId() == ID_GHMod) mainwin->startmod = modGH;
+	//if(event.GetId() == ID_LysisMod) mainwin->startmod = modLysis;
+	//if(event.GetId() == ID_AgentMod) mainwin->startmod = modAgent;
+	//mainwin->startmod = event.GetId();
+
+	graph = graphwin->graphset[0]->plot[0];
+
+	if(event.GetId() == 0) graph->xtickmode = 0;
+	if(event.GetId() == 1) graph->xtickmode = 1;
+
+}
+
+
+void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
+{
+	long stringnum;
+	wxString snum;
+
+	ParamStore *params = paramset->GetParamsNew(boxout);
+	//mainwin->SetStatus(wxT("Scale OK")); 
+
+	graph = graphwin->graphset[0]->plot[0];
+	graph->xlabels = (*params)["xlabels"];
+	graph->ylabels = (*params)["ylabels"];
+	graph->xstep = (*params)["xstep"];
+	graph->ystep = (*params)["ystep"];
+	graphwin->UpdateScroll(-1);
+	
+	/*
+	numdrawcon->numbox->GetValue().ToLong(&stringnum);
+	mainwin->numdraw = stringnum;
+	
+	viewheightcon->numbox->GetValue().ToLong(&stringnum);
+	mainwin->viewheight = stringnum;
+
+	ylabelcon->numbox->GetValue().ToLong(&stringnum);
+	mainwin->ylabels = stringnum;
+
+	datsamplecon->numbox->GetValue().ToLong(&stringnum);
+	mainwin->datsample = stringnum;
+
+	mainwin->parampath = parampathcon->GetValue();
+	mainwin->datapath = datapathcon->GetValue();
+	mainwin->outpath = outpathcon->GetValue();
+	mainwin->modpath = modpathcon->GetValue();
+	
+	snum.Printf("ok numdraw %d", mainwin->numdraw);
+	mainwin->SetStatus(snum);
+	*/
+	Close();
+}
+
+
+void ScalePanel::ParamLayout(int columns)
+{
+	int i;
+	int colsize = 0;
+
+	if(columns != 2) colsize = paramset->numparams;
+	if(columns == 2) {
+		if(!column) colsize = (paramset->numparams+1) / 2;
+		else colsize = column; 
+	}
+
+	//SetVBox(columns);
+	for(i=0; i<columns; i++) {
+		vbox[i] = new wxBoxSizer(wxVERTICAL);
+		vbox[i]->AddSpacer(5);
+	}
+	
+	for(i=0; i<colsize; i++) {
+		vbox[0]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		vbox[0]->AddSpacer(5);
+	}
+	parambox->Add(vbox[0], 0);
+	
+	if(columns == 2) {
+		for(i=colsize; i<paramset->numparams; i++) {
+			vbox[1]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+			vbox[1]->AddSpacer(5);
+		}
+		parambox->Add(vbox[1], 0);
+	}
+}
+
 
 ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, wxString name, int type)
 : ToolBox(model->mainwin, title, pos, size, type)

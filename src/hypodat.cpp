@@ -269,23 +269,23 @@ void GraphDat::LoadDat(wxString data)
 
 GraphDat::GraphDat(datdouble *newdat, double xf, double xt, double yf, double yt, wxString name, int gtype, double bin, int gcolour, int xs, int xd)
 {
-	scrollpos = 0;
 	xscale = xs;
 	xdis = xd;
-	negscale = 0;
 	spikedata = NULL;
 
 	gdatadv = newdat;
 	gparam = -4;
+	type = gtype;
+	samprate = 1;
+
 	xfrom = xf;
 	xto = xt;
 	yfrom = yf;
 	yto = yt;
 	gname = name;
-	type = gtype;
 	colour = gcolour;
 	binsize = bin;
-	samprate = 1;
+	Init();
 }
 
 
@@ -299,36 +299,51 @@ GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, w
 
 	gdatav = newdat;
 	gparam = -3;
+	type = gtype;
+	
 	xfrom = xf;
 	xto = xt;
 	yfrom = yf;
 	yto = yt;
 	gname = name;
-	type = gtype;
 	colour = gcolour;
 	binsize = bin;
+	Init();
 }
 
 
 GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, wxString name, SpikeDat *newspikedata, double bin, int gcolour)
 {
-	//GraphDat();
-	scrollpos = 0;
 	xscale = 1;
 	xdis = 0;
 	negscale = 0;
 
+	type = 3;
+	spikedata = newspikedata;
 	gdatav = newdat;
 	gparam = -3;
+
 	xfrom = xf;
 	xto = xt;
 	yfrom = yf;
 	yto = yt;
 	gname = name;
-	type = 3;
-	spikedata = newspikedata;
 	colour = gcolour;
 	binsize = bin;
+	Init();
+}
+
+
+void GraphDat::Init()
+{
+	scrollpos = 0;
+	negscale = 0;
+	xlabels = 0;
+	ylabels = 0;
+	xstep = 0;
+	ystep = 0;
+	xtickmode = 0;
+	ytickmode = 0;
 }
 
 

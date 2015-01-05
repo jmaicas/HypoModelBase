@@ -59,6 +59,7 @@ public:
 	
 	ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
+	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
   ToolPanel(MainFrame *main, wxWindow *parent);
 };
 
@@ -281,11 +282,11 @@ public:
 	void AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
 	void AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
 	ParamStore *GetParams();
+	ParamStore *GetParamsNew(BoxOut *boxout);
 	int GetID(wxString);
 	wxString GetText(wxString);
 	double GetValue(wxString);
 	void SetMinMax(wxString tag, double, double);
-
 };
 
 

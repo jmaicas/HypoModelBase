@@ -197,6 +197,7 @@ enum {
 	ID_GraphRemove,
 	ID_GraphPrint,
 	ID_GraphEPS,
+	ID_Scale,
 	ID_Go,
 	ID_Stop, 
 	ID_Wave,
@@ -236,7 +237,8 @@ enum {
 	ID_Diag,
 	ID_s,
 	ID_ms,
-	ID_net
+	ID_net, 
+	ID_norm
 };
 
 
@@ -275,6 +277,16 @@ class DiagBox;
 class ToolSet;
 
 
+class BoxOut
+{
+public:
+	wxStaticText *status;
+	DiagBox *diagbox;
+	wxString name;
+
+	BoxOut() {status = NULL; diagbox = NULL; name = "";}
+	BoxOut(wxStaticText *statustext, DiagBox *diag, wxString boxname) {status = statustext; diagbox =diag; name = boxname;}
+};
 
 
 class MainFrame: public wxFrame

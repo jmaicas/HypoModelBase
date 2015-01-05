@@ -78,8 +78,47 @@ public:
 	void OnGraphRemove(wxCommandEvent& event);
 	void OnGraphPrint(wxCommandEvent& event);
 	void OnGraphEPS(wxCommandEvent& event);
+	void OnScale(wxCommandEvent& event);
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
 	wxRealPoint GraphPos(wxPoint);
+};
+
+
+class ScalePanel : public wxDialog
+{
+public:
+	GraphWindow3 *graphwin;
+	ToolPanel *panel;
+
+	int ostype;
+	int buttonheight;
+	int column;
+	wxFont boxfont, confont;
+
+	wxBoxSizer *mainbox;
+	wxBoxSizer *parambox;
+	wxBoxSizer *vbox[5];
+	ParamSet *paramset;
+	GraphDat *graph;
+	BoxOut *boxout;
+	wxStaticText *status;
+
+	ParamNum *numdrawcon;
+	ParamNum *viewheightcon;
+	ParamNum *ylabelcon;
+	ParamNum *datsamplecon;
+	ParamText *datapathcon;
+	ParamText *outpathcon;
+	ParamText *parampathcon;
+	ParamText *modpathcon;
+	ScalePanel(GraphWindow3 *, const wxString&);
+
+	void OnOK(wxCommandEvent& event);
+	//void OnBrowse(wxCommandEvent& event);
+	//void OnBrowseOut(wxCommandEvent& event);
+	void OnRadio(wxCommandEvent& event);
+	void ParamLayout(int columns=1);
+	//void SetVBox(int);
 };
 
 
@@ -111,6 +150,7 @@ public:
 	int dendmode;
 	int ratedata;
 	int internflag;
+	int normtog;
 	unsigned int boxtype;
 	int synchcon;
 
@@ -145,6 +185,7 @@ public:
 	void OnBinRes1(wxCommandEvent& event);
 	void OnBinRes2(wxCommandEvent& event);
 	void OnNetMode(wxCommandEvent& event);
+	void OnNorm(wxCommandEvent& event);
 	void OnAllBurst(wxCommandEvent& event);
 	void OnProfMode(wxCommandEvent& event);
 	void OnExpMode(wxCommandEvent& event);

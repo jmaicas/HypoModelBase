@@ -398,6 +398,37 @@ ParamStore *ParamSet::GetParams()
 }
 
 
+ParamStore *ParamSet::GetParamsNew(BoxOut *boxout)
+{ 
+	int i;
+	double value;
+	ParamCon *pcon;
+	wxString text;
+
+	if(boxout->diagbox) boxout->diagbox->textbox->AppendText(text.Format("%s get params\n", boxout->name));
+
+	for(i=0; i<numparams; i++) {
+		pcon = con[i];
+		value = pcon->GetValue();
+		if(value < pcon->min) {
+			//value = con->min;
+			value = pcon->oldvalue;
+			pcon->SetValue(value);
+			//SetStatus(text.Format("Parameter \'%s\' out of range", con->label->GetLabel()));
+			//mainwin->diagbox->Write(text.Format("Parameter \'%s\' out of range, min %.2f max %.2f\n", con->label->GetLabel(), con->min, con->max));
+		}
+		if(value > pcon->max) {
+			value = pcon->oldvalue;
+			pcon->SetValue(value);
+			//SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
+		}
+		(*paramstore)[con[i]->name] = value;
+		pcon->oldvalue = value;
+	}
+	return paramstore;
+}
+
+
 TextBox::TextBox(wxWindow *parent, wxWindowID id, wxString value, wxPoint pos, wxSize size, long style)
 	: wxTextCtrl(parent, id, value, pos, size, style)
 {
@@ -411,6 +442,20 @@ ToolPanel::ToolPanel(MainFrame *main, wxWindow *parent)
 	mainwin = main;
 	toolbox = NULL;
 }
+
+
+ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
+	: wxPanel(box, wxID_ANY, pos, size)
+{
+	toolbox = NULL;
+	mainwin = NULL;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
+	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
+}
+
 
 
 ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)

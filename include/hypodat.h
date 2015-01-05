@@ -281,11 +281,16 @@ public:
 	double xdis;
 	int negscale;
 	int burstdisp;
+	int xlabels, ylabels; 
+	double xstep, ystep;
+	int xtickmode, ytickmode;
+
 	BurstDat *burstdata;
 	SpikeDat *spikedata;
 
 	wxString StoreDat();
 	void LoadDat(wxString);
+	void Init();
 };
 
 

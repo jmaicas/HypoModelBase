@@ -58,6 +58,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	dendmode = 0;
 	ratedata = 0;
 	internflag = 0;
+	normtog = 0;
 
 	synchcon = 0;
 
@@ -239,16 +240,20 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 			}
 			if(i == 1) {
+				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
 					ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
-					ScaleButton(ID_binres1, "Bin Res", 60, vbox);
+					ScaleButton(ID_binres1, "Bin Res", 60, binbox);
+					ScaleButton(ID_norm, "Norm", 60, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
 				else {
 					ScaleButton(ID_histhaz1, "Hist / Haz", 54, vbox);
-					ScaleButton(ID_binres1, "Bin Res", 43, vbox);
+					ScaleButton(ID_binres1, "Bin Res", 43, binbox);
+					ScaleButton(ID_norm, "Norm", 35, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 55, vbox);
 				}		
+				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
 
 			/*
@@ -320,6 +325,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(ID_binres1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes1));
 	Connect(ID_binres2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes2));
 	Connect(ID_net, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNetMode));
+	Connect(ID_norm, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNorm));
 
 	Connect(ID_allburst, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnAllBurst));
 	Connect(ID_profile, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnProfMode));
@@ -762,6 +768,13 @@ void ScaleBox::OnNetMode(wxCommandEvent& WXUNUSED(event))
 	GraphSwitch();
 }
 
+
+void ScaleBox::OnNorm(wxCommandEvent& WXUNUSED(event))
+{
+	normtog = 1 - normtog;
+	GraphSwitch();
+}
+
 void ScaleBox::OnAllBurst(wxCommandEvent& WXUNUSED(event))
 {
 	burstmode = 1 - burstmode;
@@ -918,6 +931,7 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["sectype"] = sectype;
 	(*gflags)["dendmode"] = dendmode;
 	(*gflags)["vmhflag"] = vmhflag;
+	(*gflags)["normtog"] = normtog;
 
 	return gflags;
 }
