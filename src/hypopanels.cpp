@@ -39,7 +39,7 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	column = 0;
 
 	panel = new ToolPanel(this, wxDefaultPosition, wxDefaultSize);
-  panel->SetFont(boxfont);
+    panel->SetFont(boxfont);
 	mainbox = new wxBoxSizer(wxVERTICAL);
 	panel->SetSizer(mainbox);
 
@@ -48,19 +48,13 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	parambox = new wxBoxSizer(wxHORIZONTAL);
 
 	labelwidth = 40;
+    if(ostype == Mac) labelwidth = 50;
 	graph = graphwin->graphset[0]->plot[0];
 	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth);
 	paramset->AddNum("xstep", "X Step", graph->xstep, 0, labelwidth);
 	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth);
 	paramset->AddNum("ystep", "Y Step", graph->ystep, 0, labelwidth);
 	ParamLayout(2);
-	
-	//paramset->AddCon("pspheight", "PSP mag", 4, 0.1, 2);
-	//paramset->AddCon("psphalflife", "PSP halflife", 7.5, 0.01, 3);
-	
-	//wxBoxSizer *panelhbox = new wxBoxSizer(wxHORIZONTAL);
-	//wxBoxSizer *prefbox = new wxBoxSizer(wxVERTICAL);
-	//wxBoxSizer *pathbox = new wxBoxSizer(wxVERTICAL);
 
 	wxStaticBoxSizer *radbox = new wxStaticBoxSizer(wxHORIZONTAL, panel, "X Mode");
 	xrad[0] = new wxRadioButton(panel, 0, "Count");
@@ -76,7 +70,8 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	buttonbox->Add(closeButton, 1, wxLEFT, 5);
 
 	//status = StatusBar();
-	status = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE|wxBORDER_DOUBLE|wxST_NO_AUTORESIZE);
+	status = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, 
+                              wxALIGN_CENTRE|wxBORDER_DOUBLE|wxST_NO_AUTORESIZE);
 	status->SetFont(confont);
 	wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
 	statusbox->Add(status, 1, wxEXPAND);

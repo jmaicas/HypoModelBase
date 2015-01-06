@@ -603,7 +603,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
 		}
 
-		for(i=0; i<=xlabels; i++) {
+		for(i=0; i<=xlabels && xlabels > 0; i++) {
 			xcoord = i * xplot / xlabels;
 			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);

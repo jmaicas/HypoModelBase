@@ -13,6 +13,8 @@
 #include "wx/dcbuffer.h"
 #include "wx/msgqueue.h"
 #include <wx/textfile.h>
+#include <hypodef.h>
+
 
 //#include "hypocontrols.h"
 //#include "hypograph.h"
@@ -30,7 +32,9 @@
 //#define _CRTDBG_MAP_ALLOC_NEW
 //#include <stdlib.h>
 //#include <crtdbg.h>
+#ifndef OSXClip
 #include <vld.h>
+#endif
 
 
 //using namespace stk;
