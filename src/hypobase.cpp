@@ -181,6 +181,14 @@ wxString numstring(double number, int places=0)
 }
 
 
+wxString ColourString(wxColour col)
+{
+	wxString colstring;
+
+	return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
+}
+
+
 TextFile::TextFile()
 {
 	file = NULL;

@@ -284,6 +284,9 @@ public:
 	int xlabels, ylabels; 
 	double xstep, ystep;
 	int xtickmode, ytickmode;
+	double plotstroke;
+	wxColour strokecolour;
+	int xplot, yplot;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

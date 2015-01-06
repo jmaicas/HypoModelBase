@@ -200,6 +200,7 @@ enum {
 	ID_GraphAdd,
 	ID_GraphRemove,
 	ID_GraphPrint,
+	ID_Print,
 	ID_GraphEPS,
 	ID_Scale,
 	ID_Go,
@@ -255,7 +256,8 @@ enum {
 	purple = 5,
 	lightred = 6,
 	lightgreen = 7,
-	lightblue = 8
+	lightblue = 8,
+	custom = 9
 };
 
 
@@ -265,6 +267,7 @@ wxString numstring(double, int);
 int numplaces(double);
 wxString numchar(int);
 wxString numtext(double number, int places);
+wxString ColourString(wxColour colour);
 
 int GetSystem();
 
@@ -291,6 +294,7 @@ public:
 	BoxOut() {status = NULL; diagbox = NULL; name = "";}
 	BoxOut(wxStaticText *statustext, DiagBox *diag, wxString boxname) {status = statustext; diagbox =diag; name = boxname;}
 };
+
 
 
 class MainFrame: public wxFrame

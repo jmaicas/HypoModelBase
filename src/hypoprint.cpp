@@ -6,13 +6,14 @@
 #include <hypomodel.h>
 
 
-void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
+void GraphWindow3::PrintEPS()
 {
 	TextFile out;
 	GraphDat *graph;
 
 	int i, j, k;
 	wxString snum, gname, text;
+	wxString filepath, filetag, filename;
 
 	int ylabels, xlabels;
 	double xval, xscale, xdis, xtime;
@@ -20,7 +21,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	double xfromAxis, xtoAxis;
 	double srangex, srangey;
 	double binsize, bargap;
-	int gtype, colour, sample, gpar;
+	int gtype, sample, gpar;
 	int xplot, yplot, xstretch;
 	double xbase, ybase;
 	wxSize textsize;
@@ -32,6 +33,8 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	double xpos, ypos;
 	int xoffset, xindex;
 	double oldx, oldy, mpoint, preval;
+	double axisstroke, plotstroke;
+	wxColour colour;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -44,6 +47,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	xlabels = 10;
 	ylabels = mainwin->ylabels;
 	xoffset = 1;
+	axisstroke = 0.75;
 
 	// Get Graph parameters
 	graph = graphset[0]->plot[0];
@@ -57,9 +61,13 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	gname = graph->gname;
 	binsize = graph->binsize;
 	gtype = graph->type;
-	colour = graph->colour;
+	colour = graph->strokecolour;
 	sample = graph->samprate;
 	xtime = xto - xfrom;
+	plotstroke = graph->plotstroke;
+	xplot = graph->xplot; 
+	yplot = graph->yplot; 
+
 
 	// Set graph data pointers
 	if(gpar == -3) gdatav = graph->gdatav;
@@ -67,8 +75,19 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
 	else burstdata = NULL;
 
+	// Set output file path
+
+	filepath = mainwin->outpath;
+	//filetag = paramstoretag->GetValue();
+	filetag = "test";
+	filename = filepath + "/" + filetag + "-" + gname + ".eps";
+
+
+
+
 	// Initialise postscript file and write header
-	out.New("C:/Users/Duncan/Desktop/plot.eps");
+	//out.New("C:/Users/Duncan/Desktop/plot.eps");
+	out.New(filename);
 	out.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
 	out.WriteLine("%%BoundingBox: 0 0 1000 500");
 	out.WriteLine("/pu {1 mul} def");                        // pu = plot units, set scaling to points
@@ -78,7 +97,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	out.WriteLine("1 setlinejoin");
 	out.WriteLine("");
 
-	out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour]));   
+	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour)));   
 
 	// Set drawing scales
 	xtoAxis = xto;
@@ -91,6 +110,8 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	xnum = (double)(xto - xfrom) / xplot;
 
 	// Draw graph data
+
+	out.WriteLine(text.Format("%.2f setlinewidth", plotstroke));
 
 	if(gtype == 7) {                             // scaled width bars
 		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 7, scaled bars\n"));
@@ -121,7 +142,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		bargap = 1.5;
 		if(xrange < 3) bargap = 0;
 		if(xrange < 5) bargap = 1;
-		out.WriteLine("0.5 setlinewidth");
+		//out.WriteLine("0.5 setlinewidth");
 
 		for(i=0; i<(xto - xfrom); i++) {
 			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
@@ -156,7 +177,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		bargap = 1.5;
 		if(xrange < 3) bargap = 0;
 		if(xrange < 5) bargap = 1;
-		out.WriteLine("0.5 setlinewidth");
+		//out.WriteLine("0.5 setlinewidth");
 
 		for(i=0; i<(xto - xfrom); i++) {
 			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
@@ -168,7 +189,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 			if(binsize == 0.01) res = 2;
 			if(binsize == 0.001) res = 3;
 
-			if(burstdata == NULL || burstdata->burstdisp == 0) out.SetColour(colourstring[red]);
+			if(burstdata == NULL || burstdata->burstdisp == 0) out.SetColour(ColourString(colourpen[red]));
 
 			else {                  // burst colouring
 				burstcolour = 0;
@@ -188,11 +209,11 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 					}
 				}			
 				if(burstcolour == 0)
-					out.SetColour(colourstring[red]);
+					out.SetColour(ColourString(colourpen[red]));
 				else if(burstcolour % 2 == 0)
-					out.SetColour(colourstring[blue]);
+					out.SetColour(ColourString(colourpen[blue]));
 				else if(burstcolour % 2 == 1)
-					out.SetColour(colourstring[green]);
+					out.SetColour(ColourString(colourpen[green]));
 			}
 
 			xpos = i * xrange + xbase;
@@ -229,7 +250,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		oldy = ybase + yrange * (preval - yfrom);
 
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour])); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour))); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
 			xindex = i + ceil(xfrom / sample);
 			xpos = (int)(xindex * sample - xfrom) * xrange;
@@ -243,7 +264,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 		}
 		out.WriteLine("stroke");
 
-		out.WriteLine(text.Format("%s setrgbcolor", colourstring[black])); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
 			xindex = i + ceil(xfrom / sample);
 			xpos = (xindex * sample - xfrom) * xrange;
@@ -263,7 +284,7 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	if(gtype == 4 || gtype == 5) {                         // line graph
 		xoffset = 1;
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", colourstring[colour])); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour))); 
 
 		oldx = xbase;
 		oldy = ybase;                         // TODO proper start coordinates
@@ -285,11 +306,11 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 	xto = xtoAxis;
 	xfrom = xfromAxis;
 
-	ybase = ybase - (0.75 / 2);    // offset to account for line width
+	ybase = ybase - (axisstroke / 2);    // offset to account for line width
 
-	out.WriteLine(text.Format("%s setrgbcolor", colourstring[black])); 
+	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
 
-	out.WriteLine("0.75 setlinewidth");
+	out.WriteLine(text.Format("%.2f setlinewidth", axisstroke));
 	out.WriteLine("newpath");
 	/*
 	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
@@ -305,23 +326,65 @@ void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 
 	// Draw ticks
 
-	for(i=0; i<=xlabels; i++) out.DrawLine(xbase + i*xplot/xlabels, ybase, xbase + i*xplot/xlabels, ybase - 5);
+	double xcoord;
+	double xplotstep;
+
+	if(graph->xtickmode && graph->xstep > 0) {
+		xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
+		xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
+	}
+
+	for(i=0; i<=xlabels && xlabels > 0; i++) {
+		xcoord = i * xplot / xlabels;
+		if(graph->xtickmode) xcoord = xplotstep * i;
+		out.DrawLine(xbase + xcoord, ybase, xbase + i*xplot/xlabels, ybase - 5);
+	}
+
 	for(i=0; i<=ylabels; i+=1) out.DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
 
 	out.WriteLine("stroke");
-	
+
+	/*
+	int xcoord;
+		double xplotstep;
+
+		if(graph->xtickmode && graph->xstep > 0) {
+			xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
+			xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
+		}
+
+		for(i=0; i<=xlabels && xlabels > 0; i++) {
+			xcoord = i * xplot / xlabels;
+			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
+			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
+			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale;
+			if(graph->xtickmode) xval = graph->xstep * i;
+			srangex = (xto - xfrom) / xscale;
+			snum.Printf("%.0f", xval + xdis);	
+			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
+			if(srangex < 1) snum.Printf("%.2f", xval + xdis);
+			if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
+			textsize = dc.GetTextExtent(snum);
+			if(ostype == Mac)
+				dc.DrawText(snum, xbase + xcoord - textsize.GetWidth()/2, ybase + yplot + 10);
+			else
+				dc.DrawText(snum, xbase + xcoord - textsize.GetWidth()/2, ybase + yplot + 10);
+		}
+	*/
 
 	// Draw labels
 
-	for(i=0; i<=xlabels; i++) {
+	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		out.WriteLine("newpath");
-		xval = ((double)(xto - xfrom) / 10*i + xfrom) / xscale;
+		xcoord = i * xplot / xlabels;
+		if(graph->xtickmode) xcoord = xplotstep * i;
+		xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale;
 		srangex = (xto - xfrom) / xscale;
 		snum.Printf("%.0f", xval + xdis);	
 		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
 		if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
-		out.MoveTo(xbase + i*xplot/xlabels, ybase - 17);
+		out.MoveTo(xbase + xcoord, ybase - 17);
 		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
 		out.WriteLine("stroke");
 	}

@@ -16,14 +16,15 @@
 
 ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 //: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 300),
+: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 350),
 		wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
 	int labelwidth;
 	graphwin = graphw; 
+	diagbox = graphwin->mainwin->diagbox;
 	
-	wxRadioButton *xrad[2];
+	wxRadioButton *xrad[2], *yrad[2];
 	wxString text;
 
 	ostype = GetSystem();
@@ -48,30 +49,54 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	parambox = new wxBoxSizer(wxHORIZONTAL);
 
 	labelwidth = 40;
-    if(ostype == Mac) labelwidth = 50;
+  if(ostype == Mac) labelwidth = 50;
 	graph = graphwin->graphset[0]->plot[0];
 	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth);
 	paramset->AddNum("xstep", "X Step", graph->xstep, 0, labelwidth);
+	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth);
 	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth);
 	paramset->AddNum("ystep", "Y Step", graph->ystep, 0, labelwidth);
+	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth);
 	ParamLayout(2);
 
-	wxStaticBoxSizer *radbox = new wxStaticBoxSizer(wxHORIZONTAL, panel, "X Mode");
-	xrad[0] = new wxRadioButton(panel, 0, "Count");
+	wxStaticBoxSizer *xradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
+	xrad[0] = new wxRadioButton(panel, 0, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	xrad[1] = new wxRadioButton(panel, 1, "Step");
-	radbox->Add(xrad[0], 1, wxTOP | wxBOTTOM, 3);
-	radbox->Add(xrad[1], 1, wxTOP | wxBOTTOM, 3);
+	xradbox->Add(xrad[0], 1, wxTOP | wxBOTTOM, 3);
+	xradbox->Add(xrad[1], 1, wxTOP | wxBOTTOM, 3);
 	xrad[graph->xtickmode]->SetValue(true);
 
+	wxStaticBoxSizer *yradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Tick Mode");
+	yrad[0] = new wxRadioButton(panel, 2, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	yrad[1] = new wxRadioButton(panel, 3, "Step");
+	yradbox->Add(yrad[0], 1, wxTOP | wxBOTTOM, 3);
+	yradbox->Add(yrad[1], 1, wxTOP | wxBOTTOM, 3);
+	yrad[graph->ytickmode]->SetValue(true);
+
+	wxBoxSizer *radbox = new wxBoxSizer(wxHORIZONTAL);
+	radbox->Add(xradbox, 1, wxALL, 5);
+	radbox->Add(yradbox, 1, wxALL, 5);
+
+	colourpicker = new wxColourPickerCtrl(panel, 0, graphwin->colourpen[graph->colour], wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
+	paramset->AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
+	wxBoxSizer *colourbox = new wxBoxSizer(wxHORIZONTAL);
+	//wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Stroke");
+	//label->SetFont(confont);
+	//colourbox->Add(label, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	colourbox->Add(paramset->con[paramset->GetID("plotstroke")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	colourbox->Add(colourpicker);
+
 	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
-	wxButton *okButton = new wxButton(panel, wxID_OK, "Ok", wxDefaultPosition, wxSize(70, 30));
-	wxButton *closeButton = new wxButton(panel, wxID_CANCEL, "Close", wxDefaultPosition, wxSize(70, 30));
+	wxButton *okButton = new wxButton(panel, wxID_OK, "Ok", wxDefaultPosition, wxSize(60, 30));
+	wxButton *printButton = new wxButton(panel, ID_Print, "Print", wxDefaultPosition, wxSize(60, 30));
+	wxButton *closeButton = new wxButton(panel, wxID_CANCEL, "Close", wxDefaultPosition, wxSize(60, 30));
 	buttonbox->Add(okButton, 1);
+	buttonbox->Add(printButton, 1, wxLEFT, 5);
 	buttonbox->Add(closeButton, 1, wxLEFT, 5);
 
 	//status = StatusBar();
 	status = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, 
-                              wxALIGN_CENTRE|wxBORDER_DOUBLE|wxST_NO_AUTORESIZE);
+		wxALIGN_CENTRE|wxBORDER_DOUBLE|wxST_NO_AUTORESIZE);
 	status->SetFont(confont);
 	wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
 	statusbox->Add(status, 1, wxEXPAND);
@@ -79,7 +104,9 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	mainbox->AddSpacer(5);
 	mainbox->Add(parambox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
-	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 10);
+	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(colourbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(buttonbox, 0, wxALIGN_CENTRE | wxTOP | wxBOTTOM, 10);
 	mainbox->Add(statusbox, 0, wxEXPAND);
@@ -88,39 +115,36 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(ScalePanel::OnRadio));
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnOK));
+	Connect(ID_Print, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnPrint));
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScalePanel::OnOK));
 	
-	ShowModal();
-	Destroy(); 
+	//ShowModal();
+	//Destroy(); 
+	Show();
 }
 
 
 void ScalePanel::OnRadio(wxCommandEvent& event)
 {
-	//if(event.GetId() == ID_BlankPanel) mainwin->startmod = 0;
-	//if(event.GetId() == ID_IGFPanel) mainwin->startmod = 1;
-	//if(event.GetId() == ID_VasoPanel) mainwin->startmod = 2;
-	//if(event.GetId() == ID_VMHPanel) mainwin->startmod = 3;
-	//if(event.GetId() == ID_CortPanel) mainwin->startmod = 4;
-	//if(event.GetId() == ID_OsmoPanel) mainwin->startmod = 5;
-	//if(event.GetId() == ID_HeatMod) mainwin->startmod = modHeat;
-	//if(event.GetId() == ID_GHMod) mainwin->startmod = modGH;
-	//if(event.GetId() == ID_LysisMod) mainwin->startmod = modLysis;
-	//if(event.GetId() == ID_AgentMod) mainwin->startmod = modAgent;
-	//mainwin->startmod = event.GetId();
-
 	graph = graphwin->graphset[0]->plot[0];
 
 	if(event.GetId() == 0) graph->xtickmode = 0;
 	if(event.GetId() == 1) graph->xtickmode = 1;
+	if(event.GetId() == 2) graph->ytickmode = 0;
+	if(event.GetId() == 3) graph->ytickmode = 1;
+}
 
+
+void ScalePanel::OnPrint(wxCommandEvent& WXUNUSED(event))
+{
+	graphwin->PrintEPS();
 }
 
 
 void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 {
 	long stringnum;
-	wxString snum;
+	wxString snum, text;
 
 	ParamStore *params = paramset->GetParamsNew(boxout);
 	//mainwin->SetStatus(wxT("Scale OK")); 
@@ -130,7 +154,14 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	graph->ylabels = (*params)["ylabels"];
 	graph->xstep = (*params)["xstep"];
 	graph->ystep = (*params)["ystep"];
+	graph->xplot = (*params)["xplot"];
+	graph->yplot = (*params)["yplot"];
+	graph->plotstroke = (*params)["plotstroke"];
+	graph->strokecolour = colourpicker->GetColour();
+	graph->colour = custom;
 	graphwin->UpdateScroll(-1);
+
+	diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
 	
 	/*
 	numdrawcon->numbox->GetValue().ToLong(&stringnum);
@@ -153,7 +184,7 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	snum.Printf("ok numdraw %d", mainwin->numdraw);
 	mainwin->SetStatus(snum);
 	*/
-	Close();
+	//Close();
 }
 
 

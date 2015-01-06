@@ -10,6 +10,7 @@
 #include "hypobase.h"
 #include "hypodat.h"
 #include "hypomods.h"
+#include <wx/clrpicker.h>
 
 
 class GraphWindow3: public wxPanel
@@ -36,7 +37,7 @@ public:
 	wxOverlay *overlay;
 	wxFont textfont, smallfont;
 	wxColour colourpen[10];
-	wxString colourstring[10];
+	//wxString colourstring[10];
 	wxBufferedPaintDC *dc;
 
 	wxMenu *menuPlot;
@@ -80,6 +81,7 @@ public:
 	void OnGraphEPS(wxCommandEvent& event);
 	void OnScale(wxCommandEvent& event);
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
+	void PrintEPS();
 	wxRealPoint GraphPos(wxPoint);
 };
 
@@ -89,6 +91,7 @@ class ScalePanel : public wxDialog
 public:
 	GraphWindow3 *graphwin;
 	ToolPanel *panel;
+	DiagBox *diagbox;
 
 	int ostype;
 	int buttonheight;
@@ -102,6 +105,7 @@ public:
 	GraphDat *graph;
 	BoxOut *boxout;
 	wxStaticText *status;
+	wxColourPickerCtrl *colourpicker;
 
 	ParamNum *numdrawcon;
 	ParamNum *viewheightcon;
@@ -114,7 +118,7 @@ public:
 	ScalePanel(GraphWindow3 *, const wxString&);
 
 	void OnOK(wxCommandEvent& event);
-	//void OnBrowse(wxCommandEvent& event);
+	void OnPrint(wxCommandEvent& event);
 	//void OnBrowseOut(wxCommandEvent& event);
 	void OnRadio(wxCommandEvent& event);
 	void ParamLayout(int columns=1);

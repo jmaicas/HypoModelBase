@@ -158,10 +158,11 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	colourpen[6].Set("#FF8080");       // 6 light red
 	colourpen[7].Set("#80FF80");       // 7 light green
 	colourpen[8].Set("#8080FF");       // 8 light blue
+	colourpen[9].Set("#000000");       // 9 custom
 
+	//double cf = 0.96;
 
-	double cf = 0.96;
-
+	/*
 	colourstring[0] = "0 0 0";
 	colourstring[1] = "0.96 0 0";
 	colourstring[2] = "0 0.96 0";
@@ -170,14 +171,13 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	colourstring[5] = "0.96 0 0.96";
 	colourstring[6] = "1 0.5 0.5";
 	colourstring[7] = "0.5 1 0.5";
-	colourstring[8] = "0.5 0.5 1";
+	colourstring[8] = "0.5 0.5 1";*/
 
 	scrollbar = new wxScrollBar(this, wxID_ANY, wxPoint(30, yplot + 35), wxSize(xplot + 50, 15));
 	scrollbar->SetScrollbar(0, 40, xplot, 40);
 
 	//wxBufferedPaintDC dc(this);
 	//dc = new wxBufferedPaintDC(this);
-
 
 	Connect(wxEVT_PAINT, wxPaintEventHandler(GraphWindow3::OnPaint));
 	//Connect(wxEVT_PAINT, wxPaintEventHandler(GraphWindow3::OnPaintGC));
@@ -215,6 +215,11 @@ void GraphWindow3::OnGraphRemove(wxCommandEvent& event)
 	//this->Destroy();
 }
 
+
+void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
+{
+	PrintEPS();
+}
 
 void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
 {
@@ -560,13 +565,16 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		xfrom = graph->xfrom * xscale;
 		xto = graph->xto * xscale;
 		if(!graph->xlabels) graph->xlabels = 10; 
-		if(!graph->ylabels) graph->ylabels = mainwin->ylabels; 
+		if(!graph->ylabels) graph->ylabels = mainwin->ylabels;
+		if(!graph->xstep) graph->xstep = (xto - xfrom) / xlabels;
+		if(!graph->ystep) graph->ystep = (yto - yfrom) / ylabels;
 		xlabels = graph->xlabels;
 		ylabels = graph->ylabels;
 		gname = graph->gname;
 		binsize = graph->binsize;
 		gtype = graph->type;
 		colour = graph->colour;
+		colourpen[custom] = graph->strokecolour;
 		sample = graph->samprate;
 		if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
 		else burstdata = NULL;
@@ -577,7 +585,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		//if(gtype == 3) ofp = fopen("graph.txt", "w");
 		if(drawdiag && burstdata != NULL && burstdata->burstdisp == 1) ofp = fopen("graph.txt", "w");  
 
-		if(colour < 0 || colour > 8) colour = 3;
+		if(colour < 0 || colour > 9) colour = 3;
 
 		dc.SetPen(colourpen[black]);
 		//gc->SetPen(colourpen[black]);
@@ -611,9 +619,6 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			if(graph->xtickmode) xval = graph->xstep * i;
 			srangex = (xto - xfrom) / xscale;
 			snum.Printf("%.0f", xval + xdis);	
-			//if(xto - xfrom < 10) snum.Printf(wxT("%.1f"), xval);	
-			//if(xto - xfrom < 1) snum.Printf(wxT("%.2f"), xval);
-			//if(xto - xfrom < 0.1) snum.Printf(wxT("%.3f"), xval);	
 			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 			if(srangex < 1) snum.Printf("%.2f", xval + xdis);
 			if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	

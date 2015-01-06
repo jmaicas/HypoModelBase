@@ -344,6 +344,9 @@ void GraphDat::Init()
 	ystep = 0;
 	xtickmode = 0;
 	ytickmode = 0;
+	plotstroke = 0.5;
+	xplot = 500;
+	yplot = 200;
 }
 
 
