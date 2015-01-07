@@ -268,6 +268,7 @@ class ParamSet
 {
 public:
 	int numparams;
+	int currlay;      // Current parameter for panel layout, starts at 0
 	int type;
 	ToolPanel *panel;
 	ParamCon *con[100];

@@ -277,7 +277,7 @@ public:
 	int sdex;
 	double xmax;
 	int scrollpos;
-	double xscale;
+	double xscale, xshift;
 	double xdis;
 	int negscale;
 	int burstdisp;
@@ -287,6 +287,7 @@ public:
 	double plotstroke;
 	wxColour strokecolour;
 	int xplot, yplot;
+	double xunitscale;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

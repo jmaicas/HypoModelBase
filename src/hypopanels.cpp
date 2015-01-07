@@ -15,15 +15,15 @@
 
 
 ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
-//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 350),
-		wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
+	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 370),
+	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
 	int labelwidth;
 	graphwin = graphw; 
 	diagbox = graphwin->mainwin->diagbox;
-	
+
 	wxRadioButton *xrad[2], *yrad[2];
 	wxString text;
 
@@ -40,7 +40,7 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	column = 0;
 
 	panel = new ToolPanel(this, wxDefaultPosition, wxDefaultSize);
-    panel->SetFont(boxfont);
+	panel->SetFont(boxfont);
 	mainbox = new wxBoxSizer(wxVERTICAL);
 	panel->SetSizer(mainbox);
 
@@ -49,15 +49,13 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	parambox = new wxBoxSizer(wxHORIZONTAL);
 
 	labelwidth = 40;
-  if(ostype == Mac) labelwidth = 50;
+	if(ostype == Mac) labelwidth = 50;
 	graph = graphwin->graphset[0]->plot[0];
 	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth);
-	paramset->AddNum("xstep", "X Step", graph->xstep, 0, labelwidth);
-	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth);
+	paramset->AddNum("xstep", "X Step", graph->xstep, 1, labelwidth);
 	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth);
-	paramset->AddNum("ystep", "Y Step", graph->ystep, 0, labelwidth);
-	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth);
-	ParamLayout(2);
+	paramset->AddNum("ystep", "Y Step", graph->ystep, 1, labelwidth);
+	wxBoxSizer *tickparams = ParamLayout(2);
 
 	wxStaticBoxSizer *xradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
 	xrad[0] = new wxRadioButton(panel, 0, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -76,6 +74,12 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	wxBoxSizer *radbox = new wxBoxSizer(wxHORIZONTAL);
 	radbox->Add(xradbox, 1, wxALL, 5);
 	radbox->Add(yradbox, 1, wxALL, 5);
+
+	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth);
+	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth);
+	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth);
+	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth);
+	wxBoxSizer *plotparams = ParamLayout(2);
 
 	colourpicker = new wxColourPickerCtrl(panel, 0, graphwin->colourpen[graph->colour], wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
 	paramset->AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
@@ -100,11 +104,13 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	status->SetFont(confont);
 	wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
 	statusbox->Add(status, 1, wxEXPAND);
-	
+
 	mainbox->AddSpacer(5);
-	mainbox->Add(parambox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->Add(tickparams, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(plotparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(colourbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
@@ -112,12 +118,12 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(statusbox, 0, wxEXPAND);
 
 	panel->Layout();
-	
+
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(ScalePanel::OnRadio));
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnOK));
 	Connect(ID_Print, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnPrint));
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScalePanel::OnOK));
-	
+
 	//ShowModal();
 	//Destroy(); 
 	Show();
@@ -156,17 +162,19 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	graph->ystep = (*params)["ystep"];
 	graph->xplot = (*params)["xplot"];
 	graph->yplot = (*params)["yplot"];
+	graph->xshift = (*params)["xshift"];
+	graph->xunitscale = (*params)["xscale"];
 	graph->plotstroke = (*params)["plotstroke"];
 	graph->strokecolour = colourpicker->GetColour();
 	graph->colour = custom;
 	graphwin->UpdateScroll(-1);
 
 	diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
-	
+
 	/*
 	numdrawcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->numdraw = stringnum;
-	
+
 	viewheightcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->viewheight = stringnum;
 
@@ -180,7 +188,7 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	mainwin->datapath = datapathcon->GetValue();
 	mainwin->outpath = outpathcon->GetValue();
 	mainwin->modpath = modpathcon->GetValue();
-	
+
 	snum.Printf("ok numdraw %d", mainwin->numdraw);
 	mainwin->SetStatus(snum);
 	*/
@@ -188,14 +196,20 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 }
 
 
-void ScalePanel::ParamLayout(int columns)
+wxBoxSizer *ScalePanel::ParamLayout(int columns)
 {
+	// Only works for one or two columns currently, columns parameter bigger than two treated like one
+	//
+	// paramset->currlay allows repeated use after adding more parameters, for separate layout
+
 	int i;
 	int colsize = 0;
 
+	wxBoxSizer *box = new wxBoxSizer(wxHORIZONTAL);
+
 	if(columns != 2) colsize = paramset->numparams;
 	if(columns == 2) {
-		if(!column) colsize = (paramset->numparams+1) / 2;
+		if(!column) colsize = (paramset->numparams+1 - paramset->currlay) / 2;
 		else colsize = column; 
 	}
 
@@ -204,26 +218,29 @@ void ScalePanel::ParamLayout(int columns)
 		vbox[i] = new wxBoxSizer(wxVERTICAL);
 		vbox[i]->AddSpacer(5);
 	}
-	
-	for(i=0; i<colsize; i++) {
+
+	for(i=paramset->currlay; i<paramset->currlay + colsize; i++) {
 		vbox[0]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		vbox[0]->AddSpacer(5);
 	}
-	parambox->Add(vbox[0], 0);
-	
+	box->Add(vbox[0], 0);
+
 	if(columns == 2) {
-		for(i=colsize; i<paramset->numparams; i++) {
+		for(i=paramset->currlay + colsize; i<paramset->numparams; i++) {
 			vbox[1]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 			vbox[1]->AddSpacer(5);
 		}
-		parambox->Add(vbox[1], 0);
+		box->Add(vbox[1], 0);
 	}
+
+	paramset->currlay = paramset->numparams;
+	return box;
 }
 
 
 ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, wxString name, int type)
-: ToolBox(model->mainwin, title, pos, size, type)
-//wxFRAME_FLOAT_ON_PARENT | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER | wxMINIMIZE_BOX)
+	: ToolBox(model->mainwin, title, pos, size, type)
+	//wxFRAME_FLOAT_ON_PARENT | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER | wxMINIMIZE_BOX)
 {	
 	autorun = 0;
 	//blankevent = new wxCommandEvent();
@@ -244,14 +261,14 @@ ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, cons
 ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, bool close)
 : ToolBox(model->mainwin, title, pos, size, close)
 {	
-	autorun = 0;
-	boxname = "";
-	redtag = "";
-	histmode = 0;
-	mod = model;
-	boxtype = 0;
+autorun = 0;
+boxname = "";
+redtag = "";
+histmode = 0;
+mod = model;
+boxtype = 0;
 
-	Initialise();
+Initialise();
 }*/
 
 
@@ -287,7 +304,7 @@ void ParamBox::SetStatus(wxString text)
 
 }
 
-	
+
 void ParamBox::Initialise()
 {	
 	modparams = new ParamStore;
@@ -303,27 +320,27 @@ void ParamBox::Initialise()
 	}
 	else paramstoretag = NULL;
 	//flagset = new FlagSet();
-	
+
 	//panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize); 
 	//panel->SetFont(boxfont);
-	
+
 	//vbox1 = new wxBoxSizer(wxVERTICAL);
 	//vbox2 = new wxBoxSizer(wxVERTICAL);
 	//vbox3 = new wxBoxSizer(wxVERTICAL);
 	//vbox4 = new wxBoxSizer(wxVERTICAL);
 	//vbox5 = new wxBoxSizer(wxVERTICAL);
-	
+
 	if(boxtype == 0) parambox = new wxBoxSizer(wxHORIZONTAL);
 	//mainbox = new wxBoxSizer(wxVERTICAL);
-	
+
 	//vbox1->AddSpacer(5);
 	//vbox2->AddSpacer(5);
 	//vbox3->AddSpacer(5);
 	//vbox4->AddSpacer(5);
 	//vbox5->AddSpacer(5);
-	
+
 	//panel->SetSizer(mainbox);
-	
+
 	Connect(ID_autorun, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnAutorun));
 	Connect(ID_Run, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnRun));
 	Connect(ID_Default, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnDefault));
@@ -363,13 +380,13 @@ void ParamBox::ParamLayout(int columns)
 	}
 
 	SetVBox(columns);
-	
+
 	for(i=0; i<colsize; i++) {
 		vbox[0]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		vbox[0]->AddSpacer(5);
 	}
 	parambox->Add(vbox[0], 0);
-	
+
 	if(columns == 2) {
 		for(i=colsize; i<paramset->numparams; i++) {
 			vbox[1]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
@@ -385,11 +402,11 @@ void ParamBox::HistStore()
 	short i;
 	wxString filename, filepath;
 	wxString outline;
-	
+
 	filepath = mod->GetPath();
 	filename = filepath + "/" + boxname + "-hist.ini";
 	initparams = paramstoretag->GetValue();
-	
+
 	wxTextFile opfile(filename);
 	if(!opfile.Exists()) opfile.Create();
 	opfile.Open();
@@ -406,19 +423,19 @@ void ParamBox::HistStore()
 void ParamBox::HistLoad()
 {
 	//long numdat;
-	
+
 	wxString filename, filepath;
 	wxString readline, numstring;
-	
+
 	filepath = mod->GetPath();
 	filename = filepath + "/" + boxname + "-hist.ini";
-	
+
 	wxTextFile opfile(filename);
-	
+
 	if(!opfile.Exists()) {
 		return;
 	}
-	
+
 	opfile.Open();
 	readline = opfile.GetLine(0);
 	while(!readline.IsEmpty()) {
@@ -428,7 +445,7 @@ void ParamBox::HistLoad()
 		paramstoretag->Insert(initparams, 0);
 		readline = opfile.GetNextLine();
 	}
-	
+
 	opfile.Close();	
 }
 
@@ -439,7 +456,7 @@ wxBoxSizer *ParamBox::StoreBox(wxString label, wxPanel *storepanel)
 	wxBoxSizer *parambuttons = new wxBoxSizer(wxHORIZONTAL);
 
 	if(!storepanel) storepanel = panel;
-	
+
 	//paramstoretag = TextInput(100, 20, label);
 	//if(!paramstoretag) paramstoretag = TextInputCombo(100, 20, "");
 	if(activepanel != panel) paramstoretag->Reparent(activepanel);
@@ -515,7 +532,7 @@ void ParamBox::OnFlag(wxCommandEvent& event)
 {
 	int id = event.GetId();
 	wxString flag = flagrefs->GetRef(id);
-	
+
 	if((*modflags)[flag] == 0) (*modflags)[flag] = 1;
 	else (*modflags)[flag] = 0;
 
@@ -528,11 +545,11 @@ void ParamBox::InitMenu()
 	menuControls = new wxMenu;
 	menuControls->Append(ID_autorun, "Auto Run", "Toggle Autorun", wxITEM_CHECK);
 	menuControls->Check(ID_autorun, autorun);
-	
+
 	menuModel = new wxMenu;
-	
+
 	//menuParamSet = new wxMenu;
-	
+
 	menuBar = new wxMenuBar;
 
 	menuBar->Append(menuControls, "Controls");
@@ -558,13 +575,13 @@ void ParamBox::SetCount(double count)
 /*
 void ParamBox::OnRun(wxCommandEvent& WXUNUSED(event))
 {
-	mainwin->SetStatus("ParamBox Run");
-	countmark = 0;
-	GetParams();
-	mainwin->RunModel(this);
+mainwin->SetStatus("ParamBox Run");
+countmark = 0;
+GetParams();
+mainwin->RunModel(this);
 
-	//for(i=0; i<numparams; i++)
-	//	paramset[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset[i]->name]));
+//for(i=0; i<numparams; i++)
+//	paramset[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset[i]->name]));
 }*/
 
 
@@ -583,14 +600,14 @@ wxBoxSizer *ParamBox::RunBox()
 	wxBoxSizer *runbox = new wxBoxSizer(wxHORIZONTAL);
 	runcount = NumPanel(50, wxALIGN_CENTRE, "---");
 	if(ostype == Mac) AddButton(ID_Run, "RUN", 50, runbox);
-    else AddButton(ID_Run, "RUN", 70, runbox);
+	else AddButton(ID_Run, "RUN", 70, runbox);
 	runbox->AddSpacer(5);
 	runbox->Add(runcount, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	if(defbutt) {
 		runbox->AddSpacer(5);
 		if(ostype == Mac) AddButton(ID_Default, "RESET", 50, runbox);
-        else AddButton(ID_Default, "RESET", 70, runbox);
+		else AddButton(ID_Default, "RESET", 70, runbox);
 	}
 
 	return runbox;
@@ -607,9 +624,9 @@ void ParamBox::OnSpin(wxSpinEvent& event)
 void ParamBox::OnAutorun(wxCommandEvent& WXUNUSED(event))
 {
 	wxString fontname;
-	
+
 	autorun = 1 - autorun;
-  //wxFont fontcheck = runbutton->GetFont();
+	//wxFont fontcheck = runbutton->GetFont();
 	//fontname = fontcheck.GetNativeFontInfoUserDesc();
 	//mainwin->SetStatusText("Font: " + fontname);	
 }
@@ -618,11 +635,11 @@ void ParamBox::OnAutorun(wxCommandEvent& WXUNUSED(event))
 /*
 ParamStore *ParamBox::GetParams(ParamStore *pstore)
 { 
-	double value;
-	if(pstore == NULL) pstore = modparams;
-	for(i=0; i<paramset->numparams; i++)
-		paramset->con[i]->numbox->GetValue().ToDouble(&((*pstore)[paramset->con[i]->name]));
-	return pstore;
+double value;
+if(pstore == NULL) pstore = modparams;
+for(i=0; i<paramset->numparams; i++)
+paramset->con[i]->numbox->GetValue().ToDouble(&((*pstore)[paramset->con[i]->name]));
+return pstore;
 }*/
 
 
@@ -698,7 +715,7 @@ void ParamBox::ParamLoad(wxString tag)
 	filepath = mod->GetPath() + "/Params";
 
 	//if(diagnostic) ofp.New(boxname + "paramload.txt");
-	
+
 	// Param data file
 
 	//if(diagnostic) ofp.WriteLine(text.Format("tag %s", tag));
@@ -706,9 +723,9 @@ void ParamBox::ParamLoad(wxString tag)
 	else filetag = tag;
 
 	filename = filepath + "/" + filetag + "-" + boxname + "param.dat";
-	
+
 	wxTextFile paramfile(filename);
-	
+
 	if(!paramfile.Exists()) {
 		if(paramstoretag) paramstoretag->SetValue("Not found");
 		//if(diagnostic) ofp.Close();
@@ -726,11 +743,11 @@ void ParamBox::ParamLoad(wxString tag)
 		paramstoretag->SetValue("");
 		paramstoretag->SetValue(filetag);
 	}
-	
+
 	paramfile.Open();
 	//numparams = paramfile.GetLineCount();
 	readline = paramfile.GetFirstLine();
-	
+
 	//for(i=0; i<numparams; i++) {
 	while(!readline.IsEmpty()) {
 		//if(readline.IsEmpty()) continue;
@@ -800,7 +817,7 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	//if(!wxDirExists(filepath)) wxMkdir(filepath);
 	//filepath = mod->GetPath();
 	filepath = mod->GetPath() + "/Params";
-	
+
 	// Param data file
 	filetag = paramstoretag->GetValue();
 	filename = filepath + "/" + filetag + "-" + boxname + "param.dat";
@@ -809,7 +826,7 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	short tagpos = paramstoretag->FindString(filetag);
 	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
 	paramstoretag->Insert(filetag, 0);
-	
+
 	wxTextFile paramfile(filename);
 	if(!paramfile.Exists()) paramfile.Create();
 	else if(redtag != filetag) {
@@ -819,15 +836,15 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 		redtag = filetag;
 		return;
 	}
-	
+
 	redtag = "";
 	paramstoretag->SetForegroundColour(blackpen);
 	paramstoretag->SetValue("");
 	paramstoretag->SetValue(filetag);
-	
+
 	paramfile.Open();
 	paramfile.Clear();
-	
+
 	for(i=0; i<paramset->numparams; i++) {
 		paramset->con[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset->con[i]->name]));
 		outline.Printf("%.8f", (*modparams)[paramset->con[i]->name]);  

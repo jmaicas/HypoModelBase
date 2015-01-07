@@ -316,6 +316,7 @@ ParamSet::ParamSet(ToolPanel *pan)
 {
 	panel = pan;
 	numparams = 0;
+	currlay = 0;
 	paramstore = new ParamStore();
 }
 

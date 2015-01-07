@@ -121,7 +121,7 @@ public:
 	void OnPrint(wxCommandEvent& event);
 	//void OnBrowseOut(wxCommandEvent& event);
 	void OnRadio(wxCommandEvent& event);
-	void ParamLayout(int columns=1);
+	wxBoxSizer *ParamLayout(int columns=1);
 	//void SetVBox(int);
 };
 

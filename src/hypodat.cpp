@@ -243,27 +243,69 @@ wxString GraphDat::StoreDat()
 {
 	wxString gtext;
 
-	return gtext.Format("index %d xf %.8f xt %.8f yf %.8f yt %.8f name %s", gindex, xfrom, xto, yfrom, yto, gname);
+	return gtext.Format("index %d xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d name %s", 
+		gindex, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, gname);
 }
 
 
-void GraphDat::LoadDat(wxString data)
+void GraphDat::LoadDat(wxString data)                    // Not in use, see GraphBase::BaseLoad
 {
 	wxString readline, numstring;
+	long numdat;
 
 	readline = data.AfterFirst('f');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&xfrom);
+
 	readline = readline.AfterFirst('t');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&xto);
 
 	readline = readline.AfterFirst('f');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&yfrom);
+
 	readline = readline.AfterFirst('t');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&yto);
+
+	readline = readline.AfterFirst('l');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	xlabels = numdat;
+
+	readline = readline.AfterFirst('s');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToDouble(&xstep);
+
+	readline = readline.AfterFirst('m');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	xtickmode = numdat;
+
+	readline = readline.AfterFirst('l');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	ylabels = numdat;
+
+	readline = readline.AfterFirst('s');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToDouble(&ystep);
+
+	readline = readline.AfterFirst('m');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	ytickmode = numdat;
 }
 
 
@@ -347,6 +389,8 @@ void GraphDat::Init()
 	plotstroke = 0.5;
 	xplot = 500;
 	yplot = 200;
+	xshift = 0;
+	xunitscale = 1;
 }
 
 
@@ -571,6 +615,7 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 		//readline = infile.ReadLine();
 		//textbox->AppendText(readline + "\n");
 
+		/*
 		readline = readline.AfterFirst('f');
 		readline.Trim(false);
 		numstring = readline.BeforeFirst(' ');
@@ -593,9 +638,9 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 		numstring = readline.BeforeFirst(' ');
 		numstring.ToDouble(&numdat);
 		graphstore[i].yto = numdat;
-		//textbox->AppendText(text.Format("yt %.4f\n", numdat));
+		//textbox->AppendText(text.Format("yt %.4f\n", numdat));*/
 
-		//graphstore[i].LoadDat(readline);
+		graphstore[i].LoadDat(readline);
 			
 		if(infile.End()) break;
 		readline = infile.ReadLine();	

@@ -88,6 +88,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 		menuPlot->Append(ID_GraphPrint, "Print Graph");
 		menuPlot->Append(ID_GraphEPS, "Graph EPS");
 		menuPlot->Append(ID_Scale, "Adjust Axes");
+		menuPlot->AppendSeparator();
 	}
 	for(i=0; i<mod->graphbase->numsets; i++) {
 		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
@@ -517,6 +518,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	int gplot;
 	int ylabels, xlabels;
 	double xval, xscale, xdis;
+	double yval, yscale;
 	double timepoint, maxtime;
 	double data;
 	int pdir, sample, xtime;
@@ -558,6 +560,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		if(gpar == -3) gdatav = graph->gdatav;
 		if(gpar == -4) gdatadv = graph->gdatadv;
 		xscale = graph->xscale;
+		yscale = 1;
 		xdis = graph->xdis;
 		//xdis = 200;
 		yfrom = graph->yfrom;
@@ -603,8 +606,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		//int ticks;
 
-		int xcoord;
-		double xplotstep;
+		int xcoord, ycoord;
+		double xplotstep, yplotstep;
 
 		if(graph->xtickmode && graph->xstep > 0) {
 			xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
@@ -615,9 +618,9 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			xcoord = i * xplot / xlabels;
 			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
-			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale;
-			if(graph->xtickmode) xval = graph->xstep * i;
-			srangex = (xto - xfrom) / xscale;
+			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale;
+			if(graph->xtickmode) xval = graph->xstep * i * graph->xunitscale;
+			srangex = (xto - xfrom) / xscale * graph->xunitscale;
 			snum.Printf("%.0f", xval + xdis);	
 			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 			if(srangex < 1) snum.Printf("%.2f", xval + xdis);
@@ -632,22 +635,26 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
 		xylab = 5;
 
-		for(i=0; i<=ylabels; i+=1) {
-			dc.DrawLine(xbase, ybase + yplot - i*yplot/ylabels, xbase - 5, ybase + yplot - i*yplot/ylabels);
-			if(yto - yfrom < 0.1)
-				snum.Printf("%.3f", (double)(yto - yfrom) / ylabels*i + yfrom);
-			else if(yto - yfrom < 1)
-				snum.Printf("%.2f", (double)(yto - yfrom) / ylabels*i + yfrom);
-			else if(yto - yfrom < 10)
-				snum.Printf("%.1f", (double)(yto - yfrom) / ylabels*i + yfrom);
-			else
-				snum.Printf("%.0f", (double)(yto - yfrom) / ylabels*i + yfrom);
+		if(graph->ytickmode && graph->ystep > 0) {
+			ylabels = (int)((yto - yfrom) / (yscale * graph->ystep));
+			yplotstep = (yplot * graph->ystep) / (yto - yfrom);  
+		}
+
+		for(i=0; i<=ylabels && ylabels > 0; i+=1) {
+			ycoord = i * yplot / ylabels;
+			if(graph->ytickmode) ycoord = (int)(yplotstep * i);
+			dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
+			yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale;
+			if(graph->ytickmode) yval = graph->ystep * i;
+			if(yto - yfrom < 0.1) snum.Printf("%.3f", yval);
+			else if(yto - yfrom < 1) snum.Printf("%.2f", yval);
+			else if(yto - yfrom < 10) snum.Printf("%.1f", yval);
+			else snum.Printf("%.0f", yval);
 			textsize = dc.GetTextExtent(snum);
 			if(ostype == Mac)
-				dc.DrawText(snum, xbase - xylab - textsize.GetWidth(), ybase + yplot - i*yplot/ylabels - textsize.GetHeight()/2);
+				dc.DrawText(snum, xbase - xylab - textsize.GetWidth(), ybase + yplot - ycoord - textsize.GetHeight()/2);
 			else
-				dc.DrawText(snum, xbase - xylab - textsize.GetWidth(), ybase + yplot - i*yplot/ylabels - 7);
-
+				dc.DrawText(snum, xbase - xylab - textsize.GetWidth(), ybase + yplot - ycoord - 7);
 		}
 		//gname.Printf("GText width %d height %d", textsize.x, textsize.y);
 

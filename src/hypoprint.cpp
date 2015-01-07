@@ -16,7 +16,8 @@ void GraphWindow3::PrintEPS()
 	wxString filepath, filetag, filename;
 
 	int ylabels, xlabels;
-	double xval, xscale, xdis, xtime;
+	double xval, xscale, xdis, xtime, xshift;
+	double yval, yscale;
 	double xfrom, xto, yfrom, yto;
 	double xfromAxis, xtoAxis;
 	double srangex, srangey;
@@ -53,6 +54,8 @@ void GraphWindow3::PrintEPS()
 	graph = graphset[0]->plot[0];
 	gpar = graph->gparam;
 	xscale = graph->xscale;
+	xshift = graph->xshift;
+	yscale = 1;
 	xdis = graph->xdis;
 	yfrom = graph->yfrom;
 	yto = graph->yto;
@@ -67,7 +70,11 @@ void GraphWindow3::PrintEPS()
 	plotstroke = graph->plotstroke;
 	xplot = graph->xplot; 
 	yplot = graph->yplot; 
+	xlabels = graph->xlabels;
+	ylabels = graph->ylabels;
 
+	//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
+	//xto = xto - xstart;
 
 	// Set graph data pointers
 	if(gpar == -3) gdatav = graph->gdatav;
@@ -312,22 +319,18 @@ void GraphWindow3::PrintEPS()
 
 	out.WriteLine(text.Format("%.2f setlinewidth", axisstroke));
 	out.WriteLine("newpath");
-	/*
-	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
-	out.WriteLine(text.Format("%d pu %d pu lineto", xbase, ybase + yplot));
-	out.WriteLine(text.Format("%d pu %d pu moveto", xbase, ybase));
-	out.WriteLine(text.Format("%d pu %d pu lineto", xbase + xplot + xstretch, ybase));*/
+	
 	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
 	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
-	//out.WriteLine("stroke");
+	
 
 	out.WriteLine("");
 	out.WriteLine("");
 
-	// Draw ticks
+	// Draw Ticks
 
-	double xcoord;
-	double xplotstep;
+	double xcoord, ycoord;
+	double xplotstep, yplotstep;
 
 	if(graph->xtickmode && graph->xstep > 0) {
 		xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
@@ -337,49 +340,33 @@ void GraphWindow3::PrintEPS()
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
-		out.DrawLine(xbase + xcoord, ybase, xbase + i*xplot/xlabels, ybase - 5);
+		out.DrawLine(xbase + xcoord, ybase, xbase + xcoord, ybase - 5);
 	}
 
-	for(i=0; i<=ylabels; i+=1) out.DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
+	if(graph->ytickmode && graph->ystep > 0) {
+		ylabels = (int)((yto - yfrom) / (yscale * graph->ystep));
+		yplotstep = (yplot * graph->ystep) / (yto - yfrom);  
+	}
+
+	for(i=0; i<=ylabels && ylabels > 0; i++) {
+		ycoord = i * yplot / ylabels;
+		if(graph->ytickmode) ycoord = yplotstep * i;
+		out.DrawLine(xbase, ybase + ycoord, xbase - 5, ybase + ycoord);
+	}
+
+	//for(i=0; i<=ylabels; i+=1) out.DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
 
 	out.WriteLine("stroke");
 
-	/*
-	int xcoord;
-		double xplotstep;
-
-		if(graph->xtickmode && graph->xstep > 0) {
-			xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
-			xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
-		}
-
-		for(i=0; i<=xlabels && xlabels > 0; i++) {
-			xcoord = i * xplot / xlabels;
-			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
-			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
-			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale;
-			if(graph->xtickmode) xval = graph->xstep * i;
-			srangex = (xto - xfrom) / xscale;
-			snum.Printf("%.0f", xval + xdis);	
-			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
-			if(srangex < 1) snum.Printf("%.2f", xval + xdis);
-			if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
-			textsize = dc.GetTextExtent(snum);
-			if(ostype == Mac)
-				dc.DrawText(snum, xbase + xcoord - textsize.GetWidth()/2, ybase + yplot + 10);
-			else
-				dc.DrawText(snum, xbase + xcoord - textsize.GetWidth()/2, ybase + yplot + 10);
-		}
-	*/
-
-	// Draw labels
+	// Draw Labels
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		out.WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
-		xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale;
-		srangex = (xto - xfrom) / xscale;
+		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale - xshift;
+		if(graph->xtickmode) xval = (graph->xstep * i) * graph->xunitscale - xshift;
+		srangex = (xto - xfrom) / xscale * graph->xunitscale;
 		snum.Printf("%.0f", xval + xdis);	
 		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
@@ -394,11 +381,15 @@ void GraphWindow3::PrintEPS()
 
 	out.WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
-		if(yto - yfrom < 0.1) snum.Printf("%.3f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		else if(yto - yfrom < 1) snum.Printf("%.2f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		else if(yto - yfrom < 10) snum.Printf("%.1f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		else snum.Printf("%.0f", (double)(yto - yfrom) / ylabels*i + yfrom);
-		out.MoveTo(xbase - xylab, ybase + i*yplot/ylabels - 2.75);
+		ycoord = i * yplot / ylabels;
+		if(graph->ytickmode) ycoord = yplotstep * i;
+		yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale;
+		if(graph->ytickmode) yval = graph->ystep * i;
+		if(yto - yfrom < 0.1) snum.Printf("%.3f", yval);
+		else if(yto - yfrom < 1) snum.Printf("%.2f", yval);
+		else if(yto - yfrom < 10) snum.Printf("%.1f", yval);
+		else snum.Printf("%.0f", yval);
+		out.MoveTo(xbase - xylab, ybase + ycoord - 2.75);
 		out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));
 	}
 	out.WriteLine("stroke");
