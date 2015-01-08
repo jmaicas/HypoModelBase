@@ -90,7 +90,6 @@ void GraphWindow3::PrintEPS()
 	filetag = "test";
 	filename = filepath + "/" + filetag + "-" + gname + ".eps";
 
-
 	// Initialise postscript file and write header
 	//out.New("C:/Users/Duncan/Desktop/plot.eps");
 	out.New(filename);
@@ -288,14 +287,14 @@ void GraphWindow3::PrintEPS()
 	}
 
 	if(gtype == 4 || gtype == 5) {                         // line graph
-		xoffset = 1;
+		xoffset = 0;
 		out.WriteLine("newpath");
 		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour]))); 
 
 		oldx = xbase;
-		oldy = ybase;                         // TODO proper start coordinates
+		oldy = ybase + yrange * ((*gdatadv)[xfrom] - yfrom);            // TODO proper start coordinates
 
-		for(i=0; i<=(xto - xfrom); i++) {		
+		for(i=1; i<=(xto - xfrom); i++) {		
 			xindex = i + xfrom;
 			xpos = (xindex - xfrom) * xrange;
 			y = (*gdatadv)[xindex];
