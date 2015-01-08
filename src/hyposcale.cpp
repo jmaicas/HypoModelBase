@@ -225,8 +225,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
 
 				if(ostype == Mac) {
-					ScaleButton(ID_spikes, "Sp", 43, resbox);   
-					ScaleButton(ID_rateres, "Ra", 43, resbox); 
+					ScaleButton(ID_spikes, "Sp", 40, resbox);   
+					ScaleButton(ID_rateres, "Ra", 40, resbox); 
 					ScaleButton(ID_net, "Net", 43, modebox);
 				}
 				else {
@@ -243,8 +243,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
 					ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
-					ScaleButton(ID_binres1, "Bin Res", 60, binbox);
-					ScaleButton(ID_norm, "Norm", 60, binbox);
+					ScaleButton(ID_binres1, "Bin Res", 45, binbox);
+					ScaleButton(ID_norm, "Norm", 45, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
 				else {
