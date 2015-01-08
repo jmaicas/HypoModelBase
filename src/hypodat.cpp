@@ -243,8 +243,8 @@ wxString GraphDat::StoreDat()
 {
 	wxString gtext;
 
-	return gtext.Format("index %d xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d name %s", 
-		gindex, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, gname);
+	return gtext.Format("index %d xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s name %s", 
+		gindex, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), gname);
 }
 
 
@@ -391,6 +391,7 @@ void GraphDat::Init()
 	yplot = 200;
 	xshift = 0;
 	xunitscale = 1;
+	strokecolour.Set(0, 0, 0);
 }
 
 

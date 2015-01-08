@@ -181,11 +181,12 @@ wxString numstring(double number, int places=0)
 }
 
 
-wxString ColourString(wxColour col)
+wxString ColourString(wxColour col, int type)
 {
 	wxString colstring;
 
-	return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
+	if(type == 0) return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
+	else return colstring.Format("%d %d %d", col.Red(), col.Green(), col.Blue());
 }
 
 

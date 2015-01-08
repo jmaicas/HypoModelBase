@@ -35,7 +35,8 @@ void GraphWindow3::PrintEPS()
 	int xoffset, xindex;
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
-	wxColour colour;
+	//wxColour colour;
+	int colour;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -64,7 +65,7 @@ void GraphWindow3::PrintEPS()
 	gname = graph->gname;
 	binsize = graph->binsize;
 	gtype = graph->type;
-	colour = graph->strokecolour;
+	colour = graph->colour;
 	sample = graph->samprate;
 	xtime = xto - xfrom;
 	plotstroke = graph->plotstroke;
@@ -90,8 +91,6 @@ void GraphWindow3::PrintEPS()
 	filename = filepath + "/" + filetag + "-" + gname + ".eps";
 
 
-
-
 	// Initialise postscript file and write header
 	//out.New("C:/Users/Duncan/Desktop/plot.eps");
 	out.New(filename);
@@ -104,7 +103,7 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine("1 setlinejoin");
 	out.WriteLine("");
 
-	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour)));   
+	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour])));   
 
 	// Set drawing scales
 	xtoAxis = xto;
@@ -257,7 +256,7 @@ void GraphWindow3::PrintEPS()
 		oldy = ybase + yrange * (preval - yfrom);
 
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour))); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour]))); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
 			xindex = i + ceil(xfrom / sample);
 			xpos = (int)(xindex * sample - xfrom) * xrange;
@@ -291,7 +290,7 @@ void GraphWindow3::PrintEPS()
 	if(gtype == 4 || gtype == 5) {                         // line graph
 		xoffset = 1;
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour))); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour]))); 
 
 		oldx = xbase;
 		oldy = ybase;                         // TODO proper start coordinates
