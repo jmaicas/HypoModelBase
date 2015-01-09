@@ -310,18 +310,13 @@ void GraphWindow3::PrintEPS()
 
 	xto = xtoAxis;
 	xfrom = xfromAxis;
-
 	ybase = ybase - (axisstroke / 2);    // offset to account for line width
-
 	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
-
 	out.WriteLine(text.Format("%.2f setlinewidth", axisstroke));
 	out.WriteLine("newpath");
-	
 	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
 	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
 	
-
 	out.WriteLine("");
 	out.WriteLine("");
 
@@ -356,7 +351,7 @@ void GraphWindow3::PrintEPS()
 
 	out.WriteLine("stroke");
 
-	// Draw Labels
+	// Draw Tick Labels
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		out.WriteLine("newpath");
@@ -373,7 +368,6 @@ void GraphWindow3::PrintEPS()
 		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
 		out.WriteLine("stroke");
 	}
-
 	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
 	xylab = 8;
 
@@ -392,6 +386,17 @@ void GraphWindow3::PrintEPS()
 	}
 	out.WriteLine("stroke");
 
+
+	// Draw Axis Labels
+
+	out.MoveTo(xbase + xplot/2, ybase - graph->xlabelgap);
+	out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->xtag));
+
+	out.MoveTo(xbase - graph->ylabelgap, ybase + yplot/2);
+	out.WriteLine(text.Format("90 rotate"));
+	out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->ytag));
+	out.WriteLine(text.Format("270 rotate"));
+
 	//if(yplot < 150) dc.SetFont(textfont);
 
 	//textsize = dc->GetTextExtent(gname);
@@ -401,8 +406,6 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", gname));
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("EPS Written OK\n"));
-
-	
 
 	out.Close();
 }

@@ -6,6 +6,9 @@
 
 
 
+// ParamText and ParamNum have been replaced by a generalised version of ParamCon, but still used in System panel and ScaleBox
+
+
 ParamText::ParamText(wxPanel *panel, wxString pname, wxString labelname, wxString initval, int labelwid, int textwid)
 {
 	wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
@@ -105,7 +108,7 @@ wxString ParamNum::GetValue()
 }
 
 
-ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxString initval, int labelwid, int numwid)
+ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxString initval, int labelwid, int numwid)               // Stripped down string only version for text entry
 {
 	ostype = GetSystem();
 	wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
@@ -124,6 +127,9 @@ ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxStrin
 		textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 		smalltextfont = wxFont(9, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	}
+
+	min = 0;
+	max = 1000;                    // Text version needs min and max set for use with GetParams()
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
@@ -203,8 +209,6 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	SetSizer(sizer);
 	Layout();
 
-	//Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(ParamCon::OnSpinUp));
-	//Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(ParamCon::OnSpinDown));
 	Connect(wxEVT_SPIN_UP, wxSpinEventHandler(ParamCon::OnSpinUp));
 	Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(ParamCon::OnSpinDown));
 	Connect(wxEVT_SPIN, wxSpinEventHandler(ParamCon::OnSpin));
@@ -213,6 +217,7 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 
 double ParamCon::GetValue()
 {
+	if(type == textcon) return 0;
 	numbox->GetValue().ToDouble(&value);
 	return value;
 }
@@ -344,9 +349,15 @@ int ParamSet::GetID(wxString tag)
 }
 
 
-void ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth)
+ParamCon *ParamSet::GetCon(wxString tag)
 {
-	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);
+	return con[(int)ref[tag]];
+}
+
+
+void ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth) 
+{
+	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);           // number + spin
 	ref[name] = numparams;
 	numparams++;
 }
@@ -354,7 +365,7 @@ void ParamSet::AddCon(wxString name, wxString labelname, double initval, double 
 
 void ParamSet::AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth, int numwidth)
 {
-	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);
+	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);              // number
 	ref[name] = numparams;
 	numparams++;
 }
@@ -362,7 +373,7 @@ void ParamSet::AddNum(wxString name, wxString labelname, double initval, int pla
 
 void ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
 {
-	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);
+	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);																// text
 	ref[name] = numparams;
 	numparams++;
 }
@@ -411,8 +422,8 @@ ParamStore *ParamSet::GetParamsNew(BoxOut *boxout)
 	for(i=0; i<numparams; i++) {
 		pcon = con[i];
 		value = pcon->GetValue();
+		//boxout->diagbox->Write(text.Format("param %s type %d value %.4f\n", con[i]->name, con[i]->type, value));
 		if(value < pcon->min) {
-			//value = con->min;
 			value = pcon->oldvalue;
 			pcon->SetValue(value);
 			//SetStatus(text.Format("Parameter \'%s\' out of range", con->label->GetLabel()));
@@ -423,6 +434,7 @@ ParamStore *ParamSet::GetParamsNew(BoxOut *boxout)
 			pcon->SetValue(value);
 			//SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
 		}
+		boxout->diagbox->Write(text.Format("param %s type %d value %.4f\n", con[i]->name, con[i]->type, value));
 		(*paramstore)[con[i]->name] = value;
 		pcon->oldvalue = value;
 	}
@@ -456,7 +468,6 @@ ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
 	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
 	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
 }
-
 
 
 ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)

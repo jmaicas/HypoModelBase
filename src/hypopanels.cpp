@@ -16,7 +16,7 @@
 
 ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 370),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 500),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -77,8 +77,10 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 
 	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth);
 	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth);
+	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth);
 	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth);
 	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth);
+	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
 
 	colourpicker = new wxColourPickerCtrl(panel, 0, graphwin->colourpen[graph->colour], wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
@@ -88,7 +90,15 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	//label->SetFont(confont);
 	//colourbox->Add(label, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	colourbox->Add(paramset->con[paramset->GetID("plotstroke")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	paramset->currlay++;
 	colourbox->Add(colourpicker);
+
+	paramset->AddText("gname", "Name", graph->gname, labelwidth);
+	paramset->AddText("xtag", "X Label", graph->xtag, labelwidth);
+	paramset->AddText("ytag", "Y Label", graph->ytag, labelwidth);
+	wxBoxSizer *labelparams = ParamLayout(1);
+
+	//wxBoxSizer *gapparams = ParamLayout(2);
 
 	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
 	wxButton *okButton = new wxButton(panel, wxID_OK, "Ok", wxDefaultPosition, wxSize(60, 30));
@@ -99,8 +109,7 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	buttonbox->Add(closeButton, 1, wxLEFT, 5);
 
 	//status = StatusBar();
-	status = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, 
-		wxALIGN_CENTRE|wxBORDER_DOUBLE|wxST_NO_AUTORESIZE);
+	status = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE|wxBORDER_DOUBLE|wxST_NO_AUTORESIZE);
 	status->SetFont(confont);
 	wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
 	statusbox->Add(status, 1, wxEXPAND);
@@ -114,7 +123,10 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	mainbox->AddStretchSpacer();
 	mainbox->Add(colourbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
-	mainbox->Add(buttonbox, 0, wxALIGN_CENTRE | wxTOP | wxBOTTOM, 10);
+	mainbox->Add(labelparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	//mainbox->Add(gapparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(buttonbox, 0, wxALIGN_CENTRE | wxTOP | wxBOTTOM, 5);
 	mainbox->Add(statusbox, 0, wxEXPAND);
 
 	panel->Layout();
@@ -123,10 +135,24 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnOK));
 	Connect(ID_Print, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnPrint));
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScalePanel::OnOK));
+	Connect(wxEVT_SIZE, wxSizeEventHandler(ScalePanel::OnSize));
 
 	//ShowModal();
 	//Destroy(); 
 	Show();
+}
+
+
+void ScalePanel::OnSize(wxSizeEvent& event)
+{	
+	wxString snum;
+
+	wxSize newsize = GetSize();
+	wxPoint pos = GetPosition();
+	snum.Printf("Box Size X %d Y %d", newsize.x, newsize.y);
+	graphwin->mainwin->SetStatusText(snum);
+	//boxsize = newsize;
+	wxDialog::OnSize(event);
 }
 
 
@@ -167,6 +193,13 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	graph->plotstroke = (*params)["plotstroke"];
 	graph->strokecolour = colourpicker->GetColour();
 	graph->colour = custom;
+	graph->gname = paramset->GetCon("gname")->GetString();
+	graph->xtag = paramset->GetCon("xtag")->GetString();
+	graph->ytag = paramset->GetCon("ytag")->GetString();
+	graph->xlabelgap = (*params)["xlabelgap"];
+	graph->ylabelgap = (*params)["ylabelgap"];
+
+
 	graphwin->UpdateScroll(-1);
 
 	diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
@@ -207,7 +240,7 @@ wxBoxSizer *ScalePanel::ParamLayout(int columns)
 
 	wxBoxSizer *box = new wxBoxSizer(wxHORIZONTAL);
 
-	if(columns != 2) colsize = paramset->numparams;
+	if(columns != 2) colsize = paramset->numparams - paramset->currlay;
 	if(columns == 2) {
 		if(!column) colsize = (paramset->numparams+1 - paramset->currlay) / 2;
 		else colsize = column; 
