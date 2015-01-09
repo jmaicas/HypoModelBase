@@ -267,7 +267,9 @@ wxString numstring(double, int);
 int numplaces(double);
 wxString numchar(int);
 wxString numtext(double number, int places);
-wxString ColourString(wxColour colour);
+wxString ColourString(wxColour colour, int type=0);
+long ParseLong(wxString *, wxUniChar);
+double ParseDouble(wxString *, wxUniChar);
 
 int GetSystem();
 
@@ -282,6 +284,9 @@ class GraphBase;
 class ModGenBox;
 class DiagBox;
 class ToolSet;
+
+
+//DiagBox *gdiag;
 
 
 class BoxOut

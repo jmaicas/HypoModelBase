@@ -35,7 +35,8 @@ void GraphWindow3::PrintEPS()
 	int xoffset, xindex;
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
-	wxColour colour;
+	//wxColour colour;
+	int colour;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -64,7 +65,7 @@ void GraphWindow3::PrintEPS()
 	gname = graph->gname;
 	binsize = graph->binsize;
 	gtype = graph->type;
-	colour = graph->strokecolour;
+	colour = graph->colour;
 	sample = graph->samprate;
 	xtime = xto - xfrom;
 	plotstroke = graph->plotstroke;
@@ -88,7 +89,6 @@ void GraphWindow3::PrintEPS()
 	//filetag = paramstoretag->GetValue();
 	filetag = "test";
 	filename = filepath + "/" + filetag + "-" + gname + ".eps";
-    
 
 	// Initialise postscript file and write header
 	//out.New("C:/Users/Duncan/Desktop/plot.eps");
@@ -102,7 +102,7 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine("1 setlinejoin");
 	out.WriteLine("");
 
-	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour)));   
+	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour])));   
 
 	// Set drawing scales
 	xtoAxis = xto;
@@ -255,7 +255,7 @@ void GraphWindow3::PrintEPS()
 		oldy = ybase + yrange * (preval - yfrom);
 
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour))); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour]))); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
 			xindex = i + ceil(xfrom / sample);
 			xpos = (int)(xindex * sample - xfrom) * xrange;
@@ -289,7 +289,7 @@ void GraphWindow3::PrintEPS()
 	if(gtype == 4 || gtype == 5) {                         // line graph
 		xoffset = 0;
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colour))); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour]))); 
 
 		oldx = xbase;
 		oldy = ybase + yrange * ((*gdatadv)[xfrom] - yfrom);            // TODO proper start coordinates
@@ -310,18 +310,13 @@ void GraphWindow3::PrintEPS()
 
 	xto = xtoAxis;
 	xfrom = xfromAxis;
-
 	ybase = ybase - (axisstroke / 2);    // offset to account for line width
-
 	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
-
 	out.WriteLine(text.Format("%.2f setlinewidth", axisstroke));
 	out.WriteLine("newpath");
-	
 	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
 	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
 	
-
 	out.WriteLine("");
 	out.WriteLine("");
 
@@ -356,7 +351,7 @@ void GraphWindow3::PrintEPS()
 
 	out.WriteLine("stroke");
 
-	// Draw Labels
+	// Draw Tick Labels
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		out.WriteLine("newpath");
@@ -373,7 +368,6 @@ void GraphWindow3::PrintEPS()
 		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
 		out.WriteLine("stroke");
 	}
-
 	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
 	xylab = 8;
 
@@ -392,6 +386,17 @@ void GraphWindow3::PrintEPS()
 	}
 	out.WriteLine("stroke");
 
+
+	// Draw Axis Labels
+
+	out.MoveTo(xbase + xplot/2, ybase - graph->xlabelgap);
+	out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->xtag));
+
+	out.MoveTo(xbase - graph->ylabelgap, ybase + yplot/2);
+	out.WriteLine(text.Format("90 rotate"));
+	out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->ytag));
+	out.WriteLine(text.Format("270 rotate"));
+
 	//if(yplot < 150) dc.SetFont(textfont);
 
 	//textsize = dc->GetTextExtent(gname);
@@ -401,8 +406,6 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", gname));
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("EPS Written OK\n"));
-
-	
 
 	out.Close();
 }

@@ -28,6 +28,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
 
+	//gdiag = diagbox;
+
 	toolset = new ToolSet();
 	toolset->AddBox(diagbox, true);
 }
@@ -181,11 +183,38 @@ wxString numstring(double number, int places=0)
 }
 
 
-wxString ColourString(wxColour col)
+wxString ColourString(wxColour col, int type)
 {
 	wxString colstring;
 
-	return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
+	if(type == 0) return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
+	else return colstring.Format("%d %d %d", col.Red(), col.Green(), col.Blue());
+}
+
+
+double ParseDouble(wxString *readline, wxUniChar tag)
+{
+	wxString numstring;
+	double numdat;
+
+	*readline = readline->AfterFirst(tag);
+	readline->Trim(false);
+	numstring = readline->BeforeFirst(' ');
+	numstring.ToDouble(&numdat);
+	return numdat;
+}
+
+
+long ParseLong(wxString *readline, wxUniChar tag)
+{
+	wxString numstring;
+	long numdat;
+
+	*readline = readline->AfterFirst(tag);
+	readline->Trim(false);
+	numstring = readline->BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	return numdat;
 }
 
 

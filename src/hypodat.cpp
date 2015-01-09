@@ -242,16 +242,31 @@ GraphDat::GraphDat()
 wxString GraphDat::StoreDat()
 {
 	wxString gtext;
+	wxString stgname, stxtag, stytag;
 
-	return gtext.Format("index %d xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d name %s", 
-		gindex, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, gname);
+	stgname = gname;                       // replace spaces with underscores for textfile storing
+	stgname.Replace(" ", "_");
+	stxtag = xtag;
+	stxtag.Replace(" ", "_");
+	stytag = ytag;
+	stytag.Replace(" ", "_");
+
+	return gtext.Format("v1 index %d xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s", 
+		gindex, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), xshift, xunitscale, plotstroke, stgname, stxtag, stytag);
 }
 
 
 void GraphDat::LoadDat(wxString data)                    // Not in use, see GraphBase::BaseLoad
 {
-	wxString readline, numstring;
+	wxString readline, numstring, stringdat;
 	long numdat;
+	long red, green, blue;
+	int version;
+
+	version = 0;
+	if(data.GetChar(0) == 'v') version = ParseLong(&data, 'v');          // check file version for backwards compatability
+
+	//if(diagbox) diagbox->Write(data + '\n');
 
 	readline = data.AfterFirst('f');
 	readline.Trim(false);
@@ -306,6 +321,51 @@ void GraphDat::LoadDat(wxString data)                    // Not in use, see Grap
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToLong(&numdat);
 	ytickmode = numdat;
+
+	readline = readline.AfterFirst('c');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	colour = numdat;
+
+	readline = readline.AfterFirst('b');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&red);
+	readline = readline.AfterFirst(' ');
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&green);
+	readline = readline.AfterFirst(' ');
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&blue);
+	strokecolour = wxColour(red, green, blue);
+
+	if(version > 0) {
+		xshift = ParseDouble(&readline, 's');
+		xunitscale = ParseDouble(&readline, 'u');
+		plotstroke = ParseDouble(&readline, 's');
+
+		//if(diagbox) diagbox->Write(readline + '\n');
+		
+		readline = readline.AfterFirst('e');
+		readline.Trim(false);
+		gname = readline.BeforeFirst(' ');
+		gname.Replace("_", " ");
+		readline = readline.AfterFirst(' ');
+
+		//if(diagbox) diagbox->Write(readline + '\n');
+
+		readline = readline.AfterFirst('g');
+		readline.Trim(false);
+		xtag = readline.BeforeFirst(' ');
+		xtag.Replace("_", " ");
+		readline = readline.AfterFirst(' ');
+
+		readline = readline.AfterFirst('g');
+		readline.Trim(false);
+		ytag = readline.BeforeFirst(' ');
+		ytag.Replace("_", " ");
+	}	
 }
 
 
@@ -378,6 +438,7 @@ GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, w
 
 void GraphDat::Init()
 {
+	diagbox = NULL;
 	scrollpos = 0;
 	negscale = 0;
 	xlabels = 0;
@@ -391,6 +452,13 @@ void GraphDat::Init()
 	yplot = 200;
 	xshift = 0;
 	xunitscale = 1;
+	strokecolour.Set(0, 0, 0);
+	xtag = "X";
+	ytag = "Y";
+	xlabelgap = 40;
+	ylabelgap = 30;
+	labelfontsize = 10;
+	tickfontsize = 10;
 }
 
 
@@ -640,6 +708,7 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 		graphstore[i].yto = numdat;
 		//textbox->AppendText(text.Format("yt %.4f\n", numdat));*/
 
+		graphstore[i].diagbox = mainwin->diagbox;
 		graphstore[i].LoadDat(readline);
 			
 		if(infile.End()) break;

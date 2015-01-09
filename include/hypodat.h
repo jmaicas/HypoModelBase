@@ -257,6 +257,8 @@ public:
 	GraphDat(datdouble *, double, double, double, double, wxString, int type, double bin = 1, int colour = red, int xscale = 1, int xdis = 0);
 	GraphDat(datint *, double, double, double, double, wxString, int type, double bin = 1, int colour = red);
 	GraphDat(datint *, double, double, double, double, wxString, SpikeDat *, double bin = 1, int colour = red);
+
+	DiagBox *diagbox;
 	int gparam;
 	int *gdata;
 	short gindex;
@@ -269,6 +271,7 @@ public:
 	double xto;
 	double binsize;
 	wxString gname;
+	wxString xtag, ytag;
 	int samprate;    // 0 for no limit
 	int type;        // 0 for normal, 1 for histogram
 	int pos;         // graph position
@@ -287,6 +290,8 @@ public:
 	double plotstroke;
 	wxColour strokecolour;
 	int xplot, yplot;
+	double xlabelgap, ylabelgap;
+	double labelfontsize, tickfontsize;
 	double xunitscale;
 
 	BurstDat *burstdata;

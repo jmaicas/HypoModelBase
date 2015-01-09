@@ -208,7 +208,7 @@ public:
 	int ostype;
 	int type;
 	int numwidth, labelwidth;
-    int pad;
+  int pad;
 	wxFont textfont, smalltextfont;
 	wxTextCtrl *numbox;
 	wxSpinButton *spin;
@@ -282,6 +282,7 @@ public:
 	void AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=65, int numwidth=40);
 	void AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
 	void AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
+	ParamCon *GetCon(wxString);
 	ParamStore *GetParams();
 	ParamStore *GetParamsNew(BoxOut *boxout);
 	int GetID(wxString);
