@@ -138,6 +138,7 @@ enum {
 	ID_netcheck,
 	ID_cellcheck,
 	ID_unicheck,
+	ID_seedcheck,
 	ID_netstore,
 	ID_netload,
 	ID_output,

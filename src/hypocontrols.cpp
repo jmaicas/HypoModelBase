@@ -188,23 +188,30 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	snum.Printf("%.1f", initval);
 	snum = numstring(initval, places);
-	label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+
+	if(labelname == "") {
+		label = NULL;
+		labelwidth = 0;
+	}
+	else {
+		label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+		label->SetFont(textfont);
+		if(ostype == Mac && labelwidth < 40) label->SetFont(smalltextfont);
+		sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
+	}
+
 	numbox = new wxTextCtrl(this, wxID_ANY, snum, wxDefaultPosition, wxSize(numwidth, -1), wxTE_PROCESS_ENTER);
+	numbox->SetFont(textfont);
+	sizer->Add(numbox, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
 
 	if(type == spincon) {
 		spin = new wxSpinButton(this, wxID_ANY, wxDefaultPosition, wxSize(17, 23), wxSP_VERTICAL|wxSP_ARROW_KEYS);  // 21
 		spin->SetRange(-1000000, 1000000);
-	}
-	label->SetFont(textfont);
-	if(ostype == Mac && labelwidth < 40) label->SetFont(smalltextfont);
-
-	numbox->SetFont(textfont);
+	}	
 
 	SetInitialSize(wxDefaultSize);
 	Move(wxDefaultPosition);
 
-	sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
-	sizer->Add(numbox, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
 	if(type == spincon) sizer->Add(spin, 0, wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(sizer);
 	Layout();

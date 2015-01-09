@@ -694,14 +694,16 @@ ParamStore *ParamBox::GetParams(ParamStore *pstore)
 			//value = con->min;
 			value = con->oldvalue;
 			con->SetValue(value);
-			SetStatus(text.Format("Parameter \'%s\' out of range", con->label->GetLabel()));
-			mainwin->diagbox->Write(text.Format("Parameter \'%s\' out of range, min %.2f max %.2f\n", con->label->GetLabel(), con->min, con->max));
+			if(con->label) {
+				SetStatus(text.Format("Parameter \'%s\' out of range", con->label->GetLabel()));
+				mainwin->diagbox->Write(text.Format("Parameter \'%s\' out of range, min %.2f max %.2f\n", con->label->GetLabel(), con->min, con->max));
+			}
 		}
 		if(value > con->max) {
 			//value = con->max;
 			value = con->oldvalue;
 			con->SetValue(value);
-			SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
+			if(con->label) SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
 		}
 		//paramset->con[i]->numbox->GetValue().ToDouble(&((*pstore)[paramset->con[i]->name]));
 		(*pstore)[paramset->con[i]->name] = value;
