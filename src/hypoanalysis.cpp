@@ -1052,7 +1052,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
 	}
 
-	int normscale = 1000;
+	int normscale = 10000;
 
 	// Normalise
 	for(i=0; i<=hist1.max; i++) {
