@@ -424,7 +424,7 @@ ParamStore *ParamSet::GetParamsNew(BoxOut *boxout)
 	ParamCon *pcon;
 	wxString text;
 
-	if(boxout->diagbox) boxout->diagbox->textbox->AppendText(text.Format("%s get params\n", boxout->name));
+	//if(boxout->diagbox) boxout->diagbox->textbox->AppendText(text.Format("%s get params\n", boxout->name));
 
 	for(i=0; i<numparams; i++) {
 		pcon = con[i];
@@ -441,7 +441,7 @@ ParamStore *ParamSet::GetParamsNew(BoxOut *boxout)
 			pcon->SetValue(value);
 			//SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
 		}
-		boxout->diagbox->Write(text.Format("param %s type %d value %.4f\n", con[i]->name, con[i]->type, value));
+		//boxout->diagbox->Write(text.Format("param %s type %d value %.4f\n", con[i]->name, con[i]->type, value));
 		(*paramstore)[con[i]->name] = value;
 		pcon->oldvalue = value;
 	}

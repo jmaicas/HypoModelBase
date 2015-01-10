@@ -111,6 +111,11 @@ SpikeDat::SpikeDat()
 	histquadlin.setsize(1000);
 	hazquad.setsize(10000);
 
+	hist1norm.setsize(10000);
+	hist5norm.setsize(10000);
+	//haz1norm.setsize(10000);
+	//haz5norm.setsize(10000);
+
 	srate.setsize(100000);
 	srate1.setsize(1000000);
 	srate100.setsize(100000);
@@ -239,7 +244,7 @@ GraphDat::GraphDat()
 }
 
 
-wxString GraphDat::StoreDat()
+wxString GraphDat::StoreDat(wxString tag)
 {
 	wxString gtext;
 	wxString stgname, stxtag, stytag;
@@ -251,20 +256,17 @@ wxString GraphDat::StoreDat()
 	stytag = ytag;
 	stytag.Replace(" ", "_");
 
-	return gtext.Format("v1 index %d xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s", 
-		gindex, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), xshift, xunitscale, plotstroke, stgname, stxtag, stytag);
+	return gtext.Format("v2 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s", 
+		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), xshift, xunitscale, plotstroke, stgname, stxtag, stytag);
 }
 
 
-void GraphDat::LoadDat(wxString data)                    // Not in use, see GraphBase::BaseLoad
+void GraphDat::LoadDat(wxString data, int version)                    // Not in use, see GraphBase::BaseLoad - now in use
 {
 	wxString readline, numstring, stringdat;
 	long numdat;
 	long red, green, blue;
-	int version;
-
-	version = 0;
-	if(data.GetChar(0) == 'v') version = ParseLong(&data, 'v');          // check file version for backwards compatability
+	//int version;
 
 	//if(diagbox) diagbox->Write(data + '\n');
 
@@ -564,6 +566,8 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	wxString text;
 	GraphSet *graphset = NULL;
 
+	newgraph.diagbox = mainwin->diagbox;
+
 	// If single graph, create new single graph set, otherwise add to set 'settag'
 	if(set) {
 		if(settag == "") graphset = NewSet(newgraph.gname, tag);
@@ -582,6 +586,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	graphstore[numgraphs] = newgraph;
 	graphstore[numgraphs].gindex = numgraphs;
 	tagindex[tag] = numgraphs;
+	nameindex[newgraph.gname] = numgraphs;
 	indextag[numgraphs] = tag;
 
 	if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
@@ -637,6 +642,22 @@ GraphSet *GraphBase::GetSet(wxString tag)
 }
 
 
+GraphDat *GraphBase::GetGraph(wxString tag) 
+{
+	if(!tagindex.check(tag)) return NULL;
+	int index = tagindex[tag];
+	return &(graphstore[index]);
+}
+
+
+GraphDat *GraphBase::GetGraphFromName(wxString name) 
+{
+	if(!nameindex.check(name)) return NULL;
+	int index = nameindex[name];
+	return &(graphstore[index]);
+}
+
+
 GraphSet *GraphBase::GetSet(int index) 
 {
 	return &(setstore[index]);
@@ -654,7 +675,7 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 	//outfile.New(initpath + "/Graphs/" + filename);
 	outfile.New(path + "/" + filename);
 	for(i=0; i<numgraphs; i++) {
-		outfile.WriteLine(graphstore[i].StoreDat());
+		outfile.WriteLine(graphstore[i].StoreDat(GetTag(i)));
 		//outfile.WriteLine(text.Format
 	}
 	outfile.Close();
@@ -663,11 +684,14 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 
 void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 {
-	int i;
+	int i, index;
 	TextFile infile;
 	wxString readline, filename, filetag;
-	wxString text, numstring;
+	wxString text, numstring, namestring, basestring;
+	wxString gtag, gname;
 	double numdat;
+	GraphDat *graph;
+	int version;
 
 	filename = "gbase-" + tag + ".dat";
 
@@ -679,42 +703,51 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 	i = 0;
 	readline = infile.ReadLine();
 
+	// Version check
+
+	//fileversion = ParseLong(&vstring, 'v');
+	//textbox->AppendText(text.Format("Base file version %d\n", fileversion));
+	//if(fileversion < version) textbox->AppendText(text.Format("Create base index\n"));
+
 	while(!readline.IsEmpty()) {
-		//readline = infile.ReadLine();
-		//textbox->AppendText(readline + "\n");
 
-		/*
-		readline = readline.AfterFirst('f');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&numdat);
-		graphstore[i].xfrom = numdat;
-		//textbox->AppendText(text.Format("xf %.4f\n", numdat));
+		if(readline.GetChar(0) == 'v') version = ParseLong(&readline, 'v');          // check file version for backwards compatability
+		else version = 0;
 
-		readline = readline.AfterFirst('t');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&graphstore[i].xto);
-
-		readline = readline.AfterFirst('f');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&graphstore[i].yfrom);
-
-		readline = readline.AfterFirst('t');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&numdat);
-		graphstore[i].yto = numdat;
-		//textbox->AppendText(text.Format("yt %.4f\n", numdat));*/
-
-		graphstore[i].diagbox = mainwin->diagbox;
-		graphstore[i].LoadDat(readline);
+		if(version >= 2) {                                                  // Modern, reference by tag
+			gtag = ParseString(&readline, 'g');
+			GetGraph(gtag)->LoadDat(readline, version);
+		}
+		else {
+			GetGraphFromName(gname)->LoadDat(readline, version);              // Should add code to chop off any tag first
+			//int ndex = readline.Find("name");
+			namestring = readline.Mid(readline.Find("name"));
+			gname = ParseString(&namestring, 'e');
+			graph = GetGraphFromName(gname);
+			if(graph) graph->LoadDat(readline, version);
+		}
+			
+		//graphstore[i].LoadDat(readline, version);
 			
 		if(infile.End()) break;
 		readline = infile.ReadLine();	
 		i++;	
 	}
 	infile.Close();
+
+
+	// Read graphbase entries
+
+	/*
+	while(!readline.IsEmpty()) {
+		graphstore[i].diagbox = mainwin->diagbox;
+		graphstore[i].LoadDat(readline, version);
+			
+		if(infile.End()) break;
+		readline = infile.ReadLine();	
+		i++;	
+	}
+	infile.Close();
+	*/
 }
 

@@ -81,6 +81,12 @@ public:
 	datdouble histquadx;
 	datdouble histquadsm;
 	datdouble histquadlin;
+
+	datdouble hist1norm;
+	datdouble hist5norm;
+	//datdouble haz1norm;
+	//datdouble haz5norm;
+
 	datint srate;
 	datint srate1;
 	datint srate100;
@@ -297,8 +303,8 @@ public:
 	BurstDat *burstdata;
 	SpikeDat *spikedata;
 
-	wxString StoreDat();
-	void LoadDat(wxString);
+	wxString StoreDat(wxString tag);
+	void LoadDat(wxString, int version);
 	void Init();
 };
 
@@ -349,6 +355,7 @@ class GraphBase{
 public:
 	int numsets;
 	int setstoresize;
+	int baseversion;
 	short numgraphs;
 	short storesize;
 	wxString initpath;
@@ -358,6 +365,7 @@ public:
 	std::vector <GraphDat> graphstore;
 	std::vector <GraphSet> setstore;
 	ParamStore tagindex;
+	ParamStore nameindex;
 	ParamStore settagindex;
 	MainFrame *mainwin;
 	//Model *mod;
@@ -371,6 +379,7 @@ public:
 		storesize = size;
 		setstoresize = setsize;
 		initpath = "Init/";
+		baseversion = 2;
 	};
 
 	~GraphBase() {
@@ -398,13 +407,14 @@ public:
 		return setindextag[index];
 	};
 
-
 	int Add(GraphDat newgraph, wxString tag, wxString settag = "", bool set=true);
 	GraphSet *NewSet(wxString name, wxString tag);
 	//int AddNewSet(wxString tag, int gdex);
 	GraphSet *GetSet(wxString);
 	GraphSet *GetSet(int);
 
+	GraphDat *GetGraph(wxString);
+	GraphDat *GetGraphFromName(wxString);
 	/*
 	GraphDat &operator[](wxString tag) {
 		for(unsigned long i=0; i<store.size(); i++) 

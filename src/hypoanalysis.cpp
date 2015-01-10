@@ -783,6 +783,10 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 		haz1.data[i] = 0;	
 		haz5.data[i] = 0;	
 		hazquad[i] = 0;
+		hist1norm.data[i] = 0;
+		hist5norm.data[i] = 0;
+		//haz1norm.data[i] = 0;
+		//haz5norm.data[i] = 0;
 	}
 
 	for(i=0; i<maxtime; i++) srate.data[i] = 0;
@@ -791,9 +795,13 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 
 	hist1.max = 0;
 	hist5.max = 0;
+	hist1norm.max = 0;
+	hist5norm.max = 0;
 	histquad.max = 0;
 	haz1.max = 0;
 	haz5.max = 0;
+	//haz1norm.max = 0;
+	//haz5norm.max = 0;
 	hazquad.max = 0;
 	srate.max = 0;
 	srate1.max = 0;
@@ -1025,24 +1033,33 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 	haz1.max = hist1.max;
 	if(haz1.data.size() < haz1.max + 1) haz1.data.resize(haz1.max + 1);
 
-  for(i=0; i<=hist1.max; i++) {
+  for(i=0; i<=hist1.max; i++) {        // 1ms Hazard
     haz1.data[i] = hist1.data[i] / (spikecount - hazcount); //   / freq;		
     hazcount = hazcount + hist1.data[i];
 	}
 
-  for(i=0; i<hist1.max; i++) {
+  for(i=0; i<hist1.max; i++) {      // 5ms Hazard                                               
 		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
 		if(i/binsize > haz5.max) haz5.max = i/binsize;
 		if(haz5.data.size() < haz5.max + 1)	haz5.data.resize(haz5.max + 1);
 		haz5.data[i/binsize] = haz5.data[i/binsize] + haz1.data[i]; // * haznorm;	
 	}
 
-	for(i=0; i<=hist1.max; i++) {
+	for(i=0; i<=hist1.max; i++) {         // 5ms ISI Histogram
     //hist[i] = hist[i] / norm;
 		if(i/binsize > hist5.max) hist5.max = i/binsize;
 		if(hist5.data.size() < hist5.max + 1)	hist5.data.resize(hist5.max + 1);
 		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
 	}
+
+	int normscale = 1000;
+
+	// Normalise
+	for(i=0; i<=hist1.max; i++) {
+		hist1norm[i] = normscale * hist1[i] / isicount;
+		hist5norm[i] = normscale * hist5[i] / isicount;
+	}
+	
 }
 
 
@@ -1110,6 +1127,9 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int datset, int colou
 	graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, blue + shift), reftag + "histquadsmooth", reftag);
 	graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, red + shift), reftag + "histquadlinear", reftag);
 	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, green + shift), reftag + "hazquad", reftag);
+
+	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
+	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
 
 	graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 

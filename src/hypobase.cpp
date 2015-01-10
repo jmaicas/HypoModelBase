@@ -201,6 +201,7 @@ double ParseDouble(wxString *readline, wxUniChar tag)
 	readline->Trim(false);
 	numstring = readline->BeforeFirst(' ');
 	numstring.ToDouble(&numdat);
+	*readline = readline->AfterFirst(' ');
 	return numdat;
 }
 
@@ -214,7 +215,21 @@ long ParseLong(wxString *readline, wxUniChar tag)
 	readline->Trim(false);
 	numstring = readline->BeforeFirst(' ');
 	numstring.ToLong(&numdat);
+	*readline = readline->AfterFirst(' ');
 	return numdat;
+}
+
+
+wxString ParseString(wxString *readline, wxUniChar tag)
+{
+	wxString string;
+	long numdat;
+
+	*readline = readline->AfterFirst(tag);
+	readline->Trim(false);
+	string = readline->BeforeFirst(' ');
+	*readline = readline->AfterFirst(' ');
+	return string;
 }
 
 
