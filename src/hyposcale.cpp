@@ -471,6 +471,7 @@ void ScaleBox::GLoad(wxString tag)
 	if(gmod->diagbox != NULL) gmod->graphbase->BaseLoad(filepath, filetag, gmod->diagbox->textbox);
 	else gmod->graphbase->BaseLoad(filepath, filetag);
 	//gmod->graphbase->BaseLoad(filetag);
+	mainwin->diagbox->Write("BaseLoad\n");
 
 	gmod->gsmode = 1;
 	GraphSwitch(0);

@@ -713,16 +713,23 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 
 		if(readline.GetChar(0) == 'v') version = ParseLong(&readline, 'v');          // check file version for backwards compatability
 		else version = 0;
+		//textbox->AppendText(text.Format("Base file version %d\n", version));
+		//textbox->AppendText(text.Format("Readline %s\n", readline));
 
 		if(version >= 2) {                                                  // Modern, reference by tag
 			gtag = ParseString(&readline, 'g');
 			GetGraph(gtag)->LoadDat(readline, version);
 		}
 		else {
-			GetGraphFromName(gname)->LoadDat(readline, version);              // Should add code to chop off any tag first
+			//GetGraphFromName(gname)->LoadDat(readline, version);              // Should add code to chop off any tag first
 			//int ndex = readline.Find("name");
+			//textbox->AppendText(text.Format("Base file version %d\n", version));
+			//textbox->AppendText(text.Format("Readline %s\n", readline));
 			namestring = readline.Mid(readline.Find("name"));
+			//textbox->AppendText(text.Format("Name string %s\n", namestring));
 			gname = ParseString(&namestring, 'e');
+			gname.Replace("_", " ");
+			textbox->AppendText(text.Format("gname %s\n", gname));
 			graph = GetGraphFromName(gname);
 			if(graph) graph->LoadDat(readline, version);
 		}
