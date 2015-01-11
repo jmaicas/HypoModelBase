@@ -619,7 +619,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
 			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale - graph->xshift;
-			if(graph->xtickmode) xval = graph->xstep * i * graph->xunitscale - graph->xshift;
+			if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale - graph->xshift;
 			srangex = (xto - xfrom) / xscale * graph->xunitscale;
 			snum.Printf("%.0f", xval + xdis);	
 			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
@@ -645,7 +645,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			if(graph->ytickmode) ycoord = (int)(yplotstep * i);
 			dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
 			yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale;
-			if(graph->ytickmode) yval = graph->ystep * i;
+			if(graph->ytickmode) yval = yfrom + graph->ystep * i;
 			if(yto - yfrom < 0.1) snum.Printf("%.3f", yval);
 			else if(yto - yfrom < 1) snum.Printf("%.2f", yval);
 			else if(yto - yfrom < 10) snum.Printf("%.1f", yval);

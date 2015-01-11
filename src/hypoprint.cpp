@@ -358,7 +358,7 @@ void GraphWindow3::PrintEPS()
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
 		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale - xshift;
-		if(graph->xtickmode) xval = (graph->xstep * i) * graph->xunitscale - xshift;
+		if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale - xshift;
 		srangex = (xto - xfrom) / xscale * graph->xunitscale;
 		snum.Printf("%.0f", xval + xdis);	
 		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
@@ -376,7 +376,7 @@ void GraphWindow3::PrintEPS()
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
 		yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale;
-		if(graph->ytickmode) yval = graph->ystep * i;
+		if(graph->ytickmode) yval = yfrom + graph->ystep * i;
 		if(yto - yfrom < 0.1) snum.Printf("%.3f", yval);
 		else if(yto - yfrom < 1) snum.Printf("%.2f", yval);
 		else if(yto - yfrom < 10) snum.Printf("%.1f", yval);

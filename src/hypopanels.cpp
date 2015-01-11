@@ -24,7 +24,6 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 	graphwin = graphw; 
 	diagbox = graphwin->mainwin->diagbox;
 
-	wxRadioButton *xrad[2], *yrad[2];
 	wxString text;
 
 	ostype = GetSystem();
@@ -133,13 +132,53 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(ScalePanel::OnRadio));
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnOK));
+	Connect(wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED, wxCloseEventHandler(ScalePanel::OnClose));
 	Connect(ID_Print, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnPrint));
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScalePanel::OnOK));
 	Connect(wxEVT_SIZE, wxSizeEventHandler(ScalePanel::OnSize));
+	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ScalePanel::OnClose));
 
 	//ShowModal();
 	//Destroy(); 
 	Show();
+}
+
+
+void ScalePanel::SetGraph(GraphDat *newgraph)
+{
+	int i, type;
+	wxString tag;
+	double pval;
+
+	graph = newgraph;
+
+	paramset->GetCon("gname")->SetLabel(graph->gname);
+	paramset->GetCon("xtag")->SetLabel(graph->xtag);
+	paramset->GetCon("ytag")->SetLabel(graph->ytag);
+
+	paramset->GetCon("xlabels")->SetValue(graph->xlabels);
+	paramset->GetCon("ylabels")->SetValue(graph->ylabels);
+	paramset->GetCon("xstep")->SetValue(graph->xstep);
+	paramset->GetCon("ystep")->SetValue(graph->ystep);
+	paramset->GetCon("xplot")->SetValue(graph->xplot);
+	paramset->GetCon("yplot")->SetValue(graph->yplot);
+	paramset->GetCon("xshift")->SetValue(graph->xshift);
+	paramset->GetCon("xscale")->SetValue(graph->xunitscale);
+	paramset->GetCon("xlabelgap")->SetValue(graph->xlabelgap);
+	paramset->GetCon("ylabelgap")->SetValue(graph->ylabelgap);
+	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
+
+	xrad[graph->xtickmode]->SetValue(true);
+	yrad[graph->ytickmode]->SetValue(true);
+
+	colourpicker->SetColour(graph->strokecolour);
+}
+
+
+void ScalePanel::OnClose(wxCloseEvent& event)
+{
+	diagbox->Write("Axis box close\n");
+	wxDialog::Destroy();
 }
 
 
@@ -167,8 +206,9 @@ void ScalePanel::OnRadio(wxCommandEvent& event)
 }
 
 
-void ScalePanel::OnPrint(wxCommandEvent& WXUNUSED(event))
+void ScalePanel::OnPrint(wxCommandEvent& event)
 {
+	OnOK(event);
 	graphwin->PrintEPS();
 }
 
@@ -179,9 +219,9 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	wxString snum, text;
 
 	ParamStore *params = paramset->GetParamsNew(boxout);
-	//mainwin->SetStatus(wxT("Scale OK")); 
 
 	graph = graphwin->graphset[0]->plot[0];
+
 	graph->xlabels = (*params)["xlabels"];
 	graph->ylabels = (*params)["ylabels"];
 	graph->xstep = (*params)["xstep"];
@@ -191,13 +231,16 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	graph->xshift = (*params)["xshift"];
 	graph->xunitscale = (*params)["xscale"];
 	graph->plotstroke = (*params)["plotstroke"];
+	graph->xlabelgap = (*params)["xlabelgap"];
+	graph->ylabelgap = (*params)["ylabelgap"];
+
 	graph->strokecolour = colourpicker->GetColour();
 	graph->colour = custom;
+
 	graph->gname = paramset->GetCon("gname")->GetString();
 	graph->xtag = paramset->GetCon("xtag")->GetString();
 	graph->ytag = paramset->GetCon("ytag")->GetString();
-	graph->xlabelgap = (*params)["xlabelgap"];
-	graph->ylabelgap = (*params)["ylabelgap"];
+	
 
 
 	graphwin->UpdateScroll(-1);

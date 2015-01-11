@@ -106,6 +106,7 @@ public:
 	BoxOut *boxout;
 	wxStaticText *status;
 	wxColourPickerCtrl *colourpicker;
+	wxRadioButton *xrad[2], *yrad[2];
 
 	ParamNum *numdrawcon;
 	ParamNum *viewheightcon;
@@ -123,6 +124,8 @@ public:
 	void OnRadio(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
 	wxBoxSizer *ParamLayout(int columns=1);
+	void OnClose(wxCloseEvent& event);
+	void SetGraph(GraphDat *graph);
 	//void SetVBox(int);
 };
 
