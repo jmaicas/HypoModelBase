@@ -317,6 +317,7 @@ public:
 	//ToolSet toolset;
 	ToolSet *toolset;
   DiagBox *diagbox;
+	wxColour colourpen[10];
     
 	int basic;
 	int diagnostic;

@@ -53,6 +53,17 @@ void MainFrame::MainLoad()
 	wxPoint pos;
   wxSize size;
 
+	colourpen[0].Set("#000000");       // 0 black
+	colourpen[1].Set("#F50000");       // 1 red
+	colourpen[2].Set("#00F500");       // 2 green
+	colourpen[3].Set("#0000F5");       // 3 blue
+	colourpen[4].Set("#F5F500");       // 4 yellow
+	colourpen[5].Set("#F500F5");       // 5 purple
+	colourpen[6].Set("#FF8080");       // 6 light red
+	colourpen[7].Set("#80FF80");       // 7 light green
+	colourpen[8].Set("#8080FF");       // 8 light blue
+	colourpen[9].Set("#000000");       // 9 custom
+
 	//filepath = GetPath();
 	filepath = "Init//";
 

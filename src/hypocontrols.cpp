@@ -243,6 +243,12 @@ void ParamCon::SetValue(double val)
 }
 
 
+void ParamCon::SetValue(wxString text)
+{
+	numbox->SetValue(text);
+}
+
+
 void ParamCon::SetMinMax(double newmin, double newmax)
 {
 	min = newmin;

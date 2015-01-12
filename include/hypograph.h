@@ -36,7 +36,7 @@ public:
 	wxPoint mousedown;
 	wxOverlay *overlay;
 	wxFont textfont, smallfont;
-	wxColour colourpen[10];
+	wxColour *colourpen;
 	//wxString colourstring[10];
 	wxBufferedPaintDC *dc;
 
@@ -86,7 +86,7 @@ public:
 };
 
 
-class ScalePanel : public wxDialog
+class GraphBox : public wxDialog
 {
 public:
 	GraphWindow3 *graphwin;
@@ -116,17 +116,15 @@ public:
 	ParamText *outpathcon;
 	ParamText *parampathcon;
 	ParamText *modpathcon;
-	ScalePanel(GraphWindow3 *, const wxString&);
+	GraphBox(GraphWindow3 *, const wxString&);
 
 	void OnOK(wxCommandEvent& event);
 	void OnPrint(wxCommandEvent& event);
-	//void OnBrowseOut(wxCommandEvent& event);
 	void OnRadio(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
 	wxBoxSizer *ParamLayout(int columns=1);
 	void OnClose(wxCloseEvent& event);
-	void SetGraph(GraphDat *graph);
-	//void SetVBox(int);
+	void SetGraph(GraphWindow3 *);
 };
 
 

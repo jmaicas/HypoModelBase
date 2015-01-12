@@ -78,6 +78,8 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	spikedisp = 0;
 	gsynch = 1;
 
+	colourpen = mainwin->colourpen;
+
 	overlay = new wxOverlay();
 
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
@@ -149,17 +151,6 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 		textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
 		smallfont = wxFont(6, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
 	}
-
-	colourpen[0].Set("#000000");       // 0 black
-	colourpen[1].Set("#F50000");       // 1 red
-	colourpen[2].Set("#00F500");       // 2 green
-	colourpen[3].Set("#0000F5");       // 3 blue
-	colourpen[4].Set("#F5F500");       // 4 yellow
-	colourpen[5].Set("#F500F5");       // 5 purple
-	colourpen[6].Set("#FF8080");       // 6 light red
-	colourpen[7].Set("#80FF80");       // 7 light green
-	colourpen[8].Set("#8080FF");       // 8 light blue
-	colourpen[9].Set("#000000");       // 9 custom
 
 	//double cf = 0.96;
 
@@ -245,13 +236,10 @@ void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
 
 void GraphWindow3::OnScale(wxCommandEvent& event)
 {
-	//SetStatus("Sys Panel");
-	
-	//int ID = event->GetId;
-	
-	//if(event.GetId() == ID_IGFPanel) {}
-	ScalePanel *scalepanel = new ScalePanel(this, "Axis Panel");
-	scalepanel->Show(true);
+	//GraphBox *graphbox = new GraphBox(this, "Axis Panel");
+	if(!mainwin->graphbox) mainwin->graphbox = new GraphBox(this, "Axis Panel");
+	else mainwin->graphbox->SetGraph(this);
+	mainwin->graphbox->Show(true);
 }
 
 
@@ -308,8 +296,14 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 
 	int xplaces;
 
-	wxPoint pos = event.GetPosition();
 
+	// Graph select
+
+	if(mainwin->graphbox) mainwin->graphbox->SetGraph(this);
+
+	// Data Selection drag 
+
+	wxPoint pos = event.GetPosition();
 	if(pos.x - mousedown.x > 5) {
 		graph = gpos->plot[0];
 
@@ -327,7 +321,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 	else snum.Printf("LUp %d", pos.x);
 
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
-	//mod->DataSelect(xgraphFrom, xgraphTo);
+	
 }
 
 

@@ -232,6 +232,7 @@ public:
 	double GetValue();
 	wxString GetString();
 	void SetValue(double val);
+	void SetValue(wxString);
 	void SetMinMax(double min, double max);
 	
 protected:

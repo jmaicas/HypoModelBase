@@ -567,6 +567,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	GraphSet *graphset = NULL;
 
 	newgraph.diagbox = mainwin->diagbox;
+	newgraph.strokecolour = mainwin->colourpen[newgraph.colour];
 
 	// If single graph, create new single graph set, otherwise add to set 'settag'
 	if(set) {

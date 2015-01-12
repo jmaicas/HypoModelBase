@@ -14,7 +14,7 @@
 #include <wx/scopedarray.h>
 
 
-ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
+GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
 	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 500),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
@@ -130,13 +130,13 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 
 	panel->Layout();
 
-	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(ScalePanel::OnRadio));
-	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnOK));
-	Connect(wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED, wxCloseEventHandler(ScalePanel::OnClose));
-	Connect(ID_Print, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScalePanel::OnPrint));
-	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScalePanel::OnOK));
-	Connect(wxEVT_SIZE, wxSizeEventHandler(ScalePanel::OnSize));
-	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ScalePanel::OnClose));
+	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(GraphBox::OnRadio));
+	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnOK));
+	Connect(wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED, wxCloseEventHandler(GraphBox::OnClose));
+	Connect(ID_Print, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnPrint));
+	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(GraphBox::OnOK));
+	Connect(wxEVT_SIZE, wxSizeEventHandler(GraphBox::OnSize));
+	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(GraphBox::OnClose));
 
 	//ShowModal();
 	//Destroy(); 
@@ -144,17 +144,19 @@ ScalePanel::ScalePanel(GraphWindow3 *graphw, const wxString & title)
 }
 
 
-void ScalePanel::SetGraph(GraphDat *newgraph)
+void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 {
 	int i, type;
 	wxString tag;
 	double pval;
 
-	graph = newgraph;
+	graphwin = newgraphwin;
+	graph = graphwin->graphset[0]->plot[0];
 
-	paramset->GetCon("gname")->SetLabel(graph->gname);
-	paramset->GetCon("xtag")->SetLabel(graph->xtag);
-	paramset->GetCon("ytag")->SetLabel(graph->ytag);
+	paramset->GetCon("gname")->SetValue(graph->gname);
+	//paramset->GetCon("gname")->SetLabel("test label");
+	paramset->GetCon("xtag")->SetValue(graph->xtag);
+	paramset->GetCon("ytag")->SetValue(graph->ytag);
 
 	paramset->GetCon("xlabels")->SetValue(graph->xlabels);
 	paramset->GetCon("ylabels")->SetValue(graph->ylabels);
@@ -175,14 +177,15 @@ void ScalePanel::SetGraph(GraphDat *newgraph)
 }
 
 
-void ScalePanel::OnClose(wxCloseEvent& event)
+void GraphBox::OnClose(wxCloseEvent& event)
 {
 	diagbox->Write("Axis box close\n");
+	graphwin->mainwin->graphbox = NULL;
 	wxDialog::Destroy();
 }
 
 
-void ScalePanel::OnSize(wxSizeEvent& event)
+void GraphBox::OnSize(wxSizeEvent& event)
 {	
 	wxString snum;
 
@@ -195,7 +198,7 @@ void ScalePanel::OnSize(wxSizeEvent& event)
 }
 
 
-void ScalePanel::OnRadio(wxCommandEvent& event)
+void GraphBox::OnRadio(wxCommandEvent& event)
 {
 	graph = graphwin->graphset[0]->plot[0];
 
@@ -206,14 +209,14 @@ void ScalePanel::OnRadio(wxCommandEvent& event)
 }
 
 
-void ScalePanel::OnPrint(wxCommandEvent& event)
+void GraphBox::OnPrint(wxCommandEvent& event)
 {
 	OnOK(event);
 	graphwin->PrintEPS();
 }
 
 
-void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
+void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 {
 	long stringnum;
 	wxString snum, text;
@@ -272,7 +275,7 @@ void ScalePanel::OnOK(wxCommandEvent& WXUNUSED(event))
 }
 
 
-wxBoxSizer *ScalePanel::ParamLayout(int columns)
+wxBoxSizer *GraphBox::ParamLayout(int columns)
 {
 	// Only works for one or two columns currently, columns parameter bigger than two treated like one
 	//

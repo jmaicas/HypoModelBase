@@ -111,6 +111,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	protocolbox = NULL;
 	focusdata = NULL;
 	dispwin = NULL;
+	graphbox = NULL;
 	//diagbox->Show();
 	
 	SetBackgroundColour(backcolour);
