@@ -110,10 +110,10 @@ public:
 	ModelSet modset;
 
 	// Display
-	ScaleBox *scalebox;
-	GraphBox *graphbox;
+	//ScaleBox *scalebox;
+	//GraphBox *graphbox;
 	//ToolBox *toolset[10];
-	GraphWindow3 *graphwin[10];
+	//GraphWindow3 *graphwin[10];
 	graphdisp *gpos;
 	GraphDat *greg;
 	GraphBase *graphbase;

@@ -22,6 +22,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	mod = model;
 
 	gflags = new ParamStore();
+	gflagrefs = new RefStore();
 
 	wxBoxSizer *psetbox;
 	//boxfont = new wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
@@ -58,7 +59,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	dendmode = 0;
 	ratedata = 0;
 	internflag = 0;
-	normtog = 0;
+
+	//normtog = 0;
 
 	synchcon = 0;
 
@@ -244,13 +246,14 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				if(ostype == Mac) {
 					ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
 					ScaleButton(ID_binres1, "Bin Res", 45, binbox);
-					ScaleButton(ID_norm, "Norm", 45, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
 				else {
 					ScaleButton(ID_histhaz1, "Hist / Haz", 54, vbox);
 					ScaleButton(ID_binres1, "Bin Res", 43, binbox);
-					ScaleButton(ID_norm, "Norm", 35, binbox);
+					//ScaleButton(ID_norm, "Norm", 35, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 55, vbox);
 				}		
 				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
@@ -325,7 +328,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(ID_binres1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes1));
 	Connect(ID_binres2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes2));
 	Connect(ID_net, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNetMode));
-	Connect(ID_norm, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNorm));
+	//Connect(ID_norm, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNorm));
 
 	Connect(ID_allburst, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnAllBurst));
 	Connect(ID_profile, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnProfMode));
@@ -411,9 +414,27 @@ void ScaleBox::OnGStore(wxCommandEvent& event)
 	gstag->SetValue(filetag);
 
 	outfile.New(filepath + "/" + filename);
+	for(i=0; i<gmod->gcount; i++) 
+		outfile.WriteLine(text.Format("%d %s", i, gmod->gcodes[i]));
+
+	outfile.WriteLine("");
+	for(i=0; i<gflagrefs->numrefs; i++) {
+		outline.Printf("%.0f", (*gflags)[gflagrefs->refbase[i].label]);  
+		outfile.WriteLine(gflagrefs->refbase[i].label + " " + outline);
+	}
+
+	outfile.Close();
+
+	/*
+	outfile.New(filepath + "/" + filename);
 	for(i=0; i<gmod->gcount; i++)
 		outfile.WriteLine(text.Format("%d %s", i, gmod->gcodes[i]));
 	outfile.Close();
+
+	for(i=0; i<flagrefs->numrefs; i++) {
+		outline.Printf("%.0f", (*modflags)[flagrefs->refbase[i].label]);  
+		paramfile.AddLine(flagrefs->refbase[i].label + " " + outline);
+	}*/
 
 	gmod->graphbase->BaseStore(filepath, filetag);
 }
@@ -466,12 +487,30 @@ void ScaleBox::GLoad(wxString tag)
 		gmod->gcodes[gindex] = glabel;
 		readline = infile.ReadLine();
 	}
+
+	if(!infile.End()) readline = infile.ReadLine();      // Check for next section, graph flags
+	else readline = "";
+
+	// Read graph flags
+	long flagval;
+	while(!readline.IsEmpty()) {
+		tag = readline.BeforeFirst(' ');
+		readline = readline.AfterFirst(' ');
+		readline.Trim();
+		readline.ToLong(&flagval);
+		(*gflags)[tag] = flagval;
+		mainwin->diagbox->Write(text.Format("Graph flag tag %s, value %d\n", tag, flagval)); 
+		readline = infile.ReadLine();	
+	}
+
 	infile.Close();
 
 	if(gmod->diagbox != NULL) gmod->graphbase->BaseLoad(filepath, filetag, gmod->diagbox->textbox);
 	else gmod->graphbase->BaseLoad(filepath, filetag);
 	//gmod->graphbase->BaseLoad(filetag);
 	mainwin->diagbox->Write("BaseLoad\n");
+
+	if(mainwin->graphbox) mainwin->graphbox->SetGraph();
 
 	gmod->gsmode = 1;
 	GraphSwitch(0);
@@ -646,6 +685,42 @@ wxButton *ScaleBox::ScaleButton(int id, wxString label, int width, wxBoxSizer *b
 }
 
 
+wxButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label, int width, wxBoxSizer *box, int point)
+{
+	(*gflags)[tag] = state;
+	gflagrefs->AddRef(id, tag);
+	Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnGraphButton));
+
+	return ScaleButton(id, label, width, box, point);
+}
+
+
+void ScaleBox::OnGraphButton(wxCommandEvent& event)
+{
+	int id = event.GetId();
+	wxString tag = gflagrefs->GetRef(id);
+
+	if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
+	else (*gflags)[tag] = 0;
+
+	GraphSwitch();
+}
+
+/*
+wxCheckBox *ParamBox::SetModCheck(int id, wxString checktag, wxString checktext, int state)
+{
+	wxCheckBox *newcheck;
+	(*modflags)[checktag] = state;
+	newcheck = new wxCheckBox(panel, id, checktext);
+	newcheck->SetFont(confont);
+	newcheck->SetValue(state);
+	checkrefs->AddRef(id, checktag, newcheck);
+	Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(ParamBox::OnCheck));
+
+	return newcheck;
+}*/
+
+
 wxToggleButton *ScaleBox::ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point)
 {
 	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
@@ -769,12 +844,12 @@ void ScaleBox::OnNetMode(wxCommandEvent& WXUNUSED(event))
 	GraphSwitch();
 }
 
-
+/*
 void ScaleBox::OnNorm(wxCommandEvent& WXUNUSED(event))
 {
 	normtog = 1 - normtog;
 	GraphSwitch();
-}
+}*/
 
 void ScaleBox::OnAllBurst(wxCommandEvent& WXUNUSED(event))
 {
@@ -932,7 +1007,7 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["sectype"] = sectype;
 	(*gflags)["dendmode"] = dendmode;
 	(*gflags)["vmhflag"] = vmhflag;
-	(*gflags)["normtog"] = normtog;
+	//(*gflags)["normtog"] = 0;
 
 	return gflags;
 }

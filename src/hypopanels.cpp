@@ -150,7 +150,7 @@ void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 	wxString tag;
 	double pval;
 
-	graphwin = newgraphwin;
+	if(newgraphwin) graphwin = newgraphwin;            // default newgraphwin=NULL for updating panel without changing graph window
 	graph = graphwin->graphset[0]->plot[0];
 
 	paramset->GetCon("gname")->SetValue(graph->gname);

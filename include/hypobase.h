@@ -281,6 +281,8 @@ class BurstBox;
 class BurstDat;
 class InfoBox;
 class ScaleBox;
+class GraphBox;
+class GraphWindow3;
 class ToolBox;
 class GraphBase;
 class ModGenBox;
@@ -318,6 +320,11 @@ public:
 	ToolSet *toolset;
   DiagBox *diagbox;
 	wxColour colourpen[10];
+
+	// Display
+	ScaleBox *scalebox;
+	GraphBox *graphbox;
+	GraphWindow3 *graphwin[10];
     
 	int basic;
 	int diagnostic;
@@ -355,6 +362,7 @@ public:
 	int Exists(wxString name);
 	void WriteLine(wxString);
 
+	// Postscript Writing
 	void MoveTo(double x, double y);
 	void LineTo(double x, double y);
 	void DrawLine(double xf, double yf, double xt, double yt);

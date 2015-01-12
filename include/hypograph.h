@@ -124,7 +124,7 @@ public:
 	void OnSize(wxSizeEvent& event);
 	wxBoxSizer *ParamLayout(int columns=1);
 	void OnClose(wxCloseEvent& event);
-	void SetGraph(GraphWindow3 *);
+	void SetGraph(GraphWindow3 *newgraphwin=NULL);
 };
 
 
@@ -172,7 +172,10 @@ public:
 	GraphWindow3 **graphwin;
 	Model *gmod;
 	Model *mod;
+
 	ParamStore *gflags;
+	RefStore *gflagrefs;
+
 	wxComboBox *gstag;
 	wxToggleButton *syncbutton;
 	wxCheckBox *gsync[10];
@@ -183,6 +186,7 @@ public:
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);
 	TextBox *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer, int);
 	wxButton *ScaleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10);
+	wxButton *GraphButton(wxString tag, int initval, int id, wxString label, int width, wxBoxSizer *box, int point = 10);
 	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10);
 	void OnOK(wxCommandEvent& event);
 	void OnSync(wxCommandEvent& event);
@@ -209,8 +213,12 @@ public:
 	void OnXZoomOut(wxCommandEvent& event);
 	void OnGStore(wxCommandEvent& event);
 	void OnGLoad(wxCommandEvent& event);
+
+	void OnGraphButton(wxCommandEvent& event);   // New general button system
+
 	//void OnClose(wxCloseEvent& event);
 	//void GSwitch(int mod = 0);
+
 	void GLoad(wxString tag = "");
 	void GSwitch1();
 	void GSwitch2();
