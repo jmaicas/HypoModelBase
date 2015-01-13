@@ -350,6 +350,16 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 
 		//if(diagbox) diagbox->Write(readline + '\n');
 		
+		gname = ParseString(&readline, 'e');
+		gname.Replace("_", " ");
+
+		xtag = ParseString(&readline, 'g');
+		xtag.Replace("_", " ");
+
+		ytag = ParseString(&readline, 'g');
+		ytag.Replace("_", " ");
+
+		/*
 		readline = readline.AfterFirst('e');
 		readline.Trim(false);
 		gname = readline.BeforeFirst(' ');
@@ -367,7 +377,7 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		readline = readline.AfterFirst('g');
 		readline.Trim(false);
 		ytag = readline.BeforeFirst(' ');
-		ytag.Replace("_", " ");
+		ytag.Replace("_", " ");*/
 	}	
 
 	if(version > 2) {

@@ -92,7 +92,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	paramset->currlay++;
 
-	colourpicker = new wxColourPickerCtrl(panel, 0, graphwin->colourpen[graph->colour], wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
+	colourpicker = new wxColourPickerCtrl(panel, 0, graph->strokecolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
 	paramset->AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
 	wxBoxSizer *colourbox = new wxBoxSizer(wxHORIZONTAL);
 	//wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Stroke");
@@ -160,6 +160,8 @@ void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 	int i, type;
 	wxString tag;
 	double pval;
+
+	SetParams();
 
 	if(newgraphwin) graphwin = newgraphwin;            // default newgraphwin=NULL for updating panel without changing graph window
 	graph = graphwin->graphset[0]->plot[0];
@@ -232,14 +234,9 @@ void GraphBox::OnPrint(wxCommandEvent& event)
 }
 
 
-void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
+void GraphBox::SetParams()
 {
-	long stringnum;
-	wxString snum, text;
-
 	ParamStore *params = paramset->GetParamsNew(boxout);
-
-	graph = graphwin->graphset[0]->plot[0];
 
 	graph->xlabels = (*params)["xlabels"];
 	graph->ylabels = (*params)["ylabels"];
@@ -261,9 +258,19 @@ void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 	graph->gname = paramset->GetCon("gname")->GetString();
 	graph->xtag = paramset->GetCon("xtag")->GetString();
 	graph->ytag = paramset->GetCon("ytag")->GetString();
+}
+
+
+void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
+{
+	long stringnum;
+	wxString snum, text;
+
+	graph = graphwin->graphset[0]->plot[0];
+
+	SetParams();
 	
 	graphwin->UpdateScroll(-1);
-
 	diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
 }
 

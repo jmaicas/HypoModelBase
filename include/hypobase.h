@@ -34,7 +34,9 @@
 //#include <crtdbg.h>
 
 #ifndef OSXClip
+#ifndef TEACH
 #include <vld.h>
+#endif
 #endif
 
 

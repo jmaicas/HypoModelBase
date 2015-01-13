@@ -295,6 +295,8 @@ void HypoMain::CleanUp() {
 
 	//for(i=0; i<numdraw; i++) delete graphwin[i];
 
+	if(graphbox) graphbox->Destroy();
+
 	delete[] gpos;
 	//delete wxofp;
 	delete mod;

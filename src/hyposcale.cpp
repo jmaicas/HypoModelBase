@@ -229,13 +229,14 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				if(ostype == Mac) {
 					ScaleButton(ID_spikes, "Sp", 40, resbox);   
 					ScaleButton(ID_rateres, "Ra", 40, resbox); 
-					ScaleButton(ID_net, "Net", 43, modebox);
+					GraphButton("nettog", 0, ID_net, "Net", 43, modebox);
 				}
 				else {
 					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
 					resbox->AddSpacer(2);
 					ScaleButton(ID_rateres, "Rate", 37, resbox); 
-					ScaleButton(ID_net, "Net", 37, modebox);
+					//ScaleButton(ID_net, "Net", 37, modebox);
+					GraphButton("nettog", 0, ID_net, "Net", 37, modebox);
 				}
 				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 				vbox->Add(modebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
@@ -323,11 +324,11 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	else Connect(ID_Sync, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSync));
 
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScaleBox::OnOK));
-	Connect(ID_histhaz1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz1));
-	Connect(ID_histhaz2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz2));
-	Connect(ID_binres1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes1));
-	Connect(ID_binres2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes2));
-	Connect(ID_net, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNetMode));
+	//Connect(ID_histhaz1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz1));
+	//Connect(ID_histhaz2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz2));
+	//Connect(ID_binres1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes1));
+	//Connect(ID_binres2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes2));
+	//Connect(ID_net, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNetMode));
 	//Connect(ID_norm, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNorm));
 
 	Connect(ID_allburst, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnAllBurst));
@@ -435,6 +436,8 @@ void ScaleBox::OnGStore(wxCommandEvent& event)
 		outline.Printf("%.0f", (*modflags)[flagrefs->refbase[i].label]);  
 		paramfile.AddLine(flagrefs->refbase[i].label + " " + outline);
 	}*/
+
+	if(mainwin->graphbox) mainwin->graphbox->SetParams();
 
 	gmod->graphbase->BaseStore(filepath, filetag);
 }
@@ -697,11 +700,14 @@ wxButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label,
 
 void ScaleBox::OnGraphButton(wxCommandEvent& event)
 {
+	wxString text;
 	int id = event.GetId();
 	wxString tag = gflagrefs->GetRef(id);
 
 	if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
 	else (*gflags)[tag] = 0;
+
+	mainwin->diagbox->Write(text.Format("graphbutton %s %.0f", tag, (*gflags)[tag]));
 
 	GraphSwitch();
 }
@@ -992,7 +998,7 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["cortflag"] = cortflag;
 	(*gflags)["rateres"] = rateres;
 	(*gflags)["timeres"] = timeres;
-	(*gflags)["nettog"] = nettog;
+	//(*gflags)["nettog"] = nettog;
 	(*gflags)["expdatflag"] = expdatflag;
 	(*gflags)["burstmode"] = burstmode;
 	(*gflags)["ratedata"] = ratedata;
@@ -1005,12 +1011,13 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["vmhflag"] = vmhflag;
 	//(*gflags)["normtog"] = 0;
 
+	/*
 	if(boxtype != modVMN) {
 		(*gflags)["hazmode1"] = hazmode1;
 		(*gflags)["hazmode2"] = hazmode2;
 		(*gflags)["binrestog1"] = binrestog1;
 		(*gflags)["binrestog2"] = binrestog2;
-	}
+	}*/
 
 	return gflags;
 }
