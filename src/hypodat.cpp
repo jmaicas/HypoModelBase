@@ -256,8 +256,9 @@ wxString GraphDat::StoreDat(wxString tag)
 	stytag = ytag;
 	stytag.Replace(" ", "_");
 
-	return gtext.Format("v2 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s", 
-		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), xshift, xunitscale, plotstroke, stgname, stxtag, stytag);
+	return gtext.Format("v3 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %.4f yp %.4f pf %.4f cm %d", 
+		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
+		xshift, xunitscale, plotstroke, stgname, stxtag, stytag, xplot, yplot, labelfontsize);
 }
 
 
@@ -368,6 +369,13 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		ytag = readline.BeforeFirst(' ');
 		ytag.Replace("_", " ");
 	}	
+
+	if(version > 2) {
+		xplot = ParseDouble(&readline, 'p');
+		yplot = ParseDouble(&readline, 'p');
+		labelfontsize = ParseDouble(&readline, 'f');
+		clipmode = ParseLong(&readline, 'm');
+	}
 }
 
 
@@ -461,6 +469,7 @@ void GraphDat::Init()
 	ylabelgap = 30;
 	labelfontsize = 10;
 	tickfontsize = 10;
+	clipmode = 1;
 }
 
 

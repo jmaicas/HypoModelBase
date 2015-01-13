@@ -82,6 +82,16 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
 
+	paramset->AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
+	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
+	clipcheck->SetFont(confont);
+	clipcheck->SetValue(graph->clipmode);
+	wxBoxSizer *fontparams = new wxBoxSizer(wxHORIZONTAL);
+	fontparams->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	fontparams->AddSpacer(5);
+	fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	paramset->currlay++;
+
 	colourpicker = new wxColourPickerCtrl(panel, 0, graphwin->colourpen[graph->colour], wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
 	paramset->AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
 	wxBoxSizer *colourbox = new wxBoxSizer(wxHORIZONTAL);
@@ -119,6 +129,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(plotparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->Add(fontparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(colourbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
@@ -169,7 +180,12 @@ void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 	paramset->GetCon("xlabelgap")->SetValue(graph->xlabelgap);
 	paramset->GetCon("ylabelgap")->SetValue(graph->ylabelgap);
 	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
+	paramset->GetCon("labelfontsize")->SetValue(graph->labelfontsize);
 
+
+	//paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
+
+	clipcheck->SetValue(graph->clipmode);
 	xrad[graph->xtickmode]->SetValue(true);
 	yrad[graph->ytickmode]->SetValue(true);
 
@@ -236,7 +252,9 @@ void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 	graph->plotstroke = (*params)["plotstroke"];
 	graph->xlabelgap = (*params)["xlabelgap"];
 	graph->ylabelgap = (*params)["ylabelgap"];
+	graph->labelfontsize = (*params)["labelfontsize"];
 
+	graph->clipmode = clipcheck->GetValue();
 	graph->strokecolour = colourpicker->GetColour();
 	graph->colour = custom;
 
@@ -244,34 +262,9 @@ void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 	graph->xtag = paramset->GetCon("xtag")->GetString();
 	graph->ytag = paramset->GetCon("ytag")->GetString();
 	
-
-
 	graphwin->UpdateScroll(-1);
 
 	diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
-
-	/*
-	numdrawcon->numbox->GetValue().ToLong(&stringnum);
-	mainwin->numdraw = stringnum;
-
-	viewheightcon->numbox->GetValue().ToLong(&stringnum);
-	mainwin->viewheight = stringnum;
-
-	ylabelcon->numbox->GetValue().ToLong(&stringnum);
-	mainwin->ylabels = stringnum;
-
-	datsamplecon->numbox->GetValue().ToLong(&stringnum);
-	mainwin->datsample = stringnum;
-
-	mainwin->parampath = parampathcon->GetValue();
-	mainwin->datapath = datapathcon->GetValue();
-	mainwin->outpath = outpathcon->GetValue();
-	mainwin->modpath = modpathcon->GetValue();
-
-	snum.Printf("ok numdraw %d", mainwin->numdraw);
-	mainwin->SetStatus(snum);
-	*/
-	//Close();
 }
 
 

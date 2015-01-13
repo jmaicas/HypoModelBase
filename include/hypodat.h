@@ -299,6 +299,7 @@ public:
 	double xlabelgap, ylabelgap;
 	double labelfontsize, tickfontsize;
 	double xunitscale;
+	int clipmode;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

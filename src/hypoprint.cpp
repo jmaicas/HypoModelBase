@@ -114,8 +114,19 @@ void GraphWindow3::PrintEPS()
 	xrange = (double)xplot / (xto - xfrom); 
 	xnum = (double)(xto - xfrom) / xplot;
 
-	// Draw graph data
+	out.WriteLine(text.Format("gsave"));
 
+	if(graph->clipmode) {
+		out.WriteLine("newpath");
+		out.MoveTo(xbase, ybase);
+		out.LineTo(xbase, ybase + yplot);
+		out.LineTo(xbase + xplot, ybase + yplot);
+		out.LineTo(xbase + xplot, ybase);
+		out.WriteLine("closepath");
+		out.WriteLine("clip");
+	}
+
+	// Draw graph data
 	out.WriteLine(text.Format("%.2f setlinewidth", plotstroke));
 
 	if(gtype == 7) {                             // scaled width bars
@@ -305,6 +316,7 @@ void GraphWindow3::PrintEPS()
 		out.WriteLine("stroke");
 	}
 
+	out.WriteLine(text.Format("grestore"));
 
 	// Draw Axes
 

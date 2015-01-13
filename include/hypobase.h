@@ -244,7 +244,8 @@ enum {
 	ID_s,
 	ID_ms,
 	ID_net, 
-	ID_norm
+	ID_norm,
+	ID_clipmode
 };
 
 
@@ -352,6 +353,7 @@ public:
 	wxString txt;
 	bool unread;
 	bool readonly;
+	bool buffmode;
     
 	//TextFile(wxString name);
 	TextFile();

@@ -107,6 +107,7 @@ public:
 	wxStaticText *status;
 	wxColourPickerCtrl *colourpicker;
 	wxRadioButton *xrad[2], *yrad[2];
+	wxCheckBox *clipcheck;
 
 	ParamNum *numdrawcon;
 	ParamNum *viewheightcon;
