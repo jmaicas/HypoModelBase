@@ -247,18 +247,18 @@ GraphDat::GraphDat()
 wxString GraphDat::StoreDat(wxString tag)
 {
 	wxString gtext;
-	wxString stgname, stxtag, stytag;
+	wxString storegname, storextag, storeytag;
 
-	stgname = gname;                       // replace spaces with underscores for textfile storing
-	stgname.Replace(" ", "_");
-	stxtag = xtag;
-	stxtag.Replace(" ", "_");
-	stytag = ytag;
-	stytag.Replace(" ", "_");
+	storegname = gname;                       // replace spaces with underscores for textfile storing
+	storegname.Replace(" ", "_");
+	storextag = xtag;
+	storextag.Replace(" ", "_");
+	storeytag = ytag;
+	storeytag.Replace(" ", "_");
 
-	return gtext.Format("v3 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %.4f yp %.4f pf %.4f cm %d", 
+	return gtext.Format("v3 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
-		xshift, xunitscale, plotstroke, stgname, stxtag, stytag, xplot, yplot, labelfontsize);
+		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode);
 }
 
 

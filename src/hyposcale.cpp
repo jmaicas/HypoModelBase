@@ -244,14 +244,14 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			if(i == 1) {
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
-					ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
-					ScaleButton(ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
 				else {
-					ScaleButton(ID_histhaz1, "Hist / Haz", 54, vbox);
-					ScaleButton(ID_binres1, "Bin Res", 43, binbox);
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
 					//ScaleButton(ID_norm, "Norm", 35, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 55, vbox);
@@ -510,7 +510,7 @@ void ScaleBox::GLoad(wxString tag)
 	//gmod->graphbase->BaseLoad(filetag);
 	mainwin->diagbox->Write("BaseLoad\n");
 
-	if(mainwin->graphbox) mainwin->graphbox->SetGraph();
+	//if(mainwin->graphbox) mainwin->graphbox->SetGraph();
 
 	gmod->gsmode = 1;
 	GraphSwitch(0);
@@ -995,10 +995,6 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["nettog"] = nettog;
 	(*gflags)["expdatflag"] = expdatflag;
 	(*gflags)["burstmode"] = burstmode;
-	(*gflags)["hazmode1"] = hazmode1;
-	(*gflags)["hazmode2"] = hazmode2;
-	(*gflags)["binrestog1"] = binrestog1;
-	(*gflags)["binrestog2"] = binrestog2;
 	(*gflags)["ratedata"] = ratedata;
 	(*gflags)["profmode"] = profmode;
 	(*gflags)["proftype"] = proftype;
@@ -1009,6 +1005,13 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["vmhflag"] = vmhflag;
 	//(*gflags)["normtog"] = 0;
 
+	if(boxtype != modVMN) {
+		(*gflags)["hazmode1"] = hazmode1;
+		(*gflags)["hazmode2"] = hazmode2;
+		(*gflags)["binrestog1"] = binrestog1;
+		(*gflags)["binrestog2"] = binrestog2;
+	}
+
 	return gflags;
 }
 
@@ -1018,6 +1021,7 @@ void ScaleBox::GraphSwitch(int disp)
 	GetFlags();
 	gmod->GSwitch(gpos, gflags);
 	ScaleUpdate();
+	if(mainwin->graphbox) mainwin->graphbox->SetGraph();
 	//if(disp) GraphUpdate();
 }
 

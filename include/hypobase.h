@@ -32,6 +32,7 @@
 //#define _CRTDBG_MAP_ALLOC_NEW
 //#include <stdlib.h>
 //#include <crtdbg.h>
+
 #ifndef OSXClip
 #include <vld.h>
 #endif

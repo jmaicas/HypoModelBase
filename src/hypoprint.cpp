@@ -35,7 +35,6 @@ void GraphWindow3::PrintEPS()
 	int xoffset, xindex;
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
-	//wxColour colour;
 	int colour;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
@@ -102,7 +101,7 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine("1 setlinejoin");
 	out.WriteLine("");
 
-	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour])));   
+	out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour)));   
 
 	// Set drawing scales
 	xtoAxis = xto;
@@ -266,7 +265,7 @@ void GraphWindow3::PrintEPS()
 		oldy = ybase + yrange * (preval - yfrom);
 
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour]))); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
 		for(i=0; i<=(xto - xfrom) / sample; i++) {		
 			xindex = i + ceil(xfrom / sample);
 			xpos = (int)(xindex * sample - xfrom) * xrange;
@@ -300,7 +299,7 @@ void GraphWindow3::PrintEPS()
 	if(gtype == 4 || gtype == 5) {                         // line graph
 		xoffset = 0;
 		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[colour]))); 
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
 
 		oldx = xbase;
 		oldy = ybase + yrange * ((*gdatadv)[xfrom] - yfrom);            // TODO proper start coordinates
