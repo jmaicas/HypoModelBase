@@ -479,7 +479,7 @@ void GraphDat::Init()
 	ylabelgap = 30;
 	labelfontsize = 10;
 	tickfontsize = 10;
-	clipmode = 1;
+	clipmode = 0;
 }
 
 

@@ -173,14 +173,17 @@ void GraphWindow3::PrintEPS()
 			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange - bargap, ybase);
 			out.WriteLine("closepath");
+			out.WriteLine("gsave");
 			out.WriteLine("fill");
+			out.WriteLine("grestore");
 			
+			/*
 			out.WriteLine("newpath");
 			out.MoveTo(xpos, ybase);
 			out.LineTo(xpos, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange - bargap, ybase);
-			out.WriteLine("closepath");
+			out.WriteLine("closepath");*/
 			out.WriteLine("stroke");
 		}
 	}
