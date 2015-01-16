@@ -77,10 +77,12 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	currentgraph = 0;
 	spikedisp = 0;
 	gsynch = 1;
+	
+	selectband = false;
 
 	colourpen = mainwin->colourpen;
 
-	overlay = new wxOverlay();
+	//overlay = new wxOverlay();
 
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
 
@@ -195,7 +197,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 
 GraphWindow3::~GraphWindow3()
 {
-	delete overlay;
+	//delete overlay;
 	delete menuPlot;
 }
 
@@ -287,6 +289,14 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 
 	snum.Printf("LDown %d", pos.x);
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
+
+	int x,y,xx,yy ;
+  //event.GetPosition(&x,&y);
+  //CalcUnscrolledPosition( x, y, &xx, &yy );
+  anchorpos = pos;
+  currentpos = anchorpos;
+  selectband = true;
+  //CaptureMouse() ;
 }
 
 
@@ -321,7 +331,14 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 	else snum.Printf("LUp %d", pos.x);
 
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
-	
+
+	selectband = false;
+	//ReleaseMouse();
+	{wxClientDC dc(this);
+	PrepareDC(dc);
+	wxDCOverlay overlaydc(overlay, &dc);
+	overlaydc.Clear();}
+  overlay.Reset();
 }
 
 
@@ -414,6 +431,31 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 	if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
 	else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
 	mainwin->SetStatusText(snum);
+
+	if(selectband) {
+		int x,y, xx, yy;
+		event.GetPosition(&x,&y);
+		//CalcUnscrolledPosition( x, y, &xx, &yy );
+	  currentpos = pos;
+		if(currentpos.y > ybase + yplot) currentpos.y = ybase + yplot;
+		anchorpos.y = ybase;
+		currentpos.y = ybase + yplot;
+		wxRect newrect(anchorpos, currentpos);
+		wxClientDC dc(this);
+		PrepareDC(dc);
+		//wxDCOverlay overlaydc(overlay, &dc, xbase, ybase, xplot, yplot);
+		wxDCOverlay overlaydc(overlay, &dc);
+		overlaydc.Clear();
+#ifdef __WXMAC__
+		dc.SetPen(*wxGREY_PEN);
+		dc.SetBrush(wxColour(192,192,192,64));
+#else
+		dc.SetPen(wxPen(*wxLIGHT_GREY, 2));
+		dc.SetBrush(*wxTRANSPARENT_BRUSH);
+		//dc.SetBrush( *wxBLUE_BRUSH );
+#endif
+		dc.DrawRectangle(newrect);
+	}
 }
 
 

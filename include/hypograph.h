@@ -34,13 +34,18 @@ public:
 	int gsynch;
 	int xstretch;
 	wxPoint mousedown;
-	wxOverlay *overlay;
+	//wxOverlay *overlay;
 	wxFont textfont, smallfont;
 	wxColour *colourpen;
 	//wxString colourstring[10];
 	wxBufferedPaintDC *dc;
 
 	wxMenu *menuPlot;
+
+	// Selection Overlay
+	bool selectband;
+	wxPoint anchorpos, currentpos;
+	wxOverlay overlay;
 
 	wxTextCtrl *yf;
 	wxTextCtrl *yt;

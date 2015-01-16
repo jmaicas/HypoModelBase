@@ -68,6 +68,10 @@ class SpikeDat{
 public:
 	SpikeDat();
 	~SpikeDat();
+
+	DiagBox *diagbox;
+
+
 	datdouble times;
 	datdouble isis;
 	BurstDat *burstdata;
@@ -185,11 +189,14 @@ public:
 	int burstdisp;
 	int maxbursts;
 	double maxtime;
+	bool selectmode;
 	
 	datdouble haz1;
 	datdouble hist1;
+	datdouble hist1norm;
 	datdouble haz5;
 	datdouble hist5;
+	datdouble hist5norm;
 	datdouble spikes;
 	datdouble times;
 	datdouble profile;
@@ -226,7 +233,7 @@ public:
 	double pmodetime;
 	int pnzcount;
 	
-	BurstDat();
+	BurstDat(bool select=false);
 	~BurstDat();
 	int spikeburst(int);
 	//void Scan(BurstBox *);

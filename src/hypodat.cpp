@@ -101,6 +101,8 @@ void SpikeDat::ReSize(int newsize)
 
 SpikeDat::SpikeDat()
 {
+	diagbox = NULL;
+
 	hist1.setsize(10000);
 	hist5.setsize(10000);
 	haz1.setsize(10000);
@@ -152,12 +154,16 @@ SpikeDat::~SpikeDat()
 }
 
 
-BurstDat::BurstDat()
+BurstDat::BurstDat(bool select)
 {
+	selectmode = select; 
+
 	burstdisp = 0;
 	numbursts = 0;
 	hist1.data.resize(10000);
 	hist5.data.resize(10000);
+	hist1norm.data.resize(10000);
+	hist5norm.data.resize(10000);
 	haz1.data.resize(10000);
 	haz5.data.resize(10000);
 	spikes.data.resize(100000);

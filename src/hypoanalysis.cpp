@@ -200,9 +200,11 @@ void SpikeDat::IntraBurstAnalysis()
 	TextFile outfile;
 	wxString filename, filetag, text;
 
-	scandiag = false;
+	scandiag = true;
 
 	if(scandiag) outfile.New("intradat.txt");
+
+	if(diagbox) diagbox->Write("Intra Burst Analysis\n");
 
 	 // Intraburst Re-Analysis  
 
@@ -221,9 +223,11 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->haz5[i] = 0;
 	}
 
+	diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
+
 	for(i=0; i<spikecount-1; i++) {
 		if(burstdata->spikes[i] > 0 && isis[i] < maxspikes) {
-			if(i == burstdata->bustore[bindex].end) {
+			if(!burstdata->selectmode && i == burstdata->bustore[bindex].end) {
 				//fprintf(ofp, "New burst %d, time total %.2f\n", bindex, inttime);
 				bindex++;
 				if(scandiag) outfile.WriteLine(text.Format("i %d burstend", i));
@@ -242,7 +246,7 @@ void SpikeDat::IntraBurstAnalysis()
 			}
 		}
 	}
-
+	
 	//mean = mean / (scount - burstdata->numbursts);
 	//variance = variance / (scount - burstdata->numbursts);
 	mean = mean / intcount;
@@ -260,6 +264,8 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->meanisi = 0;
 	}
 
+	diagbox->Write(text.Format("intcount %d\n", intcount));
+	
 	//burstdata->intraspikes = intracount;
 	//burstdata->intraspikes = scount;
 	//burstdata->isisd = sqrt(variance - mean * mean);
@@ -416,7 +422,7 @@ void SpikeDat::IntraSelectAnalysis()
 		if(burstdata->hist5.data.size() < burstdata->hist5.max + 1)	burstdata->hist5.data.resize(burstdata->hist5.max + 1);
 		burstdata->hist5.data[i/binsize] = burstdata->hist5.data[i/binsize] + burstdata->hist1.data[i];		
 	}
-
+	
 	if(scandiag) outfile.Close();
 }
 
