@@ -311,12 +311,13 @@ void HypoMain::CleanUp() {
 
 void HypoMain::FullMenu()
 {
+	bool display = true;
+
 	wxMenu *menuFile = new wxMenu;
 	wxMenu *menuControls = new wxMenu;
 	//wxMenu *menuAnalysis = new wxMenu;
 	wxMenu *menuTools = new wxMenu;
 	wxMenu *menuSystem = new wxMenu;
-	//wxMenu *menuDisplay = new wxMenu;
 	
 	menuFile->Append(ID_About, "&About...");
 	menuFile->AppendSeparator();
@@ -340,11 +341,8 @@ void HypoMain::FullMenu()
 	menuTools->Append(ID_GraphAdd, "Add Graph");
 	menuTools->Append(ID_ModGen, "Mod Gen");
 	menuTools->Append(ID_Diag, "Diagnostic Box");
-
-	
 	
 	menuSystem->Append(ID_Options, "Options");
-	//menuDisplay->Append(ID_Display, "New Display");
 	
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(menuFile, "&File");
@@ -352,7 +350,12 @@ void HypoMain::FullMenu()
 	//menuBar->Append(menuAnalysis, "Analysis");
 	menuBar->Append(menuTools, "Tools");
 	menuBar->Append(menuSystem, "System");
-	//menuBar->Append(menuDisplay, "Display");
+
+	if(display) {
+		wxMenu *menuDisplay = new wxMenu;
+		menuDisplay->Append(ID_Display, "New Display");
+		menuBar->Append(menuDisplay, "Display");
+	}
 	
 	SetMenuBar(menuBar);
 

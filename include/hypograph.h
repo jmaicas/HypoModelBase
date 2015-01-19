@@ -13,6 +13,21 @@
 #include <wx/clrpicker.h>
 
 
+
+class GraphPanel: public wxScrolledWindow             // For testing, not in Use
+{
+public:
+	bool usebuffer;
+	
+	GraphPanel(wxFrame *parent);
+
+	void OnPaint(wxPaintEvent &event);
+	void OnEraseBackground(wxEraseEvent& event);
+	void PaintBackground(wxDC& dc);
+	void Draw(wxDC &dc);
+};
+
+
 class GraphWindow3: public wxPanel
 {
 public:
@@ -268,6 +283,7 @@ public:
 	graphdisp *gpos;
 	ScaleBox *scalebox;
 	GraphWindow3 *graphwin[10];
+	GraphPanel *graphpanel[10];
 
 	DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size, int start, int numgraphs);
 	void GraphUpdate();

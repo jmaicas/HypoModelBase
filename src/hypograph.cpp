@@ -19,19 +19,25 @@ DispWin::DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, cons
 	startpos = start;
 	numdraw = numgraphs;
 
-	scalebox = new ScaleBox(mainwin, this, wxSize(80, 780), numdraw, gpos, mainwin->mod, graphwin, startpos);
+	//scalebox = new ScaleBox(mainwin, this, wxSize(80, 780), numdraw, gpos, mainwin->mod, graphwin, startpos);
 
 	wxBoxSizer *mainsizer = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *graphsizer = new wxBoxSizer(wxVERTICAL); 
 
+	graphpanel[0] = new GraphPanel(this);
+
 	//graphsizer->AddSpacer(5);
-	mainsizer->Add(scalebox, 1, wxEXPAND);
+	//mainsizer->Add(scalebox, 1, wxEXPAND);
 	mainsizer->Add(graphsizer, 7, wxEXPAND);
 
+
+	graphsizer->Add(graphpanel[0], 1, wxEXPAND);
+
+	/*
 	for(graph = 0; graph<numdraw; graph++) {
 		graphwin[graph] = new GraphWindow3(mainwin, this, mainwin->mod, wxPoint(0, graph*250 + 10), wxSize(100, 255), &gpos[graph+startpos], graph+startpos);
 		graphsizer->Add(graphwin[graph], 1, wxEXPAND);
-	}
+	}*/
 
 	CreateStatusBar();
 	SetSizer(mainsizer);
@@ -438,7 +444,7 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 		//CalcUnscrolledPosition( x, y, &xx, &yy );
 	  currentpos = pos;
 		if(currentpos.y > ybase + yplot) currentpos.y = ybase + yplot;
-		anchorpos.y = ybase;
+		anchorpos.y = ybase - 10;
 		currentpos.y = ybase + yplot;
 		wxRect newrect(anchorpos, currentpos);
 		wxClientDC dc(this);
@@ -450,7 +456,7 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 		dc.SetPen(*wxGREY_PEN);
 		dc.SetBrush(wxColour(192,192,192,64));
 #else
-		dc.SetPen(wxPen(*wxLIGHT_GREY, 2));
+		dc.SetPen(wxPen(*wxBLUE, 2));
 		dc.SetBrush(*wxTRANSPARENT_BRUSH);
 		//dc.SetBrush( *wxBLUE_BRUSH );
 #endif
