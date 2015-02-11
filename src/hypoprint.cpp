@@ -162,6 +162,7 @@ void GraphWindow3::PrintEPS()
 		for(i=0; i<(xto - xfrom); i++) {
 			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
 			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+			if(y == 0) continue;
 			xpos = i * xrange + xbase;
 
 			//if(xrange <= 1) DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
@@ -241,15 +242,19 @@ void GraphWindow3::PrintEPS()
 			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange - bargap, ybase);
 			out.WriteLine("closepath");
+			out.WriteLine("gsave");
+			out.WriteLine("fill");
+			out.WriteLine("grestore");
 			out.WriteLine("stroke");	
 
+			/*
 			out.WriteLine("newpath");
 			out.MoveTo(xpos, ybase);
 			out.LineTo(xpos, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
 			out.LineTo(xpos + xrange - bargap, ybase);
 			out.WriteLine("closepath");
-			out.WriteLine("fill");	
+			out.WriteLine("fill");*/	
 		}	
 	}
 
@@ -378,7 +383,7 @@ void GraphWindow3::PrintEPS()
 		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
 		if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
-		out.MoveTo(xbase + xcoord, ybase - 17);
+		out.MoveTo(xbase + xcoord, ybase - 15);
 		out.WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
 		out.WriteLine("stroke");
 	}
