@@ -223,7 +223,7 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->haz5[i] = 0;
 	}
 
-	diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
+	if(diagbox) diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
 
 	for(i=0; i<spikecount-1; i++) {
 		if(burstdata->spikes[i] > 0 && isis[i] < maxspikes) {
@@ -264,7 +264,7 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->meanisi = 0;
 	}
 
-	diagbox->Write(text.Format("intcount %d\n", intcount));
+	if(diagbox) diagbox->Write(text.Format("intcount %d\n", intcount));
 	
 	//burstdata->intraspikes = intracount;
 	//burstdata->intraspikes = scount;
@@ -1135,7 +1135,9 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int datset, int colou
 	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, green + shift), reftag + "hazquad", reftag);
 
 	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
-	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
+	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 4, 5, colour + shift), reftag + "normhist5ms", reftag);
+
+	//graphbase->Add(GraphDat(&vasoneurodata->Ca, 0, 500, 0, 500, "Vaso Net Ca", 4, 1, lightgreen, 1000/datsample), "vasonetCa");
 
 	graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 

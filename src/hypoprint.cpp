@@ -35,7 +35,7 @@ void GraphWindow3::PrintEPS()
 	int xoffset, xindex;
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
-	int colour;
+	int gplot, colour;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -50,8 +50,30 @@ void GraphWindow3::PrintEPS()
 	xoffset = 1;
 	axisstroke = 0.75;
 
+	// Set output file path
+	filepath = mainwin->outpath;
+	//filetag = paramstoretag->GetValue();
+	filetag = "test";
+	filename = filepath + "/" + filetag + "-" + gname + ".eps";
+
+	// Initialise postscript file and write header
+	//out.New("C:/Users/Duncan/Desktop/plot.eps");
+	out.New(filename);
+	out.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
+	out.WriteLine("%%BoundingBox: 0 0 1000 500");
+	out.WriteLine("/pu {1 mul} def");                        // pu = plot units, set scaling to points
+	out.WriteLine("/Helvetica findfont 10 scalefont setfont");
+	out.WriteLine("0 0 0 setrgbcolor");
+	out.WriteLine("1 setlinecap");
+	out.WriteLine("1 setlinejoin");
+	out.WriteLine("");
+
+
+	for(gplot=0; gplot<numgraphs; gplot++) {
+		graph = graphset[gplot]->plot[0];
+
 	// Get Graph parameters
-	graph = graphset[0]->plot[0];
+	//graph = graphset[0]->plot[0];
 	gpar = graph->gparam;
 	xscale = graph->xscale;
 	xshift = graph->xshift;
@@ -82,25 +104,6 @@ void GraphWindow3::PrintEPS()
 	if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
 	else burstdata = NULL;
 
-	// Set output file path
-
-	filepath = mainwin->outpath;
-	//filetag = paramstoretag->GetValue();
-	filetag = "test";
-	filename = filepath + "/" + filetag + "-" + gname + ".eps";
-
-	// Initialise postscript file and write header
-	//out.New("C:/Users/Duncan/Desktop/plot.eps");
-	out.New(filename);
-	out.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
-	out.WriteLine("%%BoundingBox: 0 0 1000 500");
-	out.WriteLine("/pu {1 mul} def");                        // pu = plot units, set scaling to points
-	out.WriteLine("/Helvetica findfont 10 scalefont setfont");
-	out.WriteLine("0 0 0 setrgbcolor");
-	out.WriteLine("1 setlinecap");
-	out.WriteLine("1 setlinejoin");
-	out.WriteLine("");
-
 	out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour)));   
 
 	// Set drawing scales
@@ -115,6 +118,7 @@ void GraphWindow3::PrintEPS()
 
 	out.WriteLine(text.Format("gsave"));
 
+	
 	if(graph->clipmode) {
 		out.WriteLine("newpath");
 		out.MoveTo(xbase, ybase);
@@ -324,6 +328,8 @@ void GraphWindow3::PrintEPS()
 	}
 
 	out.WriteLine(text.Format("grestore"));
+
+	}
 
 	// Draw Axes
 

@@ -161,18 +161,36 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				//vbox->Add(rightarrow, 0);
 			}
 			//vbox->AddSpacer(2);
+			
 			if(i == 1) {
+				/*
 				if(ostype == Mac) {
-					ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
-					ScaleButton(ID_binres1, "Bin Res", 60, vbox);
+				ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
+				ScaleButton(ID_binres1, "Bin Res", 60, vbox);
+				ScaleButton(ID_allburst, "All / Burst", 74, vbox);
+				}
+				else {
+				ScaleButton(ID_histhaz1, "Hist / Haz", 54, vbox);
+				ScaleButton(ID_binres1, "Bin Res", 43, vbox);
+				ScaleButton(ID_allburst, "All / Burst", 55, vbox);
+				}	*/	
+
+				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+				if(ostype == Mac) {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
 					ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
 				else {
-					ScaleButton(ID_histhaz1, "Hist / Haz", 54, vbox);
-					ScaleButton(ID_binres1, "Bin Res", 43, vbox);
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
 					ScaleButton(ID_allburst, "All / Burst", 55, vbox);
 				}		
+				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
+
 			//vbox->AddSpacer(2);
 			if(i == 2) {		
 				wxBoxSizer *secbox = new wxBoxSizer(wxHORIZONTAL); 
@@ -206,6 +224,22 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		}
 
 		if(boxtype == modHeat) {
+			if(i == 1) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+		}
+
+		if(boxtype == modFirstTest) {
 			if(i == 1) {
 				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 				if(ostype == Mac) {
