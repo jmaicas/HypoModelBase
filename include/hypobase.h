@@ -13,7 +13,7 @@
 #include "wx/dcbuffer.h"
 #include "wx/msgqueue.h"
 #include <wx/textfile.h>
-#include <hypodef.h>
+//#include <hypodef.h>
 
 
 //#include "hypocontrols.h"

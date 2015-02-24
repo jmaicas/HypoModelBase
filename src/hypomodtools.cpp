@@ -169,9 +169,9 @@ void ModGenBox::Read()
 
 	// hypodef.cpp : read and update
 
-	inpath = "src\\";
-	PageRead(platecount, "hypodef.h", inpath); 
-	PageRead(platecount+1, "hypodef.cpp", inpath); 
+	//inpath = "src\\";
+	PageRead(platecount, "hypodef.h", "include\\"); 
+	PageRead(platecount+1, "hypodef.cpp", ""); 
 }
 
 

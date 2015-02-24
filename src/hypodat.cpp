@@ -755,7 +755,7 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 			//textbox->AppendText(text.Format("Name string %s\n", namestring));
 			gname = ParseString(&namestring, 'e');
 			gname.Replace("_", " ");
-			textbox->AppendText(text.Format("gname %s\n", gname));
+			if(textbox) textbox->AppendText(text.Format("gname %s\n", gname));
 			graph = GetGraphFromName(gname);
 			if(graph) graph->LoadDat(readline, version);
 		}

@@ -1102,7 +1102,7 @@ void SpikeDat::inputsim(double halflife)
 }
 
 
-int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int datset, int colour, int light, wxString reftag, wxString btag)
+int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light, wxString reftag, wxString btag)
 {
 	int setindex;
 	int shift;
@@ -1145,7 +1145,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int datset, int colou
 }
 
 
-int SpikeDat::GraphSetLysis(GraphBase *graphbase, wxString tag, int datset, int colour, int light, wxString reftag, wxString btag)
+int SpikeDat::GraphSetLysis(GraphBase *graphbase, wxString tag, int colour, int light, wxString reftag, wxString btag)
 {
 	int setindex;
 	int shift;

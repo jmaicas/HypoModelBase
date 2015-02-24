@@ -2,7 +2,7 @@
 
 #include <hypomodel.h>
 #include <wx/print.h>
-//#include <hypodef.h>
+#include <hypodef.h>
 //#include "hypomods.h"
 //#include "hypopanels.h"
 //#include "cortmod.h"

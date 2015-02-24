@@ -141,8 +141,8 @@ public:
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *);
 	void BurstProfile();
-	int GraphSet(GraphBase *, wxString, int, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
-	int GraphSetLysis(GraphBase *, wxString, int, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	void Clear();
 	void ReSize(int);
 };

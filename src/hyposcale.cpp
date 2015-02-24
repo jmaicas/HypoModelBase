@@ -1,6 +1,7 @@
 
 #include <hypomodel.h>
 #include <hypograph.h>
+#include <hypodef.h>
 
 
 
@@ -1018,8 +1019,15 @@ UpdateScale(0);
 
 void ScaleBox::SetMod(Model *model)
 {
+	/*
 	if(dispmod != model->modtype) {
 		dispmod = model->modtype;
+		gbase = model->graphbase;
+		gmod = model;
+		GraphSwitch(0);
+	}*/
+	if(mod != model) {
+		mod = model;
 		gbase = model->graphbase;
 		gmod = model;
 		GraphSwitch(0);
