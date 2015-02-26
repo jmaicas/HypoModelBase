@@ -194,6 +194,7 @@ public:
 	void OnRightClick(wxMouseEvent& event);
 	void OnUndo(wxCommandEvent& event);
 	void OnCopy(wxCommandEvent& event);
+	void ColumnData(int, datdouble *);
 };
 
 

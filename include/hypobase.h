@@ -320,6 +320,7 @@ public:
 	wxSize screensize;
 	wxString snum, text;
 	wxBoxSizer *mainsizer;
+	wxStatusBar *statusbar;
 	//ToolSet toolset;
 	ToolSet *toolset;
   DiagBox *diagbox;

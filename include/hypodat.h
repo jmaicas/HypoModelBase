@@ -264,6 +264,24 @@ public:
 };
 
 
+class TypeSet
+{
+public:
+	int numtypes;
+	int refindex[10];
+	int typeindex[10];
+	wxString names[10];
+
+	TypeSet() {
+		numtypes = 0; 
+	};
+
+	void Add(wxString, int);
+	int GetIndex(int);
+	int GetType(int);
+};
+
+
 class GraphDat{
 public:
 	GraphDat();
@@ -286,7 +304,15 @@ public:
 	wxString gname;
 	wxString xtag, ytag;
 	int samprate;    // 0 for no limit
-	int type;        // 0 for normal, 1 for histogram
+	int type;        // 0 for normal, 1 for histogram    // 26/2/15 Update this!
+
+	// 1 for histogram
+	// 4 or 5 for line (5 is new scaling fixed version)
+	// 7 for bar
+	// 6 line with sampling
+	// 8 scatter with sampling
+	// 3 for spike rate
+
 	int pos;         // graph position
 	int dataset;
 	int colour;

@@ -16,11 +16,11 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 500),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 550),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
-	int labelwidth;
+	int labelwidth, numwidth;
 	graphwin = graphw; 
 	diagbox = graphwin->mainwin->diagbox;
 
@@ -48,12 +48,13 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	parambox = new wxBoxSizer(wxHORIZONTAL);
 
 	labelwidth = 40;
+	numwidth = 50;
 	if(ostype == Mac) labelwidth = 50;
 	graph = graphwin->graphset[0]->plot[0];
-	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth);
-	paramset->AddNum("xstep", "X Step", graph->xstep, 1, labelwidth);
-	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth);
-	paramset->AddNum("ystep", "Y Step", graph->ystep, 1, labelwidth);
+	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth, numwidth);
+	paramset->AddNum("xstep", "X Step", graph->xstep, 1, labelwidth, numwidth);
+	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth, numwidth);
+	paramset->AddNum("ystep", "Y Step", graph->ystep, 1, labelwidth, numwidth);
 	wxBoxSizer *tickparams = ParamLayout(2);
 
 	wxStaticBoxSizer *xradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
@@ -102,6 +103,33 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset->currlay++;
 	colourbox->Add(colourpicker);
 
+	typeset = TypeSet();
+	typeset.Add("Line", 5);
+	typeset.Add("Line with Sampling", 6);
+	typeset.Add("Scatter with Sampling", 8);
+	typeset.Add("Bar", 7);
+	typeset.Add("Histogram", 1);
+	typeset.Add("Spike Rate", 3);
+
+	/*
+	typestrings[0] = "Line";
+	typestrings[1] = "Line with Sampling";
+	typestrings[2] = "Scatter with Sampling";
+	typestrings[3] = "Bar";
+	typestrings[4] = "Histogram";
+	typestrings[5] = "Spike Rate";*/
+
+	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), 6, typeset.names);
+	typechoice->SetSelection(typeset.GetIndex(graph->type));
+	//typechoice->SetSelection(0);
+	wxBoxSizer *typebox = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Plot Type");
+	label->SetFont(confont);
+	typebox->Add(label, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	typebox->AddSpacer(5);
+	typebox->Add(typechoice);
+	
+
 	paramset->AddText("gname", "Name", graph->gname, labelwidth);
 	paramset->AddText("xtag", "X Label", graph->xtag, labelwidth);
 	paramset->AddText("ytag", "Y Label", graph->ytag, labelwidth);
@@ -133,6 +161,8 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->AddStretchSpacer();
 	mainbox->Add(colourbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
+	mainbox->Add(typebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	mainbox->AddStretchSpacer();
 	mainbox->Add(labelparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	//mainbox->Add(gapparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
@@ -141,6 +171,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 
 	panel->Layout();
 
+	Connect(wxEVT_CHOICE, wxCommandEventHandler(GraphBox::OnChoice));
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(GraphBox::OnRadio));
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnOK));
 	Connect(wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED, wxCloseEventHandler(GraphBox::OnClose));
@@ -216,6 +247,18 @@ void GraphBox::OnSize(wxSizeEvent& event)
 }
 
 
+void GraphBox::OnChoice(wxCommandEvent& event)
+{
+	wxString text;
+
+	graph = graphwin->graphset[0]->plot[0];
+	int selection = typechoice->GetSelection();
+	graph->type = typeset.GetType(selection);
+	//status->SetLabel(text.Format("Type %d", typeset.GetType(selection)));
+	graphwin->UpdateScroll();
+}
+
+
 void GraphBox::OnRadio(wxCommandEvent& event)
 {
 	graph = graphwin->graphset[0]->plot[0];
@@ -270,7 +313,7 @@ void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 
 	SetParams();
 	
-	graphwin->UpdateScroll(-1);
+	graphwin->UpdateScroll();
 	diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
 }
 

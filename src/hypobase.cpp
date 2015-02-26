@@ -23,7 +23,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 {
 	ostype = GetSystem();
 	mainwin = this;
-	CreateStatusBar();
+	statusbar = CreateStatusBar();
 
   diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");

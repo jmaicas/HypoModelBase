@@ -477,12 +477,16 @@ void HypoMain::OnSize(wxSizeEvent& WXUNUSED(event))
 {	
 	int gspace, gspacex;
 	int scalewidth = 155;
+	wxSize statusSize;
 	int i;
 
 	wxSize newsize = GetSize();
+	wxSize graphsize = graphsizer->GetSize();
 	wxPoint mainpos = GetPosition();
 	snum.Printf("Size X %d Y %d", newsize.x, newsize.y);
 	SetStatusText(snum);
+
+	statusSize = statusbar->GetSize();
 	
 	yplot = 200;
 	xplot = 500;
@@ -498,10 +502,15 @@ void HypoMain::OnSize(wxSizeEvent& WXUNUSED(event))
 	if(gspacex < 350) xplot = 300;
 	xplot = gspacex - 15;
 
-	gspace = newsize.y - numdraw * 75 - 5;
+	//gspace = newsize.y - numdraw * 75 - statusSize.y;
+	//gspace = newsize.y - numdraw * 75 - 5;
+	gspace = graphsize.y - numdraw * 55 - 5;
 	if(gspace / numdraw < 200) yplot = 150;
 	if(gspace / numdraw < 150) yplot = 100;
 	yplot = gspace/numdraw;
+
+	snum.Printf("Size X %d Y %d, Graph X %d Y %d, yplot %d", newsize.x, newsize.y, graphsize.x, graphsize.y, yplot);
+	SetStatusText(snum);
 
 	viewwidth = newsize.x;
 	viewheight = newsize.y;

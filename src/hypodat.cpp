@@ -238,6 +238,28 @@ CurrentDat::CurrentDat()
 }
 
 
+void TypeSet::Add(wxString name, int type)
+{
+	names[numtypes] = name;
+	typeindex[numtypes] = type;
+	refindex[type] = numtypes;
+	numtypes++;
+}
+
+
+int TypeSet::GetIndex(int type)
+{
+	if(type == 4) type = 5;
+	return refindex[type];
+}
+
+
+int TypeSet::GetType(int ref)
+{
+	return typeindex[ref];
+}
+
+
 GraphDat::GraphDat()
 {
 	scrollpos = 0;

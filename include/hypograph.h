@@ -126,6 +126,8 @@ public:
 	BoxOut *boxout;
 	wxStaticText *status;
 	wxColourPickerCtrl *colourpicker;
+	wxChoice *typechoice;
+	TypeSet typeset;
 	wxRadioButton *xrad[2], *yrad[2];
 	wxCheckBox *clipcheck;
 
@@ -139,9 +141,11 @@ public:
 	ParamText *modpathcon;
 	GraphBox(GraphWindow3 *, const wxString&);
 
+
 	void OnOK(wxCommandEvent& event);
 	void OnPrint(wxCommandEvent& event);
 	void OnRadio(wxCommandEvent& event);
+	void OnChoice(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
 	wxBoxSizer *ParamLayout(int columns=1);
 	void OnClose(wxCloseEvent& event);
