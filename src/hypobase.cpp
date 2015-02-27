@@ -368,6 +368,7 @@ datint::datint()
 datdouble::datdouble(wxTextCtrl *text)
 {
 	zero = 0;
+	maxindex = 0;
 	textbox = text;
 }
 
@@ -378,6 +379,7 @@ datdouble::datdouble(int size)
 	data.resize(size * 1.1);
 	max = size;
 	textbox = NULL;
+	maxindex = 0;
 }
 
 

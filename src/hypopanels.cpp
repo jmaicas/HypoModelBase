@@ -105,6 +105,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 
 	typeset = TypeSet();
 	typeset.Add("Line", 5);
+	typeset.Add("Line with X data", 2);
 	typeset.Add("Line with Sampling", 6);
 	typeset.Add("Scatter with Sampling", 8);
 	typeset.Add("Bar", 7);
@@ -119,7 +120,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	typestrings[4] = "Histogram";
 	typestrings[5] = "Spike Rate";*/
 
-	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), 6, typeset.names);
+	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), typeset.numtypes, typeset.names);
 	typechoice->SetSelection(typeset.GetIndex(graph->type));
 	//typechoice->SetSelection(0);
 	wxBoxSizer *typebox = new wxBoxSizer(wxHORIZONTAL);

@@ -185,6 +185,7 @@ public:
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20);
 
 	virtual void GridDefault();
+	virtual void TestGrid();
 	void GridStore();
 	void GridLoad();
 	void OnGridStore(wxCommandEvent& event);

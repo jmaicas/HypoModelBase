@@ -248,7 +248,9 @@ enum {
 	ID_ms,
 	ID_net, 
 	ID_norm,
-	ID_clipmode
+	ID_clipmode,
+	ID_Plot,
+	ID_Load
 };
 
 
@@ -392,7 +394,7 @@ public:
 	datdouble(int size);
 	std::vector <double> data;
 	double count;
-	int max;
+	int max, maxindex;
 	double zero;
 	wxString tag, mess;
 	wxTextCtrl *textbox;
@@ -405,6 +407,10 @@ public:
 			return zero;		
 		}
 		return data[index];
+	}
+
+	int maxdex() {
+		return data.size();
 	}
     
 	void setsize(int size, wxTextCtrl *text = NULL, wxString dattag = "") {

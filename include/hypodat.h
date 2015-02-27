@@ -290,12 +290,15 @@ public:
 	GraphDat(datint *, double, double, double, double, wxString, SpikeDat *, double bin = 1, int colour = red);
 
 	DiagBox *diagbox;
+
 	int gparam;
 	int *gdata;
 	short gindex;
 	double *gdatad;
 	datdouble *gdatadv;
 	datint *gdatav;
+	datdouble *gdatax;
+
 	double yfrom;
 	double yto;
 	double xfrom;
@@ -307,6 +310,7 @@ public:
 	int type;        // 0 for normal, 1 for histogram    // 26/2/15 Update this!
 
 	// 1 for histogram
+	// 2 for XY line plot
 	// 4 or 5 for line (5 is new scaling fixed version)
 	// 7 for bar
 	// 6 line with sampling

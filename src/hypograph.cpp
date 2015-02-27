@@ -829,6 +829,22 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		}
 
 
+		if(gtype == 2) {				                            // line graph with X data
+			oldx = xbase + xoffset;
+			oldy = (int)(yplot + ybase - yrange * (yfrom));
+			for(i=0; i<graph->gdatax->maxdex(); i++) {
+				xval = (*graph->gdatax)[i];
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (int)(xval - xfrom) * xrange;
+					y = (*gdatadv)[i];
+					DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+					oldx = xpos + xbase + xoffset;
+					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+				}
+			}
+		}
+
+
 		if(gtype == 6) {                         // line graph with sampling
 			oldx = xbase + xoffset;
 			xindex = (int)xfrom / sample;

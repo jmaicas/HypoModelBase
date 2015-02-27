@@ -402,12 +402,15 @@ void ScaleBox::OnConFocus(wxFocusEvent& event)
 {
 	wxString text; 
 
+	//mainwin->diagbox->Write("\nFocus Event\n");
+
 	int id = event.GetId();
 	TextBox *con = (TextBox *)FindWindowById(id); 
 
 	con->SetFocus();
 	synchcon = con->val;
-	if(mainwin->diagnostic) gmod->diagbox->textbox->AppendText(text.Format("con click %d\n", con->val));
+	//if(mainwin->diagnostic) gmod->diagbox->textbox->AppendText(text.Format("con click %d\n", con->val));
+	mainwin->diagbox->Write(text.Format("con click %d\n", con->val));
 
 	event.Skip();
 }
