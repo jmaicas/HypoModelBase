@@ -376,6 +376,8 @@ ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	defbutt = 0;
 	mainwin = mod->mainwin;
 
+	model->mainwin->diagbox->Write("ParamBox init\n");
+
 	Initialise();
 }
 
@@ -436,12 +438,14 @@ void ParamBox::Initialise()
 	paramset = new ParamSet(activepanel);
 	flagrefs = new RefStore();
 	checkrefs = new RefStore();
-	//if(boxtype == 0 || boxtype == 1) {
+
+	paramstoretag = NULL;
 	if(boxtype == 0 || boxtype == 1) {
+		mainwin->diagbox->Write("Store Box initialise\n");
 		paramstoretag = TextInputCombo(100, 20, "", boxname, mod->GetPath());
 		paramstoretag->Show(false);
 	}
-	else paramstoretag = NULL;
+	
 	//flagset = new FlagSet();
 
 	//panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize); 
@@ -934,6 +938,8 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	wxString outline;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	wxString text;
+	//TextFile paramfile;
+	//bool check;
 
 	//mod->diagbox->Write(text.Format("param store %s\n", boxname));
 
@@ -942,6 +948,7 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	//if(!wxDirExists(filepath)) wxMkdir(filepath);
 	//filepath = mod->GetPath();
 	filepath = mod->GetPath() + "/Params";
+	if(!wxDirExists(filepath)) wxMkdir(filepath);
 
 	// Param data file
 	filetag = paramstoretag->GetValue();
@@ -952,7 +959,8 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
 	paramstoretag->Insert(filetag, 0);
 
-	wxTextFile paramfile(filename);
+  wxTextFile paramfile(filename);
+	//check = paramfile.Open(filename);
 	if(!paramfile.Exists()) paramfile.Create();
 	else if(redtag != filetag) {
 		paramstoretag->SetForegroundColour(redpen);

@@ -489,6 +489,8 @@ ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)
 	toolbox = tbox;
 	mainwin = toolbox->mainwin;
 
+	if(mainwin->diagbox) mainwin->diagbox->Write("ToolPanel init\n");
+
 	//pinmode = 0;
 
 	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
@@ -565,6 +567,8 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	boxname = title;
 	canclose = true;
 
+	//main->diagbox->Write("ToolBox init\n");
+
   Init();
 }
 
@@ -583,7 +587,6 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	Init();
 }
 	
-
 
 /*
 ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, bool close)
@@ -675,6 +678,8 @@ void ToolBox::Init()
 	}
 
 	activepanel = panel;
+
+	//mod->diagbox->Write("ToolBox init\n");
 
 	Connect(wxEVT_MOVE, wxMoveEventHandler(ToolBox::OnMove));
 	Connect(wxEVT_SIZE, wxSizeEventHandler(ToolBox::OnSize));
@@ -899,7 +904,7 @@ void ToolBox::OnClose(wxCloseEvent& event)
 }
 
 
-TagBox::TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxname, wxString modpath)
+TagBox::TagBox(ToolPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxname, wxString modpath)
 	: wxComboBox(panel, wxID_ANY, label, wxDefaultPosition, size)
 {
 	wxString filename, filepath;
@@ -913,11 +918,20 @@ TagBox::TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const 
 	labelset = false;
 	tag = "";
 
+	if(panel->mainwin) diagbox = panel->mainwin->diagbox;
+
+	diagbox->Write("TagBox init\n");
+
 	// tag history load
 	if(name == "") return;
 	filename =  name + "tags.ini";
 	check = opfile.Open(path + "/Tags/" + filename);
-	if(!check) return;
+	if(!check) {
+		if(diagbox) diagbox->Write("No tag history\n");
+		return;
+	}
+
+	diagbox->Write("Reading tag history\n");
 
 	readline = opfile.ReadLine();
 
@@ -931,6 +945,7 @@ TagBox::TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const 
 
 	opfile.Close();	
 	SetLabel(tag);
+	diagbox->Write(name + " " + tag + "\n");
 	if(tag != "") labelset = true;
 }
 

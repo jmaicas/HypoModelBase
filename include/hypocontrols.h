@@ -19,6 +19,7 @@ class MainFrame;
 class ToolBox;
 class Model;
 class ToolSet;
+class ToolPanel;
 
 
 
@@ -37,11 +38,14 @@ class TagBox: public wxComboBox
 {
 public:
 	wxString name, path;
-	bool labelset;
+	bool labelset, histmode;
 	DiagBox *diagbox;
 
-	TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
+	TagBox(ToolPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
 	~TagBox();
+
+	void HistLoad();
+	void HistStore();
 };
 
 

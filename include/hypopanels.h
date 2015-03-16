@@ -143,7 +143,7 @@ public:
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
-	wxBoxSizer *StoreBox(wxString, wxPanel *storepanel=NULL);
+	wxBoxSizer *StoreBox(wxString label="", wxPanel *storepanel=NULL);
 	ParamStore *GetParams(ParamStore *pstore=NULL);
 	ParamStore *GetNumParams();
 	void ParamLayout(int columns=1);
