@@ -67,6 +67,11 @@ void Model::RunModel()
 }
 
 
+void Model::ModClose()
+{
+}
+
+
 void Model::Output()
 {
 	int i;
@@ -238,6 +243,12 @@ void Model::ModStore()
 	//if(!wxDirExists(filepath)) wxMkdir(filepath);
 	filepath = GetPath();
 
+	// Default Parameters
+
+	//if(modbox->defstore) 
+		
+  //modbox->StoreParam("default");
+
 	// Parameter history
 	filename = modname + "prefs.ini";
 	initparams = modbox->paramstoretag->GetValue();
@@ -245,8 +256,6 @@ void Model::ModStore()
 	//wxTextFile opfile("Init//" + filename);
 	//if(!opfile.Exists()) opfile.Create();
 
-
-	
 	opfile.New(filepath + "/" + filename);
 
 	for(i=modbox->paramstoretag->GetCount()-1; i>=0; i--) {

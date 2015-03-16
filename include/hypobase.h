@@ -232,6 +232,8 @@ enum {
 	ID_DataBrowse,
 	ID_OutputBrowse,
 	ID_ParamBrowse,
+	ID_PathBrowse,
+	ID_FileBrowse,
 	ID_ModBrowse,
 	ID_absref,
 	ID_SelectAll,
@@ -250,7 +252,8 @@ enum {
 	ID_norm,
 	ID_clipmode,
 	ID_Plot,
-	ID_Load
+	ID_Load,
+	ID_Browse
 };
 
 

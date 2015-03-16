@@ -75,6 +75,7 @@ public:
 	wxString initparams;
 	wxString name;
 	short histmode;
+	bool defstore;
 
 	HypoMain *mainwin;
 	Model *mod;
@@ -129,6 +130,7 @@ public:
 	void OnSpin(wxSpinEvent& event);
 	void OnAutorun(wxCommandEvent& event);
 	void OnParamStore(wxCommandEvent& event);
+	void StoreParam(wxString tag="");
 	void OnParamLoad(wxCommandEvent& event);
 	void ParamLoad(wxString tag="");
 	void HistStore();

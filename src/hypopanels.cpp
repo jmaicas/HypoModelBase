@@ -374,6 +374,7 @@ ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	boxtype = type;
 	//status = NULL;
 	defbutt = 0;
+	defstore = false;
 	mainwin = mod->mainwin;
 
 	model->mainwin->diagbox->Write("ParamBox init\n");
@@ -887,10 +888,13 @@ void ParamBox::ParamLoad(wxString tag)
 		//sdat = readline.BeforeFirst('k');
 		readline.Trim();
 		//storetag->SetValue(readline);
-		readline.ToDouble(&datval);
 		if(paramset->ref.check(datname)) {
 			id = paramset->ref[datname];
-			paramset->con[id]->SetValue(datval);
+			if(paramset->con[id]->type != textcon) {
+				readline.ToDouble(&datval);
+				paramset->con[id]->SetValue(datval);
+			}
+			else paramset->con[id]->SetValue(readline);
 		}
 		//if(diagnostic) ofp.WriteLine(text.Format("Model Param ID %d, Value %.4f\n", id, datval)); 
 		if(paramfile.Eof()) return;
@@ -934,6 +938,12 @@ void ParamBox::ParamLoad(wxString tag)
 
 void ParamBox::OnParamStore(wxCommandEvent& event)
 {
+	StoreParam();
+}
+
+
+void ParamBox::StoreParam(wxString tag)
+{
 	wxString filetag, filename, filepath;
 	wxString outline;
 	wxColour redpen("#dd0000"), blackpen("#000000");
@@ -941,7 +951,7 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	//TextFile paramfile;
 	//bool check;
 
-	//mod->diagbox->Write(text.Format("param store %s\n", boxname));
+	mainwin->diagbox->Write(text.Format("param store %s\n", boxname));
 
 	//if(mod->path == "") filepath = mod->mainwin->parampath;
 	//else filepath = mod->path + "/Params";
@@ -951,7 +961,8 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	if(!wxDirExists(filepath)) wxMkdir(filepath);
 
 	// Param data file
-	filetag = paramstoretag->GetValue();
+	if(tag == "") filetag = paramstoretag->GetValue();
+	else filetag = tag;
 	filename = filepath + "/" + filetag + "-" + boxname + "param.dat";
 
 	// Param file history
@@ -962,7 +973,7 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
   wxTextFile paramfile(filename);
 	//check = paramfile.Open(filename);
 	if(!paramfile.Exists()) paramfile.Create();
-	else if(redtag != filetag) {
+	else if(tag == "" && redtag != filetag) {
 		paramstoretag->SetForegroundColour(redpen);
 		paramstoretag->SetValue("");
 		paramstoretag->SetValue(filetag);
@@ -979,8 +990,11 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	paramfile.Clear();
 
 	for(i=0; i<paramset->numparams; i++) {
-		paramset->con[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset->con[i]->name]));
-		outline.Printf("%.8f", (*modparams)[paramset->con[i]->name]);  
+		if(paramset->con[i]->type != textcon) {
+			paramset->con[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset->con[i]->name]));
+			outline.Printf("%.8f", (*modparams)[paramset->con[i]->name]);
+		}
+		else outline = paramset->con[i]->GetString();
 		paramfile.AddLine(paramset->con[i]->name + " " + outline);
 	}
 	paramfile.AddLine("");
@@ -995,6 +1009,8 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 	}
 	paramfile.Write();
 	paramfile.Close();
+
+	mainwin->diagbox->Write("Param File OK\n");
 }
 
 
