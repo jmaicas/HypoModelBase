@@ -713,7 +713,7 @@ wxStaticText *ToolBox::TextLabel(wxString label)
 TagBox *ToolBox::TextInputCombo(int width, int height, wxString label, wxString name, wxString path)
 {
 	//wxComboBox *text = new (_NORMAL_BLOCK, __FILE__, __LINE__) wxComboBox(activepanel, wxID_ANY, label, wxDefaultPosition, wxSize(width, height));
-	TagBox *text = new TagBox(activepanel, label, wxDefaultPosition, wxSize(width, height), name, path);
+	TagBox *text = new TagBox(activepanel, wxID_ANY, label, wxDefaultPosition, wxSize(width, height), name, path);
 	text->diagbox = mainwin->diagbox;
 	text->SetFont(confont);
 	return text;
@@ -904,8 +904,8 @@ void ToolBox::OnClose(wxCloseEvent& event)
 }
 
 
-TagBox::TagBox(ToolPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxname, wxString modpath)
-	: wxComboBox(panel, wxID_ANY, label, wxDefaultPosition, size)
+TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxname, wxString modpath)
+	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
 	wxString filename, filepath;
 	wxString readline, tag;

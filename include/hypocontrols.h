@@ -41,7 +41,7 @@ public:
 	bool labelset, histmode;
 	DiagBox *diagbox;
 
-	TagBox(ToolPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
+	TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
 	~TagBox();
 
 	void HistLoad();
