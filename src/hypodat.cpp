@@ -284,9 +284,9 @@ wxString GraphDat::StoreDat(wxString tag)
 	storeytag = ytag;
 	storeytag.Replace(" ", "_");
 
-	return gtext.Format("v3 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d", 
+	return gtext.Format("v4 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
-		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode);
+		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type);
 }
 
 
@@ -386,26 +386,6 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 
 		ytag = ParseString(&readline, 'g');
 		ytag.Replace("_", " ");
-
-		/*
-		readline = readline.AfterFirst('e');
-		readline.Trim(false);
-		gname = readline.BeforeFirst(' ');
-		gname.Replace("_", " ");
-		readline = readline.AfterFirst(' ');
-
-		//if(diagbox) diagbox->Write(readline + '\n');
-
-		readline = readline.AfterFirst('g');
-		readline.Trim(false);
-		xtag = readline.BeforeFirst(' ');
-		xtag.Replace("_", " ");
-		readline = readline.AfterFirst(' ');
-
-		readline = readline.AfterFirst('g');
-		readline.Trim(false);
-		ytag = readline.BeforeFirst(' ');
-		ytag.Replace("_", " ");*/
 	}	
 
 	if(version > 2) {
@@ -414,6 +394,8 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		labelfontsize = ParseDouble(&readline, 'f');
 		clipmode = ParseLong(&readline, 'm');
 	}
+
+	if(version > 3) type = ParseLong(&readline, 'e');
 }
 
 

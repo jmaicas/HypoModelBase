@@ -254,7 +254,8 @@ enum {
 	ID_Plot,
 	ID_Load,
 	ID_Browse,
-	ID_Select
+	ID_Select,
+	ID_Bin
 };
 
 
