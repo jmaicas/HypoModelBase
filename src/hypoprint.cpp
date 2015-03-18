@@ -621,7 +621,7 @@ void GraphPrint::Plot()
 
 	wxWindowDC *window_dc = wxDynamicCast(dc, wxWindowDC);
 	if(window_dc) gc = wxGraphicsContext::Create(*window_dc);
-#ifndef OSXClip
+#ifndef __WXOSX__
 	wxEnhMetaFileDC *emf_dc = wxDynamicCast(dc, wxEnhMetaFileDC);
 	if(emf_dc) gc = wxGraphicsContext::Create(*emf_dc);
 #endif
