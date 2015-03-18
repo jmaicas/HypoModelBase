@@ -804,10 +804,11 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					for(j=1; j<xnum; j++) {
 						data = (*gdatadv)[xindex + j];
 						if(drawdiag) fprintf(ofp, "xdraw %d, xnum %d, data %.4f\n", i, j, data);
-						if(dir)
+                        if(dir) {
 							if(data > mpoint) mpoint = data;
 							else if(data < mpoint) mpoint = data;
 							//if(!dir && (*gdatadv)[xindex + j] < mpoint) mpoint = (*gdatadv)[xindex + j];
+                        }
 					}
 					if(preval <= mpoint || preval < 0.000001) dir = 1; else dir = 0;
 					y = mpoint;
