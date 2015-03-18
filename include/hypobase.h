@@ -355,35 +355,6 @@ public:
 };
 
 
-class FileDat{
-public:
-	wxString name;
-	wxString path;
-	int index;
-
-	FileDat() {
-		name = "";
-		path = "";
-		index = -1;
-	};
-
-	FileDat(wxString fpath, wxString fname) {
-		name = fname;
-		path = fpath;
-		index = -1;
-	};
-
-	bool Compare(FileDat test) {
-		if(name == test.name && path == test.path) return true;
-		else return false;
-	}
-
-	bool operator==(FileDat test)  {
-   return Compare(test);
-	};
-};
-
-
 // Text File 
 
 class TextFile{
