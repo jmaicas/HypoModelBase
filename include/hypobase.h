@@ -255,7 +255,8 @@ enum {
 	ID_Load,
 	ID_Browse,
 	ID_Select,
-	ID_Bin
+	ID_Bin,
+	ID_Compare
 };
 
 

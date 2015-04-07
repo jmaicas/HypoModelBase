@@ -128,11 +128,12 @@ public:
 	virtual void OnRun(wxCommandEvent& event);
 	virtual void OnDefault(wxCommandEvent& event);
 	void OnSpin(wxSpinEvent& event);
+	void OnDClick(wxMouseEvent& event);
 	void OnAutorun(wxCommandEvent& event);
 	void OnParamStore(wxCommandEvent& event);
 	void StoreParam(wxString tag="");
 	void OnParamLoad(wxCommandEvent& event);
-	void ParamLoad(wxString tag="");
+	void ParamLoad(wxString tag="", bool compmode = false);
 	void HistStore();
 	void HistLoad();
 	void OnFlag(wxCommandEvent& event);

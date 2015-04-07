@@ -6,6 +6,37 @@
 
 
 
+ToolButton::ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *db)
+	: wxButton(parent, id, label, pos, size)
+{
+	//toolbox = tbox;
+	//pinmode = 0;
+	//toolbox = NULL;
+	//mainwin = main;
+	diagbox = db;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolButton::OnLeftUp));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolButton::OnLeftDClick));
+	//Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
+}
+
+
+void ToolButton::OnLeftDClick(wxMouseEvent& event)
+{
+	diagbox->Write("tool button double click\n");
+	event.Skip();
+}
+
+
+void ToolButton::OnLeftUp(wxMouseEvent& event)
+{
+	diagbox->Write("tool button click\n");
+	event.Skip();
+}
+
+
+
 // ParamText and ParamNum have been replaced by a generalised version of ParamCon, but still used in System panel and ScaleBox
 
 
@@ -233,6 +264,12 @@ double ParamCon::GetValue()
 wxString ParamCon::GetString()
 {
 	return numbox->GetValue();
+}
+
+
+void ParamCon::SetPen(wxColour pen)
+{
+	numbox->SetForegroundColour(pen);
 }
 
 
@@ -744,7 +781,7 @@ void ToolBox::AddButton(int id, wxString label, int width, wxBoxSizer *box, int 
 	if(pan == NULL) pan = activepanel;
 	if(height == 0) height = buttonheight;
 	//wxButton *button = new (_NORMAL_BLOCK, __FILE__, __LINE__) wxButton(pan, id, label, wxDefaultPosition, wxSize(width, height));
-	wxButton *button = new wxButton(pan, id, label, wxDefaultPosition, wxSize(width, height));
+	ToolButton *button = new ToolButton(pan, id, label, wxDefaultPosition, wxSize(width, height), mainwin->diagbox);
 	button->SetFont(confont);
 	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, pad);
 }

@@ -477,6 +477,7 @@ void ParamBox::Initialise()
 	//Connect(wxEVT_SIZE, wxSizeEventHandler(ParamBox::OnSize));
 	Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(ParamBox::OnFocus));
 	Connect(wxEVT_SPIN, wxSpinEventHandler(ParamBox::OnSpin));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ParamBox::OnDClick));
 	Connect(ID_paramstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnParamStore));
 	Connect(ID_paramload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnParamLoad));
 	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ParamBox::OnClose));
@@ -742,6 +743,12 @@ wxBoxSizer *ParamBox::RunBox()
 }
 
 
+void ParamBox::OnDClick(wxMouseEvent& event)
+{
+	mainwin->diagbox->Write("Param DClick\n");
+}
+
+
 void ParamBox::OnSpin(wxSpinEvent& event)
 {
 	if(mainwin->diagnostic) mainwin->SetStatusText("on spin");
@@ -820,11 +827,17 @@ ParamStore *ParamBox::GetNumParams()
 
 void ParamBox::OnParamLoad(wxCommandEvent& event)
 {
-	ParamLoad();
+	bool compmode = false;
+
+	if(event.GetId() == ID_Compare) {
+		compmode = true;
+		mainwin->diagbox->Write(boxname + " param compare\n");
+	}
+	ParamLoad("", compmode);
 }
 
 
-void ParamBox::ParamLoad(wxString tag)
+void ParamBox::ParamLoad(wxString tag, bool compmode)
 {
 	int id;
 	long flagval;
@@ -832,11 +845,13 @@ void ParamBox::ParamLoad(wxString tag)
 	short diagnostic;
 	wxString filetag, filename, filepath;
 	wxString readline, datname;
-	wxColour redpen("#dd0000"), blackpen("#000000");
+	wxColour redpen("#dd0000"), blackpen("#000000"), greenpen("#009900"), bluepen("#0000dd");
 	//TextFile ofp;
 	wxString text;
 
 	diagnostic = 0;
+
+	ParamStore *oldparams = GetParams();
 
 	//mod->diagbox->Write(text.Format("param load %s\n", boxname));
 
@@ -892,6 +907,13 @@ void ParamBox::ParamLoad(wxString tag)
 			id = paramset->ref[datname];
 			if(paramset->con[id]->type != textcon) {
 				readline.ToDouble(&datval);
+				paramset->con[id]->SetPen(blackpen);
+				if(compmode && datval != (*oldparams)[datname]) {
+					paramset->con[id]->SetPen(greenpen);
+					mainwin->diagbox->Write(datname + " param change\n");
+				}
+				//paramset->con[id]->SetForegroundColour(greenpen);
+				paramset->con[id]->SetValue("");
 				paramset->con[id]->SetValue(datval);
 			}
 			else paramset->con[id]->SetValue(readline);

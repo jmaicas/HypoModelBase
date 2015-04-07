@@ -49,6 +49,19 @@ public:
 };
 
 
+class ToolButton: public wxButton
+{
+public:
+	bool compmode;
+	DiagBox *diagbox;
+
+	virtual void OnLeftUp(wxMouseEvent & event);
+	virtual void OnLeftDClick(wxMouseEvent & event);
+
+	ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *diagbox);
+};
+
+
 class ToolPanel: public wxPanel
 {
 public:
@@ -236,6 +249,7 @@ public:
 	double GetValue();
 	wxString GetString();
 	void SetValue(double val);
+	void SetPen(wxColour);
 	void SetValue(wxString);
 	void SetMinMax(double min, double max);
 	
