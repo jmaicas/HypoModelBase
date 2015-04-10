@@ -262,7 +262,9 @@ void GraphWindow3::PrintEPS()
 		}	
 	}
 
-	if(gtype == 8) {                         // scatter with sampling
+	sample = 60;
+	if(gtype == 6 || gtype == 8) {                         // line with sampling (6), line and scatter with sampling (8)
+		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Sample rate %d\n", sample));
 		oldx = xbase + xoffset;
 		xindex = (int)xfrom / sample;
 		if(xfrom > 0) {
@@ -291,20 +293,22 @@ void GraphWindow3::PrintEPS()
 		}
 		out.WriteLine("stroke");
 
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
-		for(i=0; i<=(xto - xfrom) / sample; i++) {		
-			xindex = i + ceil(xfrom / sample);
-			xpos = (xindex * sample - xfrom) * xrange;
-			mpoint = (*gdatadv)[xindex];
-			y = mpoint;
-			//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
-			//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-			//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
-			out.WriteLine("newpath");
-			out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 350 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), 2.0));
-			out.WriteLine("stroke");
-			oldx = xpos + xbase + xoffset;
-			oldy = ybase + yrange * (y - yfrom);
+		if(gtype == 8) {
+			out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+			for(i=0; i<=(xto - xfrom) / sample; i++) {		
+				xindex = i + ceil(xfrom / sample);
+				xpos = (xindex * sample - xfrom) * xrange;
+				mpoint = (*gdatadv)[xindex];
+				y = mpoint;
+				//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
+				//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+				//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
+				out.WriteLine("newpath");
+				out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 350 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), 2.0));
+				out.WriteLine("stroke");
+				oldx = xpos + xbase + xoffset;
+				oldy = ybase + yrange * (y - yfrom);
+			}
 		}
 	}
 
