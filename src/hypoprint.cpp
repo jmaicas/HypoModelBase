@@ -23,7 +23,7 @@ void GraphWindow3::PrintEPS()
 	double srangex, srangey;
 	double binsize, bargap;
 	int gtype, sample, gpar;
-	int xplot, yplot, xstretch;
+	int xplot, yplot, xstretch, xsample;
 	double xbase, ybase;
 	wxSize textsize;
 	int xylab, res;
@@ -77,6 +77,7 @@ void GraphWindow3::PrintEPS()
 	gpar = graph->gparam;
 	xscale = graph->xscale;
 	xshift = graph->xshift;
+	xsample = graph->xsample;
 	yscale = 1;
 	xdis = graph->xdis;
 	yfrom = graph->yfrom;
@@ -262,7 +263,7 @@ void GraphWindow3::PrintEPS()
 		}	
 	}
 
-	sample = 60;
+	//sample = 60;
 	if(gtype == 6 || gtype == 8) {                         // line with sampling (6), line and scatter with sampling (8)
 		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Sample rate %d\n", sample));
 		oldx = xbase + xoffset;
@@ -312,6 +313,8 @@ void GraphWindow3::PrintEPS()
 		}
 	}
 
+	//xsample = 1;
+
 	if(gtype == 4 || gtype == 5) {                         // line graph
 		xoffset = 0;
 		out.WriteLine("newpath");
@@ -320,8 +323,8 @@ void GraphWindow3::PrintEPS()
 		oldx = xbase;
 		oldy = ybase + yrange * ((*gdatadv)[xfrom] - yfrom);            // TODO proper start coordinates
 
-		for(i=1; i<=(xto - xfrom); i++) {		
-			xindex = i + xfrom;
+		for(i=1; i<=(xto - xfrom) / xsample; i++) {		
+			xindex = i * xsample + xfrom;
 			xpos = (xindex - xfrom) * xrange;
 			y = (*gdatadv)[xindex];
 			out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
@@ -386,9 +389,9 @@ void GraphWindow3::PrintEPS()
 		out.WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
-		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale - xshift;
-		if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale - xshift;
-		srangex = (xto - xfrom) / xscale * graph->xunitscale;
+		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale / graph->xunitdscale - xshift;
+		if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - xshift;
+		srangex = (xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale;
 		snum.Printf("%.0f", xval + xdis);	
 		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 		if(srangex < 1) snum.Printf("%.2f", xval + xdis);

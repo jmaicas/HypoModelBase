@@ -660,9 +660,9 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			xcoord = i * xplot / xlabels;
 			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
-			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale - graph->xshift;
-			if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale - graph->xshift;
-			srangex = (xto - xfrom) / xscale * graph->xunitscale;
+			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale / graph->xunitdscale - graph->xshift;
+			if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - graph->xshift;
+			srangex = (xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale;
 			snum.Printf("%.0f", xval + xdis);	
 			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 			if(srangex < 1) snum.Printf("%.2f", xval + xdis);

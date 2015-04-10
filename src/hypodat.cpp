@@ -481,7 +481,9 @@ void GraphDat::Init()
 	xplot = 500;
 	yplot = 200;
 	xshift = 0;
+	xsample = 1;
 	xunitscale = 1;
+	xunitdscale = 1;
 	strokecolour.Set(0, 0, 0);
 	xtag = "X";
 	ytag = "Y";

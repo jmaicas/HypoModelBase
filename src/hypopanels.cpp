@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 550),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 560),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -76,9 +76,11 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	radbox->Add(yradbox, 1, wxALL, 5);
 
 	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth);
+	paramset->AddNum("xsample", "Sample", graph->xsample, 0, labelwidth);
 	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth);
 	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth);
 	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth);
+	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth);
 	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth);
 	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
@@ -210,7 +212,9 @@ void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 	paramset->GetCon("xplot")->SetValue(graph->xplot);
 	paramset->GetCon("yplot")->SetValue(graph->yplot);
 	paramset->GetCon("xshift")->SetValue(graph->xshift);
+	paramset->GetCon("xsample")->SetValue(graph->xsample);
 	paramset->GetCon("xscale")->SetValue(graph->xunitscale);
+	paramset->GetCon("xdscale")->SetValue(graph->xunitdscale);
 	paramset->GetCon("xlabelgap")->SetValue(graph->xlabelgap);
 	paramset->GetCon("ylabelgap")->SetValue(graph->ylabelgap);
 	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
@@ -289,7 +293,9 @@ void GraphBox::SetParams()
 	graph->xplot = (*params)["xplot"];
 	graph->yplot = (*params)["yplot"];
 	graph->xshift = (*params)["xshift"];
+	graph->xsample = (*params)["xsample"];
 	graph->xunitscale = (*params)["xscale"];
+	graph->xunitdscale = (*params)["xdscale"];
 	graph->plotstroke = (*params)["plotstroke"];
 	graph->xlabelgap = (*params)["xlabelgap"];
 	graph->ylabelgap = (*params)["ylabelgap"];

@@ -323,7 +323,7 @@ public:
 	int sdex;
 	double xmax;
 	int scrollpos;
-	double xscale, xshift;
+	double xscale, xshift, xsample;
 	double xdis;
 	int negscale;
 	int burstdisp;
@@ -335,7 +335,7 @@ public:
 	int xplot, yplot;
 	double xlabelgap, ylabelgap;
 	double labelfontsize, tickfontsize;
-	double xunitscale;
+	double xunitscale, xunitdscale;
 	int clipmode;
 
 	BurstDat *burstdata;
