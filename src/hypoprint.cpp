@@ -62,7 +62,6 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
 	out.WriteLine("%%BoundingBox: 0 0 1000 500");
 	out.WriteLine("/pu {1 mul} def");                        // pu = plot units, set scaling to points
-	out.WriteLine("/Helvetica findfont 10 scalefont setfont");
 	out.WriteLine("0 0 0 setrgbcolor");
 	out.WriteLine("1 setlinecap");
 	out.WriteLine("1 setlinejoin");
@@ -337,6 +336,8 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine(text.Format("grestore"));
 
 	}
+
+	out.WriteLine(text.Format("/Helvetica findfont %.2f scalefont setfont", graph->labelfontsize));
 
 	// Draw Axes
 

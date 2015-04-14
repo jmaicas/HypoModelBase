@@ -75,14 +75,16 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	radbox->Add(xradbox, 1, wxALL, 5);
 	radbox->Add(yradbox, 1, wxALL, 5);
 
-	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth);
-	paramset->AddNum("xsample", "Sample", graph->xsample, 0, labelwidth);
-	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth);
-	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth);
-	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth);
-	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth);
-	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth);
-	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth);
+	numwidth = 50;
+
+	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth, numwidth);
+	paramset->AddNum("xsample", "Sample", graph->xsample, 0, labelwidth, numwidth);
+	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
+	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
+	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
+	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
+	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
+	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
 
 	paramset->AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
