@@ -298,6 +298,7 @@ public:
 	datdouble *gdatadv;
 	datint *gdatav;
 	datdouble *gdatax;
+	int xcount, ycount;
 
 	double yfrom;
 	double yto;

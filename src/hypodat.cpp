@@ -410,6 +410,9 @@ GraphDat::GraphDat(datdouble *newdat, double xf, double xt, double yf, double yt
 	xdis = xd;
 	spikedata = NULL;
 
+	gdatax = NULL;
+	xcount = 0;
+	ycount = 0;
 	gdatadv = newdat;
 	gparam = -4;
 	type = gtype;

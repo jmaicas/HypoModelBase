@@ -829,19 +829,24 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			if(drawdiag) fclose(ofp);
 		}
 
+		double prevx;
 
-		if(gtype == 2) {				                            // line graph with X data
+		if(gtype == 2 && graph->gdatax) {				                            // line graph with X data
 			oldx = xbase + xoffset;
 			oldy = (int)(yplot + ybase - yrange * (yfrom));
-			for(i=0; i<graph->gdatax->maxdex(); i++) {
+			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			for(i=0; i<graph->xcount; i++) {
 				xval = (*graph->gdatax)[i];
+				//if(xval <= prevx) break;
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (int)(xval - xfrom) * xrange;
 					y = (*gdatadv)[i];
+					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
 					DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
 					oldx = xpos + xbase + xoffset;
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}
+				prevx = xval;
 			}
 		}
 

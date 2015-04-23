@@ -184,6 +184,7 @@ public:
 	Model *mod;
 	wxTextCtrl *textbox;
 	TextGrid *textgrid;
+	DiagBox *diagbox;
 
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20);
 
@@ -198,7 +199,7 @@ public:
 	void OnRightClick(wxMouseEvent& event);
 	void OnUndo(wxCommandEvent& event);
 	void OnCopy(wxCommandEvent& event);
-	void ColumnData(int, datdouble *);
+	int ColumnData(int, datdouble *);
 };
 
 

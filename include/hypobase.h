@@ -412,11 +412,13 @@ public:
 			if(textbox && index%100 == 0) textbox->AppendText(mess.Format("%s bad access, index %d\n", tag, index));
 			return zero;		
 		}
+		if(index > maxindex) maxindex = index;
 		return data[index];
 	}
 
 	int maxdex() {
-		return data.size();
+		//return data.size()-1;
+		return maxindex;
 	}
     
 	void setsize(int size, wxTextCtrl *text = NULL, wxString dattag = "") {
@@ -424,6 +426,7 @@ public:
 		tag = dattag;
 		data.resize(size * 1.1);
 		max = size;
+		maxindex = 0;
 	}
 
 	//~datdouble() {
