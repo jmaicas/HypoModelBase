@@ -842,7 +842,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					xpos = (int)(xval - xfrom) * xrange;
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
+					dc.SetPen(colourpen[colour]);
 					DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+					dc.SetPen(colourpen[black]);
+				  if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
 					oldx = xpos + xbase + xoffset;
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}

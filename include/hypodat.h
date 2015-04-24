@@ -299,6 +299,9 @@ public:
 	datint *gdatav;
 	datdouble *gdatax;
 	int xcount, ycount;
+	bool scattermode;
+	bool line;
+	double scattersize;
 
 	double yfrom;
 	double yto;
@@ -332,7 +335,7 @@ public:
 	double xstep, ystep;
 	int xtickmode, ytickmode;
 	double plotstroke;
-	wxColour strokecolour;
+	wxColour strokecolour, fillcolour;
 	int xplot, yplot;
 	double xlabelgap, ylabelgap;
 	double labelfontsize, tickfontsize;

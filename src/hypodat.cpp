@@ -417,6 +417,9 @@ GraphDat::GraphDat(datdouble *newdat, double xf, double xt, double yf, double yt
 	gparam = -4;
 	type = gtype;
 	samprate = 1;
+	scattermode = false;
+	line = true;
+	scattersize = 2;
 
 	xfrom = xf;
 	xto = xt;

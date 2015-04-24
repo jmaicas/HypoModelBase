@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 560),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 600),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -91,13 +91,29 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
 	clipcheck->SetFont(confont);
 	clipcheck->SetValue(graph->clipmode);
-	wxBoxSizer *fontparams = new wxBoxSizer(wxHORIZONTAL);
-	fontparams->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	fontparams->AddSpacer(5);
-	fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//wxBoxSizer *fontparams = new wxBoxSizer(wxHORIZONTAL);
+	//fontparams->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//fontparams->AddSpacer(5);
+	//fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	paramset->currlay++;
 
-	colourpicker = new wxColourPickerCtrl(panel, 0, graph->strokecolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
+	paramset->AddNum("scattersize", "Scatter Size", graph->scattersize, 2, 50);
+	scattercheck = new wxCheckBox(panel, ID_scattermode, "Scatter");
+	scattercheck->SetFont(confont);
+	scattercheck->SetValue(graph->scattermode);
+	//wxBoxSizer *scatterparams = new wxBoxSizer(wxHORIZONTAL);
+	//scatterparams->Add(paramset->GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//scatterparams->AddSpacer(5);
+	//scatterparams->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	paramset->currlay++;
+
+	wxGridSizer *plotgrid = new wxFlexGridSizer(2, 5, 5);
+	plotgrid->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
+	plotgrid->Add(clipcheck, 0, wxALIGN_CENTRE_VERTICAL);
+	plotgrid->Add(paramset->GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
+	plotgrid->Add(scattercheck, 0, wxALIGN_CENTRE_VERTICAL);
+
+	strokepicker = new wxColourPickerCtrl(panel, 0, graph->strokecolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
 	paramset->AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
 	wxBoxSizer *colourbox = new wxBoxSizer(wxHORIZONTAL);
 	//wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Stroke");
@@ -105,7 +121,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//colourbox->Add(label, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	colourbox->Add(paramset->con[paramset->GetID("plotstroke")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	paramset->currlay++;
-	colourbox->Add(colourpicker);
+	colourbox->Add(strokepicker);
 
 	typeset = TypeSet();
 	typeset.Add("Line", 5);
@@ -162,7 +178,10 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(plotparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-	mainbox->Add(fontparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	//mainbox->Add(fontparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	//mainbox->Add(scatterparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(plotgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(colourbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
@@ -221,15 +240,15 @@ void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 	paramset->GetCon("ylabelgap")->SetValue(graph->ylabelgap);
 	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
 	paramset->GetCon("labelfontsize")->SetValue(graph->labelfontsize);
-
-
-	//paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
+	paramset->GetCon("scattersize")->SetValue(graph->scattersize);
 
 	clipcheck->SetValue(graph->clipmode);
+	scattercheck->SetValue(graph->scattermode);
 	xrad[graph->xtickmode]->SetValue(true);
 	yrad[graph->ytickmode]->SetValue(true);
 
-	colourpicker->SetColour(graph->strokecolour);
+	strokepicker->SetColour(graph->strokecolour);
+	fillpicker->SetColour(graph->fillcolour);
 }
 
 
@@ -302,9 +321,12 @@ void GraphBox::SetParams()
 	graph->xlabelgap = (*params)["xlabelgap"];
 	graph->ylabelgap = (*params)["ylabelgap"];
 	graph->labelfontsize = (*params)["labelfontsize"];
+	graph->scattersize = (*params)["scattersize"];
 
 	graph->clipmode = clipcheck->GetValue();
-	graph->strokecolour = colourpicker->GetColour();
+	graph->scattermode = scattercheck->GetValue();
+	graph->strokecolour = strokepicker->GetColour();
+	graph->fillcolour = fillpicker->GetColour();
 	graph->colour = custom;
 
 	graph->gname = paramset->GetCon("gname")->GetString();

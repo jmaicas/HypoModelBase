@@ -251,6 +251,7 @@ enum {
 	ID_net, 
 	ID_norm,
 	ID_clipmode,
+	ID_scattermode,
 	ID_Plot,
 	ID_Load,
 	ID_Browse,

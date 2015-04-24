@@ -125,11 +125,11 @@ public:
 	GraphDat *graph;
 	BoxOut *boxout;
 	wxStaticText *status;
-	wxColourPickerCtrl *colourpicker;
+	wxColourPickerCtrl *strokepicker, *fillpicker;
 	wxChoice *typechoice;
 	TypeSet typeset;
 	wxRadioButton *xrad[2], *yrad[2];
-	wxCheckBox *clipcheck;
+	wxCheckBox *clipcheck, *scattercheck;
 
 	ParamNum *numdrawcon;
 	ParamNum *viewheightcon;
