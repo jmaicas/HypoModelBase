@@ -71,270 +71,306 @@ void GraphWindow3::PrintEPS()
 	for(gplot=0; gplot<numgraphs; gplot++) {
 		graph = graphset[gplot]->plot[0];
 
-	// Get Graph parameters
-	//graph = graphset[0]->plot[0];
-	gpar = graph->gparam;
-	xscale = graph->xscale;
-	xshift = graph->xshift;
-	xsample = graph->xsample;
-	yscale = 1;
-	xdis = graph->xdis;
-	yfrom = graph->yfrom;
-	yto = graph->yto;
-	xfrom = graph->xfrom * xscale;
-	xto = graph->xto * xscale;
-	gname = graph->gname;
-	binsize = graph->binsize;
-	gtype = graph->type;
-	colour = graph->colour;
-	sample = graph->samprate;
-	xtime = xto - xfrom;
-	plotstroke = graph->plotstroke;
-	xplot = graph->xplot; 
-	yplot = graph->yplot; 
-	xlabels = graph->xlabels;
-	ylabels = graph->ylabels;
+		// Get Graph parameters
+		//graph = graphset[0]->plot[0];
+		gpar = graph->gparam;
+		xscale = graph->xscale;
+		xshift = graph->xshift;
+		xsample = graph->xsample;
+		yscale = 1;
+		xdis = graph->xdis;
+		yfrom = graph->yfrom;
+		yto = graph->yto;
+		xfrom = graph->xfrom * xscale;
+		xto = graph->xto * xscale;
+		gname = graph->gname;
+		binsize = graph->binsize;
+		gtype = graph->type;
+		colour = graph->colour;
+		sample = graph->samprate;
+		xtime = xto - xfrom;
+		plotstroke = graph->plotstroke;
+		xplot = graph->xplot; 
+		yplot = graph->yplot; 
+		xlabels = graph->xlabels;
+		ylabels = graph->ylabels;
 
-	//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
-	//xto = xto - xstart;
+		//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
+		//xto = xto - xstart;
 
-	// Set graph data pointers
-	if(gpar == -3) gdatav = graph->gdatav;
-	if(gpar == -4) gdatadv = graph->gdatadv;
-	if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
-	else burstdata = NULL;
+		// Set graph data pointers
+		if(gpar == -3) gdatav = graph->gdatav;
+		if(gpar == -4) gdatadv = graph->gdatadv;
+		if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
+		else burstdata = NULL;
 
-	out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour)));   
+		out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour)));   
 
-	// Set drawing scales
-	xtoAxis = xto;
-	xfromAxis = xfrom;
-	xto /= binsize;
-	xfrom /= binsize;
+		// Set drawing scales
+		xtoAxis = xto;
+		xfromAxis = xfrom;
+		xto /= binsize;
+		xfrom /= binsize;
 
-	yrange = (double)yplot / (yto - yfrom);
-	xrange = (double)xplot / (xto - xfrom); 
-	xnum = (double)(xto - xfrom) / xplot;
+		yrange = (double)yplot / (yto - yfrom);
+		xrange = (double)xplot / (xto - xfrom); 
+		xnum = (double)(xto - xfrom) / xplot;
 
-	out.WriteLine(text.Format("gsave"));
+		out.WriteLine(text.Format("gsave"));
 
-	
-	if(graph->clipmode) {
-		out.WriteLine("newpath");
-		out.MoveTo(xbase, ybase);
-		out.LineTo(xbase, ybase + yplot);
-		out.LineTo(xbase + xplot, ybase + yplot);
-		out.LineTo(xbase + xplot, ybase);
-		out.WriteLine("closepath");
-		out.WriteLine("clip");
-	}
 
-	// Draw graph data
-	out.WriteLine(text.Format("%.2f setlinewidth", plotstroke));
-
-	if(gtype == 7) {                             // scaled width bars
-		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 7, scaled bars\n"));
-		for(i=0; i<(xto - xfrom); i++) {
-			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
-			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
-			if(y == 0) continue;
-			xpos = i * xrange + xbase;
+		if(graph->clipmode) {
 			out.WriteLine("newpath");
-			out.MoveTo(xpos, ybase);
-			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase);
+			out.MoveTo(xbase, ybase);
+			out.LineTo(xbase, ybase + yplot);
+			out.LineTo(xbase + xplot, ybase + yplot);
+			out.LineTo(xbase + xplot, ybase);
 			out.WriteLine("closepath");
-			out.WriteLine("fill");
-			out.WriteLine("newpath");
-			out.MoveTo(xpos, ybase);
-			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange, ybase);
-			out.WriteLine("closepath");
-			out.WriteLine("stroke");
+			out.WriteLine("clip");
 		}
-	}
 
-	if(gtype == 1) {                             // scaled width bars, Histogram    
-		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 0, histogram\n"));
-		bargap = 1.5;
-		if(xrange < 3) bargap = 0;
-		if(xrange < 5) bargap = 1;
-		//out.WriteLine("0.5 setlinewidth");
+		// Draw graph data
+		out.WriteLine(text.Format("%.2f setlinewidth", plotstroke));
 
-		for(i=0; i<(xto - xfrom); i++) {
-			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
-			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
-			if(y == 0) continue;
-			xpos = i * xrange + xbase;
-
-			//if(xrange <= 1) DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
-			//else for(k=0; k<xrange-1; k++) DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));	
-
-			out.WriteLine("newpath");
-			out.MoveTo(xpos, ybase);
-			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase);
-			out.WriteLine("closepath");
-			out.WriteLine("gsave");
-			out.WriteLine("fill");
-			out.WriteLine("grestore");
-			
-			/*
-			out.WriteLine("newpath");
-			out.MoveTo(xpos, ybase);
-			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase);
-			out.WriteLine("closepath");*/
-			out.WriteLine("stroke");
+		if(gtype == 7) {                             // scaled width bars
+			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 7, scaled bars\n"));
+			for(i=0; i<(xto - xfrom); i++) {
+				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+				if(y == 0) continue;
+				xpos = i * xrange + xbase;
+				out.WriteLine("newpath");
+				out.MoveTo(xpos, ybase);
+				out.LineTo(xpos, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange, ybase);
+				out.WriteLine("closepath");
+				out.WriteLine("fill");
+				out.WriteLine("newpath");
+				out.MoveTo(xpos, ybase);
+				out.LineTo(xpos, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange, ybase);
+				out.WriteLine("closepath");
+				out.WriteLine("stroke");
+			}
 		}
-	}
 
-	if(gtype == 3) {                             // spike rate data with optional burst colouring
-		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 3, spike rate\n"));
-		int spikestep = 0;
-		int burstcolour = 0;
-		bargap = 1.5;
-		if(xrange < 3) bargap = 0;
-		if(xrange < 5) bargap = 1;
-		//out.WriteLine("0.5 setlinewidth");
+		if(gtype == 1) {                             // scaled width bars, Histogram    
+			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 0, histogram\n"));
+			bargap = 1.5;
+			if(xrange < 3) bargap = 0;
+			if(xrange < 5) bargap = 1;
+			//out.WriteLine("0.5 setlinewidth");
 
-		for(i=0; i<(xto - xfrom); i++) {
-			if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
-			if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
-			if(y == 0) continue;
+			for(i=0; i<(xto - xfrom); i++) {
+				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+				if(y == 0) continue;
+				xpos = i * xrange + xbase;
 
-			if(binsize == 1) res = 0;
-			if(binsize == 0.1) res = 1;
-			if(binsize == 0.01) res = 2;
-			if(binsize == 0.001) res = 3;
+				//if(xrange <= 1) DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
+				//else for(k=0; k<xrange-1; k++) DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));	
 
-			if(burstdata == NULL || burstdata->burstdisp == 0) out.SetColour(ColourString(colourpen[red]));
+				out.WriteLine("newpath");
+				out.MoveTo(xpos, ybase);
+				out.LineTo(xpos, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase);
+				out.WriteLine("closepath");
+				out.WriteLine("gsave");
+				out.WriteLine("fill");
+				out.WriteLine("grestore");
 
-			else {                  // burst colouring
-				burstcolour = 0;
-				if(res > 0 && res < 3) burstcolour = 0;
-				if(res == 0) {
-					timepoint = (xfrom + i + 1) * binsize * 1000;
-					while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
-						if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
-						spikestep++;
+				/*
+				out.WriteLine("newpath");
+				out.MoveTo(xpos, ybase);
+				out.LineTo(xpos, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase);
+				out.WriteLine("closepath");*/
+				out.WriteLine("stroke");
+			}
+		}
+
+		if(gtype == 3) {                             // spike rate data with optional burst colouring
+			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 3, spike rate\n"));
+			int spikestep = 0;
+			int burstcolour = 0;
+			bargap = 1.5;
+			if(xrange < 3) bargap = 0;
+			if(xrange < 5) bargap = 1;
+			//out.WriteLine("0.5 setlinewidth");
+
+			for(i=0; i<(xto - xfrom); i++) {
+				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+				if(y == 0) continue;
+
+				if(binsize == 1) res = 0;
+				if(binsize == 0.1) res = 1;
+				if(binsize == 0.01) res = 2;
+				if(binsize == 0.001) res = 3;
+
+				if(burstdata == NULL || burstdata->burstdisp == 0) out.SetColour(ColourString(colourpen[red]));
+
+				else {                  // burst colouring
+					burstcolour = 0;
+					if(res > 0 && res < 3) burstcolour = 0;
+					if(res == 0) {
+						timepoint = (xfrom + i + 1) * binsize * 1000;
+						while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
+							spikestep++;
+						}
 					}
+					if(res == 3) {
+						timepoint = (xfrom + i) * binsize * 1000;
+						while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							burstcolour = burstdata->spikes[spikestep];
+							spikestep++;
+						}
+					}			
+					if(burstcolour == 0)
+						out.SetColour(ColourString(colourpen[red]));
+					else if(burstcolour % 2 == 0)
+						out.SetColour(ColourString(colourpen[blue]));
+					else if(burstcolour % 2 == 1)
+						out.SetColour(ColourString(colourpen[green]));
 				}
-				if(res == 3) {
-					timepoint = (xfrom + i) * binsize * 1000;
-					while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
-						burstcolour = burstdata->spikes[spikestep];
-						spikestep++;
-					}
-				}			
-				if(burstcolour == 0)
-					out.SetColour(ColourString(colourpen[red]));
-				else if(burstcolour % 2 == 0)
-					out.SetColour(ColourString(colourpen[blue]));
-				else if(burstcolour % 2 == 1)
-					out.SetColour(ColourString(colourpen[green]));
-			}
 
-			xpos = i * xrange + xbase;
-			out.WriteLine("newpath");
-			out.MoveTo(xpos, ybase);
-			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase);
-			out.WriteLine("closepath");
-			out.WriteLine("gsave");
-			out.WriteLine("fill");
-			out.WriteLine("grestore");
-			out.WriteLine("stroke");	
+				xpos = i * xrange + xbase;
+				out.WriteLine("newpath");
+				out.MoveTo(xpos, ybase);
+				out.LineTo(xpos, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase);
+				out.WriteLine("closepath");
+				out.WriteLine("gsave");
+				out.WriteLine("fill");
+				out.WriteLine("grestore");
+				out.WriteLine("stroke");	
 
-			/*
-			out.WriteLine("newpath");
-			out.MoveTo(xpos, ybase);
-			out.LineTo(xpos, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-			out.LineTo(xpos + xrange - bargap, ybase);
-			out.WriteLine("closepath");
-			out.WriteLine("fill");*/	
-		}	
-	}
-
-	//sample = 60;
-	if(gtype == 6 || gtype == 8) {                         // line with sampling (6), line and scatter with sampling (8)
-		if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Sample rate %d\n", sample));
-		oldx = xbase + xoffset;
-		xindex = (int)xfrom / sample;
-		if(xfrom > 0) {
-			if((int)xfrom % sample != 0) {
-				double sydiff = (*gdatadv)[xindex] - (*gdatadv)[xindex - 1];
-				double sxdiff = (xfrom - xindex * sample) / sample;
-				preval = sydiff * sxdiff + (*gdatadv)[xindex - 1];
-			}
-			else preval = (*gdatadv)[xindex - 1];
+				/*
+				out.WriteLine("newpath");
+				out.MoveTo(xpos, ybase);
+				out.LineTo(xpos, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - bargap, ybase);
+				out.WriteLine("closepath");
+				out.WriteLine("fill");*/	
+			}	
 		}
-		else preval = (*gdatadv)[0];
-		oldy = ybase + yrange * (preval - yfrom);
 
-		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
-		for(i=0; i<=(xto - xfrom) / sample; i++) {		
-			xindex = i + ceil(xfrom / sample);
-			xpos = (int)(xindex * sample - xfrom) * xrange;
-			mpoint = (*gdatadv)[xindex];
-			y = mpoint;
-			//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
-			out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
-			//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
-			oldx = xpos + xbase + xoffset;
-			oldy = ybase + yrange * (y - yfrom);
-		}
-		out.WriteLine("stroke");
+		//sample = 60;
+		if(gtype == 6 || gtype == 8) {                         // line with sampling (6), line and scatter with sampling (8)
+			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Sample rate %d\n", sample));
+			oldx = xbase + xoffset;
+			xindex = (int)xfrom / sample;
+			if(xfrom > 0) {
+				if((int)xfrom % sample != 0) {
+					double sydiff = (*gdatadv)[xindex] - (*gdatadv)[xindex - 1];
+					double sxdiff = (xfrom - xindex * sample) / sample;
+					preval = sydiff * sxdiff + (*gdatadv)[xindex - 1];
+				}
+				else preval = (*gdatadv)[xindex - 1];
+			}
+			else preval = (*gdatadv)[0];
+			oldy = ybase + yrange * (preval - yfrom);
 
-		if(gtype == 8) {
-			out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+			out.WriteLine("newpath");
+			out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
 			for(i=0; i<=(xto - xfrom) / sample; i++) {		
 				xindex = i + ceil(xfrom / sample);
-				xpos = (xindex * sample - xfrom) * xrange;
+				xpos = (int)(xindex * sample - xfrom) * xrange;
 				mpoint = (*gdatadv)[xindex];
 				y = mpoint;
 				//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
-				//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+				out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
 				//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
-				out.WriteLine("newpath");
-				out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 350 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), 2.0));
-				out.WriteLine("stroke");
 				oldx = xpos + xbase + xoffset;
 				oldy = ybase + yrange * (y - yfrom);
 			}
+			out.WriteLine("stroke");
+
+			if(gtype == 8) {
+				out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+				for(i=0; i<=(xto - xfrom) / sample; i++) {		
+					xindex = i + ceil(xfrom / sample);
+					xpos = (xindex * sample - xfrom) * xrange;
+					mpoint = (*gdatadv)[xindex];
+					y = mpoint;
+					out.WriteLine("newpath");
+					out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), 2.0));
+					out.WriteLine("stroke");
+					oldx = xpos + xbase + xoffset;
+					oldy = ybase + yrange * (y - yfrom);
+				}
+			}
 		}
-	}
 
-	//xsample = 1;
+		//xsample = 1;
 
-	if(gtype == 4 || gtype == 5) {                         // line graph
-		xoffset = 0;
-		out.WriteLine("newpath");
-		out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
+		if(gtype == 4 || gtype == 5) {                         // line graph
+			xoffset = 0;
+			out.WriteLine("newpath");
+			out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
 
-		oldx = xbase;
-		oldy = ybase + yrange * ((*gdatadv)[xfrom] - yfrom);            // TODO proper start coordinates
+			oldx = xbase;
+			oldy = ybase + yrange * ((*gdatadv)[xfrom] - yfrom);            // TODO proper start coordinates
 
-		for(i=1; i<=(xto - xfrom) / xsample; i++) {		
-			xindex = i * xsample + xfrom;
-			xpos = (xindex - xfrom) * xrange;
-			y = (*gdatadv)[xindex];
-			out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
-			oldx = xpos + xbase + xoffset;
-			oldy = ybase + yrange * (y - yfrom);
+			for(i=1; i<=(xto - xfrom) / xsample; i++) {		
+				xindex = i * xsample + xfrom;
+				xpos = (xindex - xfrom) * xrange;
+				y = (*gdatadv)[xindex];
+				out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
+				oldx = xpos + xbase + xoffset;
+				oldy = ybase + yrange * (y - yfrom);
+			}
+			out.WriteLine("stroke");
 		}
-		out.WriteLine("stroke");
-	}
 
-	out.WriteLine(text.Format("grestore"));
+		if(gtype == 2 && graph->gdatax) {		                 // line graph with X data
+			out.WriteLine("newpath");
+			out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
+			oldx = xbase;
+			oldy = ybase; // - yrange * (yfrom);
+			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			for(i=0; i<graph->xcount; i++) {
+				xval = (*graph->gdatax)[i];
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (xval - xfrom) * xrange;
+					y = (*gdatadv)[i];
+					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
+					out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
+					//dc.SetPen(colourpen[black]);
+					//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+					oldx = xpos + xbase + xoffset;
+					oldy = ybase + yrange * (y - yfrom);
+				}
+			}
+			out.WriteLine("stroke");
 
+			if(graph->scattermode) {
+				out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+				for(i=0; i<graph->xcount; i++) {
+					xval = (*graph->gdatax)[i];
+					if(xval >= xfrom && xval <= xto) {
+						xpos = (int)(xval - xfrom) * xrange;
+						y = (*gdatadv)[i];		
+						out.WriteLine("newpath");
+						out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
+						out.WriteLine("gsave");
+						out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
+						out.WriteLine("fill");
+						out.WriteLine("grestore");
+						out.WriteLine("stroke");
+					}
+				}
+			}
+		}
+
+		out.WriteLine(text.Format("grestore"));
 	}
 
 	out.WriteLine(text.Format("/Helvetica findfont %.2f scalefont setfont", graph->labelfontsize));
@@ -349,7 +385,7 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine("newpath");
 	out.DrawLine(xbase, ybase, xbase, ybase + yplot);
 	out.DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
-	
+
 	out.WriteLine("");
 	out.WriteLine("");
 

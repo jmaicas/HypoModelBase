@@ -299,8 +299,8 @@ public:
 	datint *gdatav;
 	datdouble *gdatax;
 	int xcount, ycount;
-	bool scattermode;
-	bool line;
+	int scattermode;
+	int linemode;
 	double scattersize;
 
 	double yfrom;

@@ -91,37 +91,51 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
 	clipcheck->SetFont(confont);
 	clipcheck->SetValue(graph->clipmode);
-	//wxBoxSizer *fontparams = new wxBoxSizer(wxHORIZONTAL);
-	//fontparams->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	//fontparams->AddSpacer(5);
-	//fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	wxBoxSizer *fontparams = new wxBoxSizer(wxHORIZONTAL);
+	fontparams->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	fontparams->AddSpacer(5);
+	fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	paramset->currlay++;
 
-	paramset->AddNum("scattersize", "Scatter Size", graph->scattersize, 2, 50);
-	scattercheck = new wxCheckBox(panel, ID_scattermode, "Scatter");
+	linecheck = new wxCheckBox(panel, ID_line, "");
+	linecheck->SetFont(confont);
+	linecheck->SetValue(graph->linemode);
+
+	scattercheck = new wxCheckBox(panel, ID_scatter, "");
 	scattercheck->SetFont(confont);
 	scattercheck->SetValue(graph->scattermode);
-	//wxBoxSizer *scatterparams = new wxBoxSizer(wxHORIZONTAL);
+
+	//wxBoxSizer *checkbox = new wxBoxSizer(wxHORIZONTAL);
 	//scatterparams->Add(paramset->GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	//scatterparams->AddSpacer(5);
-	//scatterparams->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	paramset->currlay++;
+	//checkbox->Add(linecheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//checkbox->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//paramset->currlay++;
 
-	wxGridSizer *plotgrid = new wxFlexGridSizer(2, 5, 5);
-	plotgrid->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
-	plotgrid->Add(clipcheck, 0, wxALIGN_CENTRE_VERTICAL);
-	plotgrid->Add(paramset->GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
-	plotgrid->Add(scattercheck, 0, wxALIGN_CENTRE_VERTICAL);
+	//wxGridSizer *plotgrid = new wxFlexGridSizer(2, 5, 5);
+	//plotgrid->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
+	//plotgrid->Add(clipcheck, 0, wxALIGN_CENTRE_VERTICAL);
+	//plotgrid->Add(paramset->GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
+	//plotgrid->Add(scattercheck, 0, wxALIGN_CENTRE_VERTICAL);
 
 	strokepicker = new wxColourPickerCtrl(panel, 0, graph->strokecolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
 	paramset->AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
-	wxBoxSizer *colourbox = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *strokebox = new wxBoxSizer(wxHORIZONTAL);
 	//wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Stroke");
 	//label->SetFont(confont);
 	//colourbox->Add(label, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
-	colourbox->Add(paramset->con[paramset->GetID("plotstroke")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	strokebox->Add(paramset->con[paramset->GetID("plotstroke")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	paramset->currlay++;
-	colourbox->Add(strokepicker);
+	strokebox->Add(linecheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	strokebox->Add(strokepicker);
+
+	fillpicker = new wxColourPickerCtrl(panel, 0, graph->fillcolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
+	paramset->AddNum("scattersize", "Scatter Size", graph->scattersize, 2, labelwidth);
+	wxBoxSizer *fillbox = new wxBoxSizer(wxHORIZONTAL);
+	fillbox->Add(paramset->con[paramset->GetID("scattersize")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	paramset->currlay++;
+	fillbox->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	fillbox->Add(fillpicker);
 
 	typeset = TypeSet();
 	typeset.Add("Line", 5);
@@ -178,12 +192,13 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(plotparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-	//mainbox->Add(fontparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(fontparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	//mainbox->Add(scatterparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	//mainbox->Add(plotgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
-	mainbox->Add(plotgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-	mainbox->AddStretchSpacer();
-	mainbox->Add(colourbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	mainbox->Add(strokebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	mainbox->Add(fillbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(typebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();

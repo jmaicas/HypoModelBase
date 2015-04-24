@@ -129,7 +129,7 @@ public:
 	wxChoice *typechoice;
 	TypeSet typeset;
 	wxRadioButton *xrad[2], *yrad[2];
-	wxCheckBox *clipcheck, *scattercheck;
+	wxCheckBox *clipcheck, *scattercheck, *linecheck;
 
 	ParamNum *numdrawcon;
 	ParamNum *viewheightcon;
