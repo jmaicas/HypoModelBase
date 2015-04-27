@@ -111,6 +111,20 @@ void TextGrid::OnKey(wxKeyEvent &event)
 }
 
 
+void TextGrid::ParseLine(int row, int col, wxString readline)
+{
+	int i;
+	wxString text;
+
+	while(!readline.IsEmpty()) {
+		text = readline.BeforeFirst(' ');
+		text.Trim();
+		SetCellValue(row, col++, text);
+		readline = readline.AfterFirst(' ');
+	}
+}
+ 
+
 void TextGrid::ClearCol(int col)
 {
 	int i;
