@@ -33,6 +33,7 @@ void GraphWindow3::PrintEPS()
 	double y, xrange, yrange, xnum;
 	double xpos, ypos;
 	int xoffset, xindex;
+	double yoffset;
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
 	int gplot, colour;
@@ -49,6 +50,8 @@ void GraphWindow3::PrintEPS()
 	ylabels = mainwin->ylabels;
 	xoffset = 1;
 	axisstroke = 0.75;
+	//yoffset = axisstroke / 2;
+	yoffset = 0;
 
 	// Set output file path
 	filepath = mainwin->outpath;
@@ -379,7 +382,8 @@ void GraphWindow3::PrintEPS()
 
 	xto = xtoAxis;
 	xfrom = xfromAxis;
-	ybase = ybase - (axisstroke / 2);    // offset to account for line width
+	//ybase = ybase - (axisstroke / 2);    // offset to account for line width
+	ybase = ybase - yoffset;
 	out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
 	out.WriteLine(text.Format("%.2f setlinewidth", axisstroke));
 	out.WriteLine("newpath");
