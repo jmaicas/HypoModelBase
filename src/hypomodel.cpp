@@ -52,6 +52,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	mainframe = this;
 	
 	//blankevent = new wxCommandEvent();
+
+	/*
 	screensize = wxGetDisplaySize();
 	printdata = new wxPrintData;
 	pageSetupData = new wxPageSetupDialogData;
@@ -63,7 +65,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
   // Set some initial page margins in mm.
   pageSetupData->SetMarginTopLeft(wxPoint(15, 15));
-  pageSetupData->SetMarginBottomRight(wxPoint(15, 15));
+  pageSetupData->SetMarginBottomRight(wxPoint(15, 15));*/
 	
 	numgraphs = 8;
 	numdraw = 3;

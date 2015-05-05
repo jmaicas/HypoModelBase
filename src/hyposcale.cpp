@@ -395,6 +395,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 ScaleBox::~ScaleBox()
 {
 	delete gflags;
+	delete gflagrefs;
 }
 
 
