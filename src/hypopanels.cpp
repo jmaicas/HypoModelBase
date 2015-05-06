@@ -543,7 +543,7 @@ void ParamBox::OnClose(wxCloseEvent& event)
 }
 
 
-void ParamBox::ParamLayout(int columns)
+void ParamBox::ParamLayout(int columns)                   // Currently for one or two columns, need to generalise
 {
 	int colsize = 0;
 
