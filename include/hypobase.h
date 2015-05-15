@@ -35,7 +35,9 @@
 
 #ifndef OSXClip
 #ifndef TEACH
+#ifdef _DEBUG
 #include <vld.h>
+#endif
 #endif
 #endif
 

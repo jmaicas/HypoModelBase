@@ -64,13 +64,96 @@ public:
 };
 
 
+class SpikeDatTest{
+public:
+	SpikeDatTest();
+	~SpikeDatTest();
+
+	DiagBox *diagbox;
+
+	/*
+	datdouble times;
+	datdouble isis;
+	BurstDat *burstdata;
+	
+	datdouble haz1;
+	datdouble haz5;
+	datdouble hazquad;
+	datdouble hist1;
+	datdouble hist5;
+	datdouble histquad;
+	datdouble histquadx;
+	datdouble histquadsm;
+	datdouble histquadlin;
+
+	datdouble hist1norm;
+	datdouble hist5norm;
+	//datdouble haz1norm;
+	//datdouble haz5norm;
+
+	datint srate;
+	datint srate1;
+	datint srate100;
+	datint srate10;
+	datdouble synsim;
+	datdouble vasomean;
+	datdouble winfreq;
+	//datint autocorr;
+	
+	//double *inputrec;
+	datdouble netinputrec;
+	datdouble raterec;
+	double threshrec[10000];
+	int *rate;
+	int graphindex;
+	
+	int id;
+	int count;
+	int spikecount;
+	int isicount;
+	//int index[100000];
+	int maxtime;
+	int maxspikes;
+	char name[100];
+	double start;
+	double freq;
+	double meanisi;
+	double isivar;
+	double isisd;
+	double histquadmode;
+	short freqwindow;
+	int hazquadbins;
+	
+	double memtau, tauHAP, tauAHP, tauDAP;
+	double kHAP, kAHP, kDAP;
+	double th0, vrest;
+	MainFrame *mainwin;
+	
+	void datacalc();
+	void neurocalc(NeuroDat *datneuron = NULL);
+	void ISIanalysis();
+	//void autocalc();
+	void netneurocalc(int);
+	void output(wxString, wxString);
+	void inputsim(double);
+	void BurstScan(BurstBox *);
+	void IntraBurstAnalysis();
+	void IntraSelectAnalysis();
+	void FitScore(SpikeDat *, FitDat *);
+	void BurstProfile();
+	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	void Clear();
+	void ReSize(int);*/
+};
+
+
 class SpikeDat{
 public:
 	SpikeDat();
 	~SpikeDat();
 
 	DiagBox *diagbox;
-
 
 	datdouble times;
 	datdouble isis;

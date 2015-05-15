@@ -51,7 +51,7 @@ class ModelSet
 public:
 	int modcount; 
 
-	ModelDat modeldat[20];
+	ModelDat modeldat[50];
 
 	ModelSet() {modcount = 0;}
 
