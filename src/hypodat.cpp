@@ -150,7 +150,7 @@ SpikeDat::SpikeDat()
 
 SpikeDat::~SpikeDat()
 {
-	if(burstdata) delete burstdata;
+	//if(burstdata) delete burstdata;
 }
 
 

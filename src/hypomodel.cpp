@@ -300,10 +300,8 @@ void HypoMain::CleanUp() {
 	if(graphbox) graphbox->Destroy();
 
 	delete[] gpos;
-	//delete wxofp;
 	delete mod;
-	//delete menuFile;
-	//delete menuControls;
+	
 	
 	//wxMenu *menuTools = new wxMenu;
 	//wxMenu *menuSystem = new wxMenu;
