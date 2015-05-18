@@ -3,6 +3,7 @@
 
 #include "wx/wx.h"
 #include <hypotools.h>
+#include <hypodef.h>
 
 
 
@@ -110,6 +111,20 @@ void TextGrid::OnKey(wxKeyEvent &event)
 }
 
 
+void TextGrid::ParseLine(int row, int col, wxString readline)
+{
+	int i;
+	wxString text;
+
+	while(!readline.IsEmpty()) {
+		text = readline.BeforeFirst(' ');
+		text.Trim();
+		SetCellValue(row, col++, text);
+		readline = readline.AfterFirst(' ');
+	}
+}
+ 
+
 void TextGrid::ClearCol(int col)
 {
 	int i;
@@ -211,10 +226,12 @@ void TextGrid::Copy()
 		}
 	}
 	else {
+#ifndef OSXClip
 		wxOpenClipboard();         
 		wxEmptyClipboard();
 		wxSetClipboardData(wxDF_TEXT, copy_data.c_str(), 0, 0);
 		wxCloseClipboard();
+#endif
 	} 
 }
 
@@ -237,9 +254,11 @@ void TextGrid::Paste()
 		wxTheClipboard->Close();
 	}
 	else {
+#ifndef OSXClip
 		wxOpenClipboard(); 
 		copy_data = (char *)wxGetClipboardData(wxDF_TEXT);
 		wxCloseClipboard();
+#endif
 	}
 
 	i = GetGridCursorRow();

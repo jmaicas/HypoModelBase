@@ -90,6 +90,7 @@ public:
 	wxString initparams;
 	wxString name;
 	short histmode;
+	bool defstore;
 
 	HypoMain *mainwin;
 	Model *mod;
@@ -142,10 +143,12 @@ public:
 	virtual void OnRun(wxCommandEvent& event);
 	virtual void OnDefault(wxCommandEvent& event);
 	void OnSpin(wxSpinEvent& event);
+	void OnDClick(wxMouseEvent& event);
 	void OnAutorun(wxCommandEvent& event);
 	void OnParamStore(wxCommandEvent& event);
+	void StoreParam(wxString tag="");
 	void OnParamLoad(wxCommandEvent& event);
-	void ParamLoad(wxString tag="");
+	void ParamLoad(wxString tag="", bool compmode = false);
 	void HistStore();
 	void HistLoad();
 	void OnFlag(wxCommandEvent& event);
@@ -158,7 +161,7 @@ public:
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
-	wxBoxSizer *StoreBox(wxString, wxPanel *storepanel=NULL);
+	wxBoxSizer *StoreBox(wxString label="", wxPanel *storepanel=NULL);
 	ParamStore *GetParams(ParamStore *pstore=NULL);
 	ParamStore *GetNumParams();
 	void ParamLayout(int columns=1);
@@ -174,7 +177,7 @@ public:
 	wxString modname, modtag, modnum;
 	int modindex, platecount;
 	wxNotebook *notebook;
-	wxRichTextCtrl *page[10];
+	wxRichTextCtrl **page;
 	wxString plate[10];
 	//wxTextCtrl *page[10];
 
@@ -196,10 +199,12 @@ public:
 	Model *mod;
 	wxTextCtrl *textbox;
 	TextGrid *textgrid;
+	DiagBox *diagbox;
 
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20);
 
 	virtual void GridDefault();
+	virtual void TestGrid();
 	void GridStore();
 	void GridLoad();
 	void OnGridStore(wxCommandEvent& event);
@@ -209,6 +214,7 @@ public:
 	void OnRightClick(wxMouseEvent& event);
 	void OnUndo(wxCommandEvent& event);
 	void OnCopy(wxCommandEvent& event);
+	int ColumnData(int, datdouble *);
 };
 
 //	6. InfoBox. Derived from ToolBox, has a Hypomain window to manage, storing and loading, different parameters.

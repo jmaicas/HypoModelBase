@@ -76,6 +76,7 @@ public:
 	//virtual void GLoad(wxComboBox *);
 	virtual void GHistStore();
 	virtual void GHistLoad(wxComboBox *);
+	virtual void ModClose();
 };
 
 

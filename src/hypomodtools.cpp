@@ -25,6 +25,9 @@ ModGenBox::ModGenBox(HypoMain *main, const wxString& title, const wxPoint& pos, 
 
 	toolset = main->toolset;
 	paramset = new ParamSet(panel);
+	page = new wxRichTextCtrl*[10];
+
+	//wxTextCtrl *page1;
 
 	//paramset->AddNum("modname", "Mod Name", 10, 0, 50, 150);
 	paramset->AddText("modname", "Mod Name", "Test", 50, 150);
@@ -48,6 +51,8 @@ ModGenBox::ModGenBox(HypoMain *main, const wxString& title, const wxPoint& pos, 
 	for(i=0; i<pagecount; i++) {
 		page[i] = new wxRichTextCtrl(notebook, -1, "", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
 		notebook->AddPage(page[i], text.Format("Page %d", i+1));
+		//page1 = new wxTextCtrl(panel, -1, "test", wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+		//notebook->AddPage(page1, text.Format("Page %d", i+1));
 	}
 
 	//wxTextAttr *style;
@@ -66,7 +71,6 @@ ModGenBox::ModGenBox(HypoMain *main, const wxString& title, const wxPoint& pos, 
 		//page[i]->SetDefaultStyle(style);
 		
 	//}
-
 
 	status = StatusBar();
 	wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
@@ -165,9 +169,9 @@ void ModGenBox::Read()
 
 	// hypodef.cpp : read and update
 
-	inpath = "src\\";
-	PageRead(platecount, "hypodef.h", inpath); 
-	PageRead(platecount+1, "hypodef.cpp", inpath); 
+	//inpath = "src\\";
+	PageRead(platecount, "hypodef.h", "include\\"); 
+	PageRead(platecount+1, "hypodef.cpp", ""); 
 }
 
 
@@ -863,7 +867,9 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 		if(spikeint > filterthresh) loaddata->isis[s++] = spikeint;
 	}
 
-	for(i=0; i<count; i++) loaddata->times[i] = rawdata[i];                // February 2014  interval recode
+	// 
+
+	for(i=0; i<count; i++) loaddata->times[i] = rawdata[i];                // February 2014  interval recode, need to fix filtering
 
 	loaddata->spikecount = count;
 	loaddata->start = rawdata[0];

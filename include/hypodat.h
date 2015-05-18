@@ -33,6 +33,7 @@
 class ModDat{
 public:
 	int model;
+	//Model *mod;
 };
 
 //	2. EvoDat ?
@@ -84,11 +85,100 @@ public:
 	void ratecalc();
 };
 
+
+class SpikeDatTest{
+public:
+	SpikeDatTest();
+	~SpikeDatTest();
+
+	DiagBox *diagbox;
+
+	/*
+	datdouble times;
+	datdouble isis;
+	BurstDat *burstdata;
+	
+	datdouble haz1;
+	datdouble haz5;
+	datdouble hazquad;
+	datdouble hist1;
+	datdouble hist5;
+	datdouble histquad;
+	datdouble histquadx;
+	datdouble histquadsm;
+	datdouble histquadlin;
+
+	datdouble hist1norm;
+	datdouble hist5norm;
+	//datdouble haz1norm;
+	//datdouble haz5norm;
+
+	datint srate;
+	datint srate1;
+	datint srate100;
+	datint srate10;
+	datdouble synsim;
+	datdouble vasomean;
+	datdouble winfreq;
+	//datint autocorr;
+	
+	//double *inputrec;
+	datdouble netinputrec;
+	datdouble raterec;
+	double threshrec[10000];
+	int *rate;
+	int graphindex;
+	
+	int id;
+	int count;
+	int spikecount;
+	int isicount;
+	//int index[100000];
+	int maxtime;
+	int maxspikes;
+	char name[100];
+	double start;
+	double freq;
+	double meanisi;
+	double isivar;
+	double isisd;
+	double histquadmode;
+	short freqwindow;
+	int hazquadbins;
+	
+	double memtau, tauHAP, tauAHP, tauDAP;
+	double kHAP, kAHP, kDAP;
+	double th0, vrest;
+	MainFrame *mainwin;
+	
+	void datacalc();
+	void neurocalc(NeuroDat *datneuron = NULL);
+	void ISIanalysis();
+	//void autocalc();
+	void netneurocalc(int);
+	void output(wxString, wxString);
+	void inputsim(double);
+	void BurstScan(BurstBox *);
+	void IntraBurstAnalysis();
+	void IntraSelectAnalysis();
+	void FitScore(SpikeDat *, FitDat *);
+	void BurstProfile();
+	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	void Clear();
+	void ReSize(int);*/
+};
+
+
 //	5. SpikeDat Data for a spike signal with statistical measurements, AHP, KHP, DAP, ISIS, and burst for graphing.  
+
 class SpikeDat{
 public:
 	SpikeDat();
 	~SpikeDat();
+
+	DiagBox *diagbox;
+
 	datdouble times;
 	datdouble isis;
 	BurstDat *burstdata;
@@ -102,6 +192,10 @@ public:
 	datdouble histquadx;
 	datdouble histquadsm;	// ISI Histogram Quadratic Smooth
 	datdouble histquadlin; // ISI Histogram  Quadratic Linear
+	datdouble hist1norm;
+	datdouble hist5norm;
+	//datdouble haz1norm;
+	//datdouble haz5norm;
 	datint srate;
 	datint srate1;
 	datint srate100;
@@ -149,10 +243,11 @@ public:
 	void inputsim(double);
 	void BurstScan(BurstBox *);
 	void IntraBurstAnalysis();
+	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *);
 	void BurstProfile();
-	int GraphSet(GraphBase *, wxString, int, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
-	int GraphSetLysis(GraphBase *, wxString, int, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	void Clear();
 	void ReSize(int);
 };
@@ -196,13 +291,16 @@ public:
 	SpikeDat *spikedata;
 	wxString snum;
 	int burstdisp;
+	int maxbursts;
 	double maxtime;
+	bool selectmode;
 	
 	datdouble haz1;		// Burst Hazard 1 ms
 	datdouble hist1;	// Burst Histogram 1 ms
+	datdouble hist1norm;
 	datdouble haz5;
 	datdouble hist5;
-	burst bustore[20000];
+	datdouble hist5norm;
 	datdouble spikes;
 	datdouble times;
 	datdouble profile;
@@ -211,6 +309,9 @@ public:
 	datdouble length;
 	datdouble profilesm;		//Burst Profile Smooth
 	datdouble tailprofilesm;	//Burst Tail Profile Smooth
+
+	//burst *bustore;
+	std::vector <burst> bustore;
 
 	//datdouble tailspikesum;
 	datdouble tailmean;
@@ -236,7 +337,9 @@ public:
 	double pmodetime;
 	int pnzcount;
 	
-	BurstDat();
+	BurstDat(bool select=false);
+	~BurstDat();
+	int spikeburst(int);
 	//void Scan(BurstBox *);
 };
 
@@ -264,42 +367,93 @@ public:
 	GraphScale(double newxf, double newxt, double newyf, double newyt) { xf = newxf; xt = newxt; yf = newyf; yt = newyt; };
 };
 
+
+class TypeSet
+{
+public:
+	int numtypes;
+	int refindex[10];
+	int typeindex[10];
+	wxString names[10];
+
+	TypeSet() {
+		numtypes = 0; 
+	};
+
+	void Add(wxString, int);
+	int GetIndex(int);
+	int GetType(int);
+};
+
+
 //	12. GraphDat	Collect data before drawing the graph
+
 class GraphDat{
 public:
 	GraphDat();
 	GraphDat(datdouble *, double, double, double, double, wxString, int type, double bin = 1, int colour = red, int xscale = 1, int xdis = 0);
 	GraphDat(datint *, double, double, double, double, wxString, int type, double bin = 1, int colour = red);
 	GraphDat(datint *, double, double, double, double, wxString, SpikeDat *, double bin = 1, int colour = red);
+
+	DiagBox *diagbox;
+
 	int gparam;
 	int *gdata;
 	short gindex;
 	double *gdatad;
 	datdouble *gdatadv;
 	datint *gdatav;
+	datdouble *gdatax;
+	int xcount, ycount;
+	int scattermode;
+	int linemode;
+	double scattersize;
+
 	double yfrom;
 	double yto;
 	double xfrom;
 	double xto;
 	double binsize;
 	wxString gname;
+	wxString xtag, ytag;
 	int samprate;    // 0 for no limit
-	int type;        // 0 for normal, 1 for histogram
+	int type;        // 0 for normal, 1 for histogram    // 26/2/15 Update this!
+
+	// 1 for histogram
+	// 2 for XY line plot
+	// 4 or 5 for line (5 is new scaling fixed version)
+	// 7 for bar
+	// 6 line with sampling
+	// 8 scatter with sampling
+	// 3 for spike rate
+
 	int pos;         // graph position
 	int dataset;
 	int colour;
 	int sdex;
 	double xmax;
 	int scrollpos;
-	double xscale;
+	double xscale, xshift, xsample;
 	double xdis;
 	int negscale;
 	int burstdisp;
+	int xlabels, ylabels; 
+	double xstep, ystep;
+	int xtickmode, ytickmode;
+	double plotstroke;
+	wxColour strokecolour, fillcolour;
+	int xplot, yplot;
+	double xlabelgap, ylabelgap;
+	double labelfontsize, tickfontsize;
+	double xunitscale, xunitdscale;
+	int clipmode;
+
 	BurstDat *burstdata;
 	SpikeDat *spikedata;
 
-	wxString StoreDat();
-	void LoadDat(wxString);
+	wxString StoreDat(wxString tag);
+	void LoadDat(wxString, int version);
+	void Init();
 };
 
 
@@ -349,6 +503,7 @@ class GraphBase{
 public:
 	int numsets;
 	int setstoresize;
+	int baseversion;
 	short numgraphs;
 	short storesize;
 	wxString initpath;
@@ -358,6 +513,7 @@ public:
 	std::vector <GraphDat> graphstore;
 	std::vector <GraphSet> setstore;
 	ParamStore tagindex;
+	ParamStore nameindex;
 	ParamStore settagindex;
 	MainFrame *mainwin;
 	//Model *mod;
@@ -371,6 +527,7 @@ public:
 		storesize = size;
 		setstoresize = setsize;
 		initpath = "Init/";
+		baseversion = 2;
 	};
 
 	~GraphBase() {
@@ -398,13 +555,14 @@ public:
 		return setindextag[index];
 	};
 
-
 	int Add(GraphDat newgraph, wxString tag, wxString settag = "", bool set=true);
 	GraphSet *NewSet(wxString name, wxString tag);
 	//int AddNewSet(wxString tag, int gdex);
 	GraphSet *GetSet(wxString);
 	GraphSet *GetSet(int);
 
+	GraphDat *GetGraph(wxString);
+	GraphDat *GetGraphFromName(wxString);
 	/*
 	GraphDat &operator[](wxString tag) {
 		for(unsigned long i=0; i<store.size(); i++) 

@@ -36,6 +36,7 @@ class MainFrame;
 class ToolBox;
 class Model;
 class ToolSet;
+class ToolPanel;
 
 
 //	1. TextBox that depends on a parent Window. 
@@ -54,11 +55,27 @@ class TagBox: public wxComboBox
 {
 public:
 	wxString name, path;
-	bool labelset;
+	bool labelset, histmode;
 	DiagBox *diagbox;
 
-	TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
+	TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
 	~TagBox();
+
+	void HistLoad();
+	void HistStore();
+};
+
+
+class ToolButton: public wxButton
+{
+public:
+	bool compmode;
+	DiagBox *diagbox;
+
+	virtual void OnLeftUp(wxMouseEvent & event);
+	virtual void OnLeftDClick(wxMouseEvent & event);
+
+	ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *diagbox);
 };
 
 //	3. ToolPanel of a Window with a Toolbox and answering to diferent mouse gestures
@@ -76,6 +93,7 @@ public:
 	
 	ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
+	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
   ToolPanel(MainFrame *main, wxWindow *parent);
 };
 
@@ -222,7 +240,7 @@ public:
 	int ostype;
 	int type;
 	int numwidth, labelwidth;
-    int pad;
+  int pad;
 	wxFont textfont, smalltextfont;
 	wxTextCtrl *numbox;
 	wxSpinButton *spin;
@@ -246,6 +264,8 @@ public:
 	double GetValue();
 	wxString GetString();
 	void SetValue(double val);
+	void SetPen(wxColour);
+	void SetValue(wxString);
 	void SetMinMax(double min, double max);
 	
 protected:
@@ -282,6 +302,7 @@ class ParamSet
 {
 public:
 	int numparams;
+	int currlay;      // Current parameter for panel layout, starts at 0
 	int type;
 	ToolPanel *panel;
 	ParamCon *con[100];
@@ -295,12 +316,13 @@ public:
 	void AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=65, int numwidth=40);
 	void AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
 	void AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
+	ParamCon *GetCon(wxString);
 	ParamStore *GetParams();
+	ParamStore *GetParamsNew(BoxOut *boxout);
 	int GetID(wxString);
 	wxString GetText(wxString);
 	double GetValue(wxString);
 	void SetMinMax(wxString tag, double, double);
-
 };
 
 

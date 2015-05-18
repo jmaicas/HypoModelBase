@@ -6,6 +6,40 @@
 
 
 
+ToolButton::ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *db)
+	: wxButton(parent, id, label, pos, size)
+{
+	//toolbox = tbox;
+	//pinmode = 0;
+	//toolbox = NULL;
+	//mainwin = main;
+	diagbox = db;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolButton::OnLeftUp));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolButton::OnLeftDClick));
+	//Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
+}
+
+
+void ToolButton::OnLeftDClick(wxMouseEvent& event)
+{
+	diagbox->Write("tool button double click\n");
+	event.Skip();
+}
+
+
+void ToolButton::OnLeftUp(wxMouseEvent& event)
+{
+	diagbox->Write("tool button click\n");
+	event.Skip();
+}
+
+
+
+// ParamText and ParamNum have been replaced by a generalised version of ParamCon, but still used in System panel and ScaleBox
+
+
 ParamText::ParamText(wxPanel *panel, wxString pname, wxString labelname, wxString initval, int labelwid, int textwid)
 {
 	wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
@@ -105,7 +139,7 @@ wxString ParamNum::GetValue()
 }
 
 
-ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxString initval, int labelwid, int numwid)
+ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxString initval, int labelwid, int numwid)               // Stripped down string only version for text entry
 {
 	ostype = GetSystem();
 	wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
@@ -124,6 +158,9 @@ ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxStrin
 		textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 		smalltextfont = wxFont(9, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	}
+
+	min = 0;
+	max = 1000;                    // Text version needs min and max set for use with GetParams()
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
@@ -182,29 +219,34 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	snum.Printf("%.1f", initval);
 	snum = numstring(initval, places);
-	label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+
+	if(labelname == "") {
+		label = NULL;
+		labelwidth = 0;
+	}
+	else {
+		label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+		label->SetFont(textfont);
+		if(ostype == Mac && labelwidth < 40) label->SetFont(smalltextfont);
+		sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
+	}
+
 	numbox = new wxTextCtrl(this, wxID_ANY, snum, wxDefaultPosition, wxSize(numwidth, -1), wxTE_PROCESS_ENTER);
+	numbox->SetFont(textfont);
+	sizer->Add(numbox, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
 
 	if(type == spincon) {
 		spin = new wxSpinButton(this, wxID_ANY, wxDefaultPosition, wxSize(17, 23), wxSP_VERTICAL|wxSP_ARROW_KEYS);  // 21
 		spin->SetRange(-1000000, 1000000);
-	}
-	label->SetFont(textfont);
-	if(ostype == Mac && labelwidth < 40) label->SetFont(smalltextfont);
-
-	numbox->SetFont(textfont);
+	}	
 
 	SetInitialSize(wxDefaultSize);
 	Move(wxDefaultPosition);
 
-	sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
-	sizer->Add(numbox, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
 	if(type == spincon) sizer->Add(spin, 0, wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(sizer);
 	Layout();
 
-	//Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(ParamCon::OnSpinUp));
-	//Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(ParamCon::OnSpinDown));
 	Connect(wxEVT_SPIN_UP, wxSpinEventHandler(ParamCon::OnSpinUp));
 	Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(ParamCon::OnSpinDown));
 	Connect(wxEVT_SPIN, wxSpinEventHandler(ParamCon::OnSpin));
@@ -213,6 +255,7 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 
 double ParamCon::GetValue()
 {
+	if(type == textcon) return 0;
 	numbox->GetValue().ToDouble(&value);
 	return value;
 }
@@ -224,10 +267,22 @@ wxString ParamCon::GetString()
 }
 
 
+void ParamCon::SetPen(wxColour pen)
+{
+	numbox->SetForegroundColour(pen);
+}
+
+
 void ParamCon::SetValue(double val)
 {
 	snum = numstring(val, decimals);
 	numbox->SetValue(snum);
+}
+
+
+void ParamCon::SetValue(wxString text)
+{
+	numbox->SetValue(text);
 }
 
 
@@ -316,6 +371,7 @@ ParamSet::ParamSet(ToolPanel *pan)
 {
 	panel = pan;
 	numparams = 0;
+	currlay = 0;
 	paramstore = new ParamStore();
 }
 
@@ -343,9 +399,15 @@ int ParamSet::GetID(wxString tag)
 }
 
 
-void ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth)
+ParamCon *ParamSet::GetCon(wxString tag)
 {
-	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);
+	return con[(int)ref[tag]];
+}
+
+
+void ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth) 
+{
+	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);           // number + spin
 	ref[name] = numparams;
 	numparams++;
 }
@@ -353,7 +415,7 @@ void ParamSet::AddCon(wxString name, wxString labelname, double initval, double 
 
 void ParamSet::AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth, int numwidth)
 {
-	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);
+	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);              // number
 	ref[name] = numparams;
 	numparams++;
 }
@@ -361,7 +423,7 @@ void ParamSet::AddNum(wxString name, wxString labelname, double initval, int pla
 
 void ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
 {
-	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);
+	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);																// text
 	ref[name] = numparams;
 	numparams++;
 }
@@ -398,6 +460,38 @@ ParamStore *ParamSet::GetParams()
 }
 
 
+ParamStore *ParamSet::GetParamsNew(BoxOut *boxout)
+{ 
+	int i;
+	double value;
+	ParamCon *pcon;
+	wxString text;
+
+	//if(boxout->diagbox) boxout->diagbox->textbox->AppendText(text.Format("%s get params\n", boxout->name));
+
+	for(i=0; i<numparams; i++) {
+		pcon = con[i];
+		value = pcon->GetValue();
+		//boxout->diagbox->Write(text.Format("param %s type %d value %.4f\n", con[i]->name, con[i]->type, value));
+		if(value < pcon->min) {
+			value = pcon->oldvalue;
+			pcon->SetValue(value);
+			//SetStatus(text.Format("Parameter \'%s\' out of range", con->label->GetLabel()));
+			//mainwin->diagbox->Write(text.Format("Parameter \'%s\' out of range, min %.2f max %.2f\n", con->label->GetLabel(), con->min, con->max));
+		}
+		if(value > pcon->max) {
+			value = pcon->oldvalue;
+			pcon->SetValue(value);
+			//SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
+		}
+		//boxout->diagbox->Write(text.Format("param %s type %d value %.4f\n", con[i]->name, con[i]->type, value));
+		(*paramstore)[con[i]->name] = value;
+		pcon->oldvalue = value;
+	}
+	return paramstore;
+}
+
+
 TextBox::TextBox(wxWindow *parent, wxWindowID id, wxString value, wxPoint pos, wxSize size, long style)
 	: wxTextCtrl(parent, id, value, pos, size, style)
 {
@@ -413,11 +507,26 @@ ToolPanel::ToolPanel(MainFrame *main, wxWindow *parent)
 }
 
 
+ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
+	: wxPanel(box, wxID_ANY, pos, size)
+{
+	toolbox = NULL;
+	mainwin = NULL;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
+	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
+}
+
+
 ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)
 	: wxPanel(tbox, wxID_ANY, pos, size)
 {
 	toolbox = tbox;
 	mainwin = toolbox->mainwin;
+
+	if(mainwin->diagbox) mainwin->diagbox->Write("ToolPanel init\n");
 
 	//pinmode = 0;
 
@@ -495,6 +604,8 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	boxname = title;
 	canclose = true;
 
+	//main->diagbox->Write("ToolBox init\n");
+
   Init();
 }
 
@@ -513,7 +624,6 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	Init();
 }
 	
-
 
 /*
 ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, bool close)
@@ -606,6 +716,8 @@ void ToolBox::Init()
 
 	activepanel = panel;
 
+	//mod->diagbox->Write("ToolBox init\n");
+
 	Connect(wxEVT_MOVE, wxMoveEventHandler(ToolBox::OnMove));
 	Connect(wxEVT_SIZE, wxSizeEventHandler(ToolBox::OnSize));
 	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ToolBox::OnClose));
@@ -638,7 +750,7 @@ wxStaticText *ToolBox::TextLabel(wxString label)
 TagBox *ToolBox::TextInputCombo(int width, int height, wxString label, wxString name, wxString path)
 {
 	//wxComboBox *text = new (_NORMAL_BLOCK, __FILE__, __LINE__) wxComboBox(activepanel, wxID_ANY, label, wxDefaultPosition, wxSize(width, height));
-	TagBox *text = new TagBox(activepanel, label, wxDefaultPosition, wxSize(width, height), name, path);
+	TagBox *text = new TagBox(activepanel, wxID_ANY, label, wxDefaultPosition, wxSize(width, height), name, path);
 	text->diagbox = mainwin->diagbox;
 	text->SetFont(confont);
 	return text;
@@ -669,7 +781,7 @@ void ToolBox::AddButton(int id, wxString label, int width, wxBoxSizer *box, int 
 	if(pan == NULL) pan = activepanel;
 	if(height == 0) height = buttonheight;
 	//wxButton *button = new (_NORMAL_BLOCK, __FILE__, __LINE__) wxButton(pan, id, label, wxDefaultPosition, wxSize(width, height));
-	wxButton *button = new wxButton(pan, id, label, wxDefaultPosition, wxSize(width, height));
+	ToolButton *button = new ToolButton(pan, id, label, wxDefaultPosition, wxSize(width, height), mainwin->diagbox);
 	button->SetFont(confont);
 	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, pad);
 }
@@ -829,8 +941,8 @@ void ToolBox::OnClose(wxCloseEvent& event)
 }
 
 
-TagBox::TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxname, wxString modpath)
-	: wxComboBox(panel, wxID_ANY, label, wxDefaultPosition, size)
+TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxname, wxString modpath)
+	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
 	wxString filename, filepath;
 	wxString readline, tag;
@@ -843,11 +955,20 @@ TagBox::TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const 
 	labelset = false;
 	tag = "";
 
+	if(panel->mainwin) diagbox = panel->mainwin->diagbox;
+
+	diagbox->Write("TagBox init\n");
+
 	// tag history load
 	if(name == "") return;
 	filename =  name + "tags.ini";
 	check = opfile.Open(path + "/Tags/" + filename);
-	if(!check) return;
+	if(!check) {
+		if(diagbox) diagbox->Write("No tag history\n");
+		return;
+	}
+
+	diagbox->Write("Reading tag history\n");
 
 	readline = opfile.ReadLine();
 
@@ -861,6 +982,7 @@ TagBox::TagBox(wxPanel *panel, const wxString& label, const wxPoint& pos, const 
 
 	opfile.Close();	
 	SetLabel(tag);
+	diagbox->Write(name + " " + tag + "\n");
 	if(tag != "") labelset = true;
 }
 

@@ -21,7 +21,9 @@
 #include "hypopanels.h"
 #include "hypomods.h"
 #include "hypodat.h"
-#include "hypodef.h"
+//#include <hypodef.h>
+#include "wx/generic/printps.h"
+#include "wx/generic/prntdlgg.h"
 
 #ifdef HYPOSOUND
 #include "hyposound.h"
@@ -57,7 +59,7 @@ class ModelSet
 public:
 	int modcount; 
 
-	ModelDat modeldat[20];
+	ModelDat modeldat[50];
 
 	ModelSet() {modcount = 0;}
 
@@ -110,15 +112,18 @@ public:
 	wxString modpath;
 	wxBoxSizer *graphsizer;
 	ParamStore prefstore;
+	wxPrintData *printdata;
+	wxPageSetupDialogData *pageSetupData;
 
 	int moddex;
 	//ModelDat moddata[20];
 	ModelSet modset;
 
 	// Display
-	ScaleBox *scalebox;
+	//ScaleBox *scalebox;
+	//GraphBox *graphbox;
 	//ToolBox *toolset[10];
-	GraphWindow3 *graphwin[10];
+	//GraphWindow3 *graphwin[10];
 	graphdisp *gpos;
 	GraphDat *greg;
 	GraphBase *graphbase;

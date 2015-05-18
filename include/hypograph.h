@@ -18,6 +18,22 @@
 #include "hypobase.h"
 #include "hypodat.h"
 #include "hypomods.h"
+#include <wx/clrpicker.h>
+
+
+
+class GraphPanel: public wxScrolledWindow             // For testing, not in Use
+{
+public:
+	bool usebuffer;
+	
+	GraphPanel(wxFrame *parent);
+
+	void OnPaint(wxPaintEvent &event);
+	void OnEraseBackground(wxEraseEvent& event);
+	void PaintBackground(wxDC& dc);
+	void Draw(wxDC &dc);
+};
 
 //	1. GraphWindow3	Window for graphs. Use scalebox. Allow add and different mouse gestures. 
 class GraphWindow3: public wxPanel
@@ -41,12 +57,18 @@ public:
 	int gsynch;
 	int xstretch;
 	wxPoint mousedown;
-	wxOverlay *overlay;
+	//wxOverlay *overlay;
 	wxFont textfont, smallfont;
-	wxColour colourpen[10];
+	wxColour *colourpen;
+	//wxString colourstring[10];
 	wxBufferedPaintDC *dc;
 
 	wxMenu *menuPlot;
+
+	// Selection Overlay
+	bool selectband;
+	wxPoint anchorpos, currentpos;
+	wxOverlay overlay;
 
 	wxTextCtrl *yf;
 	wxTextCtrl *yt;
@@ -83,11 +105,66 @@ public:
 	void OnRightClick(wxMouseEvent& event);
 	void OnGraph(wxCommandEvent& event);
 	void OnGraphRemove(wxCommandEvent& event);
+	void OnGraphPrint(wxCommandEvent& event);
+	void OnGraphEPS(wxCommandEvent& event);
+	void OnScale(wxCommandEvent& event);
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
+	void PrintEPS();
 	wxRealPoint GraphPos(wxPoint);
 };
 
+
+class GraphBox : public wxDialog
+{
+public:
+	GraphWindow3 *graphwin;
+	ToolPanel *panel;
+	DiagBox *diagbox;
+
+	int ostype;
+	int buttonheight;
+	int column;
+	wxFont boxfont, confont;
+
+	wxBoxSizer *mainbox;
+	wxBoxSizer *parambox;
+	wxBoxSizer *vbox[5];
+	ParamSet *paramset;
+	GraphDat *graph;
+	BoxOut *boxout;
+	wxStaticText *status;
+	wxColourPickerCtrl *strokepicker, *fillpicker;
+	wxChoice *typechoice;
+	TypeSet typeset;
+	wxRadioButton *xrad[2], *yrad[2];
+	wxCheckBox *clipcheck, *scattercheck, *linecheck;
+
+	ParamNum *numdrawcon;
+	ParamNum *viewheightcon;
+	ParamNum *ylabelcon;
+	ParamNum *datsamplecon;
+	ParamText *datapathcon;
+	ParamText *outpathcon;
+	ParamText *parampathcon;
+	ParamText *modpathcon;
+	GraphBox(GraphWindow3 *, const wxString&);
+
+
+	void OnOK(wxCommandEvent& event);
+	void OnPrint(wxCommandEvent& event);
+	void OnRadio(wxCommandEvent& event);
+	void OnChoice(wxCommandEvent& event);
+	void OnSize(wxSizeEvent& event);
+	wxBoxSizer *ParamLayout(int columns=1);
+	void OnClose(wxCloseEvent& event);
+	void SetGraph(GraphWindow3 *newgraphwin=NULL);
+	void SetParams();
+};
+
+
 //	2. ScaleBox. Basic window for representing graphs. GraphWindow3 depends on it. 
+
+
 class ScaleBox: public wxPanel
 {
 public:
@@ -116,6 +193,7 @@ public:
 	int dendmode;
 	int ratedata;
 	int internflag;
+	int normtog;
 	unsigned int boxtype;
 	int synchcon;
 
@@ -131,7 +209,10 @@ public:
 	GraphWindow3 **graphwin;
 	Model *gmod;
 	Model *mod;
+
 	ParamStore *gflags;
+	RefStore *gflagrefs;
+
 	wxComboBox *gstag;
 	wxToggleButton *syncbutton;
 	wxCheckBox *gsync[10];
@@ -142,6 +223,7 @@ public:
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);
 	TextBox *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer, int);
 	wxButton *ScaleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10);
+	wxButton *GraphButton(wxString tag, int initval, int id, wxString label, int width, wxBoxSizer *box, int point = 10);
 	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10);
 	void OnOK(wxCommandEvent& event);
 	void OnSync(wxCommandEvent& event);
@@ -150,6 +232,7 @@ public:
 	void OnBinRes1(wxCommandEvent& event);
 	void OnBinRes2(wxCommandEvent& event);
 	void OnNetMode(wxCommandEvent& event);
+	void OnNorm(wxCommandEvent& event);
 	void OnAllBurst(wxCommandEvent& event);
 	void OnProfMode(wxCommandEvent& event);
 	void OnExpMode(wxCommandEvent& event);
@@ -167,8 +250,12 @@ public:
 	void OnXZoomOut(wxCommandEvent& event);
 	void OnGStore(wxCommandEvent& event);
 	void OnGLoad(wxCommandEvent& event);
+
+	void OnGraphButton(wxCommandEvent& event);   // New general button system
+
 	//void OnClose(wxCloseEvent& event);
 	//void GSwitch(int mod = 0);
+
 	void GLoad(wxString tag = "");
 	void GSwitch1();
 	void GSwitch2();
@@ -211,6 +298,7 @@ public:
 	graphdisp *gpos;
 	ScaleBox *scalebox;
 	GraphWindow3 *graphwin[10];
+	GraphPanel *graphpanel[10];
 
 	DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size, int start, int numgraphs);
 	void GraphUpdate();

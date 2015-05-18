@@ -23,13 +23,33 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 {
 	ostype = GetSystem();
 	mainwin = this;
-	CreateStatusBar();
+	statusbar = CreateStatusBar();
+	diagbox = NULL;                // Protect diagbox self reference for toolpanel
 
   diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
 
+	graphbox = NULL;
+
+	colourpen[0].Set("#000000");       // 0 black
+	colourpen[1].Set("#F50000");       // 1 red
+	colourpen[2].Set("#00F500");       // 2 green
+	colourpen[3].Set("#0000F5");       // 3 blue
+	colourpen[4].Set("#F5F500");       // 4 yellow
+	colourpen[5].Set("#F500F5");       // 5 purple
+	colourpen[6].Set("#FF8080");       // 6 light red
+	colourpen[7].Set("#80FF80");       // 7 light green
+	colourpen[8].Set("#8080FF");       // 8 light blue
+	colourpen[9].Set("#000000");       // 9 custom
+
 	toolset = new ToolSet();
-	toolset->AddBox(diagbox, false, true);
+	toolset->AddBox(diagbox, true);
+}
+
+
+MainFrame::~MainFrame()
+{
+	delete toolset;
 }
 
 
@@ -175,6 +195,56 @@ wxString numstring(double number, int places=0)
 }
 
 
+wxString ColourString(wxColour col, int type)
+{
+	wxString colstring;
+
+	if(type == 0) return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
+	else return colstring.Format("%d %d %d", col.Red(), col.Green(), col.Blue());
+}
+
+
+double ParseDouble(wxString *readline, wxUniChar tag)
+{
+	wxString numstring;
+	double numdat;
+
+	*readline = readline->AfterFirst(tag);
+	readline->Trim(false);
+	numstring = readline->BeforeFirst(' ');
+	numstring.ToDouble(&numdat);
+	*readline = readline->AfterFirst(' ');
+	return numdat;
+}
+
+
+long ParseLong(wxString *readline, wxUniChar tag)
+{
+	wxString numstring;
+	long numdat;
+
+	*readline = readline->AfterFirst(tag);
+	readline->Trim(false);
+	numstring = readline->BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	*readline = readline->AfterFirst(' ');
+	return numdat;
+}
+
+
+wxString ParseString(wxString *readline, wxUniChar tag)
+{
+	wxString string;
+	long numdat;
+
+	*readline = readline->AfterFirst(tag);
+	readline->Trim(false);
+	string = readline->BeforeFirst(' ');
+	*readline = readline->AfterFirst(' ');
+	return string;
+}
+
+
 TextFile::TextFile()
 {
 	file = NULL;
@@ -239,6 +309,38 @@ void TextFile::WriteLine(wxString text)
 }
 
 
+void TextFile::MoveTo(double x, double y)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu moveto", x, y));
+}
+
+
+void TextFile::LineTo(double x, double y)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu lineto", x, y));
+}
+
+
+void TextFile::DrawLine(double xf, double yf, double xt, double yt)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu moveto", xf, yf));
+	WriteLine(txt.Format("%.2f pu %.2f pu lineto", xt, yt));
+}
+
+
+void TextFile::DrawText(wxString text, double x, double y)
+{
+	WriteLine(txt.Format("%.2f pu %.2f pu moveto", x, y));
+	WriteLine(txt.Format("(%s) show", text));
+}
+
+
+void TextFile::SetColour(wxString col)
+{
+	WriteLine(txt.Format("%s setrgbcolor", col)); 
+}
+
+
 wxString TextFile::ReadLine()
 {
 	if(unread) {
@@ -267,6 +369,7 @@ datint::datint()
 datdouble::datdouble(wxTextCtrl *text)
 {
 	zero = 0;
+	maxindex = 0;
 	textbox = text;
 }
 
@@ -277,6 +380,7 @@ datdouble::datdouble(int size)
 	data.resize(size * 1.1);
 	max = size;
 	textbox = NULL;
+	maxindex = 0;
 }
 
 

@@ -25,7 +25,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	ostype = GetSystem();
 	graphload = true;
 	gsync = 0;
-	initparams = "test1";
+	initparams = "inittest";
 	storesize = 100000;
 	xmin = -100000;
 	path = "";
@@ -48,7 +48,7 @@ wxString Model::GetPath()
 		else fullpath = "Init";
 	}
 	else {
-		if(path != "") fullpath = mainwin->modpath + "/" + path;
+		if(path != "") fullpath = mainwin->modpath + "\\" + path;
 		else fullpath = mainwin->modpath;
 	}
 
@@ -64,6 +64,11 @@ void Model::RunModel()
 
 	//modthread->Create();
 	//modthread->Run();
+}
+
+
+void Model::ModClose()
+{
 }
 
 
@@ -238,6 +243,12 @@ void Model::ModStore()
 	//if(!wxDirExists(filepath)) wxMkdir(filepath);
 	filepath = GetPath();
 
+	// Default Parameters
+
+	//if(modbox->defstore) 
+		
+  //modbox->StoreParam("default");
+
 	// Parameter history
 	filename = modname + "prefs.ini";
 	initparams = modbox->paramstoretag->GetValue();
@@ -280,23 +291,24 @@ void Model::ModLoad()
 
 	filepath = GetPath();
 
-	// parameter history load
-	filename = modname + "prefs.ini";
-	check = opfile.Open(filepath + "/" + filename);
-	if(!check) return;
+	// parameter history load                       // Redundant, leave in for updating old models
+	if(!modbox->paramstoretag->labelset) {
+		filename = modname + "prefs.ini";
+		check = opfile.Open(filepath + "/" + filename);
+		if(!check) return;
 
-	readline = opfile.ReadLine();
-	while(!readline.IsEmpty()) {
-		readline = readline.AfterFirst(' ');
-		readline.Trim();
-		initparams = readline;
-		modbox->paramstoretag->Insert(initparams, 0);
-	
 		readline = opfile.ReadLine();
+		while(!readline.IsEmpty()) {
+			readline = readline.AfterFirst(' ');
+			readline.Trim();
+			initparams = readline;
+			modbox->paramstoretag->Insert(initparams, 0);
+	
+			readline = opfile.ReadLine();
+		}
+		opfile.Close();	
+		modbox->paramstoretag->SetLabel(initparams);
 	}
-	opfile.Close();	
-
-	modbox->paramstoretag->SetLabel(initparams);
 
 	// Box Load
 	filename = modname + "box.ini";

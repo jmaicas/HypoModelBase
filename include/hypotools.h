@@ -57,6 +57,7 @@ public:
 		void Delete();
 		void SetBold();
 		void ClearCol(int);
+		void ParseLine(int row, int col, wxString line);
 };
 
 

@@ -15,44 +15,6 @@
 #define HYPOBASE_H
 
 
-/*
-#ifdef _DEBUG
-      inline void * __cdecl operator new(unsigned int size, 
-                                         const char *file, int line)
-      {
-      };
-
-      inline void __cdecl operator delete(void *p)
-      {
-      };
-#endif
-
-#ifdef _DEBUG
-      #define DEBUG_NEW new(__FILE__, __LINE__)
-      #else
-      #define DEBUG_NEW new
-      #endif
-      #define new DEBUG_NEW
-
-
-
-      #ifdef _DEBUG
-      inline void * __cdecl operator new(unsigned int size,
-                                         const char *file, int line)
-      {
-	      void *ptr = (void *)malloc(size);
-	      AddTrack((DWORD)ptr, size, file, line);
-	      return(ptr);
-      };
-      inline void __cdecl operator delete(void *p)
-      {
-	      RemoveTrack((DWORD)p);
-	      free(p);
-      };
-      #endif
- */
-
-
 #include "wx/wx.h"
 
 #include "wx/spinctrl.h"
@@ -63,6 +25,8 @@
 #include "wx/dcbuffer.h"
 #include "wx/msgqueue.h"
 #include <wx/textfile.h>
+//#include <hypodef.h>
+
 
 //#include "hypocontrols.h"
 //#include "hypograph.h"
@@ -82,54 +46,19 @@
 //#include <crtdbg.h>
 //#include <vld.h>
 
+#ifndef OSXClip
+#ifndef TEACH
+#ifdef _DEBUG
+//#include <vld.h>
+#endif
+#endif
+#endif
+
+
 
 //using namespace stk;
 
 
-/*
-typedef struct {
-	      DWORD	address;
-	      DWORD	size;
-	      char	file[64];
-	      DWORD	line;
-      } ALLOC_INFO;
-
-      typedef list<ALLOC_INFO*> AllocList;
-
-      AllocList *allocList;
-
-      void AddTrack(DWORD addr,  DWORD asize,  const char *fname, DWORD lnum)
-      {
-	      ALLOC_INFO *info;
-
-	      if(!allocList) {
-		      allocList = new(AllocList);
-	      }
-
-	      info = new(ALLOC_INFO);
-	      info->address = addr;
-	      strncpy(info->file, fname, 63);
-	      info->line = lnum;
-	      info->size = asize;
-	      allocList->insert(allocList->begin(), info);
-      };
-
-      void RemoveTrack(DWORD addr)
-      {
-	      AllocList::iterator i;
-
-	      if(!allocList)
-		      return;
-	      for(i = allocList->begin(); i != allocList->end(); i++)
-	      {
-		      if((*i)->address == addr)
-		      {
-			      allocList->remove((*i));
-			      break;
-		      }
-	      }
-      };
-*/
 
 enum {
 	spincon = 1,
@@ -228,6 +157,7 @@ enum {
 	ID_netcheck,
 	ID_cellcheck,
 	ID_unicheck,
+	ID_seedcheck,
 	ID_netstore,
 	ID_netload,
 	ID_output,
@@ -289,6 +219,10 @@ enum {
 	ID_Graph,
 	ID_GraphAdd,
 	ID_GraphRemove,
+	ID_GraphPrint,
+	ID_Print,
+	ID_GraphEPS,
+	ID_Scale,
 	ID_Go,
 	ID_Stop, 
 	ID_Wave,
@@ -314,6 +248,8 @@ enum {
 	ID_DataBrowse,
 	ID_OutputBrowse,
 	ID_ParamBrowse,
+	ID_PathBrowse,
+	ID_FileBrowse,
 	ID_ModBrowse,
 	ID_absref,
 	ID_SelectAll,
@@ -328,7 +264,17 @@ enum {
 	ID_Diag,
 	ID_s,
 	ID_ms,
-	ID_net
+	ID_net, 
+	ID_norm,
+	ID_clipmode,
+	ID_scatter,
+	ID_line,
+	ID_Plot,
+	ID_Load,
+	ID_Browse,
+	ID_Select,
+	ID_Bin,
+	ID_Compare
 };
 
 
@@ -341,7 +287,8 @@ enum {
 	purple = 5,
 	lightred = 6,
 	lightgreen = 7,
-	lightblue = 8
+	lightblue = 8,
+	custom = 9
 };
 
 
@@ -351,6 +298,10 @@ wxString numstring(double, int);
 int numplaces(double);
 wxString numchar(int);
 wxString numtext(double number, int places);
+wxString ColourString(wxColour colour, int type=0);
+long ParseLong(wxString *, wxUniChar);
+double ParseDouble(wxString *, wxUniChar);
+wxString ParseString(wxString *, wxUniChar);
 
 int GetSystem();
 
@@ -360,12 +311,28 @@ class BurstBox;
 class BurstDat;
 class InfoBox;
 class ScaleBox;
+class GraphBox;
+class GraphWindow3;
 class ToolBox;
 class GraphBase;
 class ModGenBox;
 class DiagBox;
 class ToolSet;
 
+
+//DiagBox *gdiag;
+
+
+class BoxOut
+{
+public:
+	wxStaticText *status;
+	DiagBox *diagbox;
+	wxString name;
+
+	BoxOut() {status = NULL; diagbox = NULL; name = "";}
+	BoxOut(wxStaticText *statustext, DiagBox *diag, wxString boxname) {status = statustext; diagbox =diag; name = boxname;}
+};
 
 
 //	1. MainFrame. Define the Main Window, its size, position, OS, header text
@@ -379,15 +346,23 @@ public:
 	wxSize screensize;
 	wxString snum, text;
 	wxBoxSizer *mainsizer;
+	wxStatusBar *statusbar;
 	//ToolSet toolset;
 	ToolSet *toolset;
   DiagBox *diagbox;
+	wxColour colourpen[10];
+
+	// Display
+	ScaleBox *scalebox;
+	GraphBox *graphbox;
+	GraphWindow3 *graphwin[10];
     
 	int basic;
 	int diagnostic;
 	int ostype;
     
 	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+	~MainFrame();
 	virtual void MainLoad();
 	virtual void MainStore();
 };
@@ -404,8 +379,10 @@ public:
 class TextFile{
 public:
 	wxTextFile *file;
+	wxString txt;
 	bool unread;
 	bool readonly;
+	bool buffmode;
     
 	//TextFile(wxString name);
 	TextFile();
@@ -415,6 +392,14 @@ public:
 	int Open(wxString name, bool read=true);
 	int Exists(wxString name);
 	void WriteLine(wxString);
+
+	// Postscript Writing
+	void MoveTo(double x, double y);
+	void LineTo(double x, double y);
+	void DrawLine(double xf, double yf, double xt, double yt);
+	void DrawText(wxString, double x, double y);
+	void SetColour(wxString);
+
 	void Flush();
 	wxString ReadLine();
 	void Close();
@@ -431,7 +416,7 @@ public:
 	datdouble(int size);  //// OJO AQUI, ESTABA EN INTEGER. 
 	std::vector <double> data;
 	double count;
-	int max;
+	int max, maxindex;
 	double zero;
 	wxString tag, mess;
 	wxTextCtrl *textbox;
@@ -443,7 +428,13 @@ public:
 			if(textbox && index%100 == 0) textbox->AppendText(mess.Format("%s bad access, index %d\n", tag, index));
 			return zero;		
 		}
+		if(index > maxindex) maxindex = index;
 		return data[index];
+	}
+
+	int maxdex() {
+		//return data.size()-1;
+		return maxindex;
 	}
     
 	void setsize(int size, wxTextCtrl *text = NULL, wxString dattag = "") {
@@ -451,6 +442,7 @@ public:
 		tag = dattag;
 		data.resize(size * 1.1);
 		max = size;
+		maxindex = 0;
 	}
 
 	//~datdouble() {

@@ -1,7 +1,8 @@
 
 
 #include <hypomodel.h>
-//#include <hypodef.h>
+#include <wx/print.h>
+#include <hypodef.h>
 //#include "hypomods.h"
 //#include "hypopanels.h"
 //#include "cortmod.h"
@@ -51,7 +52,20 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	mainframe = this;
 	
 	//blankevent = new wxCommandEvent();
+
+	/*
 	screensize = wxGetDisplaySize();
+	printdata = new wxPrintData;
+	pageSetupData = new wxPageSetupDialogData;
+	printdata->SetPaperId(wxPAPER_A5);
+	printdata->SetOrientation(wxLANDSCAPE);
+
+	// copy over initial paper size from print record
+  *pageSetupData = *printdata;
+
+  // Set some initial page margins in mm.
+  pageSetupData->SetMarginTopLeft(wxPoint(15, 15));
+  pageSetupData->SetMarginBottomRight(wxPoint(15, 15));*/
 	
 	numgraphs = 8;
 	numdraw = 3;
@@ -281,13 +295,13 @@ void HypoMain::RemoveGraph(int gindex)
 void HypoMain::CleanUp() {
 	int i;
 
-	for(i=0; i<numdraw; i++) delete graphwin[i];
+	//for(i=0; i<numdraw; i++) delete graphwin[i];
+
+	if(graphbox) graphbox->Destroy();
 
 	delete[] gpos;
-	//delete wxofp;
 	delete mod;
-	//delete menuFile;
-	//delete menuControls;
+	
 	
 	//wxMenu *menuTools = new wxMenu;
 	//wxMenu *menuSystem = new wxMenu;
@@ -297,12 +311,13 @@ void HypoMain::CleanUp() {
 
 void HypoMain::FullMenu()
 {
+	bool display = true;
+
 	wxMenu *menuFile = new wxMenu;
 	wxMenu *menuControls = new wxMenu;
 	//wxMenu *menuAnalysis = new wxMenu;
 	wxMenu *menuTools = new wxMenu;
 	wxMenu *menuSystem = new wxMenu;
-	//wxMenu *menuDisplay = new wxMenu;
 	
 	menuFile->Append(ID_About, "&About...");
 	menuFile->AppendSeparator();
@@ -326,11 +341,8 @@ void HypoMain::FullMenu()
 	menuTools->Append(ID_GraphAdd, "Add Graph");
 	menuTools->Append(ID_ModGen, "Mod Gen");
 	menuTools->Append(ID_Diag, "Diagnostic Box");
-
-	
 	
 	menuSystem->Append(ID_Options, "Options");
-	//menuDisplay->Append(ID_Display, "New Display");
 	
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(menuFile, "&File");
@@ -338,7 +350,12 @@ void HypoMain::FullMenu()
 	//menuBar->Append(menuAnalysis, "Analysis");
 	menuBar->Append(menuTools, "Tools");
 	menuBar->Append(menuSystem, "System");
-	//menuBar->Append(menuDisplay, "Display");
+
+	if(display) {
+		wxMenu *menuDisplay = new wxMenu;
+		menuDisplay->Append(ID_Display, "New Display");
+		menuBar->Append(menuDisplay, "Display");
+	}
 	
 	SetMenuBar(menuBar);
 
@@ -422,6 +439,7 @@ void HypoMain::OnClose(wxCloseEvent& event)
 	OptionStore();
 	//ViewStore();
 	MainStore();
+	mod->ModClose();
 	mod->ModStore();
 	mod->GHistStore();
 	CleanUp();
@@ -460,12 +478,16 @@ void HypoMain::OnSize(wxSizeEvent& WXUNUSED(event))
 {	
 	int gspace, gspacex;
 	int scalewidth = 155;
+	wxSize statusSize;
 	int i;
 
 	wxSize newsize = GetSize();
+	wxSize graphsize = graphsizer->GetSize();
 	wxPoint mainpos = GetPosition();
 	snum.Printf("Size X %d Y %d", newsize.x, newsize.y);
 	SetStatusText(snum);
+
+	statusSize = statusbar->GetSize();
 	
 	yplot = 200;
 	xplot = 500;
@@ -481,10 +503,15 @@ void HypoMain::OnSize(wxSizeEvent& WXUNUSED(event))
 	if(gspacex < 350) xplot = 300;
 	xplot = gspacex - 15;
 
-	gspace = newsize.y - numdraw * 75 - 5;
+	//gspace = newsize.y - numdraw * 75 - statusSize.y;
+	//gspace = newsize.y - numdraw * 75 - 5;
+	gspace = graphsize.y - numdraw * 55 - 5;
 	if(gspace / numdraw < 200) yplot = 150;
 	if(gspace / numdraw < 150) yplot = 100;
 	yplot = gspace/numdraw;
+
+	snum.Printf("Size X %d Y %d, Graph X %d Y %d, yplot %d", newsize.x, newsize.y, graphsize.x, graphsize.y, yplot);
+	SetStatusText(snum);
 
 	viewwidth = newsize.x;
 	viewheight = newsize.y;
@@ -569,7 +596,7 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 	wxString message;
 	
 	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2013\n\nSystem: %s", wxGetOsDescription());
-	else message.Printf("Hypothalamic Network Model\n\nDuncan MacGregor 2010\n\nSystem: %s", wxGetOsDescription());
+	else message.Printf("Hypothalamic Network Model\n\nDuncan MacGregor 2010-2015\n\nSystem: %s", wxGetOsDescription());
 
 	wxMessageBox(message, "About Hypo Model", wxOK | wxICON_INFORMATION, this);
 }

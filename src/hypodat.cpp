@@ -101,6 +101,8 @@ void SpikeDat::ReSize(int newsize)
 
 SpikeDat::SpikeDat()
 {
+	diagbox = NULL;
+
 	hist1.setsize(10000);
 	hist5.setsize(10000);
 	haz1.setsize(10000);
@@ -110,6 +112,11 @@ SpikeDat::SpikeDat()
 	histquadsm.setsize(1000);
 	histquadlin.setsize(1000);
 	hazquad.setsize(10000);
+
+	hist1norm.setsize(10000);
+	hist5norm.setsize(10000);
+	//haz1norm.setsize(10000);
+	//haz5norm.setsize(10000);
 
 	srate.setsize(100000);
 	srate1.setsize(1000000);
@@ -147,12 +154,72 @@ SpikeDat::~SpikeDat()
 }
 
 
-BurstDat::BurstDat()
+SpikeDatTest::SpikeDatTest()
 {
+	diagbox = NULL;
+
+	/*
+	hist1.setsize(10000);
+	hist5.setsize(10000);
+	haz1.setsize(10000);
+	haz5.setsize(10000);
+	histquad.setsize(1000);
+	histquadx.setsize(1000);
+	histquadsm.setsize(1000);
+	histquadlin.setsize(1000);
+	hazquad.setsize(10000);
+
+	hist1norm.setsize(10000);
+	hist5norm.setsize(10000);
+	//haz1norm.setsize(10000);
+	//haz5norm.setsize(10000);
+
+	srate.setsize(100000);
+	srate1.setsize(1000000);
+	srate100.setsize(100000);
+
+	synsim.data.resize(1000100);
+	synsim.max = 1000000;
+
+	times.data.resize(100000);
+	times.max = 100000;
+	isis.data.resize(100000);
+	isis.max = 100000;
+	winfreq.data.resize(11000);
+	winfreq.max = 10000;
+
+	raterec.setsize(1000);
+	netinputrec.setsize(1000);
+
+	burstdata = NULL;
+	vasomean.data.resize(250);
+	vasomean.max = 200;
+
+	count = 0;
+	spikecount = 0;
+	start = 0;
+	freqwindow = 100;
+	maxspikes = 100000;
+	mainwin = NULL;*/
+}
+
+
+SpikeDatTest::~SpikeDatTest()
+{
+	//if(burstdata) delete burstdata;
+}
+
+
+BurstDat::BurstDat(bool select)
+{
+	selectmode = select; 
+
 	burstdisp = 0;
 	numbursts = 0;
 	hist1.data.resize(10000);
 	hist5.data.resize(10000);
+	hist1norm.data.resize(10000);
+	hist5norm.data.resize(10000);
 	haz1.data.resize(10000);
 	haz5.data.resize(10000);
 	spikes.data.resize(100000);
@@ -177,6 +244,28 @@ BurstDat::BurstDat()
 
 	profilesm.setsize(500);
 	tailprofilesm.setsize(500);
+
+	maxbursts = 1000;
+	//bustore = new burst[maxbursts];
+	bustore.resize(maxbursts);
+}
+
+
+BurstDat::~BurstDat()
+{
+	//delete[] bustore;
+}
+
+
+int BurstDat::spikeburst(int spike)
+{
+	int bindex = 1;
+
+	for(bindex = 1; bindex <= numbursts; bindex++) {
+		if(spike <= bustore[bindex].end && spike >= bustore[bindex].start) return bindex;
+	}
+
+	return 0;
 }
 
 
@@ -205,6 +294,28 @@ CurrentDat::CurrentDat()
 }
 
 
+void TypeSet::Add(wxString name, int type)
+{
+	names[numtypes] = name;
+	typeindex[numtypes] = type;
+	refindex[type] = numtypes;
+	numtypes++;
+}
+
+
+int TypeSet::GetIndex(int type)
+{
+	if(type == 4) type = 5;
+	return refindex[type];
+}
+
+
+int TypeSet::GetType(int ref)
+{
+	return typeindex[ref];
+}
+
+
 GraphDat::GraphDat()
 {
 	scrollpos = 0;
@@ -217,53 +328,163 @@ GraphDat::GraphDat()
 }
 
 
-wxString GraphDat::StoreDat()
+wxString GraphDat::StoreDat(wxString tag)
 {
 	wxString gtext;
+	wxString storegname, storextag, storeytag;
 
-	return gtext.Format("index %d xf %.8f xt %.8f yf %.8f yt %.8f name %s", gindex, xfrom, xto, yfrom, yto, gname);
+	storegname = gname;                       // replace spaces with underscores for textfile storing
+	storegname.Replace(" ", "_");
+	storextag = xtag;
+	storextag.Replace(" ", "_");
+	storeytag = ytag;
+	storeytag.Replace(" ", "_");
+
+	return gtext.Format("v5 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f", 
+		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
+		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample);
 }
 
 
-void GraphDat::LoadDat(wxString data)
+void GraphDat::LoadDat(wxString data, int version)                    // Not in use, see GraphBase::BaseLoad - now in use
 {
-	wxString readline, numstring;
+	wxString readline, numstring, stringdat;
+	long numdat;
+	long red, green, blue;
+	//int version;
+
+	//if(diagbox) diagbox->Write(data + '\n');
 
 	readline = data.AfterFirst('f');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&xfrom);
+
 	readline = readline.AfterFirst('t');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&xto);
 
 	readline = readline.AfterFirst('f');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&yfrom);
+
 	readline = readline.AfterFirst('t');
+	readline.Trim(false);
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToDouble(&yto);
+
+	readline = readline.AfterFirst('l');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	xlabels = numdat;
+
+	readline = readline.AfterFirst('s');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToDouble(&xstep);
+
+	readline = readline.AfterFirst('m');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	xtickmode = numdat;
+
+	readline = readline.AfterFirst('l');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	ylabels = numdat;
+
+	readline = readline.AfterFirst('s');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToDouble(&ystep);
+
+	readline = readline.AfterFirst('m');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	ytickmode = numdat;
+
+	readline = readline.AfterFirst('c');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&numdat);
+	colour = numdat;
+
+	readline = readline.AfterFirst('b');
+	readline.Trim(false);
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&red);
+	readline = readline.AfterFirst(' ');
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&green);
+	readline = readline.AfterFirst(' ');
+	numstring = readline.BeforeFirst(' ');
+	numstring.ToLong(&blue);
+	strokecolour = wxColour(red, green, blue);
+
+	if(version > 0) {
+		xshift = ParseDouble(&readline, 's');
+		xunitscale = ParseDouble(&readline, 'u');
+		plotstroke = ParseDouble(&readline, 's');
+
+		//if(diagbox) diagbox->Write(readline + '\n');
+		
+		gname = ParseString(&readline, 'e');
+		gname.Replace("_", " ");
+
+		xtag = ParseString(&readline, 'g');
+		xtag.Replace("_", " ");
+
+		ytag = ParseString(&readline, 'g');
+		ytag.Replace("_", " ");
+	}	
+
+	if(version > 2) {
+		xplot = ParseDouble(&readline, 'p');
+		yplot = ParseDouble(&readline, 'p');
+		labelfontsize = ParseDouble(&readline, 'f');
+		clipmode = ParseLong(&readline, 'm');
+	}
+
+	if(version > 3) type = ParseLong(&readline, 'e');
+
+	if(version > 4) {
+		xunitdscale = ParseDouble(&readline, 'd');
+		xsample = ParseDouble(&readline, 'm');
+	}
 }
 
 
 GraphDat::GraphDat(datdouble *newdat, double xf, double xt, double yf, double yt, wxString name, int gtype, double bin, int gcolour, int xs, int xd)
 {
-	scrollpos = 0;
 	xscale = xs;
 	xdis = xd;
-	negscale = 0;
 	spikedata = NULL;
 
+	gdatax = NULL;
+	xcount = 0;
+	ycount = 0;
 	gdatadv = newdat;
 	gparam = -4;
+	type = gtype;
+	samprate = 1;
+	scattermode = 0;
+	linemode = 1;
+	scattersize = 2;
+
 	xfrom = xf;
 	xto = xt;
 	yfrom = yf;
 	yto = yt;
 	gname = name;
-	type = gtype;
 	colour = gcolour;
 	binsize = bin;
-	samprate = 1;
+	Init();
 }
 
 
@@ -277,36 +498,67 @@ GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, w
 
 	gdatav = newdat;
 	gparam = -3;
+	type = gtype;
+	
 	xfrom = xf;
 	xto = xt;
 	yfrom = yf;
 	yto = yt;
 	gname = name;
-	type = gtype;
 	colour = gcolour;
 	binsize = bin;
+	Init();
 }
 
 
 GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, wxString name, SpikeDat *newspikedata, double bin, int gcolour)
 {
-	//GraphDat();
-	scrollpos = 0;
 	xscale = 1;
 	xdis = 0;
 	negscale = 0;
 
+	type = 3;
+	spikedata = newspikedata;
 	gdatav = newdat;
 	gparam = -3;
+
 	xfrom = xf;
 	xto = xt;
 	yfrom = yf;
 	yto = yt;
 	gname = name;
-	type = 3;
-	spikedata = newspikedata;
 	colour = gcolour;
 	binsize = bin;
+	Init();
+}
+
+
+void GraphDat::Init()
+{
+	diagbox = NULL;
+	scrollpos = 0;
+	negscale = 0;
+	xlabels = 0;
+	ylabels = 0;
+	xstep = 0;
+	ystep = 0;
+	xtickmode = 0;
+	ytickmode = 0;
+	plotstroke = 0.5;
+	xplot = 500;
+	yplot = 200;
+	xshift = 0;
+	xsample = 1;
+	xunitscale = 1;
+	xunitdscale = 1;
+	strokecolour.Set(0, 0, 0);
+	xtag = "X";
+	ytag = "Y";
+	xlabelgap = 40;
+	ylabelgap = 30;
+	labelfontsize = 10;
+	tickfontsize = 10;
+	clipmode = 0;
 }
 
 
@@ -410,7 +662,10 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 {
 	int sdex;
 	wxString text;
-	GraphSet *graphset;
+	GraphSet *graphset = NULL;
+
+	newgraph.diagbox = mainwin->diagbox;
+	newgraph.strokecolour = mainwin->colourpen[newgraph.colour];
 
 	// If single graph, create new single graph set, otherwise add to set 'settag'
 	if(set) {
@@ -430,9 +685,10 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	graphstore[numgraphs] = newgraph;
 	graphstore[numgraphs].gindex = numgraphs;
 	tagindex[tag] = numgraphs;
+	nameindex[newgraph.gname] = numgraphs;
 	indextag[numgraphs] = tag;
 
-	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
+	if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
 	
 	numgraphs++;
 	return numgraphs-1; 
@@ -485,6 +741,22 @@ GraphSet *GraphBase::GetSet(wxString tag)
 }
 
 
+GraphDat *GraphBase::GetGraph(wxString tag) 
+{
+	if(!tagindex.check(tag)) return NULL;
+	int index = tagindex[tag];
+	return &(graphstore[index]);
+}
+
+
+GraphDat *GraphBase::GetGraphFromName(wxString name) 
+{
+	if(!nameindex.check(name)) return NULL;
+	int index = nameindex[name];
+	return &(graphstore[index]);
+}
+
+
 GraphSet *GraphBase::GetSet(int index) 
 {
 	return &(setstore[index]);
@@ -502,7 +774,7 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 	//outfile.New(initpath + "/Graphs/" + filename);
 	outfile.New(path + "/" + filename);
 	for(i=0; i<numgraphs; i++) {
-		outfile.WriteLine(graphstore[i].StoreDat());
+		outfile.WriteLine(graphstore[i].StoreDat(GetTag(i)));
 		//outfile.WriteLine(text.Format
 	}
 	outfile.Close();
@@ -511,11 +783,14 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 // Lee un fichero de texto. 
 void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 {
-	int i;
+	int i, index;
 	TextFile infile;
 	wxString readline, filename, filetag;
-	wxString text, numstring;
+	wxString text, numstring, namestring, basestring;
+	wxString gtag, gname;
 	double numdat;
+	GraphDat *graph;
+	int version;
 
 	filename = "gbase-" + tag + ".dat";
 
@@ -527,40 +802,58 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 	i = 0;
 	readline = infile.ReadLine();
 
+	// Version check
+
+	//fileversion = ParseLong(&vstring, 'v');
+	//textbox->AppendText(text.Format("Base file version %d\n", fileversion));
+	//if(fileversion < version) textbox->AppendText(text.Format("Create base index\n"));
+
 	while(!readline.IsEmpty()) {
-		//readline = infile.ReadLine();
-		//textbox->AppendText(readline + "\n");
 
-		readline = readline.AfterFirst('f');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&numdat);
-		graphstore[i].xfrom = numdat;
-		//textbox->AppendText(text.Format("xf %.4f\n", numdat));
+		if(readline.GetChar(0) == 'v') version = ParseLong(&readline, 'v');          // check file version for backwards compatability
+		else version = 0;
+		//textbox->AppendText(text.Format("Base file version %d\n", version));
+		//textbox->AppendText(text.Format("Readline %s\n", readline));
 
-		readline = readline.AfterFirst('t');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&graphstore[i].xto);
-
-		readline = readline.AfterFirst('f');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&graphstore[i].yfrom);
-
-		readline = readline.AfterFirst('t');
-		readline.Trim(false);
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToDouble(&numdat);
-		graphstore[i].yto = numdat;
-		//textbox->AppendText(text.Format("yt %.4f\n", numdat));
-
-		//graphstore[i].LoadDat(readline);
+		if(version >= 2) {                                                  // Modern, reference by tag
+			gtag = ParseString(&readline, 'g');
+			GetGraph(gtag)->LoadDat(readline, version);
+		}
+		else {
+			//GetGraphFromName(gname)->LoadDat(readline, version);              // Should add code to chop off any tag first
+			//int ndex = readline.Find("name");
+			//textbox->AppendText(text.Format("Base file version %d\n", version));
+			//textbox->AppendText(text.Format("Readline %s\n", readline));
+			namestring = readline.Mid(readline.Find("name"));
+			//textbox->AppendText(text.Format("Name string %s\n", namestring));
+			gname = ParseString(&namestring, 'e');
+			gname.Replace("_", " ");
+			if(textbox) textbox->AppendText(text.Format("gname %s\n", gname));
+			graph = GetGraphFromName(gname);
+			if(graph) graph->LoadDat(readline, version);
+		}
+			
+		//graphstore[i].LoadDat(readline, version);
 			
 		if(infile.End()) break;
 		readline = infile.ReadLine();	
 		i++;	
 	}
 	infile.Close();
+
+
+	// Read graphbase entries
+
+	/*
+	while(!readline.IsEmpty()) {
+		graphstore[i].diagbox = mainwin->diagbox;
+		graphstore[i].LoadDat(readline, version);
+			
+		if(infile.End()) break;
+		readline = infile.ReadLine();	
+		i++;	
+	}
+	infile.Close();
+	*/
 }
 
