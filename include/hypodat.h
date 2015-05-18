@@ -141,7 +141,7 @@ public:
 	MainFrame *mainwin;
 	
 	void datacalc();
-	void neurocalc(NeuroDat *datneuron = NULL);
+	void neurocalc(NeuroDat *datneuron = NULL); // calculate things from spike times
 	void ISIanalysis();
 	//void autocalc();
 	void netneurocalc(int);

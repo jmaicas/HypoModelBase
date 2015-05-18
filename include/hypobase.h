@@ -428,7 +428,7 @@ long ReadNextData(wxString *readline);
 class datdouble{
 public:
 	datdouble(wxTextCtrl *text = NULL);
-	datdouble(int size);
+	datdouble(int size);  //// OJO AQUI, ESTABA EN INTEGER. 
 	std::vector <double> data;
 	double count;
 	int max;

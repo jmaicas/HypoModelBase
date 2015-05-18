@@ -1,4 +1,4 @@
-
+// BurstBox::OnDatLoad : Getting and processing data from files. 
 
 #include <hypomodel.h>
 #include <wx/notebook.h>
@@ -773,8 +773,8 @@ void BurstBox::BurstDataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
 	datpanel->intraisisd->SetLabel(snum);
 }
 
-
-void BurstBox::OnDatLoad(wxCommandEvent& event)
+// Getting and processing data from files. 
+void BurstBox::OnDatLoad(wxCommandEvent& event)  
 {
 	int s, count, maxdata, stretchdata;
 	double datval, spikeint;

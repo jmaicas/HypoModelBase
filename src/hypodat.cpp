@@ -508,7 +508,7 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 	outfile.Close();
 }
 
-
+// Lee un fichero de texto. 
 void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 {
 	int i;

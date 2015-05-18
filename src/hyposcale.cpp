@@ -218,6 +218,39 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			}
 		}
 
+
+		if(boxtype == modFirstTest) {
+			if(i == 1) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+		}
+
+		if(boxtype == modOxySEM) {
+			if(i == 1) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+		}
+
 		if(boxtype == modVMN) {
 			if(i == 0) {
 				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
@@ -250,36 +283,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 					//ScaleButton(ID_allburst, "All / Burst", 55, vbox);
 				}		
 			}
-
-			/*
-			if(i == 2) {		
-			wxBoxSizer *secbox = new wxBoxSizer(wxHORIZONTAL); 
-			ScaleButton(ID_expdat, "Exp", 45, vbox);
-			ScaleButton(ID_profile, "Profile", 55, vbox);
-
-			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-			if(ostype == Mac) {
-
-			ScaleButton(ID_secretion, "Sec", 43, secbox);
-
-			ScaleButton(ID_dendmode, "Den", 45, secbox);
-			ScaleButton(ID_overlay, "Ovl", 43, hbox);
-			ScaleButton(ID_position, "Pos", 43, hbox);
-			}
-			else {
-			ScaleButton(ID_secretion, "Sec", 37, secbox);
-			secbox->AddSpacer(2);
-			ScaleButton(ID_dendmode, "Dend", 37, secbox);
-			ScaleButton(ID_overlay, "Over", 35, hbox);
-			hbox->AddSpacer(2);
-			ScaleButton(ID_position, "Pos", 35, hbox);
-			}
-			vbox->Add(secbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}*/
 		}
-
 	}
+
 	//vbox->AddStretchSpacer(5);
 	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
 	if(ostype == Mac) {
