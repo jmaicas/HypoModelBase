@@ -69,6 +69,18 @@ TextGrid::~TextGrid()
 }
 
 
+void TextGrid::SetCell(int row, int col, wxString data)
+{
+	int numrows = GetNumberRows();
+	int numcols = GetNumberCols();
+
+	if(row >= numrows) AppendRows(row - numrows + 1);
+	if(col >= numcols) AppendRows(col - numcols + 1);
+
+	SetCellValue(row, col, data);
+}
+
+
 void TextGrid::OnTypeKey(wxKeyEvent &event)
 {
 	wxString text;
