@@ -817,7 +817,8 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 
 		if(version >= 2) {                                                  // Modern, reference by tag
 			gtag = ParseString(&readline, 'g');
-			GetGraph(gtag)->LoadDat(readline, version);
+			graph = GetGraph(gtag);
+			if(graph) graph->LoadDat(readline, version);
 		}
 		else {
 			//GetGraphFromName(gname)->LoadDat(readline, version);              // Should add code to chop off any tag first

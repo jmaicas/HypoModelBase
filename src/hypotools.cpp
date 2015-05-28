@@ -216,8 +216,8 @@ void TextGrid::Copy()
 					if(!copy_data.IsEmpty()) copy_data.Append("\n"); 
 					used_line = true;
 				}
-				else copy_data.Append("\t"); 
-				copy_data = copy_data + GetCellValue(i,j);   
+				else copy_data.Append("\t");   
+				copy_data.Append(GetCellValue(i, j));
 			}
 		}
 	}
