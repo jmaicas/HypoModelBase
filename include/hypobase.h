@@ -260,7 +260,8 @@ enum {
 	ID_Browse,
 	ID_Select,
 	ID_Bin,
-	ID_Compare
+	ID_Compare,
+	ID_Store
 };
 
 
@@ -514,6 +515,7 @@ public:
 	int id;
 	wxString label;
 	wxControl *box;
+	ToolBox *tool;
 };
 
 
@@ -539,6 +541,12 @@ public:
 			if(refbase[i].id == id) return refbase[i].box;
 		return NULL;
 	};
+
+	ToolBox *GetTool(int id) {
+		for(i=0; i<numrefs; i++)
+			if(refbase[i].id == id) return refbase[i].tool;
+		return NULL;
+	};
 	
 	int GetID(wxString label) {
 		for(i=0; i<numrefs; i++)
@@ -550,6 +558,12 @@ public:
 		refbase[numrefs].id = id;
 		refbase[numrefs].label = label;
 		refbase[numrefs].box = box;
+		numrefs++;
+	};
+
+	void AddTool(int id, ToolBox *tool) {
+		refbase[numrefs].id = id;
+		refbase[numrefs].tool = tool;
 		numrefs++;
 	};
 };

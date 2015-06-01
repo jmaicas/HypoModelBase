@@ -86,6 +86,7 @@ public:
 	ParamStore *modflags;
 	RefStore *flagrefs;
 	RefStore *checkrefs;
+	RefStore *panelrefs;
 	//FlagSet *flagset;
 
 	int autorun;
@@ -138,7 +139,9 @@ public:
 	void HistLoad();
 	void OnFlag(wxCommandEvent& event);
 	void OnCheck(wxCommandEvent& event);
+	void OnPanel(wxCommandEvent& event);
 	void SetCheck(wxCheckBox *, bool state);
+	void SetPanel(int, ToolBox *);
 	void OnFocus(wxFocusEvent& event);
 	void SetCount(double);
 	void SetStatus(wxString);

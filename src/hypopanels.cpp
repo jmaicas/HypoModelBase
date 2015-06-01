@@ -450,6 +450,7 @@ ParamBox::~ParamBox()
 	delete paramset;
 	delete flagrefs;
 	delete checkrefs;
+	delete panelrefs;
 
 	//delete vbox1;
 	//delete vbox2;
@@ -484,6 +485,7 @@ void ParamBox::Initialise()
 	paramset = new ParamSet(activepanel);
 	flagrefs = new RefStore();
 	checkrefs = new RefStore();
+	panelrefs = new RefStore();
 
 	paramstoretag = NULL;
 	if(boxtype == 0 || boxtype == 1) {
@@ -692,6 +694,13 @@ void ParamBox::SetCheck(wxCheckBox *checkbox, bool state)
 }
 
 
+void ParamBox::SetPanel(int id, ToolBox *toolbox)
+{
+	panelrefs->AddTool(id, toolbox);
+	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnPanel));
+}
+
+
 void ParamBox::OnCheck(wxCommandEvent &event)
 {
 	int id = event.GetId();
@@ -711,6 +720,17 @@ void ParamBox::OnFlag(wxCommandEvent& event)
 	else (*modflags)[flag] = 0;
 
 	if(autorun) OnRun(event);
+}
+
+
+void ParamBox::OnPanel(wxCommandEvent& event)
+{
+	int id = event.GetId();
+
+	ToolBox *toolbox = panelrefs->GetTool(id);
+
+	if(toolbox->IsShown()) toolbox->Show(false);
+	else toolbox->Show(true);
 }
 
 
