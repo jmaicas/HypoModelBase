@@ -5,6 +5,17 @@
 #include "wx/grid.h"
 
 
+CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
+: ParamBox(mod, title, pos, size, "cellbox")
+{
+	int numcells;
+
+	diagbox = mod->diagbox;
+
+	panel->Layout();
+}
+
+
 OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols)
 : ParamBox(mod, title, pos, size, "outbox")
 {

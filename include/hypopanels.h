@@ -181,6 +181,19 @@ public:
 };
 
 
+class CellBox: public ParamBox
+{
+public:
+	Model *mod;
+	DiagBox *diagbox;
+
+	SpikeDat *currcell;
+	NeuroDat *celldata;
+
+	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
+};
+
+
 class OutBox: public ParamBox
 {
 public:
