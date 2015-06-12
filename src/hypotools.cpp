@@ -3,7 +3,7 @@
 
 #include "wx/wx.h"
 #include <hypotools.h>
-#include <hypodef.h>
+#include "hypodef.h"
 
 
 
@@ -28,7 +28,6 @@ void DiagBox::Write(wxString text)
 TextGrid::TextGrid(wxPanel *parent, wxSize size)
 	: wxGrid(parent, wxID_ANY)
 {
-	int i;
 	//wxSize size(30, 30);
 	ostype = GetSystem();
 
