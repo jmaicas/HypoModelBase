@@ -819,10 +819,11 @@ void ToolSet::AddBox(ToolBox *newbox, bool serve, bool child) {
 	//ofp.WriteLine(text.Format("box %s, child %d", newbox->boxname, child));
 	newbox->child = child;
 	//if(mod) newbox->mod = mod;
-	for(i=0; i<numtools; i++)
+	for(i=0; i<numtools; i++)             // Allow adding boxes after removal (not yet implemented)
 		if(box[i] == NULL) {
 			box[i] = newbox;
 			newbox->boxindex = i;
+			tagindex[newbox->boxname] = i;
 			return;
 		}
 

@@ -479,7 +479,7 @@ void HypoMain::OnMove(wxMoveEvent& event)
     //if(cortbox != NULL) cortbox->Move(mainpos.x + mainsize.x, mainpos.y + 10);
     
     snum.Printf("Main Pos X %d Y %d", mainpos.x, mainpos.y);
-    DiagText(snum);
+    //DiagText(snum);
     
     for(i=0; i<toolset->numtools; i++) {
         if(toolset->box[i] != NULL) diagpos = toolset->box[i]->SetPosition();
@@ -508,7 +508,7 @@ void HypoMain::OnSize(wxSizeEvent& WXUNUSED(event))
     wxPoint mainpos = GetPosition();
     snum.Printf("Main Size X %d Y %d", newsize.x, newsize.y);
     SetStatusText(snum);
-    DiagText(snum);
+    //DiagText(snum);
     
     statusSize = statusbar->GetSize();
     
