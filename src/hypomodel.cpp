@@ -46,8 +46,6 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
     //mainwing = this;
     //CreateStatusBar();
     
-    wxPanel *defpan = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
-    
     // Check System
     wxString oslabel = wxGetOsDescription();
     SetStatusText(oslabel);
@@ -163,6 +161,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
     diagbox->Write("HypoMain graph start\n\n");
     
     if(!mod) {
+			  wxPanel *defpan = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
         graphsizer->Add(defpan, 0, wxEXPAND);
         numdraw = 0;
         diagbox->Show();
