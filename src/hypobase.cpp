@@ -26,7 +26,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	statusbar = CreateStatusBar();
 	diagbox = NULL;                // Protect diagbox self reference for toolpanel
 
-  diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
+    diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
 
 	graphbox = NULL;
@@ -63,7 +63,7 @@ void MainFrame::MainLoad()
 
 	TextFile infile;
 	wxPoint pos;
-  wxSize size;
+    wxSize size;
 
 	//filepath = GetPath();
 	filepath = "Init//";
