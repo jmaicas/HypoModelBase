@@ -1,7 +1,7 @@
 
 #include <hypomodel.h>
 #include <hypograph.h>
-#include "hypodef.h"
+#include <hypodef.h>
 
 
 
