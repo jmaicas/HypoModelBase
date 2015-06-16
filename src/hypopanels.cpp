@@ -697,7 +697,9 @@ void ParamBox::SetCheck(wxCheckBox *checkbox, bool state)
 void ParamBox::SetPanel(int id, ToolBox *toolbox)
 {
 	panelrefs->AddTool(id, toolbox);
-	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnPanel));
+	Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnPanel));
+
+	mainwin->diagbox->Write(text.Format("SetPanel %d %s\n", id, toolbox->boxname));
 }
 
 
@@ -728,6 +730,8 @@ void ParamBox::OnPanel(wxCommandEvent& event)
 	int id = event.GetId();
 
 	ToolBox *toolbox = panelrefs->GetTool(id);
+
+	mainwin->diagbox->Write("OnPanel\n");
 
 	if(toolbox->IsShown()) toolbox->Show(false);
 	else toolbox->Show(true);
