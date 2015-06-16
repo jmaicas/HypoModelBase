@@ -156,7 +156,6 @@ public:
 
 	void OnPaint2(wxPaintEvent& event);
 	void SetStatus(wxString);
-    void DiagText(wxString);
 	void DispParam(ParamStore *, wxString);
 	void GraphData();
 	void RunModel(ParamBox *);

@@ -261,8 +261,7 @@ enum {
 	ID_Select,
 	ID_Bin,
 	ID_Compare,
-	ID_Store,
-    ID_Wheel
+	ID_Store
 };
 
 

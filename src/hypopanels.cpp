@@ -734,19 +734,6 @@ void ParamBox::OnPanel(wxCommandEvent& event)
 }
 
 
-
-void ParamBox::DataMenu()
-{
-    menuData = new wxMenu;
-    menuData->Append(ID_Select, "Selection");
-    menuData->Append(ID_Wheel, "Wheel Data");
-    menuData->Append(ID_Plot, "Plotting");
-    
-    menuBar = new wxMenuBar;
-    menuBar->Append(menuControls, "Data Tools");
-    SetMenuBar(menuBar);
-}
-
 void ParamBox::InitMenu()
 {
 	menuControls = new wxMenu;

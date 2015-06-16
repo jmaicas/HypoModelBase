@@ -103,8 +103,6 @@ public:
 	wxMenu *menuControls;
 	wxMenu *menuModel;
 	wxMenu *menuParamSet;
-    wxMenu *menuData;
-    wxMenu *menuTools;
 	wxMenuBar *menuBar;
 
 	wxButton *runbutton; 
@@ -148,7 +146,6 @@ public:
 	void SetCount(double);
 	void SetStatus(wxString);
 	void InitMenu();
-    void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();

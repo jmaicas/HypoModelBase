@@ -425,12 +425,6 @@ void HypoMain::OnDClick(wxMouseEvent& event)
 }
 
 
-void HypoMain::DiagText(wxString text)
-{
-    if(diagbox) diagbox->Write(text + "\n");
-}
-
-
 void HypoMain::SetStatus(wxString message)
 {
     SetStatusText(message);
@@ -478,9 +472,6 @@ void HypoMain::OnMove(wxMoveEvent& event)
     
     //if(cortbox != NULL) cortbox->Move(mainpos.x + mainsize.x, mainpos.y + 10);
     
-    snum.Printf("Main Pos X %d Y %d", mainpos.x, mainpos.y);
-    DiagText(snum);
-    
     for(i=0; i<toolset->numtools; i++) {
         if(toolset->box[i] != NULL) diagpos = toolset->box[i]->SetPosition();
         //snum.Printf("Move %d tools, box 0 = %s xpos %d ypos %d", toolset.numtools, toolset.box[0]->boxname, diagpos.x, diagpos.y);
@@ -506,9 +497,8 @@ void HypoMain::OnSize(wxSizeEvent& WXUNUSED(event))
     wxSize newsize = GetSize();
     wxSize graphsize = graphsizer->GetSize();
     wxPoint mainpos = GetPosition();
-    snum.Printf("Main Size X %d Y %d", newsize.x, newsize.y);
+    snum.Printf("Size X %d Y %d", newsize.x, newsize.y);
     SetStatusText(snum);
-    DiagText(snum);
     
     statusSize = statusbar->GetSize();
     
@@ -1470,7 +1460,7 @@ bool HypoApp::OnInit()
     if(GetSystem() == Mac) {
         x = 685;
         pos.x = 50;
-        pos.y = 23;    // 0;
+        pos.y = 0;
     }
     else pos = wxDefaultPosition;
     
@@ -1484,7 +1474,7 @@ bool HypoApp::OnInit()
     if(y > screensize.GetY()) y = screensize.GetY() - 50;
     
     //MainFrame *mainwin = new MainFrame("Hypo Net Model", wxPoint(50, 10), wxSize(700, y));   // 850   // 920
-    HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y));   // 850   // 920
+    HypoMain *mainwin = new HypoMain("HypoMod", wxDefaultPosition, wxSize(x, y));   // 850   // 920
     //HypoMain *mainwin = new HypoMain("HypoMod", wxDefaultPosition, wxSize(400, 500));
     mainwin->Show(TRUE);
     SetTopWindow(mainwin);
