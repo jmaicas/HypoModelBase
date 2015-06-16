@@ -262,7 +262,8 @@ enum {
 	ID_Bin,
 	ID_Compare,
 	ID_Store,
-    ID_Wheel
+	ID_Wheel,
+	ID_Neuron
 };
 
 

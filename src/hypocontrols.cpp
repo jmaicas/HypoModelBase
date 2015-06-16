@@ -801,8 +801,7 @@ wxToggleButton *ToolBox::ToggleButton(int id, wxString label, int width, wxBoxSi
 
 
 void ToolBox::OnToggle(wxCommandEvent& event)
-{
-}
+{}
 
 
 void ToolSet::AddBox(ToolBox *newbox, bool serve, bool child) {

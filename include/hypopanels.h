@@ -96,6 +96,7 @@ public:
 
 	wxStaticText *runtime;
 	wxStaticText *mean;
+	wxStaticText *spikes;
 	wxStaticText *freq;
 	wxStaticText *sd;
 	wxStaticText *runcount;
@@ -103,8 +104,8 @@ public:
 	wxMenu *menuControls;
 	wxMenu *menuModel;
 	wxMenu *menuParamSet;
-    wxMenu *menuData;
-    wxMenu *menuTools;
+	wxMenu *menuData;
+	wxMenu *menuTools;
 	wxMenuBar *menuBar;
 
 	wxButton *runbutton; 
@@ -190,10 +191,20 @@ public:
 	Model *mod;
 	DiagBox *diagbox;
 
+	int neuroindex;
+	int cellcount;
 	SpikeDat *currcell;
-	NeuroDat *celldata;
+	NeuroDat *cells;
+
+	wxTextCtrl *datneuron;
+	wxSpinButton *datspin;
 
 	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
+	void NeuroData();
+	void PanelData(NeuroDat *);
+	void OnNext(wxSpinEvent& event);
+	void OnPrev(wxSpinEvent& event);
+	void OnEnter(wxCommandEvent& event);
 };
 
 

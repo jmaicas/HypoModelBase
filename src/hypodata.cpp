@@ -8,11 +8,107 @@
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 : ParamBox(mod, title, pos, size, "cellbox")
 {
-	int numcells;
+	int numcells, datwidth;
 
 	diagbox = mod->diagbox;
 
+	datwidth = 50;
+	spikes = NumPanel(datwidth, wxALIGN_RIGHT);
+	mean = NumPanel(datwidth, wxALIGN_RIGHT);
+	freq = NumPanel(datwidth, wxALIGN_RIGHT);
+	sd = NumPanel(datwidth, wxALIGN_RIGHT);
+
+	wxGridSizer *datagrid = new wxGridSizer(2, 5, 5);
+	datagrid->Add(new wxStaticText(panel, -1, "Spikes"), 0, wxALIGN_CENTRE);
+	datagrid->Add(spikes);
+	datagrid->Add(new wxStaticText(panel, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(freq);
+	datagrid->Add(new wxStaticText(panel, -1, "Mean"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(mean);
+	datagrid->Add(new wxStaticText(panel, -1, "Std Dev"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(sd);
+	
+	datneuron = new wxTextCtrl(panel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
+	datspin = new wxSpinButton(panel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+	wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
+	datbox->Add(datspin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datbox->AddSpacer(5);
+	
+	wxBoxSizer *neurobox = new wxBoxSizer(wxHORIZONTAL);
+	neurobox->Add(new wxStaticText(panel, wxID_ANY, "Neuron"), 1, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	neurobox->Add(datneuron, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+	wxStaticBoxSizer *databox = new wxStaticBoxSizer(wxVERTICAL, panel, "");
+	databox->AddSpacer(2);
+	databox->Add(neurobox, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 5);
+	databox->AddSpacer(5);
+	databox->Add(datbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 0);
+	databox->AddSpacer(5);
+	databox->Add(datagrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+	mainbox->AddStretchSpacer();
+	mainbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	mainbox->AddStretchSpacer();
+
 	panel->Layout();
+
+	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(CellBox::OnEnter));
+	Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(CellBox::OnNext));
+	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(CellBox::OnPrev));
+}
+
+
+void CellBox::PanelData(NeuroDat *data)
+{
+	if(data->netflag) snum = "sum";
+	else snum = numstring(neuroindex, 0);
+	datneuron->SetLabel(snum);
+	spikes->SetLabel(snum.Format("%d", data->spikecount));
+	freq->SetLabel(snum.Format("%.2f", data->freq));
+	mean->SetLabel(snum.Format("%.1f", data->meanisi));
+	sd->SetLabel(snum.Format("%.2f", data->isivar));
+}
+
+
+void CellBox::NeuroData()
+{	
+	currcell->neurocalc(&(cells[neuroindex]));
+	currcell->id = neuroindex;
+	PanelData(&(cells[neuroindex]));
+	mainwin->scalebox->GraphUpdate();	
+}
+
+
+void CellBox::OnPrev(wxSpinEvent& WXUNUSED(event))
+{
+	if(neuroindex > 0) neuroindex--;
+	else neuroindex = cellcount-1;
+	NeuroData();
+}
+
+
+void CellBox::OnNext(wxSpinEvent& WXUNUSED(event))
+{
+	if(neuroindex < cellcount-1) neuroindex++;
+	else neuroindex = 0;
+	NeuroData();
+}
+
+
+void CellBox::OnEnter(wxCommandEvent& event)
+{
+	int id = event.GetId();
+	long data;
+
+	// Enter pressed for neuron selection
+	if(id == ID_Neuron) {
+		datneuron->GetValue().ToLong(&data);
+		if(data >= 0 && data < cellcount) {
+			neuroindex = data;
+			NeuroData();
+		}
+		return;
+	}
 }
 
 
