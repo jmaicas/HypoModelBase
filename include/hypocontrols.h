@@ -103,8 +103,7 @@ public:
 	wxPoint mpos, oldpos;
 	wxSize boxsize;
 	wxFont boxfont, confont;
-	wxString boxname, boxlabel;
-	wxString snum, text;
+	wxString snum, boxname, boxlabel;
 	wxCommandEvent *blankevent;
 	ToolPanel *panel;
 	ToolPanel *activepanel;
