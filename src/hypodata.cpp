@@ -8,7 +8,7 @@
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 : ParamBox(mod, title, pos, size, "cellbox")
 {
-	int numcells, datwidth;
+	int datwidth;
 
 	diagbox = mod->diagbox;
 
@@ -127,13 +127,21 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
 	for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
 
+	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
+
 	wxBoxSizer *storebox = StoreBox();
-	AddButton(ID_Undo, "Undo", 50, storebox);
-	storebox->AddSpacer(2);
-	AddButton(ID_Copy, "Copy", 50, storebox);
+
+	buttonbox = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_Undo, "Undo", 40, buttonbox);
+	buttonbox->AddSpacer(2);
+	AddButton(ID_Copy, "Copy", 40, buttonbox);
+
+	controlbox->Add(storebox, 0);
+	controlbox->AddSpacer(10);
+	controlbox->Add(buttonbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	mainbox->Add(textgrid, 1, wxEXPAND);
-	mainbox->Add(storebox, 0);
+	mainbox->Add(controlbox, 0);
 
 	//GridDefault();
 
@@ -154,6 +162,14 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 void OutBox::OnUndo(wxCommandEvent& event)
 {
 	textgrid->Undo();
+}
+
+
+void OutBox::OnButton(wxCommandEvent& event)
+{
+	wxString text;
+
+	mainwin->diagbox->Write("Button: Neuro data scan\n");
 }
 
 

@@ -31,7 +31,7 @@ void ToolButton::OnLeftDClick(wxMouseEvent& event)
 
 void ToolButton::OnLeftUp(wxMouseEvent& event)
 {
-	diagbox->Write("tool button click\n");
+	//diagbox->Write("tool button click\n");
 	event.Skip();
 }
 

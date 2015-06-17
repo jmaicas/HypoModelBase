@@ -21,7 +21,7 @@ DiagBox::DiagBox(MainFrame *mainwin, const wxString& title, const wxPoint& pos, 
 
 void DiagBox::Write(wxString text)
 {
-	textbox->AppendText(text);
+	textbox->AppendText(text);	
 }
 
 
@@ -65,6 +65,16 @@ TextGrid::~TextGrid()
 {
 	delete undogrid;
 	delete rightmenu;
+}
+
+
+wxString TextGrid::GetCell(int row, int col)
+{
+	int numrows = GetNumberRows();
+	int numcols = GetNumberCols();
+
+	if(row >= numrows || col >= numcols) return ""; 
+	else return GetCellValue(row, col);
 }
 
 
