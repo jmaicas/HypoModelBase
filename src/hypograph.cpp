@@ -95,9 +95,9 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	menuPlot = new wxMenu;
 	if(mainwin->diagnostic) {
 		menuPlot->Append(ID_GraphRemove, "Delete Graph");
-		menuPlot->Append(ID_GraphPrint, "Print Graph");
-		menuPlot->Append(ID_GraphEPS, "Graph EPS");
-		menuPlot->Append(ID_Scale, "Adjust Axes");
+		//menuPlot->Append(ID_GraphPrint, "Print Graph");
+		menuPlot->Append(ID_GraphEPS, "Export EPS");
+		menuPlot->Append(ID_Scale, "Plot Panel");
 		menuPlot->AppendSeparator();
 	}
 	for(i=0; i<mod->graphbase->numsets; i++) {
@@ -245,7 +245,7 @@ void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
 void GraphWindow3::OnScale(wxCommandEvent& event)
 {
 	//GraphBox *graphbox = new GraphBox(this, "Axis Panel");
-	if(!mainwin->graphbox) mainwin->graphbox = new GraphBox(this, "Axis Panel");
+	if(!mainwin->graphbox) mainwin->graphbox = new GraphBox(this, "Plot Panel");
 	else mainwin->graphbox->SetGraph(this);
 	mainwin->graphbox->Show(true);
 }

@@ -4,6 +4,9 @@
 #include <hypomodel.h>
 #include "wx/grid.h"
 
+#include <iostream>
+#include <string>
+
 
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 : ParamBox(mod, title, pos, size, "cellbox")
@@ -11,6 +14,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	int datwidth;
 
 	diagbox = mod->diagbox;
+	cellcount = 0;
 
 	datwidth = 50;
 	spikes = NumPanel(datwidth, wxALIGN_RIGHT);
@@ -81,6 +85,7 @@ void CellBox::NeuroData()
 
 void CellBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 {
+	if(!cellcount) return;
 	if(neuroindex > 0) neuroindex--;
 	else neuroindex = cellcount-1;
 	NeuroData();
@@ -89,6 +94,7 @@ void CellBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 
 void CellBox::OnNext(wxSpinEvent& WXUNUSED(event))
 {
+	if(!cellcount) return;
 	if(neuroindex < cellcount-1) neuroindex++;
 	else neuroindex = 0;
 	NeuroData();
@@ -333,6 +339,7 @@ void OutBox::GridLoad()
 	wxString text, filename, filetag, cell;
 	wxString readline, datstring;
 	wxColour redpen("#dd0000"), blackpen("#000000");
+	string line, filename;
 
 	filetag = paramstoretag->GetValue();
 	filename = filetag + "-grid.txt";
@@ -367,7 +374,7 @@ void OutBox::GridLoad()
 
 		readline.Trim();
 		cell = readline;
-		textgrid->SetCellValue(row, col, cell);
+		textgrid->SetCell(row, col, cell);
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");

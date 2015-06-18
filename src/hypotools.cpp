@@ -84,7 +84,7 @@ void TextGrid::SetCell(int row, int col, wxString data)
 	int numcols = GetNumberCols();
 
 	if(row >= numrows) AppendRows(row - numrows + 1);
-	if(col >= numcols) AppendRows(col - numcols + 1);
+	if(col >= numcols) AppendCols(col - numcols + 1);
 
 	SetCellValue(row, col, data);
 }

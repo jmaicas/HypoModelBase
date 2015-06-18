@@ -173,9 +173,9 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//wxBoxSizer *gapparams = ParamLayout(2);
 
 	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
-	wxButton *okButton = new wxButton(panel, wxID_OK, "Ok", wxDefaultPosition, wxSize(60, 30));
-	wxButton *printButton = new wxButton(panel, ID_Print, "Print", wxDefaultPosition, wxSize(60, 30));
-	wxButton *closeButton = new wxButton(panel, wxID_CANCEL, "Close", wxDefaultPosition, wxSize(60, 30));
+	wxButton *okButton = new wxButton(panel, wxID_OK, "Ok", wxDefaultPosition, wxSize(65, 30));
+	wxButton *printButton = new wxButton(panel, ID_Print, "Export EPS", wxDefaultPosition, wxSize(65, 30));
+	wxButton *closeButton = new wxButton(panel, wxID_CANCEL, "Close", wxDefaultPosition, wxSize(65, 30));
 	buttonbox->Add(okButton, 1);
 	buttonbox->Add(printButton, 1, wxLEFT, 5);
 	buttonbox->Add(closeButton, 1, wxLEFT, 5);
