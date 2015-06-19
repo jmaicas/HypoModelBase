@@ -148,6 +148,7 @@ public:
 	void OnFocus(wxFocusEvent& event);
 	void SetCount(double);
 	void SetStatus(wxString);
+	void WriteVDU(wxString);
 	void InitMenu();
     void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
@@ -201,6 +202,7 @@ public:
 
 	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	void NeuroData();
+	//void NeuroAnalysis();
 	void PanelData(NeuroDat *);
 	void OnNext(wxSpinEvent& event);
 	void OnPrev(wxSpinEvent& event);
@@ -215,6 +217,7 @@ public:
 	wxTextCtrl *textbox;
 	TextGrid *textgrid;
 	DiagBox *diagbox;
+	wxNotebook *notebook;
 
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20);
 

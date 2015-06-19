@@ -27,7 +27,7 @@ class TextGrid : public wxGrid
 {
 public:
 		wxMenu *rightmenu;
-    TextGrid(wxPanel *parent, wxSize size);
+    TextGrid(wxWindow *parent, wxSize size);
 		~TextGrid();
 		int ostype;
 

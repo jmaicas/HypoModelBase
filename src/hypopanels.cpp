@@ -477,6 +477,12 @@ void ParamBox::SetStatus(wxString text)
 }
 
 
+void ParamBox::WriteVDU(wxString text)
+{
+	vdu->AppendText(text);
+}
+
+
 void ParamBox::Initialise()
 {	
 	modparams = new ParamStore;

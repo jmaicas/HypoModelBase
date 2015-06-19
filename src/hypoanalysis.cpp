@@ -754,7 +754,7 @@ void AnaDat::autocalc(SpikeDat *data)
 }
 
 
-void SpikeDat::neurocalc(NeuroDat *datneuron) 
+void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams) 
 {
 	int i;
 	int spikestep, binsize;
@@ -775,8 +775,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 
 	//maxspikes = 100000;
 
-	calcdiag = true;
-	calcdiag2 = true;
+	calcdiag = false;
+	calcdiag2 = false;
 
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
 
@@ -1058,7 +1058,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
 	}
 
-	int normscale = 10000;
+	//int normscale = 10000;
 
 	// Normalise
 	for(i=0; i<=hist1.max; i++) {

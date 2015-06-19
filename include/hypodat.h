@@ -182,13 +182,15 @@ public:
 	datdouble vasomean;
 	datdouble winfreq;
 	//datint autocorr;
-	
 	//double *inputrec;
 	datdouble netinputrec;
 	datdouble raterec;
 	double threshrec[10000];
 	int *rate;
 	int graphindex;
+
+	int normscale;
+	int binsize;
 	
 	int id;
 	int count;
@@ -213,7 +215,7 @@ public:
 	MainFrame *mainwin;
 	
 	void datacalc();
-	void neurocalc(NeuroDat *datneuron = NULL);
+	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
 	void ISIanalysis();
 	//void autocalc();
 	void netneurocalc(int);

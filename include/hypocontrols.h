@@ -112,6 +112,7 @@ public:
 	wxBoxSizer *mainbox;
 	wxAuiManager *winman;
 	wxStaticText *status;
+	wxTextCtrl *vdu;
 	
 	wxPoint SetPosition();
 	void ReSize();

@@ -5,7 +5,9 @@
 #include "wx/grid.h"
 
 #include <iostream>
+#include <fstream>
 #include <string>
+using namespace std;
 
 
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -15,6 +17,9 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 
 	diagbox = mod->diagbox;
 	cellcount = 0;
+
+	paramset->AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
+	ParamLayout(1);
 
 	datwidth = 50;
 	spikes = NumPanel(datwidth, wxALIGN_RIGHT);
@@ -53,6 +58,8 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	mainbox->AddStretchSpacer();
 	mainbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	mainbox->AddStretchSpacer();
+	mainbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	mainbox->AddStretchSpacer();
 
 	panel->Layout();
 
@@ -88,6 +95,9 @@ void CellBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 	if(!cellcount) return;
 	if(neuroindex > 0) neuroindex--;
 	else neuroindex = cellcount-1;
+
+	ParamStore *calcparams = GetParams();
+	currcell->normscale = (*calcparams)["normscale"];
 	NeuroData();
 }
 
@@ -97,6 +107,9 @@ void CellBox::OnNext(wxSpinEvent& WXUNUSED(event))
 	if(!cellcount) return;
 	if(neuroindex < cellcount-1) neuroindex++;
 	else neuroindex = 0;
+
+	ParamStore *calcparams = GetParams();
+	currcell->normscale = (*calcparams)["normscale"];
 	NeuroData();
 }
 
@@ -130,8 +143,13 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 
 	diagbox = mod->diagbox;
 
-	textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
+	notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
+
+	//textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
+	textgrid = new TextGrid(notebook, wxSize(gridrows, gridcols));
+	notebook->AddPage(textgrid, text.Format("Data %d", 0));
 	for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
+	
 
 	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
 
@@ -142,11 +160,22 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	buttonbox->AddSpacer(2);
 	AddButton(ID_Copy, "Copy", 40, buttonbox);
 
-	controlbox->Add(storebox, 0);
-	controlbox->AddSpacer(10);
-	controlbox->Add(buttonbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	vdu = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(-1, -1), wxBORDER_SUNKEN|wxTE_MULTILINE);
+	vdu->SetFont(confont);
+	vdu->SetForegroundColour(wxColour(0,255,0)); // set text color
+	vdu->SetBackgroundColour(wxColour(0,0,0)); // set text back color
+	//wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
+	//statusbox->Add(status, 1, wxEXPAND);
 
-	mainbox->Add(textgrid, 1, wxEXPAND);
+	controlbox->Add(storebox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	controlbox->AddSpacer(10);
+	controlbox->Add(buttonbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	controlbox->AddSpacer(10);
+	controlbox->Add(vdu, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	controlbox->AddSpacer(10);
+
+	//mainbox->Add(textgrid, 1, wxEXPAND);
+	mainbox->Add(notebook, 1, wxEXPAND);
 	mainbox->Add(controlbox, 0);
 
 	//GridDefault();
@@ -336,14 +365,22 @@ void OutBox::GridLoad()
 
 	int row, col;
 	long numdat;
-	wxString text, filename, filetag, cell;
-	wxString readline, datstring;
+	wxString text, filetag, cell;
+	wxString datstring;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, filename;
 
 	filetag = paramstoretag->GetValue();
+	/*
 	filename = filetag + "-grid.txt";
 	if(!ifp.Open(filename)) {
+		paramstoretag->SetValue("Not found");
+		return;
+	}*/
+
+	filename = filetag.ToStdString() + "-grid.txt";
+	ifstream infile(filename.c_str());
+	if(!infile.is_open()) {
 		paramstoretag->SetValue("Not found");
 		return;
 	}
@@ -360,8 +397,11 @@ void OutBox::GridLoad()
 
 	textgrid->ClearGrid();
 
-	readline = ifp.ReadLine();
-	while(!readline.IsEmpty()) {
+	WriteVDU("Reading file...");
+
+	//readline = ifp.ReadLine();
+	while(getline(infile, line)) {
+		wxString readline(line);
 		datstring = readline.BeforeFirst(' ');
 		datstring.ToLong(&numdat);
 		row = numdat;
@@ -376,9 +416,12 @@ void OutBox::GridLoad()
 		cell = readline;
 		textgrid->SetCell(row, col, cell);
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
-		readline = ifp.ReadLine();
+		//readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");
 	}
-	ifp.Close();
+	infile.close();
+	diagbox->Write("OK\n");
+	WriteVDU("OK\n");
+	//ifp.Close();
 }
 

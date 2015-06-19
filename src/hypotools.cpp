@@ -25,7 +25,7 @@ void DiagBox::Write(wxString text)
 }
 
 
-TextGrid::TextGrid(wxPanel *parent, wxSize size)
+TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	: wxGrid(parent, wxID_ANY)
 {
 	//wxSize size(30, 30);
@@ -366,6 +366,9 @@ void TextGrid::CopyUndo()
 {
 	int x, y;
 	wxString data;
+
+	if(GetNumberRows() > undogrid->GetNumberRows()) undogrid->AppendRows(GetNumberRows() - undogrid->GetNumberRows());
+	if(GetNumberCols() > undogrid->GetNumberCols()) undogrid->AppendCols(GetNumberCols() - undogrid->GetNumberCols());
 
 	for(x=0; x<GetNumberCols(); x++)
 		for(y=0; y<GetNumberRows(); y++) {
