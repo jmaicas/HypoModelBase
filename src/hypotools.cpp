@@ -83,9 +83,12 @@ void TextGrid::SetCell(int row, int col, wxString data)
 	int numrows = GetNumberRows();
 	int numcols = GetNumberCols();
 
-	if(row >= numrows) AppendRows(row - numrows + 1);
-	if(col >= numcols) AppendCols(col - numcols + 1);
-
+	if(row >= numrows) {
+		AppendRows(row - numrows + 1);
+	}
+	if(col >= numcols) {
+		AppendCols(col - numcols + 1);
+	}
 	SetCellValue(row, col, data);
 }
 
@@ -382,6 +385,9 @@ void TextGrid::Undo()
 {
 	int x, y;
 	wxString data;
+
+	if(GetNumberRows() > undogrid->GetNumberRows()) undogrid->AppendRows(GetNumberRows() - undogrid->GetNumberRows());
+	if(GetNumberCols() > undogrid->GetNumberCols()) undogrid->AppendCols(GetNumberCols() - undogrid->GetNumberCols());
 
 	for(x=0; x<GetNumberCols(); x++)
 		for(y=0; y<GetNumberRows(); y++) {

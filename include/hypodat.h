@@ -53,6 +53,7 @@ public:
 	int isicount;
 	int netflag;
 	int type;
+	wxString name;
 	static const int maxtime = 100000;
 	
 	double freq;

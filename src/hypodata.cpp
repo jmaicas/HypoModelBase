@@ -83,6 +83,9 @@ void CellBox::PanelData(NeuroDat *data)
 
 void CellBox::NeuroData()
 {	
+	ParamStore *calcparams = GetParams();
+	currcell->normscale = (*calcparams)["normscale"];
+
 	currcell->neurocalc(&(cells[neuroindex]));
 	currcell->id = neuroindex;
 	PanelData(&(cells[neuroindex]));
@@ -96,8 +99,6 @@ void CellBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex > 0) neuroindex--;
 	else neuroindex = cellcount-1;
 
-	ParamStore *calcparams = GetParams();
-	currcell->normscale = (*calcparams)["normscale"];
 	NeuroData();
 }
 
@@ -108,8 +109,6 @@ void CellBox::OnNext(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex < cellcount-1) neuroindex++;
 	else neuroindex = 0;
 
-	ParamStore *calcparams = GetParams();
-	currcell->normscale = (*calcparams)["normscale"];
 	NeuroData();
 }
 
@@ -128,6 +127,7 @@ void CellBox::OnEnter(wxCommandEvent& event)
 		}
 		return;
 	}
+	else NeuroData();
 }
 
 
@@ -148,7 +148,10 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	//textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
 	textgrid = new TextGrid(notebook, wxSize(gridrows, gridcols));
 	notebook->AddPage(textgrid, text.Format("Data %d", 0));
-	for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
+	//for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
+	//for(i=0; i<gridcols; i++) textgrid->SetColSize(i, 60);
+	textgrid->SetDefaultRowSize(20, true);
+	textgrid->SetDefaultColSize(60, true);
 	
 
 	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
@@ -160,7 +163,7 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	buttonbox->AddSpacer(2);
 	AddButton(ID_Copy, "Copy", 40, buttonbox);
 
-	vdu = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(-1, -1), wxBORDER_SUNKEN|wxTE_MULTILINE);
+	vdu = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(-1, -1), wxBORDER_RAISED|wxTE_MULTILINE);
 	vdu->SetFont(confont);
 	vdu->SetForegroundColour(wxColour(0,255,0)); // set text color
 	vdu->SetBackgroundColour(wxColour(0,0,0)); // set text back color
@@ -325,6 +328,7 @@ void OutBox::GridStore()
 	int row, col;
 	wxString celltext, text, filename, filetag;
 	wxColour redpen("#dd0000"), blackpen("#000000");
+	string line, sfilename;
 
 	filetag = paramstoretag->GetValue();
 	filename = filetag + "-grid.txt";
@@ -346,16 +350,32 @@ void OutBox::GridStore()
 	paramstoretag->SetValue("");
 	paramstoretag->SetValue(filetag);
 
-	ofp.New(filename);
+	//ofp.New(filename);
+	sfilename = filetag.ToStdString() + "-grid.txt";
+	ofstream outfile(sfilename.c_str());
+
+	if(!outfile.is_open()) {
+		paramstoretag->SetValue("File error");
+		return;
+	}
+
+	WriteVDU("Writing file...");
 
 	for(row=0; row<textgrid->GetNumberRows(); row++)
 		for(col=0; col<textgrid->GetNumberCols(); col++) {
 			celltext = textgrid->GetCellValue(row, col);
 			celltext.Trim();                                                                     // Fixes odd line endings in pasted data  23/4/15
-			if(!celltext.IsEmpty()) ofp.WriteLine(text.Format("%d %d %s", row, col, celltext));
+			//if(!celltext.IsEmpty()) ofp.WriteLine(text.Format("%d %d %s", row, col, celltext));
+			if(!celltext.IsEmpty()) {
+				text.Printf("%d %d %s\n", row, col, celltext);
+				outfile << text.ToStdString();
+			}
 		}
 
-	ofp.Close();
+	WriteVDU("OK\n");
+
+	//ofp.Close();
+	outfile.close();
 }
 
 
