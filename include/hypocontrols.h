@@ -113,6 +113,7 @@ public:
 	wxAuiManager *winman;
 	wxStaticText *status;
 	wxTextCtrl *vdu;
+	wxGauge *gauge;
 	
 	wxPoint SetPosition();
 	void ReSize();

@@ -21,6 +21,8 @@
 #include "hyposound.h"
 #endif
 
+using namespace std;
+
 
 class HypoApp: public wxApp
 {

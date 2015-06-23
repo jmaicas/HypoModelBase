@@ -9,6 +9,12 @@
 #include <string>
 using namespace std;
 
+#include <fcntl.h>
+//#include <unistd.h>
+#include <sys/types.h>
+//#include <sys/mman.h>
+#include <sys/stat.h>
+
 
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 : ParamBox(mod, title, pos, size, "cellbox")
@@ -86,9 +92,9 @@ void CellBox::NeuroData()
 	ParamStore *calcparams = GetParams();
 	currcell->normscale = (*calcparams)["normscale"];
 
-	currcell->neurocalc(&(cells[neuroindex]));
+	currcell->neurocalc(&((*cells)[neuroindex]));
 	currcell->id = neuroindex;
-	PanelData(&(cells[neuroindex]));
+	PanelData(&((*cells)[neuroindex]));
 	mainwin->scalebox->GraphUpdate();	
 }
 
@@ -170,11 +176,19 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	//wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
 	//statusbox->Add(status, 1, wxEXPAND);
 
+	gauge = new wxGauge(panel, wxID_ANY, 100);
+	wxBoxSizer *displaybox = new wxBoxSizer(wxVERTICAL);
+	//displaybox->Add(vdu, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	displaybox->Add(vdu, 1, wxEXPAND);
+	displaybox->Add(gauge, 0, wxEXPAND);
+
 	controlbox->Add(storebox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	controlbox->AddSpacer(10);
 	controlbox->Add(buttonbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	controlbox->AddSpacer(10);
-	controlbox->Add(vdu, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//controlbox->Add(vdu, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//controlbox->Add(displaybox, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	controlbox->Add(displaybox, 100, wxEXPAND);
 	controlbox->AddSpacer(10);
 
 	//mainbox->Add(textgrid, 1, wxEXPAND);
@@ -361,7 +375,8 @@ void OutBox::GridStore()
 
 	WriteVDU("Writing file...");
 
-	for(row=0; row<textgrid->GetNumberRows(); row++)
+	for(row=0; row<textgrid->GetNumberRows(); row++) {
+		gauge->SetValue(100 * (row + 1) / textgrid->GetNumberRows());
 		for(col=0; col<textgrid->GetNumberCols(); col++) {
 			celltext = textgrid->GetCellValue(row, col);
 			celltext.Trim();                                                                     // Fixes odd line endings in pasted data  23/4/15
@@ -371,7 +386,9 @@ void OutBox::GridStore()
 				outfile << text.ToStdString();
 			}
 		}
+	}
 
+	gauge->SetValue(0);
 	WriteVDU("OK\n");
 
 	//ofp.Close();
@@ -382,13 +399,13 @@ void OutBox::GridStore()
 void OutBox::GridLoad()
 {
 	TextFile ifp;
-
 	int row, col;
 	long numdat;
 	wxString text, filetag, cell;
 	wxString datstring;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, filename;
+	int numlines, linecount;
 
 	filetag = paramstoretag->GetValue();
 	/*
@@ -419,6 +436,12 @@ void OutBox::GridLoad()
 
 	WriteVDU("Reading file...");
 
+	
+  numlines = count(istreambuf_iterator<char>(infile), istreambuf_iterator<char>(), '\n');
+	infile.clear();
+	infile.seekg(0, ios::beg);
+	linecount = 0;
+
 	//readline = ifp.ReadLine();
 	while(getline(infile, line)) {
 		wxString readline(line);
@@ -438,10 +461,112 @@ void OutBox::GridLoad()
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		//readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");
+		linecount++;
+		gauge->SetValue(100 * linecount / numlines);
 	}
 	infile.close();
 	diagbox->Write("OK\n");
 	WriteVDU("OK\n");
-	//ifp.Close();
+	gauge->SetValue(0);
 }
 
+
+/*
+void OutBox::GridLoadFast()
+{
+	TextFile ifp;
+	int row, col;
+	long numdat;
+	wxString text, filetag, cell;
+	wxString datstring;
+	wxColour redpen("#dd0000"), blackpen("#000000");
+	string line, filename;
+	int numlines, linecount;
+
+	filetag = paramstoretag->GetValue();
+	
+
+	filename = filetag.ToStdString() + "-grid.txt";
+	ifstream infile(filename.c_str());
+	if(!infile.is_open()) {
+		paramstoretag->SetValue("Not found");
+		return;
+	}
+
+	// Param file history
+	short tagpos = paramstoretag->FindString(filetag);
+	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
+	paramstoretag->Insert(filetag, 0);
+	
+	redtag = "";
+	paramstoretag->SetForegroundColour(blackpen);
+	paramstoretag->SetValue("");
+	paramstoretag->SetValue(filetag);
+
+	textgrid->ClearGrid();
+
+	WriteVDU("Reading file...");
+
+	
+  numlines = count(istreambuf_iterator<char>(infile), istreambuf_iterator<char>(), '\n');
+	infile.clear();
+	infile.seekg(0, ios::beg);
+	linecount = 0;
+
+	//readline = ifp.ReadLine();
+	while(getline(infile, line)) {
+		wxString readline(line);
+		datstring = readline.BeforeFirst(' ');
+		datstring.ToLong(&numdat);
+		row = numdat;
+		readline = readline.AfterFirst(' ');
+
+		datstring = readline.BeforeFirst(' ');
+		datstring.ToLong(&numdat);
+		col = numdat;
+		readline = readline.AfterFirst(' ');
+
+		readline.Trim();
+		cell = readline;
+		textgrid->SetCell(row, col, cell);
+		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
+		//readline = ifp.ReadLine();
+		//diagbox->Write("Read " + readline + "\n");
+		linecount++;
+		gauge->SetValue(100 * linecount / numlines);
+	}
+	infile.close();
+	diagbox->Write("OK\n");
+	WriteVDU("OK\n");
+	gauge->SetValue(0);
+
+
+	struct stat sb;
+  long cntr = 0;
+  int fd, lineLen;
+  char *data;
+  char *line;
+  // map the file
+  fd = open(filename.c_str(), O_RDONLY);
+  fstat(fd, &sb);
+  //// int pageSize;
+  //// pageSize = getpagesize();
+  //// data = mmap((caddr_t)0, pageSize, PROT_READ, MAP_PRIVATE, fd, pageSize);
+  data = mmap((caddr_t)0, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+  line = data;
+  // get lines
+  while(cntr < sb.st_size) {
+      lineLen = 0;
+      line = data;
+      // find the next line
+      while(*data != '\n' && cntr < sb.st_size) {
+          data++;
+          cntr++;
+          lineLen++;
+      }
+        //***** PROCESS LINE ****
+        // ... processLine(line, lineLen);
+  }
+}
+
+*/

@@ -7,10 +7,10 @@
 #include <wx/richtext/richtextctrl.h>
 #include "hypocontrols.h"
 #include "hypotools.h"
-//#include "hypodat.h"
+#include "hypodat.h"
 //#include "hypomods.h"
 
-
+using namespace std;
 
 class Model;
 class HypoMain;
@@ -195,7 +195,8 @@ public:
 	int neuroindex;
 	int cellcount;
 	SpikeDat *currcell;
-	NeuroDat *cells;
+	//NeuroDat *cells;
+	vector<NeuroDat> *cells;
 
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
@@ -225,6 +226,7 @@ public:
 	virtual void TestGrid();
 	void GridStore();
 	void GridLoad();
+	//void GridLoadFast();
 	void OnGridStore(wxCommandEvent& event);
 	void OnGridLoad(wxCommandEvent& event);
 	void HistLoad();
