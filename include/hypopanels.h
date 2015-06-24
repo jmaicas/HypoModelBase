@@ -226,7 +226,7 @@ public:
 	virtual void TestGrid();
 	void GridStore();
 	void GridLoad();
-	//void GridLoadFast();
+	void GridLoadFast();
 	void OnGridStore(wxCommandEvent& event);
 	void OnGridLoad(wxCommandEvent& event);
 	void HistLoad();

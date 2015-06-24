@@ -42,7 +42,8 @@
 #endif
 
 
-//using namespace stk;
+using namespace std;
+//using namespace stk
 
 
 
@@ -263,7 +264,8 @@ enum {
 	ID_Compare,
 	ID_Store,
 	ID_Wheel,
-	ID_Neuron
+	ID_Neuron,
+	ID_FileIO
 };
 
 
@@ -397,6 +399,24 @@ public:
 };
 
 long ReadNextData(wxString *readline);
+
+
+// Fast File I/O
+
+/*
+string ReadFile(const char *filename)
+{
+  ifstream infile(filename, std::ios::in | std::ios::binary);
+  if(infile) {
+    string contents;
+    infile.seekg(0, ios::end);
+    contents.resize(infile.tellg());
+    infile.seekg(0, std::ios::beg);
+    infile.read(&contents[0], contents.size());
+    infile.close();
+    return(contents);
+  }
+}*/
 
 
 // Storage

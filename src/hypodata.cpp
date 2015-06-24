@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 using namespace std;
 
@@ -146,6 +147,9 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	gridrows = rows;
 	gridcols = cols;
 	delete parambox;
+
+	//InitMenu();
+	//SetModFlag(ID_FileIO, "ioflag", "IO Mode", 0); 
 
 	diagbox = mod->diagbox;
 
@@ -312,7 +316,11 @@ void OutBox::OnGridStore(wxCommandEvent& event)
 void OutBox::OnGridLoad(wxCommandEvent& event)
 {
 	textgrid->CopyUndo();
-	GridLoad();
+	//GridLoad();
+	//int ioflag = (*modflags)["ioflag"];
+	int ioflag = true;
+	if(ioflag) GridLoadFast();
+	else GridLoad();
 }
 
 
@@ -405,7 +413,7 @@ void OutBox::GridLoad()
 	wxString datstring;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, filename;
-	int numlines, linecount;
+	int numlines, linecount, cellcount;
 
 	filetag = paramstoretag->GetValue();
 	/*
@@ -441,10 +449,12 @@ void OutBox::GridLoad()
 	infile.clear();
 	infile.seekg(0, ios::beg);
 	linecount = 0;
+	cellcount = 0;
 
 	//readline = ifp.ReadLine();
 	while(getline(infile, line)) {
 		wxString readline(line);
+		//diagbox->Write(readline + "\n");
 		datstring = readline.BeforeFirst(' ');
 		datstring.ToLong(&numdat);
 		row = numdat;
@@ -458,6 +468,7 @@ void OutBox::GridLoad()
 		readline.Trim();
 		cell = readline;
 		textgrid->SetCell(row, col, cell);
+		cellcount++;
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		//readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");
@@ -466,12 +477,13 @@ void OutBox::GridLoad()
 	}
 	infile.close();
 	diagbox->Write("OK\n");
-	WriteVDU("OK\n");
+	//WriteVDU("OK\n");
+	WriteVDU(text.Format("OK, %d cells\n", cellcount));
 	gauge->SetValue(0);
 }
 
 
-/*
+
 void OutBox::GridLoadFast()
 {
 	TextFile ifp;
@@ -481,14 +493,14 @@ void OutBox::GridLoadFast()
 	wxString datstring;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, filename;
-	int numlines, linecount;
+	int numlines, linecount, cellcount;
 
 	filetag = paramstoretag->GetValue();
 	
 
 	filename = filetag.ToStdString() + "-grid.txt";
-	ifstream infile(filename.c_str());
-	if(!infile.is_open()) {
+	ifstream readfile(filename.c_str());
+	if(!readfile.is_open()) {
 		paramstoretag->SetValue("Not found");
 		return;
 	}
@@ -507,15 +519,32 @@ void OutBox::GridLoadFast()
 
 	WriteVDU("Reading file...");
 
-	
-  numlines = count(istreambuf_iterator<char>(infile), istreambuf_iterator<char>(), '\n');
-	infile.clear();
-	infile.seekg(0, ios::beg);
+  numlines = count(istreambuf_iterator<char>(readfile), istreambuf_iterator<char>(), '\n');
+	readfile.clear();
+	readfile.seekg(0, ios::beg);
 	linecount = 0;
+
+	//string filetext = (ReadFile(filename.c_str()));
+	//istringstream filetext(ReadFile(filename.c_str()));
+
+	//ifstream infile(filename, std::ios::in | std::ios::binary);
+  
+	
+		string contents;
+		readfile.seekg(0, ios::end);
+		contents.resize(readfile.tellg());
+		readfile.seekg(0, ios::beg);
+		readfile.read(&contents[0], contents.size());
+		readfile.close();
+		istringstream infile(contents);
+	
+	cellcount = 0;
 
 	//readline = ifp.ReadLine();
 	while(getline(infile, line)) {
 		wxString readline(line);
+		if(readline.IsEmpty()) break;
+		//diagbox->Write(readline + "\n");
 		datstring = readline.BeforeFirst(' ');
 		datstring.ToLong(&numdat);
 		row = numdat;
@@ -529,44 +558,17 @@ void OutBox::GridLoadFast()
 		readline.Trim();
 		cell = readline;
 		textgrid->SetCell(row, col, cell);
+		//diagbox->Write(text.Format("setcell %d %d %s\n", row, col, cell));
+		cellcount++;
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		//readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");
 		linecount++;
 		gauge->SetValue(100 * linecount / numlines);
 	}
-	infile.close();
+	//infile.close();
 	diagbox->Write("OK\n");
+	//WriteVDU(text.Format("OK, %d cells\n", cellcount));
 	WriteVDU("OK\n");
 	gauge->SetValue(0);
-
-
-	struct stat sb;
-  long cntr = 0;
-  int fd, lineLen;
-  char *data;
-  char *line;
-  // map the file
-  fd = open(filename.c_str(), O_RDONLY);
-  fstat(fd, &sb);
-  //// int pageSize;
-  //// pageSize = getpagesize();
-  //// data = mmap((caddr_t)0, pageSize, PROT_READ, MAP_PRIVATE, fd, pageSize);
-  data = mmap((caddr_t)0, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-  line = data;
-  // get lines
-  while(cntr < sb.st_size) {
-      lineLen = 0;
-      line = data;
-      // find the next line
-      while(*data != '\n' && cntr < sb.st_size) {
-          data++;
-          cntr++;
-          lineLen++;
-      }
-        //***** PROCESS LINE ****
-        // ... processLine(line, lineLen);
-  }
 }
-
-*/
