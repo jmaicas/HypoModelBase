@@ -431,11 +431,13 @@ public:
 	double zero;
 	wxString tag, mess;
 	wxTextCtrl *textbox;
+	bool stretchmode;
 	
 	double &operator [](int index) {
 		if(index < 0) index = 0;
 		//if(index > max) return zero;
 		if(index >= data.size()) {
+			if(stretchmode) data.resize(data.size() + 100);
 			if(textbox && index%100 == 0) textbox->AppendText(mess.Format("%s bad access, index %d\n", tag, index));
 			return zero;		
 		}
@@ -454,11 +456,15 @@ public:
 		data.resize(size * 1.1);
 		max = size;
 		maxindex = 0;
+		stretchmode = false;
 	}
 
-	//~datdouble() {
-	//	delete data;
-	//}
+	void setsize(int size, bool stretch) {
+		data.resize(size * 1.1);
+		max = size;
+		maxindex = 0;
+		stretchmode = stretch;
+	}
 };
 
 

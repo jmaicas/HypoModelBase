@@ -526,7 +526,7 @@ ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)
 	toolbox = tbox;
 	mainwin = toolbox->mainwin;
 
-	if(mainwin->diagbox) mainwin->diagbox->Write("ToolPanel init\n");
+	//if(mainwin->diagbox) mainwin->diagbox->Write("ToolPanel init\n");
 
 	//pinmode = 0;
 

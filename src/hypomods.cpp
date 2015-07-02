@@ -290,6 +290,8 @@ void Model::ModLoad()
 	wxPoint pos;
   wxSize size;
 
+	diagbox->Write("ModLoad....\n");
+
 	filepath = GetPath();
 
 	// parameter history load                       // Redundant, leave in for updating old models
@@ -310,6 +312,8 @@ void Model::ModLoad()
 		opfile.Close();	
 		modbox->paramstoretag->SetLabel(initparams);
 	}
+
+	diagbox->Write("ModLoad history ok, reading boxes...\n");
 
 	// Box Load
 	filename = modname + "box.ini";
@@ -340,6 +344,8 @@ void Model::ModLoad()
 		//tofp.WriteLine(readline);
 	}
 	infile.Close();
+
+	diagbox->Write("ModLoad....OK\n");
 }
 
 
