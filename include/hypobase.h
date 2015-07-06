@@ -678,6 +678,7 @@ double gaussian(double mean, double sd);
 double uniform(double mean, double range);
 int iuniform(int base, int range);
 int randint(int range);
+float fast_tanh(float x);
 
 
 

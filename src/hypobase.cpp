@@ -448,6 +448,14 @@ int randint(int range)
 }
 
 
+float fast_tanh(float x){
+  float x2 = x * x;
+  float a = x * (135135.0f + x2 * (17325.0f + x2 * (378.0f + x2)));
+  float b = 135135.0f + x2 * (62370.0f + x2 * (3150.0f + x2 * 28.0f));
+  return a / b;
+}
+
+
 int GetSystem()
 {
 	wxString oslabel = wxGetOsDescription();
