@@ -428,6 +428,7 @@ public:
 	double labelfontsize, tickfontsize;
 	double xunitscale, xunitdscale;
 	int clipmode;
+	bool synchx;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

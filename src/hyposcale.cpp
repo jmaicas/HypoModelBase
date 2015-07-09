@@ -1177,6 +1177,7 @@ void ScaleBox::XSynch(int pos)
 {
 	if(gsynch) {
 		GraphDat *graph0 = graphwin[synchcon]->graphset[0]->plot[0];
+		if(!graph0->synchx) return;
 		for(i=startgraph; i<startgraph+numgraphs; i++) {
 			if(gsync[i] && !gsync[i]->GetValue()) {
 				//mainwin->diagbox->Write(text.Format("Sync break pos %d\n", i));
@@ -1184,6 +1185,7 @@ void ScaleBox::XSynch(int pos)
 			}
 			//mainwin->diagbox->Write(text.Format("Sync go pos %d\n", i));
 			graph = graphwin[i]->graphset[0]->plot[0];
+			if(!graph->synchx) continue;
 			if(pos >= 0) graph->scrollpos = pos;
 			graph->xfrom = graph0->xfrom;
 			graph->xto = graph0->xto;

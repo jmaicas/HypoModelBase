@@ -560,6 +560,7 @@ void GraphDat::Init()
 	labelfontsize = 10;
 	tickfontsize = 10;
 	clipmode = 0;
+	synchx = true;
 }
 
 
