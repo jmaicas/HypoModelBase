@@ -311,9 +311,8 @@ void HypoMain::CleanUp() {
     
     if(graphbox) graphbox->Destroy();
     
+		delete mod;
     delete[] gpos;
-    delete mod;
-    
     
     //wxMenu *menuTools = new wxMenu;
     //wxMenu *menuSystem = new wxMenu;
@@ -462,7 +461,7 @@ void HypoMain::OnClose(wxCloseEvent& event)
     mod->GHistStore();
     CleanUp();
     Destroy();
-    
+
     //_CrtDumpMemoryLeaks();
 }
 
