@@ -162,13 +162,14 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	//for(i=0; i<gridcols; i++) textgrid->SetColSize(i, 60);
 	textgrid->SetDefaultRowSize(20, true);
 	textgrid->SetDefaultColSize(60, true);
-	
+	textgrid->SetRowLabelSize(80); 
+
 
 	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
-
 	wxBoxSizer *storebox = StoreBox();
 
 	buttonbox = new wxBoxSizer(wxHORIZONTAL);
+	buttonbox->Add(storebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	AddButton(ID_Undo, "Undo", 40, buttonbox);
 	buttonbox->AddSpacer(2);
 	AddButton(ID_Copy, "Copy", 40, buttonbox);
@@ -180,15 +181,20 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	//wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
 	//statusbox->Add(status, 1, wxEXPAND);
 
-	gauge = new wxGauge(panel, wxID_ANY, 100);
+	gauge = new wxGauge(panel, wxID_ANY, 10);
 	wxBoxSizer *displaybox = new wxBoxSizer(wxVERTICAL);
 	//displaybox->Add(vdu, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	displaybox->Add(vdu, 1, wxEXPAND);
-	displaybox->Add(gauge, 0, wxEXPAND);
+	//displaybox->Add(gauge, 0, wxEXPAND);
 
-	controlbox->Add(storebox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	wxBoxSizer *leftbox = new wxBoxSizer(wxVERTICAL);
+	leftbox->Add(buttonbox, 0);  
+	leftbox->Add(gauge, 0, wxEXPAND);
+
+	//controlbox->Add(storebox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	controlbox->AddSpacer(10);
-	controlbox->Add(buttonbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//controlbox->Add(buttonbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+  controlbox->Add(leftbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	controlbox->AddSpacer(10);
 	//controlbox->Add(vdu, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	//controlbox->Add(displaybox, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
@@ -198,6 +204,7 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	//mainbox->Add(textgrid, 1, wxEXPAND);
 	mainbox->Add(notebook, 1, wxEXPAND);
 	mainbox->Add(controlbox, 0);
+	mainbox->AddSpacer(2);
 
 	//GridDefault();
 
@@ -206,6 +213,9 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	//paramstoretag->SetLabel(initparams);
 
 	panel->Layout();
+
+	textgrid->vdu = vdu;
+	textgrid->gauge = gauge;
 
 	Connect(ID_paramstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnGridStore));
 	Connect(ID_paramload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnGridLoad));

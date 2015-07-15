@@ -32,6 +32,8 @@ public:
 		int ostype;
 
 		wxGridStringTable *undogrid;
+		wxTextCtrl *vdu;
+		wxGauge *gauge;
 
 		void OnRightClick(wxGridEvent& event);
 		void OnLeftClick(wxGridEvent& event);
