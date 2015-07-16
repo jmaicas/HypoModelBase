@@ -92,6 +92,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
 
+	/*
 	menuPlot = new wxMenu;
 	if(mainwin->diagnostic) {
 		menuPlot->Append(ID_GraphRemove, "Delete Graph");
@@ -114,7 +115,8 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 		}
 		menuPlot->AppendSubMenu(newsub, mod->graphbase->setstore[i].name); 
 		}*/
-	}
+	//}
+
 
 
 
@@ -193,7 +195,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(GraphWindow3::OnLeftUp));
 	Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(GraphWindow3::OnRightClick));
 	//Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph), 1000, 1050);
-	Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph));
+	//Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph));
 	Connect(ID_GraphRemove, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphRemove));
 	Connect(ID_GraphPrint, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphPrint));
 	Connect(ID_GraphEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphEPS));
@@ -204,7 +206,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 GraphWindow3::~GraphWindow3()
 {
 	//delete overlay;
-	delete menuPlot;
+	//delete menuPlot;
 }
 
 
@@ -265,6 +267,7 @@ void GraphWindow3::OnGraph(wxCommandEvent& event)
 	xfrom = gpos->GetFront()->xfrom;
 	xto = gpos->GetFront()->xto;
 
+	
 	graphset = mod->graphbase->GetSet(id-1000);
 	gdex = graphset->GetPlot(mainwin->scalebox->GetFlags());
 	gpos->Front((*mod->graphbase)[gdex]);
@@ -350,6 +353,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 
 void GraphWindow3::OnRightClick(wxMouseEvent& event)
 {
+	int i;
 	wxString text;
 	//int id = event.GetId();
 	//wxWindow *pos = FindWindowById(id, toolpanel);
@@ -359,6 +363,20 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 	//wxSize size = this->GetSize();
 
 	//mainwin->diagbox->textbox->AppendText(text.Format("graph menu set %d\n", gpos->GetFront()->sdex));
+
+	wxMenu *menuPlot = new wxMenu;
+	if(mainwin->diagnostic) {
+		menuPlot->Append(ID_GraphRemove, "Delete Graph");
+		//menuPlot->Append(ID_GraphPrint, "Print Graph");
+		menuPlot->Append(ID_GraphEPS, "Export EPS");
+		menuPlot->Append(ID_Scale, "Plot Panel");
+		menuPlot->AppendSeparator();
+	}
+	for(i=0; i<mod->graphbase->numsets; i++) {
+		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
+	}
+
+	Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph));
 
 	menuPlot->Check(1000 + gpos->sdex, true);
 	mainwin->diagbox->Write(text.Format("graph menu set %d\n", gpos->sdex));

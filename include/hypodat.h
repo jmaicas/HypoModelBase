@@ -209,6 +209,7 @@ public:
 	double histquadmode;
 	short freqwindow;
 	int hazquadbins;
+	bool graphs;
 	
 	double memtau, tauHAP, tauAHP, tauDAP;
 	double kHAP, kAHP, kDAP;

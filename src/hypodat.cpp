@@ -146,6 +146,7 @@ SpikeDat::SpikeDat()
 	maxspikes = 100000;
 	normscale = 10000;
 	mainwin = NULL;
+	graphs = false;
 }
 
 

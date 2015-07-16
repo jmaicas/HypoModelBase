@@ -1323,10 +1323,19 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
 	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
 
-	//graphbase->Add(GraphDat(&vasoneurodata->Ca, 0, 500, 0, 500, "Vaso Net Ca", 4, 1, lightgreen, 1000/datsample), "vasonetCa");
+	(*graphbase)[reftag + "rate1s"]->synchx = false;
+	(*graphbase)[reftag + "spikes1ms"]->synchx = false;
+	(*graphbase)[reftag + "hist1ms"]->synchx = false;
+	(*graphbase)[reftag + "hist5ms"]->synchx = false;
+	(*graphbase)[reftag + "haz1ms"]->synchx = false;
+	(*graphbase)[reftag + "haz5ms"]->synchx = false;
+	(*graphbase)[reftag + "normhist1ms"]->synchx = false;
+	(*graphbase)[reftag + "normhist5ms"]->synchx = false;
 
 	graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
+	graphs = true;
+
 	return setindex;
 }
 
@@ -1353,6 +1362,8 @@ int SpikeDat::GraphSetLysis(GraphBase *graphbase, wxString tag, int colour, int 
 
 	graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
+	graphs = true;
+
 	return setindex;
 }
 

@@ -21,6 +21,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	graphbase->mainwin = mainwin;
 	modeflags = new ParamStore();
 	scalebox = mainwin->scalebox;
+	diagbox = mainwin->diagbox;
 
 	ostype = GetSystem();
 	graphload = true;
@@ -36,6 +37,28 @@ Model::~Model()
 {
 	delete graphbase;
 	delete modeflags;
+}
+
+
+void Model::GSwitch(graphdisp *gpos, ParamStore *gflags)
+{
+	int i, gdex;
+	GraphSet *graphset;
+	wxString text;
+
+	mainwin->diagbox->Write("GSwitch call\n");
+
+	if(gsmode == 1) {
+		for(i=0; i<gcount; i++) {
+			graphset = graphbase->GetSet(gcodes[i]);
+			if(graphset) gdex = graphset->GetPlot(gflags);
+			else continue;
+			if(diagbox) diagbox->textbox->AppendText(text.Format("gpos %d   gcode %s   set %s   plot %d   modesum %d   sdex %d  sync %d\n", 
+				i, gcodes[i], graphset->tag, gdex, graphset->modesum, graphset->sdex, (*graphbase)[gdex]->synchx));
+			gpos[i].Front((*graphbase)[gdex]);
+			gpos[i].sdex = graphset->sdex;
+		}
+	}
 }
 
 

@@ -172,6 +172,7 @@ public:
 	void OptionLoad();
 	void ViewLoad();
 	void ViewStore();
+	void SpikeModule(Model *);
 
 	void BasicMenu();
 	void FullMenu();
