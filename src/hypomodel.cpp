@@ -105,6 +105,14 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
     //expdata = new SpikeDat();
     //expdata->burstdata = new BurstDat();
     //expdata->burstdata->spikedata = expdata;
+
+		// Spike Analysis Module                  July 2015
+
+		expdata = new SpikeDat();
+    expdata->burstdata = new BurstDat();
+    selectdata = new SpikeDat();
+		burstdata = new BurstDat();
+   
     
     //GraphData();
     
@@ -346,7 +354,7 @@ void HypoMain::FullMenu()
     //menuAnalysis->Append(ID_Info, "Info");
     //menuAnalysis->Append(ID_Burst, "Burst");
     //menuTools->Append(ID_Info, "Info");
-    //menuTools->Append(ID_Burst, "Burst");
+    menuTools->Append(ID_Burst, "Spike Analysis");
     //menuTools->Append(ID_Protocol, "Protocol");
     menuTools->Append(ID_Sound, "Sonic");
     menuTools->Append(ID_GraphAdd, "Add Graph");
@@ -722,12 +730,13 @@ void HypoMain::OnBurst(wxCommandEvent& WXUNUSED(event))
         boxheight = 380;
     }
     else {
-        boxwidth = 300;
-        boxheight = 430;
+        boxwidth = 425;
+        boxheight = 500;
     }
     
     //mainpos = GetPosition();
-    burstbox = new BurstBox(mod, "Burst Analysis", wxPoint(320, 455), wxSize(boxwidth, boxheight), focusdata);
+    burstbox = new BurstBox(mod, "Burst Analysis", wxPoint(425, 500), wxSize(boxwidth, boxheight), 0, "Selected");
+		//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
     toolset->AddBox(burstbox);
     burstbox->Show(true);
 }

@@ -130,7 +130,8 @@ public:
 	BurstDat *burstdata;
 	SpikeDat *currentdata;
 	AnaDat *analysisdata;
-	SpikeDat *expdata;
+	SpikeDat *expdata, *selectdata;
+
 	ProtocolBox *protocolbox;
 #ifdef HYPOSOUND
 	SoundBox *soundbox;
