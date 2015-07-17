@@ -285,6 +285,13 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 }
 
 
+
+void HypoMain::ToolLoad(ParamStore *toolflags)
+{
+	if((*toolflags)["burstbox"]) SpikeBox(1); 
+}
+
+
 void HypoMain::OnGraphAdd(wxCommandEvent& WXUNUSED(event))
 {
     SetStatusText("Add Graph");
@@ -729,9 +736,10 @@ void HypoMain::OnParams(wxCommandEvent& WXUNUSED(event))
 }
 
 
-void HypoMain::OnBurst(wxCommandEvent& WXUNUSED(event))
+
+void HypoMain::SpikeBox(int modmode)
 {
-    int boxwidth, boxheight;
+	 int boxwidth, boxheight;
 		
 		//wxString tag;
 
@@ -753,13 +761,20 @@ void HypoMain::OnBurst(wxCommandEvent& WXUNUSED(event))
 		
 		if(!expdata->graphs) {
 			SpikeModule(mod);
-			scalebox->GraphSwitch();
+			if(!modmode) scalebox->GraphSwitch();
 		}
 
 		mod->modtools.AddBox(burstbox, true);
 
     //toolset->AddBox(burstbox);
     burstbox->Show(true);
+}
+
+
+void HypoMain::OnBurst(wxCommandEvent& WXUNUSED(event))
+{ 
+		if(burstbox) burstbox->Show(true); 
+		else SpikeBox();
 }
 
 

@@ -81,7 +81,7 @@ public:
 	//wxSize screensize;
 	//wxString snum;
 	//wxBoxSizer *mainsizer;
-	//wxCommandEvent *blankevent;
+	wxCommandEvent blankevent;
 
 	int graph, numgraphs, yplot, xplot;
 	int numdraw, numdraw2;
@@ -172,7 +172,9 @@ public:
 	void OptionLoad();
 	void ViewLoad();
 	void ViewStore();
+	void ToolLoad(ParamStore *toolflags);
 	void SpikeModule(Model *);
+	void SpikeBox(int modmode = 0);
 
 	void BasicMenu();
 	void FullMenu();
