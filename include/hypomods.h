@@ -34,6 +34,7 @@ public:
 	short gsync;
 	int storesize;
 	double xmin;
+	bool oldhist;
 
 	wxString modname;
 	wxString modtag;

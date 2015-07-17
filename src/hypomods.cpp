@@ -30,6 +30,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	storesize = 100000;
 	xmin = -100000;
 	path = "";
+	oldhist = true;
 }
 
 
@@ -261,9 +262,6 @@ void Model::ModStore()
 
 	TextFile outfile, opfile;
 
-	//if(path == "") filepath = "Init";
-	//else filepath = path;
-	//if(!wxDirExists(filepath)) wxMkdir(filepath);
 	filepath = GetPath();
 
 	// Default Parameters
@@ -273,19 +271,22 @@ void Model::ModStore()
   //modbox->StoreParam("default");
 
 	// Parameter history
-	filename = modname + "prefs.ini";
-	initparams = modbox->paramstoretag->GetValue();
 
-	//wxTextFile opfile("Init//" + filename);
-	//if(!opfile.Exists()) opfile.Create();
+	if(oldhist) {
+		filename = modname + "prefs.ini";
+		initparams = modbox->paramstoretag->GetValue();
 
-	opfile.New(filepath + "/" + filename);
+		//wxTextFile opfile("Init//" + filename);
+		//if(!opfile.Exists()) opfile.Create();
 
-	for(i=modbox->paramstoretag->GetCount()-1; i>=0; i--) {
-		outline.Printf("initparams %s", modbox->paramstoretag->GetString(i));
-		opfile.WriteLine(outline);
+		opfile.New(filepath + "/" + filename);
+
+		for(i=modbox->paramstoretag->GetCount()-1; i>=0; i--) {
+			outline.Printf("initparams %s", modbox->paramstoretag->GetString(i));
+			opfile.WriteLine(outline);
+		}
+		opfile.Close();
 	}
-	opfile.Close();
 
 	// box store
 	filename = modname + "box.ini";
@@ -318,22 +319,24 @@ void Model::ModLoad()
 	filepath = GetPath();
 
 	// parameter history load                       // Redundant, leave in for updating old models
-	if(!modbox->paramstoretag->labelset) {
-		filename = modname + "prefs.ini";
-		check = opfile.Open(filepath + "/" + filename);
-		if(!check) return;
+	if(oldhist) {
+		if(!modbox->paramstoretag->labelset) {
+			filename = modname + "prefs.ini";
+			check = opfile.Open(filepath + "/" + filename);
+			if(!check) return;
 
-		readline = opfile.ReadLine();
-		while(!readline.IsEmpty()) {
-			readline = readline.AfterFirst(' ');
-			readline.Trim();
-			initparams = readline;
-			modbox->paramstoretag->Insert(initparams, 0);
-	
 			readline = opfile.ReadLine();
+			while(!readline.IsEmpty()) {
+				readline = readline.AfterFirst(' ');
+				readline.Trim();
+				initparams = readline;
+				modbox->paramstoretag->Insert(initparams, 0);
+	
+				readline = opfile.ReadLine();
+			}
+			opfile.Close();	
+			modbox->paramstoretag->SetLabel(initparams);
 		}
-		opfile.Close();	
-		modbox->paramstoretag->SetLabel(initparams);
 	}
 
 	diagbox->Write("ModLoad history ok, reading boxes...\n");

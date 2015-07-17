@@ -812,6 +812,7 @@ void ToolSet::AddBox(ToolBox *newbox, bool serve, bool child) {
 
 	//if(mod == NULL) ofp.WriteLine(text.Format("no mod"));
 	//else ofp.WriteLine(text.Format("mod address %p", mod));
+	if(!newbox) return;
 	newbox->toolset = this;
 
 	if(serve && !newbox->servant) newbox->servant = true;
@@ -957,10 +958,13 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 
 	if(panel->mainwin) diagbox = panel->mainwin->diagbox;
 
-	diagbox->Write("TagBox init\n");
+	diagbox->Write("\nTagBox init\n");
 
 	// tag history load
-	if(name == "") return;
+	if(name == "") {
+		diagbox->Write("Tag file not set\n");
+		return;
+	}
 	filename =  name + "tags.ini";
 	check = opfile.Open(path + "/Tags/" + filename);
 	if(!check) {

@@ -756,7 +756,9 @@ void HypoMain::OnBurst(wxCommandEvent& WXUNUSED(event))
 			scalebox->GraphSwitch();
 		}
 
-    toolset->AddBox(burstbox);
+		mod->modtools.AddBox(burstbox, true);
+
+    //toolset->AddBox(burstbox);
     burstbox->Show(true);
 }
 
