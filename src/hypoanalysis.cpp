@@ -1323,7 +1323,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
 	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
 
-	(*graphbase)[reftag + "rate1s"]->synchx = false;
+	//(*graphbase)[reftag + "rate1s"]->synchx = false;
 	(*graphbase)[reftag + "spikes1ms"]->synchx = false;
 	(*graphbase)[reftag + "hist1ms"]->synchx = false;
 	(*graphbase)[reftag + "hist5ms"]->synchx = false;
