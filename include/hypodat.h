@@ -174,8 +174,8 @@ public:
 
 class SpikeDat{
 public:
-	SpikeDat();
-	~SpikeDat();
+	SpikeDat();	// Initializes sizes and values 
+	~SpikeDat(); // Destructor. 
 
 	DiagBox *diagbox;
 
@@ -194,6 +194,14 @@ public:
 	datdouble histquadlin; // ISI Histogram  Quadratic Linear
 	datdouble hist1norm;
 	datdouble hist5norm;
+	datdouble spikerate05;
+	datdouble spikerate1;
+	datdouble spikerate2;
+	datdouble spikerate4;
+	datdouble spikerate6;
+	datdouble spikerate8;
+	datdouble spikerate10;
+	datdouble dispersions;
 	//datdouble haz1norm;
 	//datdouble haz5norm;
 	datint srate;
@@ -234,12 +242,12 @@ public:
 	double th0, vrest;
 	MainFrame *mainwin;
 	
-	void datacalc();
-	void neurocalc(NeuroDat *datneuron = NULL); // calculate things from spike times
+	void datacalc();  // Not doing anything. Probably obsolete?
+	void neurocalc(NeuroDat *datneuron = NULL); // calculate Histograms and Hazard
 	void ISIanalysis();
 	//void autocalc();
-	void netneurocalc(int);
-	void output(wxString, wxString);
+	void netneurocalc(int);  // Doing nothing. 
+	void output(wxString, wxString); // Writing in a file
 	void inputsim(double);
 	void BurstScan(BurstBox *);
 	void IntraBurstAnalysis();

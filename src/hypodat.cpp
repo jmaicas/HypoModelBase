@@ -121,6 +121,14 @@ SpikeDat::SpikeDat()
 	srate.setsize(100000);
 	srate1.setsize(1000000);
 	srate100.setsize(100000);
+	spikerate05.setsize(100000);// For Indexes of Dispersion calcs
+	spikerate1.setsize(100000);
+	spikerate2.setsize(100000);
+	spikerate4.setsize(100000);
+	spikerate6.setsize(10000);
+	spikerate8.setsize(10000);
+	spikerate10.setsize(10000);
+	dispersions.setsize(1000);
 
 	synsim.data.resize(1000100);
 	synsim.max = 1000000;

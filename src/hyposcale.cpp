@@ -231,6 +231,50 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		}
 
 		if(boxtype == modFirstTest) {
+			if(i == 0) {
+				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+				if(ostype == Mac) buttonsize = 40; 
+				else buttonsize = 37;
+				//GraphButton("spikes", 0, ID_spikes, "Sp", buttonsize, resbox);   
+				//GraphButton("rateres", 0, ID_rateres, "Ra", buttonsize, resbox); 
+				ScaleButton(ID_spikes, "Sp", buttonsize, resbox);   
+				ScaleButton(ID_rateres, "Ra", buttonsize, resbox); 
+				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+
+			if(i == 1) {
+				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+				if(ostype == Mac) {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+					ScaleButton(ID_allburst, "All / Burst", 74, vbox);
+				}
+				else {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+					ScaleButton(ID_allburst, "All / Burst", 55, vbox);
+				}		
+				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+
+			if(i == 2) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+		}
+
+		if(boxtype == modOxyMatch) {
 			if(i == 1) {
 				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 				if(ostype == Mac) {
@@ -246,7 +290,51 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			}
 		}
 
-		if(boxtype == modOxySEM) {
+		if((boxtype == modOxySEM)) {
+			if(i == 0) {
+				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+				if(ostype == Mac) buttonsize = 40; 
+				else buttonsize = 37;
+				//GraphButton("spikes", 0, ID_spikes, "Sp", buttonsize, resbox);   
+				//GraphButton("rateres", 0, ID_rateres, "Ra", buttonsize, resbox); 
+				ScaleButton(ID_spikes, "Sp", buttonsize, resbox);   
+				ScaleButton(ID_rateres, "Ra", buttonsize, resbox); 
+				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+
+			if(i == 1) {
+				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+				if(ostype == Mac) {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+					ScaleButton(ID_allburst, "All / Burst", 74, vbox);
+				}
+				else {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+					ScaleButton(ID_allburst, "All / Burst", 55, vbox);
+				}		
+				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+
+			if(i == 2) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+		}
+
+		if((boxtype == modOxySec)) {
 			if(i == 0) {
 				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) buttonsize = 40; 
@@ -424,7 +512,7 @@ void ScaleBox::OnConFocus(wxFocusEvent& event)
 }
 
 
-void ScaleBox::OnGStore(wxCommandEvent& event)
+void ScaleBox::OnGStore(wxCommandEvent&)
 {
 	int i;
 	wxString filename, filetag, filepath;
@@ -566,13 +654,13 @@ void ScaleBox::GLoad(wxString tag)
 }
 
 
-void ScaleBox::OnGLoad(wxCommandEvent& event)
+void ScaleBox::OnGLoad(wxCommandEvent&)
 {
 	GLoad();
 }
 
 
-void ScaleBox::OnSync(wxCommandEvent& event)
+void ScaleBox::OnSync(wxCommandEvent&)
 {
 	if(mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("\nOnSync\n");
 	gsynch = 1 - gsynch;
@@ -1076,7 +1164,7 @@ ParamStore *ScaleBox::GetFlags()
 }
 
 
-void ScaleBox::GraphSwitch(int disp)
+void ScaleBox::GraphSwitch(int)
 {
 	GetFlags();
 	gmod->GSwitch(gpos, gflags);

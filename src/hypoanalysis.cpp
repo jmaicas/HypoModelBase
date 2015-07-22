@@ -993,6 +993,91 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 		if(times[i]/100 < 100000) srate100[(int)(times[i]/100 + 0.5)]++;
 		if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
 	}
+	
+	// Index of Dispersion Code
+	for(i=0; i<spikecount; i++) {
+		spikerate05[(int)(times[i])/500]++;  // 0.5 second BIN
+		spikerate1[(int)(times[i])/1000]++;  
+		spikerate2[(int)(times[i])/2000]++;  
+		spikerate4[(int)(times[i])/4000]++;  
+		spikerate6[(int)(times[i])/6000]++;  
+		spikerate8[(int)(times[i])/8000]++;  
+		spikerate10[(int)(times[i])/10000]++; // 10 seconds BIN		
+	}
+	double laststep05, laststep1, laststep2, laststep4, laststep6, laststep8, laststep10;
+	laststep05 =  ((int)(times[spikecount-1])/500)-4;
+	laststep1 =  ((int)(times[spikecount-1])/1000)-4;
+	laststep2 =  ((int)(times[spikecount-1])/2000)-4;
+	laststep4 =  ((int)(times[spikecount-1])/4000)-4;
+	laststep6 =  ((int)(times[spikecount-1])/6000)-4;
+	laststep8 =  ((int)(times[spikecount-1])/8000)-4;
+	laststep10 =  ((int)(times[spikecount-1])/10000)-4;
+	// **************** 0.5 sec **************************
+	double mean05, variance05, temp05, dispersion05; 
+	mean05 = variance05 = temp05 = dispersion05 = 0.0;
+	for (int a=0; a<laststep05;  a++) mean05 = mean05 +  spikerate05[a]; //mean
+	mean05 = mean05/laststep05;
+	//mainwin->diagbox->Write(text.Format("En Hypoanalysis -> %.4f Number of elements-> %d \n", mean05, (int)(times[spikecount])/500-4));
+	for(double a=0; a<laststep05;a++) temp05 += (mean05-spikerate05[a])*(mean05-spikerate05[a]); // variance
+	variance05 = temp05/laststep05;
+	//mainwin->diagbox->Write(text.Format("En Hypoanalysis Variance05-> %.4f Number of elements-> %d \n", variance05, (int)(times[spikecount])/500-4));
+	dispersion05 = variance05/mean05; // dispersion
+	// **************** 1 sec **************************
+	double mean1, variance1, temp1, dispersion1; 
+	mean1 = variance1 = temp1 = dispersion1 = 0.0;
+	for (int a=0; a<laststep1;  a++) mean1 = mean1 +  spikerate1[a]; //mean
+	mean1 = mean1/(laststep1);
+	for(double a=0; a<laststep1;a++) temp1 += (mean1-spikerate1[a])*(mean1-spikerate1[a]); // variance
+	variance1 = temp1/(laststep1);
+	dispersion1 = variance1/mean1; // dispersion
+	// **************** 2 sec **************************
+	double mean2, variance2, temp2, dispersion2; 
+	mean2 = variance2 = temp2 = dispersion2 = 0.0;
+	for (int a=0; a<laststep2;  a++) mean2 = mean2 +  spikerate2[a]; //mean
+	mean2 = mean2/(laststep2);
+	for(double a=0; a<laststep2;a++) temp2 += (mean2-spikerate2[a])*(mean2-spikerate2[a]); // variance
+	variance2 = temp2/(laststep2);
+	dispersion2 = variance2/mean2; // dispersion
+	// **************** 4 sec **************************
+	double mean4, variance4, temp4, dispersion4; 
+	mean4 = variance4 = temp4 = dispersion4 = 0.0;
+	for (int a=0; a<laststep4;  a++) mean4 = mean4 +  spikerate4[a]; //mean
+	mean4 = mean4/(laststep4);
+	for(double a=0; a<laststep4;a++) temp4 += (mean4-spikerate4[a])*(mean4-spikerate4[a]); // variance
+	variance4 = temp4/(laststep4);
+	dispersion4 = variance4/mean4; // dispersion
+	// **************** 6 sec **************************
+	double mean6, variance6, temp6, dispersion6; 
+	mean6 = variance6 = temp6 = dispersion6 = 0.0;
+	for (int a=0; a<laststep6;  a++) mean6 = mean6 +  spikerate6[a]; //mean
+	mean6 = mean6/(laststep6);
+	for(double a=0; a<laststep6;a++) temp6 += (mean6-spikerate6[a])*(mean6-spikerate6[a]); // variance
+	variance6 = temp6/(laststep6);
+	dispersion6 = variance6/mean6; // dispersion
+	// **************** 8 sec **************************
+	double mean8, variance8, temp8, dispersion8 ; 
+	mean8 = variance8 = temp8 = dispersion8 = 0.0;
+	for (int a=0; a<laststep8;  a++) mean8 = mean8 +  spikerate8[a]; //mean
+	mean8 = mean8/(laststep8);
+	for(double a=0; a<laststep8;a++) temp8 += (mean8 - spikerate8[a])*(mean8 - spikerate8[a]); // variance
+	variance8 = temp8/(laststep8);
+	dispersion8 = variance8/mean8; // dispersion
+	// **************** 10 sec **************************
+	double mean10, variance10, temp10, dispersion10; 
+	mean10 = variance10 = temp10 = dispersion10 = 0.0;
+	for (int a=0; a<laststep10;  a++) mean10 = mean10 +  spikerate10[a]; //mean
+	mean10 = mean10/(laststep10);
+	for(double a=0; a<laststep10;a++) temp10 += (mean10 - spikerate10[a])*(mean10 - spikerate10[a]); // variance
+	variance10 = temp10/(laststep10);
+	dispersion10 = variance10/mean10; // dispersion
+	// Array of dispersions for altogether plotting 
+	for (int i=10; i<20; i++) dispersions[i] = dispersion05;
+	for (int i=30; i<40; i++) dispersions[i] = dispersion1;
+	for (int i=50; i<60; i++) dispersions[i] = dispersion2;
+	for (int i=70; i<80; i++) dispersions[i] = dispersion4;
+	for (int i=90; i<100; i++) dispersions[i] = dispersion6;
+	for (int i=110; i<120; i++) dispersions[i] = dispersion10;
+			
 
 	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d \n", i, times[i], (int)(times[i]+0.5)));
 	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
@@ -1115,6 +1200,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
 	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spike Rate 100ms", this, 0.1, red + shift), reftag + "rate100ms", reftag);
 	graphbase->Add(GraphDat(&srate1, 0, 0.5, 0, 3, tag + "Spikes 1ms", this, 0.001, red + shift), reftag + "spikes1ms", reftag);
+	graphbase->Add(GraphDat(&dispersions, 0, 130, 0, 20, tag + "Indexes of Dispersions", 1, 1, colour + shift), reftag + "dispersions", reftag);
 	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "ISI Histogram 1ms", 1, 1, colour + shift), reftag + "hist1ms", reftag);
 	graphbase->Add(GraphDat(&hist5, 0, 500, 0, 500, tag + "ISI Histogram 5ms", 1, 5, colour + shift), reftag + "hist5ms", reftag);
 	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Hazard 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);
