@@ -3,7 +3,7 @@
 
 #include "wx/wx.h"
 #include <hypotools.h>
-#include <hypodef.h>
+#include "hypodef.h"
 
 
 
@@ -21,14 +21,13 @@ DiagBox::DiagBox(MainFrame *mainwin, const wxString& title, const wxPoint& pos, 
 
 void DiagBox::Write(wxString text)
 {
-	textbox->AppendText(text);
+	textbox->AppendText(text);	
 }
 
 
-TextGrid::TextGrid(wxPanel *parent, wxSize size)
+TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	: wxGrid(parent, wxID_ANY)
 {
-	int i;
 	//wxSize size(30, 30);
 	ostype = GetSystem();
 
@@ -40,6 +39,7 @@ TextGrid::TextGrid(wxPanel *parent, wxSize size)
 	SetLabelFont(wxFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
 
 	undogrid = new wxGridStringTable(size.x, size.y);
+	vdu = NULL;
 
 	rightmenu = new wxMenu;
 	rightmenu->Append(ID_SelectAll, "Select All", "Grid Select", wxITEM_NORMAL);
@@ -66,6 +66,31 @@ TextGrid::~TextGrid()
 {
 	delete undogrid;
 	delete rightmenu;
+}
+
+
+wxString TextGrid::GetCell(int row, int col)
+{
+	int numrows = GetNumberRows();
+	int numcols = GetNumberCols();
+
+	if(row >= numrows || col >= numcols) return ""; 
+	else return GetCellValue(row, col);
+}
+
+
+void TextGrid::SetCell(int row, int col, wxString data)
+{
+	int numrows = GetNumberRows();
+	int numcols = GetNumberCols();
+
+	if(row >= numrows) {
+		AppendRows(row - numrows + 1);
+	}
+	if(col >= numcols) {
+		AppendCols(col - numcols + 1);
+	}
+	SetCellValue(row, col, data);
 }
 
 
@@ -204,8 +229,8 @@ void TextGrid::Copy()
 					if(!copy_data.IsEmpty()) copy_data.Append("\n"); 
 					used_line = true;
 				}
-				else copy_data.Append("\t"); 
-				copy_data = copy_data + GetCellValue(i,j);   
+				else copy_data.Append("\t");   
+				copy_data.Append(GetCellValue(i, j));
 			}
 		}
 	}
@@ -238,13 +263,18 @@ void TextGrid::Copy()
 
 void TextGrid::Paste()
 {
-	int i, j, k;
+	long i, j, k, datasize;
+	wxString text;
+	double prog;
 
 	// grid paste code from wxwidgets forum
 
 	CopyUndo();
 
 	wxString copy_data, cur_field, cur_line;
+
+	if(vdu) vdu->AppendText("Pasting...\n");
+	if(vdu) vdu->AppendText("Copy clipboard...");
 
 	if(ostype == Mac) {
 		wxTheClipboard->Open();
@@ -261,22 +291,34 @@ void TextGrid::Paste()
 #endif
 	}
 
+	datasize = copy_data.Len();
+	if(vdu) vdu->AppendText(text.Format("OK, size %d\nWriting cells...", datasize));
+
 	i = GetGridCursorRow();
 	j = GetGridCursorCol();
 	k = j;
+	prog = 0.1;
 
 	while(!copy_data.IsEmpty()) {
 		cur_line = copy_data.BeforeFirst('\n');
+		//if(vdu) vdu->AppendText(text.Format("\nRow %d", i));	
 		while(!cur_line.IsEmpty()) {
 			cur_field = cur_line.BeforeFirst('\t');
-			if(i < GetNumberRows() && j < GetNumberCols()) SetCellValue(i, j, cur_field);
+			//if(i < GetNumberRows() && j < GetNumberCols()) SetCell(i, j, cur_field);
+			if(!(cur_field.Trim()).IsEmpty()) SetCell(i, j, cur_field);
 			j++;
 			cur_line  = cur_line.AfterFirst ('\t');
 		}
 		i++;
 		j = k;
 		copy_data = copy_data.AfterFirst('\n');
+		if(copy_data.Len() < datasize * (1 - prog)) {
+				if(vdu) vdu->AppendText(text.Format(".%.0f%%.", prog * 100));
+				prog = prog + 0.1;
+		}
 	} 
+
+	if(vdu) vdu->AppendText("OK\n");
 }
 
 
@@ -346,6 +388,9 @@ void TextGrid::CopyUndo()
 	int x, y;
 	wxString data;
 
+	if(GetNumberRows() > undogrid->GetNumberRows()) undogrid->AppendRows(GetNumberRows() - undogrid->GetNumberRows());
+	if(GetNumberCols() > undogrid->GetNumberCols()) undogrid->AppendCols(GetNumberCols() - undogrid->GetNumberCols());
+
 	for(x=0; x<GetNumberCols(); x++)
 		for(y=0; y<GetNumberRows(); y++) {
 			data = GetCellValue(y, x);
@@ -358,6 +403,9 @@ void TextGrid::Undo()
 {
 	int x, y;
 	wxString data;
+
+	if(GetNumberRows() > undogrid->GetNumberRows()) undogrid->AppendRows(GetNumberRows() - undogrid->GetNumberRows());
+	if(GetNumberCols() > undogrid->GetNumberCols()) undogrid->AppendCols(GetNumberCols() - undogrid->GetNumberCols());
 
 	for(x=0; x<GetNumberCols(); x++)
 		for(y=0; y<GetNumberRows(); y++) {

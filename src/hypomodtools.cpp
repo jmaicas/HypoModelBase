@@ -408,6 +408,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	int numpan = 3;
 
 	units = 1000;
+	boxname = "SpikeAnalysis";
 
 	mainwin = model->mainwin;
 	//burstdata = bdat;
@@ -575,7 +576,9 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	//datfiletag = new wxTextCtrl(panel, wxID_ANY, "n0", wxDefaultPosition, wxSize(100, -1));
 	//datfiletag = TextInput(100, 20, "n0");
-	datfiletag = TextInputCombo(100, 20, "");
+	wxString histpath = mainwin->modpath + "\\" + "Tools";
+	if(!wxDirExists(histpath)) wxMkdir(histpath);
+	datfiletag = TextInputCombo(100, 20, "", boxname, histpath);
 
 	if(ostype == Mac) {
 		AddButton(ID_datload, "Load", 60, datbuttons, 2);

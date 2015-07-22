@@ -21,7 +21,7 @@
 #include "wx/scrolwin.h"
 #include <vector>
 #include <list>
-#include "mersenne.h"
+#include <mersenne.h>
 #include "wx/dcbuffer.h"
 #include "wx/msgqueue.h"
 #include <wx/textfile.h>
@@ -56,7 +56,9 @@
 
 
 
+using namespace std;
 //using namespace stk;
+
 
 
 
@@ -274,7 +276,11 @@ enum {
 	ID_Browse,
 	ID_Select,
 	ID_Bin,
-	ID_Compare
+	ID_Compare,
+	ID_Store,
+	ID_Wheel,
+	ID_Neuron,
+	ID_FileIO
 };
 
 
@@ -409,7 +415,30 @@ public:
 long ReadNextData(wxString *readline);
 
 
+
 //	3. datdouble. Storage a vector of double overloading operator []
+
+// Fast File I/O
+
+/*
+string ReadFile(const char *filename)
+{
+  ifstream infile(filename, std::ios::in | std::ios::binary);
+  if(infile) {
+    string contents;
+    infile.seekg(0, ios::end);
+    contents.resize(infile.tellg());
+    infile.seekg(0, std::ios::beg);
+    infile.read(&contents[0], contents.size());
+    infile.close();
+    return(contents);
+  }
+}*/
+
+
+// Storage
+
+
 class datdouble{
 public:
 	datdouble(wxTextCtrl *text = NULL);
@@ -420,11 +449,13 @@ public:
 	double zero;
 	wxString tag, mess;
 	wxTextCtrl *textbox;
+	bool stretchmode;
 	
 	double &operator [](int index) {
 		if(index < 0) index = 0;
 		//if(index > max) return zero;
 		if(index >= data.size()) {
+			if(stretchmode) data.resize(data.size() + 100);
 			if(textbox && index%100 == 0) textbox->AppendText(mess.Format("%s bad access, index %d\n", tag, index));
 			return zero;		
 		}
@@ -443,11 +474,15 @@ public:
 		data.resize(size * 1.1);
 		max = size;
 		maxindex = 0;
+		stretchmode = false;
 	}
 
-	//~datdouble() {
-	//	delete data;
-	//}
+	void setsize(int size, bool stretch) {
+		data.resize(size * 1.1);
+		max = size;
+		maxindex = 0;
+		stretchmode = stretch;
+	}
 };
 
 //	4. datint. Storage a vector of integer overloading operator []
@@ -474,7 +509,47 @@ public:
 
 double *initfarray(int size);
 
+
 //	5. ParamStore. Storage of struct of parameters ?
+
+
+
+class DatStore{
+	struct DatData{
+		wxString tag;
+		datdouble data;
+		int xscale;
+	};
+private:
+	vector<DatData> store;
+
+public:
+	unsigned long size() {
+		return store.size();
+	}
+	void add(wxString tag, int xscale, int size) {
+		for(unsigned long i=0; i<store.size(); i++) 
+			if(store[i].tag == tag) return;                 
+		DatData dat;
+		dat.tag = tag;
+		dat.xscale = xscale;
+		dat.data.setsize(size);
+		store.push_back(dat);
+	}
+	datdouble *operator[](long index) {
+		if(index < 0 || index >= store.size()) return NULL;
+		return &store[index].data;
+	}
+	datdouble *operator[](wxString tag){
+		for(unsigned long i=0; i<store.size(); i++) 
+			if(store[i].tag == tag) {
+				return &store[i].data;
+			}
+		return NULL;
+	}  
+};
+
+
 class ParamStore{
 	struct ParamData{
 		wxString indexName;
@@ -526,6 +601,7 @@ public:
 	int id;
 	wxString label;
 	wxControl *box;
+	ToolBox *tool;
 };
 
 
@@ -551,6 +627,12 @@ public:
 			if(refbase[i].id == id) return refbase[i].box;
 		return NULL;
 	};
+
+	ToolBox *GetTool(int id) {
+		for(i=0; i<numrefs; i++)
+			if(refbase[i].id == id) return refbase[i].tool;
+		return NULL;
+	};
 	
 	int GetID(wxString label) {
 		for(i=0; i<numrefs; i++)
@@ -562,6 +644,12 @@ public:
 		refbase[numrefs].id = id;
 		refbase[numrefs].label = label;
 		refbase[numrefs].box = box;
+		numrefs++;
+	};
+
+	void AddTool(int id, ToolBox *tool) {
+		refbase[numrefs].id = id;
+		refbase[numrefs].tool = tool;
 		numrefs++;
 	};
 };
@@ -611,6 +699,8 @@ double gaussian(double mean, double sd);
 double uniform(double mean, double range);
 int iuniform(int base, int range);
 int randint(int range);
+float fast_tanh(float x);
+double kapow(double base, int power);
 
 
 

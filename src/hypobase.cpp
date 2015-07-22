@@ -26,7 +26,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	statusbar = CreateStatusBar();
 	diagbox = NULL;                // Protect diagbox self reference for toolpanel
 
-  diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
+    diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
 
 	graphbox = NULL;
@@ -63,7 +63,7 @@ void MainFrame::MainLoad()
 
 	TextFile infile;
 	wxPoint pos;
-  wxSize size;
+    wxSize size;
 
 	//filepath = GetPath();
 	filepath = "Init//";
@@ -445,6 +445,24 @@ int randint(int range)
 
 	num = mrand01();
 	return (int)(num * range);
+}
+
+
+float fast_tanh(float x) {
+  float x2 = x * x;
+  float a = x * (135135.0f + x2 * (17325.0f + x2 * (378.0f + x2)));
+  float b = 135135.0f + x2 * (62370.0f + x2 * (3150.0f + x2 * 28.0f));
+  return a / b;
+}
+
+
+double kapow(double base, int power) {
+	int i;
+	double num;
+
+	num = base;
+	for(i=1; i<power; i++) num = num * base; 
+	return num;
 }
 
 

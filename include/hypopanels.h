@@ -22,10 +22,10 @@
 #include <wx/richtext/richtextctrl.h>
 #include "hypocontrols.h"
 #include "hypotools.h"
-//#include "hypodat.h"
+#include "hypodat.h"
 //#include "hypomods.h"
 
-
+using namespace std;
 
 class Model;
 class HypoMain;
@@ -101,6 +101,7 @@ public:
 	ParamStore *modflags;
 	RefStore *flagrefs;
 	RefStore *checkrefs;
+	RefStore *panelrefs;
 	//FlagSet *flagset;
 
 	int autorun;
@@ -110,6 +111,7 @@ public:
 
 	wxStaticText *runtime;
 	wxStaticText *mean;
+	wxStaticText *spikes;
 	wxStaticText *freq;
 	wxStaticText *sd;
 	wxStaticText *runcount;
@@ -117,6 +119,8 @@ public:
 	wxMenu *menuControls;
 	wxMenu *menuModel;
 	wxMenu *menuParamSet;
+	wxMenu *menuData;
+	wxMenu *menuTools;
 	wxMenuBar *menuBar;
 
 	wxButton *runbutton; 
@@ -153,11 +157,15 @@ public:
 	void HistLoad();
 	void OnFlag(wxCommandEvent& event);
 	void OnCheck(wxCommandEvent& event);
+	void OnPanel(wxCommandEvent& event);
 	void SetCheck(wxCheckBox *, bool state);
+	void SetPanel(int, ToolBox *);
 	void OnFocus(wxFocusEvent& event);
 	void SetCount(double);
 	void SetStatus(wxString);
+	void WriteVDU(wxString);
 	void InitMenu();
+    void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
@@ -192,7 +200,35 @@ public:
 	void PageRead(int index, wxString name, wxString path);
 };
 
+
 //	5. OutBox. Use a ParamBox Class and allow history, storing and loading. 
+
+
+class CellBox: public ParamBox
+{
+public:
+	Model *mod;
+	DiagBox *diagbox;
+
+	int neuroindex;
+	int cellcount;
+	SpikeDat *currcell;
+	//NeuroDat *cells;
+	vector<NeuroDat> *cells;
+
+	wxTextCtrl *datneuron;
+	wxSpinButton *datspin;
+
+	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
+	void NeuroData();
+	//void NeuroAnalysis();
+	void PanelData(NeuroDat *);
+	void OnNext(wxSpinEvent& event);
+	void OnPrev(wxSpinEvent& event);
+	void OnEnter(wxCommandEvent& event);
+};
+
+
 class OutBox: public ParamBox
 {
 public:
@@ -200,6 +236,7 @@ public:
 	wxTextCtrl *textbox;
 	TextGrid *textgrid;
 	DiagBox *diagbox;
+	wxNotebook *notebook;
 
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20);
 
@@ -207,6 +244,7 @@ public:
 	virtual void TestGrid();
 	void GridStore();
 	void GridLoad();
+	void GridLoadFast();
 	void OnGridStore(wxCommandEvent& event);
 	void OnGridLoad(wxCommandEvent& event);
 	void HistLoad();
@@ -214,6 +252,7 @@ public:
 	void OnRightClick(wxMouseEvent& event);
 	void OnUndo(wxCommandEvent& event);
 	void OnCopy(wxCommandEvent& event);
+	void OnButton(wxCommandEvent& event);
 	int ColumnData(int, datdouble *);
 };
 

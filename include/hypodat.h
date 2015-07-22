@@ -75,6 +75,7 @@ public:
 	int isicount;
 	int netflag;
 	int type;
+	wxString name;
 	static const int maxtime = 100000;
 	
 	double freq;
@@ -212,13 +213,15 @@ public:
 	datdouble vasomean;
 	datdouble winfreq;
 	//datint autocorr;
-	
 	//double *inputrec;
 	datdouble netinputrec;
 	datdouble raterec;
 	double threshrec[10000];
 	int *rate;
 	int graphindex;
+
+	int normscale;
+	int binsize;
 	
 	int id;
 	int count;
@@ -236,6 +239,7 @@ public:
 	double histquadmode;
 	short freqwindow;
 	int hazquadbins;
+	bool graphs;
 	
 	double memtau, tauHAP, tauAHP, tauDAP;
 	double kHAP, kAHP, kDAP;
@@ -243,7 +247,10 @@ public:
 	MainFrame *mainwin;
 	
 	void datacalc();  // Not doing anything. Probably obsolete?
-	void neurocalc(NeuroDat *datneuron = NULL); // calculate Histograms and Hazard
+	//void neurocalc(NeuroDat *datneuron = NULL); 
+	//void datacalc();
+	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);  // calculate Histograms and Hazard
+	void neurocalcBasic(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
 	void ISIanalysis();
 	//void autocalc();
 	void netneurocalc(int);  // Doing nothing. 
@@ -455,6 +462,7 @@ public:
 	double labelfontsize, tickfontsize;
 	double xunitscale, xunitdscale;
 	int clipmode;
+	bool synchx;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

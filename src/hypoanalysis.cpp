@@ -200,7 +200,7 @@ void SpikeDat::IntraBurstAnalysis()
 	TextFile outfile;
 	wxString filename, filetag, text;
 
-	scandiag = true;
+	scandiag = false;
 
 	if(scandiag) outfile.New("intradat.txt");
 
@@ -753,8 +753,8 @@ void AnaDat::autocalc(SpikeDat *data)
 	fclose(ofp);
 }
 
-// Makes Calculation for histograms and hazard
-void SpikeDat::neurocalc(NeuroDat *datneuron) 
+
+void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams) 
 {
 	int i;
 	int spikestep, binsize;
@@ -775,8 +775,200 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 
 	//maxspikes = 100000;
 
-	calcdiag = true;
-	calcdiag2 = true;
+	calcdiag = false;
+	calcdiag2 = false;
+
+	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
+
+	if(datneuron != NULL) neurodat = 1;
+	
+	for(i=0; i<10000; i++) {
+		hist1.data[i] = 0;
+		hist5.data[i] = 0;
+		haz1.data[i] = 0;	
+		haz5.data[i] = 0;	
+		hist1norm.data[i] = 0;
+		hist5norm.data[i] = 0;
+	}
+
+	for(i=0; i<maxtime; i++) srate.data[i] = 0;
+	for(i=0; i<max1; i++) srate1.data[i] = 0;
+	for(i=0; i<max100; i++) srate100.data[i] = 0;
+
+	hist1.max = 0;
+	hist5.max = 0;
+	hist1norm.max = 0;
+	hist5norm.max = 0;
+	histquad.max = 0;
+	haz1.max = 0;
+	haz5.max = 0;
+	//haz1norm.max = 0;
+	//haz5norm.max = 0;
+	hazquad.max = 0;
+	srate.max = 0;
+	srate1.max = 0;
+	srate100.max = 0;
+
+	mean = 0;
+	variance = 0;
+	norm = 1;
+	binsize = 5;
+
+	if(neurodat) {
+		spikecount = datneuron->spikecount;
+		//isis = datneuron->isis;
+	}
+	stime = start;
+
+	if(calcdiag) fprintf(ofp, "Neuron %d  Spike Count %d\n", neurodat, spikecount);
+		
+	// ISIs, Histogram, Freq, Variance
+
+	isicount = spikecount - 1;
+	if(neurodat) times[0] = datneuron->times[0];
+
+	for(i=0; i<isicount; i++) {                                      // February 2014  interval recode
+		if(i > maxspikes) break;
+		if(neurodat) times[i+1] = datneuron->times[i+1];
+		isis[i] = times[i+1] - times[i];
+		if(hist1.max < (int)isis[i]) hist1.max = (int)isis[i];
+		if(hist1.data.size() < hist1.max + 1) hist1.data.resize(hist1.max + 1);
+		hist1[(int)isis[i]]++;	
+		mean = mean + (double)(isis[i] / isicount);
+		variance = isis[i] * isis[i] / isicount + variance;
+		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
+	}
+
+	isisd = sqrt(variance - mean * mean);
+	freq = 1000/mean;
+	if(mean == 0) freq = 0;
+	meanisi = mean;
+	isivar = variance;
+
+	if(calcdiag) fprintf(ofp, "Freq %.2fHz  Hist1 max %d  Hist1 500 %.2f\n\n", freq, hist1.max, hist1.data[500]);
+  
+	if(neurodat) {
+		datneuron->freq = freq;
+		datneuron->meanisi = mean;
+		datneuron->isivar = isisd;
+		datneuron->netflag = 0;
+	}
+
+
+	// Rate Count (1s)
+
+	//if(calcdiag) fprintf(ofp, "Rate count  last spike at %.2fs.\n", times[spikecount-1]/1000);
+	
+	spikestep = 0;
+	srate.max = (int)(times[spikecount-1]/1000 + 0.5); 
+	for(i=0; i<times[spikecount-1]/1000; i++) {	     // spike rate count (1s)
+		if(calcdiag) fprintf(ofp, "%ds. ", i);
+		if(spikestep > spikecount) {
+			//if(calcdiag) fprintf(ofp, "break spikestep %d  spikecount %d\n", spikestep, spikecount);
+			break;
+		}
+		while(times[spikestep]/1000 < i+1) {
+			if(calcdiag) fprintf(ofp, "spike %d  ", spikestep);
+			if(i < maxtime) srate.data[i]++;
+			spikestep++;
+			if(spikestep >= spikecount) break;
+		}
+    //if(calcdiag) fprintf(ofp, "srate %d\n", srate.data[i]);
+	}
+
+	//if(calcdiag) fprintf(ofp, "Rate count end  spikestep %d  spikecount %d\n", spikestep, spikecount);
+
+	srate1.max = (int)(times[spikecount-1] + 0.5);
+	srate100.max = (int)(times[spikecount-1]/100 + 0.5);
+
+	for(i=0; i<spikecount; i++) {
+		if(times[i] < 1000000) srate1[(int)(times[i] + 0.5)]++;            // spike rate count (1ms)
+		if(times[i]/100 < 100000) srate100[(int)(times[i]/100 + 0.5)]++;
+		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
+	}
+
+	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d \n", i, times[i], (int)(times[i]+0.5)));
+	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
+
+	if(times[spikecount] > 1000) srate1.max = srate1.data.size();
+
+
+	if(calcdiag) fclose(ofp);
+
+	if(calcdiag2) {
+		ofp = fopen("net-g18.txt", "w");
+		fprintf(ofp, "Numspikes = %d\n\n", spikecount);
+		for(i=0; i<5000; i++)
+			fprintf(ofp, "%d time %.8f int %.4f\n", i, times[i], isis[i]); 
+		fclose(ofp);
+
+		ofp = fopen("net-rate1.txt", "w");
+		fprintf(ofp, "Numspikes = %d\n\n", spikecount);
+		fprintf(ofp, "max = %d\n\n", srate.max);
+		for(i=0; i<2000; i++)
+			fprintf(ofp, "%d ms, %d spikes\n", i, srate1.data[i]); 
+		fclose(ofp);
+	}
+
+	// Hazard
+	
+	hazcount = 0;
+	haznorm = 10/freq;
+	haz1.max = hist1.max;
+	if(haz1.data.size() < haz1.max + 1) haz1.data.resize(haz1.max + 1);
+
+  for(i=0; i<=hist1.max; i++) {        // 1ms Hazard
+    haz1.data[i] = hist1.data[i] / (spikecount - hazcount); //   / freq;		
+    hazcount = hazcount + hist1.data[i];
+	}
+
+  for(i=0; i<hist1.max; i++) {      // 5ms Hazard                                               
+		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
+		if(i/binsize > haz5.max) haz5.max = i/binsize;
+		if(haz5.data.size() < haz5.max + 1)	haz5.data.resize(haz5.max + 1);
+		haz5.data[i/binsize] = haz5.data[i/binsize] + haz1.data[i]; // * haznorm;	
+	}
+
+	for(i=0; i<=hist1.max; i++) {         // 5ms ISI Histogram
+		if(i/binsize > hist5.max) hist5.max = i/binsize;
+		if(hist5.data.size() < hist5.max + 1)	hist5.data.resize(hist5.max + 1);
+		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
+	}
+
+	
+	// Normalise
+	for(i=0; i<=hist1.max; i++) {
+		hist1norm[i] = normscale * hist1[i] / isicount;
+		hist5norm[i] = normscale * hist5[i] / isicount;
+	}	
+}
+
+
+// Makes Calculation for histograms and hazard
+
+void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams) 
+{
+	int i;
+	int spikestep, binsize;
+	int neurodat = 0;
+	//int maxspikes = 100000;
+	int maxtime = 100000;
+	int max1 = 1000000;
+	int max100 = 100000;
+	double hazcount;
+	double mean, variance;
+	double norm, haznorm;
+	double stime;
+	wxString text;
+	bool spikediag = false; 
+	//short freqwindow = 300;
+	bool calcdiag, calcdiag2;
+	FILE *ofp;
+
+	//maxspikes = 100000;
+
+	calcdiag = false;
+	calcdiag2 = false;
 
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
 
@@ -1143,14 +1335,11 @@ void SpikeDat::neurocalc(NeuroDat *datneuron)
 		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
 	}
 
-	int normscale = 10000;
-
 	// Normalise
 	for(i=0; i<=hist1.max; i++) {
 		hist1norm[i] = normscale * hist1[i] / isicount;
 		hist5norm[i] = normscale * hist5[i] / isicount;
 	}
-	
 }
 
 
@@ -1223,10 +1412,19 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
 	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
 
-	//graphbase->Add(GraphDat(&vasoneurodata->Ca, 0, 500, 0, 500, "Vaso Net Ca", 4, 1, lightgreen, 1000/datsample), "vasonetCa");
+	//(*graphbase)[reftag + "rate1s"]->synchx = false;
+	(*graphbase)[reftag + "spikes1ms"]->synchx = false;
+	(*graphbase)[reftag + "hist1ms"]->synchx = false;
+	(*graphbase)[reftag + "hist5ms"]->synchx = false;
+	(*graphbase)[reftag + "haz1ms"]->synchx = false;
+	(*graphbase)[reftag + "haz5ms"]->synchx = false;
+	(*graphbase)[reftag + "normhist1ms"]->synchx = false;
+	(*graphbase)[reftag + "normhist5ms"]->synchx = false;
 
 	graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
+	graphs = true;
+
 	return setindex;
 }
 
@@ -1253,6 +1451,8 @@ int SpikeDat::GraphSetLysis(GraphBase *graphbase, wxString tag, int colour, int 
 
 	graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
+	graphs = true;
+
 	return setindex;
 }
 

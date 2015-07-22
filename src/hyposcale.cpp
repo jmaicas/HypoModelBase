@@ -1,7 +1,7 @@
 
 #include <hypomodel.h>
 #include <hypograph.h>
-#include <hypodef.h>
+#include "hypodef.h"
 
 
 
@@ -71,6 +71,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	xmax = 1000000;
 	ymin = -1000000;
 	ymax = 1000000;
+
+	overpan1 = 1;
+	overpan2 = 2;
 
 	backgroundcolour = GetBackgroundColour();
 	SetBackgroundColour(backgroundcolour);
@@ -302,6 +305,22 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
 
+		/*if(boxtype == modPlot) {
+			if(i == 0) {
+				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+
+				if(ostype == Mac) {
+					ScaleButton(ID_spikes, "Sp", 40, resbox);   
+					ScaleButton(ID_rateres, "Ra", 40, resbox); 
+				}
+				else {
+					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
+					resbox->AddSpacer(2);
+					ScaleButton(ID_rateres, "Rate", 37, resbox); 
+				}
+				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}*/
+
 			if(i == 1) {
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
@@ -345,7 +364,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				ScaleButton(ID_rateres, "Ra", buttonsize, resbox); 
 				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
-
+			
 			if(i == 1) {
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
@@ -443,6 +462,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 	//gmod->GHistLoad();
 
+	
 	dispmod = mod->modtype;
 	mod->GHistLoad(gstag);
 	GraphSwitch(0);
@@ -503,7 +523,7 @@ void ScaleBox::OnConFocus(wxFocusEvent& event)
 	int id = event.GetId();
 	TextBox *con = (TextBox *)FindWindowById(id); 
 
-	con->SetFocus();
+	//con->SetFocus();
 	synchcon = con->val;
 	//if(mainwin->diagnostic) gmod->diagbox->textbox->AppendText(text.Format("con click %d\n", con->val));
 	mainwin->diagbox->Write(text.Format("con click %d\n", con->val));
@@ -1241,6 +1261,7 @@ void ScaleBox::XSynch(int pos)
 {
 	if(gsynch) {
 		GraphDat *graph0 = graphwin[synchcon]->graphset[0]->plot[0];
+		if(!graph0->synchx) return;
 		for(i=startgraph; i<startgraph+numgraphs; i++) {
 			if(gsync[i] && !gsync[i]->GetValue()) {
 				//mainwin->diagbox->Write(text.Format("Sync break pos %d\n", i));
@@ -1248,6 +1269,7 @@ void ScaleBox::XSynch(int pos)
 			}
 			//mainwin->diagbox->Write(text.Format("Sync go pos %d\n", i));
 			graph = graphwin[i]->graphset[0]->plot[0];
+			if(!graph->synchx) continue;
 			if(pos >= 0) graph->scrollpos = pos;
 			graph->xfrom = graph0->xfrom;
 			graph->xto = graph0->xto;
@@ -1291,7 +1313,6 @@ void ScaleBox::ScaleUpdate()
 	PanelUpdate();
 	GraphUpdate();
 }
-
 
 
 void ScaleBox::PanelUpdate()
@@ -1349,9 +1370,10 @@ void ScaleBox::PanelUpdate()
 
 void ScaleBox::OnOverlay(wxCommandEvent& WXUNUSED(event))
 {
-	short pan1 = 1;  // 1
-	short pan2 = 2;  // 2
+	short pan1 = overpan1;  // 1
+	short pan2 = overpan2;  // 2
 	//if(boxtype = modHeat) {pan1 = 0; pan2 = 1;}
+	//if(boxtype = modOxy) {pan1 = 2; pan2 = 3;}
 
 	if(!overtog) {	
 		graphdisp *pos = graphwin[pan1]->graphset[0];
@@ -1374,41 +1396,17 @@ void ScaleBox::OnOverlay(wxCommandEvent& WXUNUSED(event))
 }
 
 
-/*
-void ScaleBox::OnOverlay(wxCommandEvent& WXUNUSED(event))
-{
-if(!overtog) {
-graph = gpos[1].plot[0];
-gpos[2].Add(graph);
-gpos[1].numplots--;
-graph->yto = gpos[2].plot[0]->yto;
-graph->yfrom = gpos[2].plot[0]->yfrom;
-graph->xto = gpos[2].plot[0]->xto;
-graph->xfrom = gpos[2].plot[0]->xfrom;
-}
-else {
-gpos[2].numplots--;
-gpos[1].Add(gpos[2].plot[gpos[2].numplots]);	
-}	
-overtog = 1 - overtog;
-snum.Printf("overlay = %d", overtog);
-mainwin->SetStatusText(snum);
-UpdateScale();
-GraphUpdate();
-}*/
-
-
 void ScaleBox::OnPosition(wxCommandEvent& WXUNUSED(event))
 {
-	if(graphwin[1]->numgraphs > 1) {
-		graphdisp *pos = graphwin[1]->graphset[0];
-		graphwin[1]->graphset[0] = graphwin[1]->graphset[1];
+	if(graphwin[overpan1]->numgraphs > 1) {
+		graphdisp *pos = graphwin[overpan1]->graphset[0];
+		graphwin[overpan1]->graphset[0] = graphwin[overpan1]->graphset[1];
 		graphwin[1]->graphset[1] = pos;
 	}
-	if(graphwin[2]->numgraphs > 1) {
-		graphdisp *pos = graphwin[2]->graphset[0];
-		graphwin[2]->graphset[0] = graphwin[2]->graphset[1];
-		graphwin[2]->graphset[1] = pos;
+	if(graphwin[overpan2]->numgraphs > 1) {
+		graphdisp *pos = graphwin[overpan2]->graphset[0];
+		graphwin[overpan2]->graphset[0] = graphwin[overpan2]->graphset[1];
+		graphwin[overpan2]->graphset[1] = pos;
 	}
 	if(gpos[3].numplots > 1) {
 		graph = gpos[3].plot[0];

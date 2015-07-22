@@ -63,7 +63,7 @@ public:
 	//wxString colourstring[10];
 	wxBufferedPaintDC *dc;
 
-	wxMenu *menuPlot;
+	//wxMenu *menuPlot;
 
 	// Selection Overlay
 	bool selectband;
@@ -198,6 +198,7 @@ public:
 	int synchcon;
 
 	int xmin, xmax, ymin, ymax;
+	int overpan1, overpan2;
 
 	wxString snum, redtag, text;
 	wxFont boxfont, confont;

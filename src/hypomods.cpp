@@ -21,6 +21,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	graphbase->mainwin = mainwin;
 	modeflags = new ParamStore();
 	scalebox = mainwin->scalebox;
+	diagbox = mainwin->diagbox;
 
 	ostype = GetSystem();
 	graphload = true;
@@ -29,6 +30,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	storesize = 100000;
 	xmin = -100000;
 	path = "";
+	oldhist = true;
 }
 
 
@@ -36,6 +38,28 @@ Model::~Model()
 {
 	delete graphbase;
 	delete modeflags;
+}
+
+
+void Model::GSwitch(graphdisp *gpos, ParamStore *gflags)
+{
+	int i, gdex;
+	GraphSet *graphset;
+	wxString text;
+
+	mainwin->diagbox->Write("GSwitch call\n");
+
+	if(gsmode == 1) {
+		for(i=0; i<gcount; i++) {
+			graphset = graphbase->GetSet(gcodes[i]);
+			if(graphset) gdex = graphset->GetPlot(gflags);
+			else continue;
+			if(diagbox) diagbox->textbox->AppendText(text.Format("gpos %d   gcode %s   set %s   plot %d   modesum %d   sdex %d  sync %d\n", 
+				i, gcodes[i], graphset->tag, gdex, graphset->modesum, graphset->sdex, (*graphbase)[gdex]->synchx));
+			gpos[i].Front((*graphbase)[gdex]);
+			gpos[i].sdex = graphset->sdex;
+		}
+	}
 }
 
 
@@ -238,9 +262,6 @@ void Model::ModStore()
 
 	TextFile outfile, opfile;
 
-	//if(path == "") filepath = "Init";
-	//else filepath = path;
-	//if(!wxDirExists(filepath)) wxMkdir(filepath);
 	filepath = GetPath();
 
 	// Default Parameters
@@ -250,19 +271,22 @@ void Model::ModStore()
   //modbox->StoreParam("default");
 
 	// Parameter history
-	filename = modname + "prefs.ini";
-	initparams = modbox->paramstoretag->GetValue();
 
-	//wxTextFile opfile("Init//" + filename);
-	//if(!opfile.Exists()) opfile.Create();
+	if(oldhist) {
+		filename = modname + "prefs.ini";
+		initparams = modbox->paramstoretag->GetValue();
 
-	opfile.New(filepath + "/" + filename);
+		//wxTextFile opfile("Init//" + filename);
+		//if(!opfile.Exists()) opfile.Create();
 
-	for(i=modbox->paramstoretag->GetCount()-1; i>=0; i--) {
-		outline.Printf("initparams %s", modbox->paramstoretag->GetString(i));
-		opfile.WriteLine(outline);
+		opfile.New(filepath + "/" + filename);
+
+		for(i=modbox->paramstoretag->GetCount()-1; i>=0; i--) {
+			outline.Printf("initparams %s", modbox->paramstoretag->GetString(i));
+			opfile.WriteLine(outline);
+		}
+		opfile.Close();
 	}
-	opfile.Close();
 
 	// box store
 	filename = modname + "box.ini";
@@ -270,8 +294,9 @@ void Model::ModStore()
 	
 	for(i=0; i<modtools.numtools; i++)
 		if(modtools.box[i]) {
-			outfile.WriteLine(text.Format("%d %d %d %d %d %d", i, 
-			modtools.box[i]->mpos.x, modtools.box[i]->mpos.y, modtools.box[i]->boxsize.x, modtools.box[i]->boxsize.y, modtools.box[i]->IsVisible()));
+			outfile.WriteLine(text.Format("%d %d %d %d %d %d %s", i, 
+			modtools.box[i]->mpos.x, modtools.box[i]->mpos.y, modtools.box[i]->boxsize.x, modtools.box[i]->boxsize.y, 
+			modtools.box[i]->IsVisible(), modtools.box[i]->boxname));
 		}
 	outfile.Close();
 }
@@ -289,26 +314,32 @@ void Model::ModLoad()
 	wxPoint pos;
   wxSize size;
 
+	diagbox->Write("ModLoad....\n");
+
 	filepath = GetPath();
 
 	// parameter history load                       // Redundant, leave in for updating old models
-	if(!modbox->paramstoretag->labelset) {
-		filename = modname + "prefs.ini";
-		check = opfile.Open(filepath + "/" + filename);
-		if(!check) return;
+	if(oldhist) {
+		if(!modbox->paramstoretag->labelset) {
+			filename = modname + "prefs.ini";
+			check = opfile.Open(filepath + "/" + filename);
+			if(!check) return;
 
-		readline = opfile.ReadLine();
-		while(!readline.IsEmpty()) {
-			readline = readline.AfterFirst(' ');
-			readline.Trim();
-			initparams = readline;
-			modbox->paramstoretag->Insert(initparams, 0);
-	
 			readline = opfile.ReadLine();
+			while(!readline.IsEmpty()) {
+				readline = readline.AfterFirst(' ');
+				readline.Trim();
+				initparams = readline;
+				modbox->paramstoretag->Insert(initparams, 0);
+	
+				readline = opfile.ReadLine();
+			}
+			opfile.Close();	
+			modbox->paramstoretag->SetLabel(initparams);
 		}
-		opfile.Close();	
-		modbox->paramstoretag->SetLabel(initparams);
 	}
+
+	diagbox->Write("ModLoad history ok, reading boxes...\n");
 
 	// Box Load
 	filename = modname + "box.ini";
@@ -339,6 +370,8 @@ void Model::ModLoad()
 		//tofp.WriteLine(readline);
 	}
 	infile.Close();
+
+	diagbox->Write("ModLoad....OK\n");
 }
 
 

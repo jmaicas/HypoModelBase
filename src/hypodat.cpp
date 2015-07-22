@@ -152,7 +152,9 @@ SpikeDat::SpikeDat()
 	start = 0;
 	freqwindow = 100;
 	maxspikes = 100000;
+	normscale = 10000;
 	mainwin = NULL;
+	graphs = false;
 }
 
 
@@ -567,6 +569,7 @@ void GraphDat::Init()
 	labelfontsize = 10;
 	tickfontsize = 10;
 	clipmode = 0;
+	synchx = true;
 }
 
 
@@ -825,7 +828,8 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 
 		if(version >= 2) {                                                  // Modern, reference by tag
 			gtag = ParseString(&readline, 'g');
-			GetGraph(gtag)->LoadDat(readline, version);
+			graph = GetGraph(gtag);
+			if(graph) graph->LoadDat(readline, version);
 		}
 		else {
 			//GetGraphFromName(gname)->LoadDat(readline, version);              // Should add code to chop off any tag first

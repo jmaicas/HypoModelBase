@@ -2,6 +2,7 @@
 
 #include "hypodat.h"
 #include "hypopanels.h"
+#include <cmath>
 
 
 // SpikeDat:FitScore. It shows how much it fits with diferent values for bin?
