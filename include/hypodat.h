@@ -48,6 +48,7 @@ class NeuroDat{
 public:
 	double times[100000];
 	short srate[100000];
+	int srate10[100000];
 	int count;
 	int spikecount;
 	int isicount;
@@ -55,6 +56,7 @@ public:
 	int type;
 	wxString name;
 	static const int maxtime = 100000;
+	static const int maxspikes = 100000;
 	
 	double freq;
 	double meanisi;
@@ -62,6 +64,7 @@ public:
 	
 	//void neurocalc();
 	void ratecalc();
+	void ratereset();
 };
 
 
@@ -179,6 +182,7 @@ public:
 	datint srate1;
 	datint srate100;
 	datint srate10;
+	datint srate10s;
 	datdouble synsim;
 	datdouble vasomean;
 	datdouble winfreq;

@@ -4,6 +4,18 @@
 #include <hypotools.h>
 
 
+
+void NeuroDat::ratereset()
+{
+	int i;
+
+	for(i=0; i<maxtime; i++) {
+		srate[i] = 0;
+		srate10[i] = 0;
+	}
+}
+
+
 void NeuroDat::ratecalc()
 {
 	short spikestep;
@@ -120,14 +132,18 @@ SpikeDat::SpikeDat()
 
 	srate.setsize(100000);
 	srate1.setsize(1000000);
+	srate10.setsize(100000);
 	srate100.setsize(100000);
+	srate10s.setsize(100000);
 
 	synsim.data.resize(1000100);
 	synsim.max = 1000000;
 
-	times.data.resize(100000);
+	maxspikes = 100000;
+
+	times.data.resize(maxspikes);
 	times.max = 100000;
-	isis.data.resize(100000);
+	isis.data.resize(maxspikes);
 	isis.max = 100000;
 	winfreq.data.resize(11000);
 	winfreq.max = 10000;
@@ -143,7 +159,6 @@ SpikeDat::SpikeDat()
 	spikecount = 0;
 	start = 0;
 	freqwindow = 100;
-	maxspikes = 100000;
 	normscale = 10000;
 	mainwin = NULL;
 	graphs = false;

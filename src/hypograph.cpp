@@ -962,6 +962,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
 				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
 
+				res = 0;
 				if(binsize == 1) res = 0;
 				if(binsize == 0.1) res = 1;
 				if(binsize == 0.01) res = 2;
@@ -979,7 +980,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				else {                  // burst colouring
 					burstcolour = 0;
 					//fprintf(ofp, "spikedisp 1\n");
-					if(res > 0 && res < 3) {
+					if(binsize == 0.1 || binsize == 0.01) {
 						burstcolour = 0;
 						//opfile.WriteLine("sub res");
 						//if(burstdata[res][(i + (int)xfrom)] == 0) dc.SetPen(colourpen[red]);
@@ -987,7 +988,17 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 						//else if(burstdata[res][(i + (int)xfrom)] % 2 == 1) dc.SetPen(colourpen[green]);
 					}
 
-					if(res == 0) {
+					if(binsize == 10) {
+						timepoint = (xfrom + i + 1) * binsize * 1000;
+						while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
+							//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
+							if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
+							spikestep++;
+						}
+					}
+
+					if(binsize == 1) {
 						//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
 						timepoint = (xfrom + i + 1) * binsize * 1000;
 						while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
@@ -1003,7 +1014,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 						//opfile.WriteLine(text.Format("i %d  spike %d  burstcolour %d\n", i, spikestep, burstcolour));
 					}
 
-					if(res == 3) {
+					if(binsize == 0.001) {
 						//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
 						timepoint = (xfrom + i) * binsize * 1000;
 						while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
