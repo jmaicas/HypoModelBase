@@ -13,6 +13,7 @@ void NeuroDat::ratereset()
 		srate[i] = 0;
 		srate10[i] = 0;
 	}
+	for(i=0; i<10000; i++) srate100[i] = 0;
 }
 
 
@@ -135,7 +136,7 @@ SpikeDat::SpikeDat()
 	srate10.setsize(100000);
 	srate100.setsize(100000);
 	srate10s.setsize(100000);
-	srate100s.setsize(10000);
+	srate100s.setsize(100000);
 
 	synsim.data.resize(1000100);
 	synsim.max = 1000000;

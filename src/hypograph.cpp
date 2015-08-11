@@ -988,7 +988,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 						//else if(burstdata[res][(i + (int)xfrom)] % 2 == 1) dc.SetPen(colourpen[green]);
 					}
 
-					if(binsize == 10) {
+					if(binsize == 10 || binsize == 100) {
 						timepoint = (xfrom + i + 1) * binsize * 1000;
 						while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
 							//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
