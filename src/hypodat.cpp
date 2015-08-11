@@ -135,6 +135,7 @@ SpikeDat::SpikeDat()
 	srate10.setsize(100000);
 	srate100.setsize(100000);
 	srate10s.setsize(100000);
+	srate100s.setsize(10000);
 
 	synsim.data.resize(1000100);
 	synsim.max = 1000000;

@@ -990,6 +990,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		srate10.data[i] = 0;
 		srate100.data[i] = 0;
 		srate10s.data[i] = 0;
+		srate100s.data[i] = 0;
 	}
 
 	hist1.max = 0;
@@ -1182,18 +1183,21 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	srate10.max = (int)(times[spikecount-1]/10 + 0.5);
 	srate100.max = (int)(times[spikecount-1]/100 + 0.5);
 	srate10s.max = (int)(times[spikecount-1]/10000 + 0.5);
+	srate100s.max = (int)(times[spikecount-1]/100000 + 0.5);
 
 	for(i=0; i<spikecount; i++) {
 		if(times[i] < 1000000) srate1[(int)(times[i] + 0.5)]++;            // spike rate count (1ms)
 		if(times[i]/10 < 100000) srate10[(int)(times[i]/10 + 0.5)]++;
 		if(times[i]/100 < 100000) srate100[(int)(times[i]/100 + 0.5)]++;
 		if(times[i]/10000 < 100000) srate10s[(int)(times[i] + 0.5)/10000]++;
+		if(times[i]/100000 < 100000) srate100s[(int)(times[i] + 0.5)/100000]++;
 		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
 		//if(mainwin) mainwin->diagbox->Write(text.Format("srate10s i=%d time %.2f bin %d\n", i, times[i], (int)(times[i]+0.5)/10000));
 	}
 
 	if(neurodat) {
 		for(i=0; i<100000; i++)	srate10s[i] = datneuron->srate10[i];
+		for(i=0; i<10000; i++)	srate100s[i] = datneuron->srate100[i];
 	}
 
 	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d \n", i, times[i], (int)(times[i]+0.5)));
@@ -1312,6 +1316,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	//graphbase->NewSet(tag, reftag);
 
 	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
+	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 10, red + shift), reftag + "rate100s", reftag);
 	graphbase->Add(GraphDat(&srate10s, 0, 500, 0, 200, tag + "Spike Rate 10s", this, 10, red + shift), reftag + "rate10s", reftag);
 	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spike Rate 100ms", this, 0.1, red + shift), reftag + "rate100ms", reftag);
 	graphbase->Add(GraphDat(&srate10, 0, 5, 0, 20, tag + "Spike Rate 10ms", this, 0.1, red + shift), reftag + "rate10ms", reftag);

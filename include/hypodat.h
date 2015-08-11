@@ -49,6 +49,7 @@ public:
 	double times[100000];
 	short srate[100000];
 	int srate10[100000];
+	int srate100[10000];
 	int count;
 	int spikecount;
 	int isicount;
@@ -183,6 +184,7 @@ public:
 	datint srate100;
 	datint srate10;
 	datint srate10s;
+	datint srate100s;
 	datdouble synsim;
 	datdouble vasomean;
 	datdouble winfreq;
