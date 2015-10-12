@@ -6,16 +6,16 @@
 
 
 ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size)
-: ParamBox(model, title, pos, size, "PROTO", 1)
+	: ParamBox(model, title, pos, size, "PROTO", 1)
 {
 	int artnum, antinum, inpnum, rampnum;
-  int numwidth;
+	int numwidth;
 	boxname = "PROTO";
 
 	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
 	wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
-	
-    ToolPanel *antipanel = new ToolPanel(mainwin, tabpanel);
+
+	ToolPanel *antipanel = new ToolPanel(mainwin, tabpanel);
 	antipanel->SetFont(boxfont);
 	wxBoxSizer *antibox = new wxBoxSizer(wxVERTICAL);
 	antipanel->SetSizer(antibox);
@@ -28,13 +28,13 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	wxStaticBoxSizer *artspikebox = new wxStaticBoxSizer(wxVERTICAL, antipanel, "Artificial Burst");
 	wxStaticBoxSizer *antispikebox = new wxStaticBoxSizer(wxVERTICAL, antipanel, "Antidromic Stim");
 
-	
+
 	// Artificial Spike Panel
 
 	activepanel = antipanel;
 	paramset->panel = activepanel;
-  labelwidth = 50;
-  numwidth = 40;
+	labelwidth = 50;
+	numwidth = 40;
 	paramset->AddNum("artfreq", "Freq", 4, 0, labelwidth, numwidth); 
 	paramset->AddNum("artburst", "Burst", 100, 0, labelwidth, numwidth); 
 	paramset->AddNum("artsilence", "Silence", 50, 0, labelwidth, numwidth); 
@@ -80,9 +80,9 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 
 	activepanel = synpanel;
 	paramset->panel = activepanel;
-  labelwidth = 50;
-  numwidth = 40;
-	
+	labelwidth = 50;
+	numwidth = 40;
+
 	paramset->AddNum("synstart", "Start", 0, 0, labelwidth, numwidth); 
 	paramset->AddNum("synfreq", "Freq", 20, 0, labelwidth, numwidth); 
 	paramset->AddNum("syncount", "Spikes", 4, 0, labelwidth, numwidth); 
@@ -141,7 +141,7 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	activepanel = osmopanel;
 	paramset->panel = activepanel;
 	labelwidth = 60;
-    numwidth = 55;
+	numwidth = 55;
 
 	paramset->AddNum("injecttime", "Inject Time", 1000, 0, labelwidth, numwidth); 
 	paramset->AddNum("injectstep", "Inject Step", 20, 2, labelwidth, numwidth); 
@@ -174,15 +174,15 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	osmopanel->Layout();
 
 
-	
-	
+
+
 	// Input Panel
 
 	activepanel = inputpanel;
 	paramset->panel = activepanel;
 
 	labelwidth = 50;
-    numwidth = 45;
+	numwidth = 45;
 
 	paramset->AddNum("baseval", "Start", 200, 0, labelwidth, numwidth); 
 	paramset->AddNum("stepval", "Step", 10, 0, labelwidth, numwidth); 
@@ -196,7 +196,7 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 		//artspikebox->AddSpacer(2);
 	}
 	wxBoxSizer *inputrunbox = new wxBoxSizer(wxHORIZONTAL);
-	
+
 	inputrunbox->Add(TextLabel("Input"), 1, wxALIGN_CENTRE);
 	currentinput = NumPanel(40, wxALIGN_CENTRE, "---"); 
 	inputrunbox->AddSpacer(10);
@@ -220,7 +220,7 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	}
 	rampbox->AddSpacer(10);
 	AddButton(ID_RunRamp, "Run", 50, rampbox);
-	
+
 	wxBoxSizer *inputparambox = new wxBoxSizer(wxHORIZONTAL);
 	inputparambox->Add(inputrangebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 5);
 	inputparambox->AddStretchSpacer();
@@ -249,8 +249,8 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 
 	activepanel = storepanel;
 	wxSizer *paramfilebox = StoreBox("ns1", storepanel);
-	
-  status = NumPanel(150, wxALIGN_RIGHT, "");
+
+	status = NumPanel(150, wxALIGN_RIGHT, "");
 
 	storesizer->Add(status, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);	
 	storesizer->Add(paramfilebox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);	
@@ -286,5 +286,5 @@ void ProtocolBox::OnRun(wxCommandEvent& event)
 	if(event.GetId() == ID_RunSynRate) (*(mod->modeflags))["prototype"] = synrate;
 	if(event.GetId() == ID_RunRamp) (*(mod->modeflags))["prototype"] = ramp;
 
-  mod->RunModel();
+	mod->RunModel();
 } 
