@@ -4,6 +4,13 @@
 #include <hypotools.h>
 
 
+NeuroDat::NeuroDat()
+{
+	times = new double[maxspikes];
+	srate = new int[maxtime];
+	srate10 = new int[maxtime];
+}
+
 
 void NeuroDat::ratereset()
 {

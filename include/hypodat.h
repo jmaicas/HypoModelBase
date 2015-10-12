@@ -46,9 +46,9 @@ public:
 
 class NeuroDat{
 public:
-	double times[100000];
-	short srate[100000];
-	int srate10[100000];
+	double *times;
+	int *srate;
+	int *srate10;
 	int srate100[10000];
 	int count;
 	int spikecount;
@@ -63,7 +63,7 @@ public:
 	double meanisi;
 	double isivar;
 	
-	//void neurocalc();
+	NeuroDat();
 	void ratecalc();
 	void ratereset();
 };
