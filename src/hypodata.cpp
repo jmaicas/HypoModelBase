@@ -26,6 +26,8 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	cellcount = 0;
 
 	paramset->AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
+	paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
+	//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
 	ParamLayout(1);
 
 	datwidth = 50;
@@ -62,12 +64,17 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	databox->AddSpacer(5);
 	databox->Add(datagrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 
-	mainbox->AddStretchSpacer();
-	mainbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	mainbox->AddStretchSpacer();
-	mainbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	mainbox->AddStretchSpacer();
+	wxBoxSizer *colbox = new wxBoxSizer(wxHORIZONTAL); 
+	//colbox->AddStretchSpacer();
+	colbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	colbox->AddSpacer(10);
+	colbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//colbox->AddStretchSpacer();
 
+	mainbox->AddStretchSpacer();
+	mainbox->Add(colbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	mainbox->AddStretchSpacer();
+	
 	panel->Layout();
 
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(CellBox::OnEnter));
