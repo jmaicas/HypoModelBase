@@ -840,6 +840,7 @@ void HypoMain::OnOptionPanel(wxCommandEvent& event)
     //if(event.GetId() == ID_IGFPanel) {}
     OptionPanel *optionpanel = new OptionPanel(this, "System Panel");
     optionpanel->Show(true);
+		OptionStore();
 }
 
 
