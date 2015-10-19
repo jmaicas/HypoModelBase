@@ -54,6 +54,8 @@ public:
 	wxString gcodes[10];
 	ScaleBox *scalebox;
 
+	DatStore *recdata;
+
 	Model(short, wxString, HypoMain *);
 	virtual ~Model();
 

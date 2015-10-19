@@ -506,7 +506,7 @@ public:
 	unsigned long size() {
 		return store.size();
 	}
-	void add(wxString tag, int xscale, int size) {
+	void Add(wxString tag, int xscale, int size) {
 		for(unsigned long i=0; i<store.size(); i++) 
 			if(store[i].tag == tag) return;                 
 		DatData dat;
