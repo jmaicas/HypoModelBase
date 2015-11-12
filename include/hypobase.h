@@ -653,6 +653,14 @@ public:
 };
 
 
+class NetCon{
+public:
+	int con;
+	int type;
+
+	NetCon() { type = 1; };
+};
+
 
 // Interface
 
