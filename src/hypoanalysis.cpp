@@ -1269,6 +1269,209 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		hist1norm[i] = normscale * hist1[i] / isicount;
 		hist5norm[i] = normscale * hist5[i] / isicount;
 	}
+
+
+	// Index of Dispersion Code
+
+	/*
+	IoDDat IoD_05(500, this);
+	IoD_05.dispcalc();
+
+	IoDDat IoD_1(1000, this);
+	IoD_1.dispcalc();
+
+	IoDDat IoD_2(2000, this);
+	IoD_2.dispcalc();
+
+	IoDDat IoD_4(4000, this);
+	IoD_4.dispcalc();
+
+	IoDDat IoD_6(6000, this);
+	IoD_6.dispcalc();
+
+	IoDDat IoD_8(8000, this);
+	IoD_8.dispcalc();
+
+	IoDDat IoD_10(10000, this);
+	IoD_10.dispcalc();*/
+
+	double dispersion05 = dispcalc(500);
+	double dispersion1 = dispcalc(1000);
+	double dispersion2 = dispcalc(2000);
+	double dispersion4 = dispcalc(4000);
+	double dispersion6 = dispcalc(6000);
+	double dispersion8 = dispcalc(8000);
+	double dispersion10 = dispcalc(10000);
+
+	/*
+
+	for(i=0; i<100000; i++) {
+		spikerate05.data[i] = 0;
+		spikerate1.data[i] = 0;
+		spikerate2.data[i] = 0;
+		spikerate4.data[i] = 0;
+	}
+
+	for(i=0; i<spikecount; i++) {
+		spikerate05[(int)(times[i])/500]++;  // 0.5 second BIN
+		spikerate1[(int)(times[i])/1000]++;  
+		spikerate2[(int)(times[i])/2000]++;  
+		spikerate4[(int)(times[i])/4000]++;  
+		spikerate6[(int)(times[i])/6000]++;  
+		spikerate8[(int)(times[i])/8000]++;  
+		spikerate10[(int)(times[i])/10000]++; // 10 seconds BIN		
+	}
+	double laststep05, laststep1, laststep2, laststep4, laststep6, laststep8, laststep10;
+	laststep05 =  ((int)(times[spikecount-1])/500)-4;
+	laststep1 =  ((int)(times[spikecount-1])/1000)-4;
+	laststep2 =  ((int)(times[spikecount-1])/2000)-4;
+	laststep4 =  ((int)(times[spikecount-1])/4000)-4;
+	laststep6 =  ((int)(times[spikecount-1])/6000)-4;
+	laststep8 =  ((int)(times[spikecount-1])/8000)-4;
+	laststep10 =  ((int)(times[spikecount-1])/10000)-4;
+	// **************** 0.5 sec **************************
+	double mean05, variance05, temp05, dispersion05; 
+	mean05 = variance05 = temp05 = dispersion05 = 0.0;
+	for (int a=0; a<laststep05;  a++) mean05 = mean05 +  spikerate05[a]; //mean
+	mean05 = mean05/laststep05;
+	//mainwin->diagbox->Write(text.Format("En Hypoanalysis -> %.4f Number of elements-> %d \n", mean05, (int)(times[spikecount])/500-4));
+	for(double a=0; a<laststep05;a++) temp05 += (mean05-spikerate05[a])*(mean05-spikerate05[a]); // variance
+	variance05 = temp05/laststep05;
+	//mainwin->diagbox->Write(text.Format("En Hypoanalysis Variance05-> %.4f Number of elements-> %d \n", variance05, (int)(times[spikecount])/500-4));
+	dispersion05 = variance05/mean05; // dispersion
+	// **************** 1 sec **************************
+	double mean1, variance1, temp1, dispersion1; 
+	mean1 = variance1 = temp1 = dispersion1 = 0.0;
+	for (int a=0; a<laststep1;  a++) mean1 = mean1 +  spikerate1[a]; //mean
+	mean1 = mean1/(laststep1);
+	for(double a=0; a<laststep1;a++) temp1 += (mean1-spikerate1[a])*(mean1-spikerate1[a]); // variance
+	variance1 = temp1/(laststep1);
+	dispersion1 = variance1/mean1; // dispersion
+	// **************** 2 sec **************************
+	double mean2, variance2, temp2, dispersion2; 
+	mean2 = variance2 = temp2 = dispersion2 = 0.0;
+	for (int a=0; a<laststep2;  a++) mean2 = mean2 +  spikerate2[a]; //mean
+	mean2 = mean2/(laststep2);
+	for(double a=0; a<laststep2;a++) temp2 += (mean2-spikerate2[a])*(mean2-spikerate2[a]); // variance
+	variance2 = temp2/(laststep2);
+	dispersion2 = variance2/mean2; // dispersion
+	// **************** 4 sec **************************
+	double mean4, variance4, temp4, dispersion4; 
+	mean4 = variance4 = temp4 = dispersion4 = 0.0;
+	for (int a=0; a<laststep4;  a++) mean4 = mean4 +  spikerate4[a]; //mean
+	mean4 = mean4/(laststep4);
+	for(double a=0; a<laststep4;a++) temp4 += (mean4-spikerate4[a])*(mean4-spikerate4[a]); // variance
+	variance4 = temp4/(laststep4);
+	dispersion4 = variance4/mean4; // dispersion
+	// **************** 6 sec **************************
+	double mean6, variance6, temp6, dispersion6; 
+	mean6 = variance6 = temp6 = dispersion6 = 0.0;
+	for (int a=0; a<laststep6;  a++) mean6 = mean6 +  spikerate6[a]; //mean
+	mean6 = mean6/(laststep6);
+	for(double a=0; a<laststep6;a++) temp6 += (mean6-spikerate6[a])*(mean6-spikerate6[a]); // variance
+	variance6 = temp6/(laststep6);
+	dispersion6 = variance6/mean6; // dispersion
+	// **************** 8 sec **************************
+	double mean8, variance8, temp8, dispersion8 ; 
+	mean8 = variance8 = temp8 = dispersion8 = 0.0;
+	for (int a=0; a<laststep8;  a++) mean8 = mean8 +  spikerate8[a]; //mean
+	mean8 = mean8/(laststep8);
+	for(double a=0; a<laststep8;a++) temp8 += (mean8 - spikerate8[a])*(mean8 - spikerate8[a]); // variance
+	variance8 = temp8/(laststep8);
+	dispersion8 = variance8/mean8; // dispersion
+	// **************** 10 sec **************************
+	double mean10, variance10, temp10, dispersion10; 
+	mean10 = variance10 = temp10 = dispersion10 = 0.0;
+	for (int a=0; a<laststep10;  a++) mean10 = mean10 +  spikerate10[a]; //mean
+	mean10 = mean10/(laststep10);
+	for(double a=0; a<laststep10;a++) temp10 += (mean10 - spikerate10[a])*(mean10 - spikerate10[a]); // variance
+	variance10 = temp10/(laststep10);
+	dispersion10 = variance10/mean10; // dispersion
+	*/
+
+	/*
+	// Array of dispersions for altogether plotting 
+	for (int i=6; i<12; i++) dispersionsre[i] = dispersion05;
+	for (int i=31; i<37; i++) dispersionsre[i] = dispersion1;
+	for (int i=56; i<62; i++) dispersionsre[i] = dispersion2;
+	for (int i=81; i<87; i++) dispersionsre[i] = dispersion4;
+	for (int i=106; i<112; i++) dispersionsre[i] = dispersion6;
+	for (int i=131; i<137; i++) dispersionsre[i] = dispersion8;
+	for (int i=156; i<162; i++) dispersionsre[i] = dispersion10;
+	// Array of Real dispersions for altogether plotting 
+	for (int i=13; i<19; i++) dispersions[i] = dispersion05;
+	for (int i=38; i<44; i++) dispersions[i] = dispersion1;
+	for (int i=63; i<69; i++) dispersions[i] = dispersion2;
+	for (int i=88; i<94; i++) dispersions[i] = dispersion4;
+	for (int i=113; i<119; i++) dispersions[i] = dispersion6;
+	for (int i=138; i<144; i++) dispersions[i] = dispersion8;
+	for (int i=163; i<169; i++) dispersions[i] = dispersion10;
+	*/
+}
+
+
+double SpikeDat::dispcalc(int binsize)
+{
+	int i;
+	int maxbin = 100000;
+	int *srate = new int(maxbin);
+	int laststep;
+	double mean, variance, dispersion;
+
+	// calculate spike rate for binsize
+	for(i-0; i<maxbin; i++) srate[i] = 0;
+	for(i=0; i<spikecount; i++) if(times[i] / binsize < maxbin) srate[(int)(times[i] + 0.5) / binsize]++;
+	laststep = ((int)(times[spikecount - 1])/ binsize) - 4;
+
+	// calculate index of dispersion
+	mean = 0;
+	variance = 0;
+	for(i=0; i<laststep; i++) mean = mean +  srate[i];	//mean
+	mean = mean / laststep;
+	for(i=0; i<laststep; i++) variance += (mean - srate[i]) * (mean - srate[i]);	// variance
+	variance = variance / laststep;
+	dispersion = variance / mean;		// dispersion
+
+	return dispersion;
+}
+
+
+
+IoDDat::IoDDat(int bsize, SpikeDat *sdata)
+{
+	binsize = bsize;
+	spikedata = sdata;
+	srate = new int(100000);
+}
+
+
+void IoDDat::ratecalc()
+{
+	int i;
+
+	for(i=0; i<spikedata->spikecount; i++) {
+		if(spikedata->times[i] / binsize < 100000) srate[(int)(spikedata->times[i] + 0.5) / binsize]++;
+	}
+	laststep = ((int)(spikedata->times[spikedata->spikecount - 1])/ binsize) - 4;
+}
+
+
+double IoDDat::dispcalc()
+{
+	int i;
+
+	mean = 0;
+	variance = 0;
+
+	ratecalc();
+
+	for(i=0; i<laststep; i++) mean = mean +  srate[i];	//mean
+	mean = mean / laststep;
+	for(i=0; i<laststep; i++) variance += (mean - srate[i]) * (mean - srate[i]);	// variance
+	variance = variance / laststep;
+	dispersion = variance / mean;		// dispersion
+
+	return dispersion;
 }
 
 

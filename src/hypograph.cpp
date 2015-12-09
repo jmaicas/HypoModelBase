@@ -732,6 +732,29 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		xrange = (double)xplot / (xto - xfrom); 
 		xnum = (double)(xto - xfrom) / xplot;
 
+
+		/* Plot Types
+
+		1 - scaled width bars, histogram
+
+		7 - scaled width bars
+
+		4 - normal line graph
+
+		5 - line graph with scaling fix
+
+		2 - line graph with x data
+
+		6 - line graph with sampling
+
+		8 - scatter with sampling
+
+		3 - spike rate data with optional burst colouring
+
+		9 - bar chart with x data
+
+		*/
+
 		if(gtype == 1) {                             // scaled width bars, Histogram    
 			for(i=0; i<(xto - xfrom); i++) {
 				if(gpar == -1) y = (double)gdata[i + (int)xfrom];
@@ -870,6 +893,48 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				prevx = xval;
 			}
 		}
+
+
+		if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data
+			oldx = xbase + xoffset;
+			oldy = (int)(yplot + ybase - yrange * (yfrom));
+			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			for(i=0; i<graph->xcount; i++) {
+				xval = (*graph->gdatax)[i];
+				//if(xval <= prevx) break;
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (int)(xval - xfrom) * xrange;
+					y = (*gdatadv)[i];
+					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
+					dc.SetPen(colourpen[colour]);
+					DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+					dc.SetPen(colourpen[black]);
+				  if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+					oldx = xpos + xbase + xoffset;
+					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+				}
+				prevx = xval;
+			}
+		}
+
+		/*
+		if(gtype == 7) {                             // scaled width bars    
+			for(i=0; i<(xto - xfrom); i++) {
+				if(gpar == -1) y = (double)gdata[i + (int)xfrom];
+				if(gpar == -2) y = gdatad[i + (int)xfrom];
+				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+				xpos = i * xrange + xbase;
+				if(xrange <= 1) {
+					DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
+				}
+				else {
+					for(k=0; k<xrange; k++) {
+						DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
+					}
+				}
+			}
+		}*/
 
 
 		if(gtype == 6) {                         // line graph with sampling

@@ -225,6 +225,7 @@ public:
 	void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
 	void neurocalcBasic(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
+	double dispcalc(int binsize);
 	void ISIanalysis();
 	//void autocalc();
 	void netneurocalc(int);
@@ -239,6 +240,21 @@ public:
 	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	void Clear();
 	void ReSize(int);
+};
+
+
+class IoDDat{
+public:
+	int *srate;
+	double mean, variance, dispersion;
+	int laststep;
+	int binsize;
+	SpikeDat *spikedata;
+
+	IoDDat(int binsize, SpikeDat *);
+	IoDDat::~IoDDat();
+	void ratecalc();
+	double dispcalc();
 };
 
 
