@@ -598,6 +598,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	//ofp = fopen("graph.txt", "w");
 	//if(graphindex == 0) ofp = fopen("graph.txt", "w");
 
+	mainwin->diagbox->Write(text.Format("Graph Paint Call %d\n", graphindex));
+
 	diag = mainwin->diagnostic;
 	diag = 0;
 	drawdiag = false;
@@ -881,6 +883,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				//if(xval <= prevx) break;
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (int)(xval - xfrom) * xrange;
+					//mainwin->diagbox->Write(text.Format("\n X %d val %.2f pos %d\n", i, xval, xpos));
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
 					dc.SetPen(colourpen[colour]);
@@ -894,11 +897,13 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			}
 		}
 
+		int barwidth = 10;
+		int barshift = graph->barshift;
 
 		if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data
 			oldx = xbase + xoffset;
 			oldy = (int)(yplot + ybase - yrange * (yfrom));
-			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			mainwin->diagbox->Write(text.Format("\n XY bar graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 			for(i=0; i<graph->xcount; i++) {
 				xval = (*graph->gdatax)[i];
 				//if(xval <= prevx) break;
@@ -907,9 +912,12 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
 					dc.SetPen(colourpen[colour]);
-					DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-					dc.SetPen(colourpen[black]);
-				  if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+					//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+					for(k=0; k<barwidth; k++) {
+						DrawLine(dc, gc, xpos + k + barshift, yplot + ybase, xpos + k + barshift, yplot + ybase - (int)(yrange * (y - yfrom)));
+					}
+					//dc.SetPen(colourpen[black]);
+				  //if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
 					oldx = xpos + xbase + xoffset;
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}

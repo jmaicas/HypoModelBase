@@ -192,6 +192,9 @@ public:
 	//double *inputrec;
 	datdouble netinputrec;
 	datdouble raterec;
+	datdouble IoDdata;
+	datdouble IoDdataX;
+
 	double threshrec[10000];
 	int *rate;
 	int graphindex;
@@ -424,12 +427,13 @@ public:
 	int type;        // 0 for normal, 1 for histogram    // 26/2/15 Update this!
 
 	// 1 for histogram
-	// 2 for XY line plot
+	// 2 for XY line plot + scatter option
 	// 4 or 5 for line (5 is new scaling fixed version)
 	// 7 for bar
 	// 6 line with sampling
 	// 8 scatter with sampling
 	// 3 for spike rate
+	// 9 for XY bar plot
 
 	int pos;         // graph position
 	int dataset;
@@ -452,6 +456,7 @@ public:
 	double xunitscale, xunitdscale;
 	int clipmode;
 	bool synchx;
+	int barwidth, barshift;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

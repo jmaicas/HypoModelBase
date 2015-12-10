@@ -145,6 +145,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	typeset.Add("Bar", 7);
 	typeset.Add("Histogram", 1);
 	typeset.Add("Spike Rate", 3);
+	typeset.Add("Bar with X data", 9);
 
 	/*
 	typestrings[0] = "Line";

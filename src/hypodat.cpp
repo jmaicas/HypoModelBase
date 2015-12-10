@@ -160,6 +160,9 @@ SpikeDat::SpikeDat()
 	raterec.setsize(1000);
 	netinputrec.setsize(1000);
 
+	IoDdata.setsize(100);
+	IoDdataX.setsize(100);
+
 	burstdata = NULL;
 	vasomean.data.resize(250);
 	vasomean.max = 200;
@@ -342,7 +345,7 @@ int TypeSet::GetType(int ref)
 }
 
 
-GraphDat::GraphDat()
+GraphDat::GraphDat()             // See more specific versions below
 {
 	scrollpos = 0;
 	gparam = 0;
@@ -586,6 +589,7 @@ void GraphDat::Init()
 	tickfontsize = 10;
 	clipmode = 0;
 	synchx = true;
+	barshift = 0;
 }
 
 

@@ -1295,6 +1295,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	IoDDat IoD_10(10000, this);
 	IoD_10.dispcalc();*/
 
+	
 	double dispersion05 = dispcalc(500);
 	double dispersion1 = dispcalc(1000);
 	double dispersion2 = dispcalc(2000);
@@ -1302,6 +1303,23 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	double dispersion6 = dispcalc(6000);
 	double dispersion8 = dispcalc(8000);
 	double dispersion10 = dispcalc(10000);
+
+	
+	IoDdata[0] = dispersion05;
+	IoDdata[1] = dispersion1;
+	IoDdata[2] = dispersion2;
+	IoDdata[3] = dispersion4;
+	IoDdata[4] = dispersion6;
+	IoDdata[5] = dispersion8;
+	IoDdata[6] = dispersion10;
+
+	IoDdataX[0] = 10;
+	IoDdataX[1] = 20;
+	IoDdataX[2] = 30;
+	IoDdataX[3] = 40;
+	IoDdataX[4] = 50;
+	IoDdataX[5] = 60;
+	IoDdataX[6] = 70;
 
 	/*
 
@@ -1413,25 +1431,27 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 double SpikeDat::dispcalc(int binsize)
 {
 	int i;
-	int maxbin = 100000;
-	int *srate = new int(maxbin);
+	int maxbin = 10000;
+	//int *spikerate = new int(maxbin);
+	int spikerate[10000];
 	int laststep;
-	double mean, variance, dispersion;
+	double mean, variance, dispersion = 0;
 
 	// calculate spike rate for binsize
-	for(i-0; i<maxbin; i++) srate[i] = 0;
-	for(i=0; i<spikecount; i++) if(times[i] / binsize < maxbin) srate[(int)(times[i] + 0.5) / binsize]++;
+	for(i=0; i<maxbin; i++) spikerate[i] = 0;
+	for(i=0; i<spikecount; i++) if(times[i] / binsize < maxbin) spikerate[(int)(times[i] + 0.5) / binsize]++;
 	laststep = ((int)(times[spikecount - 1])/ binsize) - 4;
+	if(laststep > maxbin) laststep = maxbin;
 
 	// calculate index of dispersion
 	mean = 0;
 	variance = 0;
-	for(i=0; i<laststep; i++) mean = mean +  srate[i];	//mean
+	for(i=0; i<laststep; i++) mean = mean +  spikerate[i];	//mean
 	mean = mean / laststep;
-	for(i=0; i<laststep; i++) variance += (mean - srate[i]) * (mean - srate[i]);	// variance
+	for(i=0; i<laststep; i++) variance += (mean - spikerate[i]) * (mean - spikerate[i]);	// variance
 	variance = variance / laststep;
 	dispersion = variance / mean;		// dispersion
-
+	
 	return dispersion;
 }
 
@@ -1546,7 +1566,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
 	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
 
-	//(*graphbase)[reftag + "rate1s"]->synchx = false;
+	(*graphbase)[reftag + "rate1s"]->synchx = false;
 	(*graphbase)[reftag + "spikes1ms"]->synchx = false;
 	(*graphbase)[reftag + "hist1ms"]->synchx = false;
 	(*graphbase)[reftag + "hist5ms"]->synchx = false;
