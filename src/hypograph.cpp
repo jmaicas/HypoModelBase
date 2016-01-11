@@ -598,7 +598,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	//ofp = fopen("graph.txt", "w");
 	//if(graphindex == 0) ofp = fopen("graph.txt", "w");
 
-	mainwin->diagbox->Write(text.Format("Graph Paint Call %d\n", graphindex));
+	//mainwin->diagbox->Write(text.Format("Graph Paint Call %d\n", graphindex));
 
 	diag = mainwin->diagnostic;
 	diag = 0;
