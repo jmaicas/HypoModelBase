@@ -957,14 +957,14 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	double norm, haznorm;
 	double stime;
 	wxString text;
-	bool spikediag = false; 
+	bool spikediag = true; 
 	//short freqwindow = 300;
 	bool calcdiag, calcdiag2;
 	FILE *ofp;
 
 	//maxspikes = 100000;
 
-	calcdiag = false;
+	calcdiag = true;
 	calcdiag2 = false;
 
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
@@ -1035,7 +1035,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		hist1[(int)isis[i]]++;	
 		mean = mean + (double)(isis[i] / isicount);
 		variance = isis[i] * isis[i] / isicount + variance;
-		if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
+		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
+		if(spikediag && diagbox) if(i<10) diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
 	}
 
 	/*
