@@ -238,6 +238,7 @@ public:
 	void IntraBurstAnalysis();
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *);
+	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
