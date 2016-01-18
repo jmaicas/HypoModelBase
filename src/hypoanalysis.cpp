@@ -957,14 +957,14 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	double norm, haznorm;
 	double stime;
 	wxString text;
-	bool spikediag = true; 
+	bool spikediag = false; 
 	//short freqwindow = 300;
 	bool calcdiag, calcdiag2;
 	FILE *ofp;
 
 	//maxspikes = 100000;
 
-	calcdiag = true;
+	calcdiag = false;
 	calcdiag2 = false;
 
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
