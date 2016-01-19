@@ -1437,11 +1437,14 @@ double SpikeDat::dispcalc(int binsize)
 	int spikerate[10000];
 	int laststep;
 	double mean, variance, dispersion = 0;
+	double timeshift = 0;
+
+	if(times[0] > 1000) timeshift = times[0] - 1000;
 
 	// calculate spike rate for binsize
 	for(i=0; i<maxbin; i++) spikerate[i] = 0;
-	for(i=0; i<spikecount; i++) if(times[i] / binsize < maxbin) spikerate[(int)(times[i] + 0.5) / binsize]++;
-	laststep = ((int)(times[spikecount - 1])/ binsize) - 4;
+	for(i=0; i<spikecount; i++) if((times[i] - timeshift) / binsize < maxbin) spikerate[(int)((times[i] - timeshift) + 0.5) / binsize]++;
+	laststep = ((int)(times[spikecount - 1] - timeshift)/ binsize) - 4;
 	if(laststep > maxbin) laststep = maxbin;
 
 	// calculate index of dispersion

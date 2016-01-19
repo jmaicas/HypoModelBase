@@ -31,7 +31,9 @@ public:
 	double RMSFirstNBins;
 	double RMSBinRange;
 	double RMSHaz;
+	double RMSIoD;
 	double RMSFirstNBinsBurst;
+	//double IoD;
 	double burstmode;
 	double burstlengthmean;
 	double burstlengthsd;
