@@ -62,6 +62,7 @@ class ParamBox: public ToolBox
 {
 public:
 	int numparams;	
+	int paramindex;
 	double countmark;
 	int column;
 	int redflag;
@@ -150,7 +151,7 @@ public:
 	void SetStatus(wxString);
 	void WriteVDU(wxString);
 	void InitMenu();
-    void DataMenu();
+  void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
@@ -158,6 +159,7 @@ public:
 	ParamStore *GetParams(ParamStore *pstore=NULL);
 	ParamStore *GetNumParams();
 	void ParamLayout(int columns=1);
+	void PanelParamLayout(wxBoxSizer *box, int columns=1);
 	void OnClose(wxCloseEvent& event);
 	wxBoxSizer *RunBox();
 };

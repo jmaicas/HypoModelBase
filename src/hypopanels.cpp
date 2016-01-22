@@ -580,6 +580,15 @@ void ParamBox::ParamLayout(int columns)                   // Currently for one o
 }
 
 
+void ParamBox::PanelParamLayout(wxBoxSizer *box, int columns)
+{
+	for(i=paramindex; i<paramset->numparams; i++) {
+		box->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	}
+	paramindex = paramset->numparams;
+}
+
+
 void ParamBox::HistStore()
 {
 	short i;
