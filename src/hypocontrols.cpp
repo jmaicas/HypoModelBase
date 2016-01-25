@@ -405,27 +405,33 @@ ParamCon *ParamSet::GetCon(wxString tag)
 }
 
 
-void ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth) 
+ParamCon *ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth) 
 {
 	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);           // number + spin
 	ref[name] = numparams;
-	numparams++;
+	//numparams++;
+
+	return con[numparams++];
 }
 
 
-void ParamSet::AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth, int numwidth)
+ParamCon *ParamSet::AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth, int numwidth)
 {
 	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);              // number
 	ref[name] = numparams;
-	numparams++;
+	//numparams++;
+
+	return con[numparams++];
 }
 
 
-void ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
+ParamCon *ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
 {
 	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);																// text
 	ref[name] = numparams;
-	numparams++;
+	//numparams++;
+
+	return con[numparams++];
 }
 
 

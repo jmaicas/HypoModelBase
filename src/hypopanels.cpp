@@ -681,7 +681,7 @@ wxCheckBox *ParamBox::SetModCheck(int id, wxString checktag, wxString checktext,
 {
 	wxCheckBox *newcheck;
 	(*modflags)[checktag] = state;
-	newcheck = new wxCheckBox(panel, id, checktext);
+	newcheck = new wxCheckBox(activepanel, id, checktext);
 	newcheck->SetFont(confont);
 	newcheck->SetValue(state);
 	checkrefs->AddRef(id, checktag, newcheck);

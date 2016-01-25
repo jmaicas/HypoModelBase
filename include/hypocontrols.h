@@ -248,7 +248,7 @@ public:
 	ParamCon(ToolPanel *panel, wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth);
 	void OnSpinUp(wxSpinEvent& event);
 	void OnSpinDown(wxSpinEvent& event);
-    void OnSpin(wxSpinEvent& event);
+  void OnSpin(wxSpinEvent& event);
 	double GetValue();
 	wxString GetString();
 	void SetValue(double val);
@@ -301,9 +301,9 @@ public:
 	ParamSet(ToolPanel *);
 	~ParamSet();
 
-	void AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=65, int numwidth=40);
-	void AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
-	void AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
+	ParamCon *AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=65, int numwidth=40);
+	ParamCon *AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
+	ParamCon *AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
 	ParamCon *GetCon(wxString);
 	ParamStore *GetParams();
 	ParamStore *GetParamsNew(BoxOut *boxout);
