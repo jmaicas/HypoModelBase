@@ -889,3 +889,26 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 	*/
 }
 
+
+FitSet::FitSet(int size)
+{
+	numparams = 0;
+	maxparams = size;
+	measures = new FitMeasure[size];
+	tags = new wxString[size];
+}
+
+
+void FitSet::AddMeasure(wxString tag, wxString label, double weight)
+{
+	ref[tag] = numparams;
+	tags[numparams] = tag;
+	measures[numparams] = FitMeasure(tag, label, weight);
+	numparams++;
+}
+
+
+FitMeasure FitSet::GetMeasure(wxString tag)
+{
+	return measures[(int)ref[tag]];
+}

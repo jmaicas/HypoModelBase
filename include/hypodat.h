@@ -21,6 +21,44 @@ class EvoDat{
 };
 
 
+class FitMeasure{
+public:
+	wxString tag, label;
+	int index;
+	double score;
+	double weight;
+	bool use;
+
+	FitMeasure() {
+		use = true;
+		weight = 0;
+		score = 0;
+		tag = "";
+	};
+
+	FitMeasure(wxString newtag, wxString newlabel, double newweight) {
+		use = true;
+		score = 0;
+		tag = newtag;
+		label = newlabel;
+		weight = newweight;
+	};
+};
+
+
+class FitSet{
+public:
+	int numparams, maxparams;
+	ParamStore ref;
+	wxString *tags;
+	FitMeasure *measures;
+
+	FitSet(int size);
+	void AddMeasure(wxString tag, wxString label, double weight);
+	FitMeasure GetMeasure(wxString tag);
+};
+
+
 class FitDat{
 public:
 	double haz5chisq;
@@ -43,6 +81,11 @@ public:
 	double score;
 	double scoresum;
 	double weightsum;
+
+	//FitSet *fitset;
+	//FitDat::FitDat(FitSet *fs) {
+	//	fitset = fs;
+	//};
 };
 
 
@@ -239,7 +282,7 @@ public:
 	void BurstScan(BurstBox *);
 	void IntraBurstAnalysis();
 	void IntraSelectAnalysis();
-	void FitScore(SpikeDat *, FitDat *);
+	void FitScore(SpikeDat *, FitDat *, FitSet *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");

@@ -1439,7 +1439,7 @@ double SpikeDat::dispcalc(int binsize)
 	double mean, variance, dispersion = 0;
 	double timeshift = 0;
 
-	if(times[0] > 1000) timeshift = times[0] - 1000;
+	if(times[0] > 1000) timeshift = times[0] - 1000;        // for data where recording starts at non-zero time point
 
 	// calculate spike rate for binsize
 	for(i=0; i<maxbin; i++) spikerate[i] = 0;

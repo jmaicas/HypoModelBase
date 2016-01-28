@@ -6,7 +6,7 @@
 
 
 
-void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat)
+void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 {
 	int i;
 	int maxcount, histmax = 512;
