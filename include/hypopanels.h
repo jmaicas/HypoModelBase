@@ -389,6 +389,25 @@ public:
 };
 
 
+class DatPanel
+{
+public:
+	wxPanel *panel;
+	ToolBox *box;
+
+	wxStaticText **datset;
+	ParamStore ref;
+	wxString *tags;
+
+	int numdats, maxdats;
+	int numwidth;
+	wxString text;
+
+	DatPanel(ToolBox *box, int size = 10);
+	void AddDat(wxString tag, wxString value = "");
+	wxStaticText *GetDat(wxString tag);
+};
+
 
 
 #endif

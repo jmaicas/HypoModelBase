@@ -912,3 +912,5 @@ FitMeasure FitSet::GetMeasure(wxString tag)
 {
 	return measures[(int)ref[tag]];
 }
+
+

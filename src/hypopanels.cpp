@@ -1134,3 +1134,27 @@ void ParamBox::StoreParam(wxString tag)
 }
 
 
+
+DatPanel::DatPanel(ToolBox *tbox, int size)
+{
+	box = tbox;
+	numdats = 0;
+	numwidth = 60;
+	maxdats = size;
+	datset = new wxStaticText*[size];
+}
+
+
+void DatPanel::AddDat(wxString tag, wxString value)
+{
+	ref[tag] = numdats;
+	tags[numdats] = tag;
+	datset[numdats] = box->NumPanel(numwidth);
+	numdats++;
+}
+
+
+wxStaticText *DatPanel::GetDat(wxString tag)
+{
+	return datset[(int)ref[tag]];
+}
