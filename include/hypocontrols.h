@@ -68,6 +68,7 @@ public:
 	wxString snum;
 	ToolBox *toolbox;
 	MainFrame *mainwin;
+	int controlborder;
 	
 	virtual void OnLeftClick(wxMouseEvent & event);
 	void OnLeftDClick(wxMouseEvent & event);

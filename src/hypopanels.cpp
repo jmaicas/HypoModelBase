@@ -1142,6 +1142,7 @@ DatPanel::DatPanel(ToolBox *tbox, int size)
 	numwidth = 60;
 	maxdats = size;
 	datset = new wxStaticText*[size];
+	tags = new wxString[size];
 }
 
 

@@ -48,7 +48,7 @@ public:
 
 class FitSet{
 public:
-	int numparams, maxparams;
+	int measureCount, measureMax;
 	ParamStore ref;
 	wxString *tags;
 	FitMeasure *measures;
@@ -61,6 +61,7 @@ public:
 
 class FitDat{
 public:
+	ParamStore scores;
 	double haz5chisq;
 	double burstheadchisq;
 	double intrafreq;
@@ -81,6 +82,10 @@ public:
 	double score;
 	double scoresum;
 	double weightsum;
+
+	/*FitDat::FitDat() {
+		scores = ParamStore;
+	}*/
 
 	//FitSet *fitset;
 	//FitDat::FitDat(FitSet *fs) {

@@ -18,34 +18,35 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 	ofp.New("fitscore-diag.txt");
 
-	fitweights = new ParamStore();
-	(*fitweights)["ISImode"] = 5;
-	(*fitweights)["ISImean"] = 5;
-	(*fitweights)["RMSFirstNBins"] = 100;
-	(*fitweights)["RMSBinRange"] = 100;
-	(*fitweights)["RMSHaz"] = 60;
-	(*fitweights)["RMSIoD"] = 20;
 
-	// Burst fit
+	//fitweights = new ParamStore();
+	//(*fitweights)["ISImode"] = 5;
+	//(*fitweights)["ISImean"] = 5;
+	//(*fitweights)["RMSFirstNBins"] = 100;
+	//(*fitweights)["RMSBinRange"] = 100;
+	//(*fitweights)["RMSHaz"] = 60;
+	//(*fitweights)["RMSIoD"] = 20;
 
-	if(burstmode) {
-		(*fitweights)["RMSFirstNBinsBurst"] = 30;
-		(*fitweights)["burstmode"] = 20;
-		(*fitweights)["burstlengthmean"] = 30;
-		(*fitweights)["burstlengthsd"] = 5;
-		(*fitweights)["burstsilencemean"] = 15;
-		(*fitweights)["burstsilencesd"] = 5;
-		(*fitweights)["burstintrafreq"] = 20;
-	}
-	else {																			// Non-Burst fit
-		(*fitweights)["RMSFirstNBinsBurst"] = 0;			
-		(*fitweights)["burstmode"] = 0;
-		(*fitweights)["burstlengthmean"] = 0;
-		(*fitweights)["burstlengthsd"] = 0;
-		(*fitweights)["burstsilencemean"] = 0;
-		(*fitweights)["burstsilencesd"] = 0;
-		(*fitweights)["burstintrafreq"] = 0;
-	}
+	//// Burst fit
+
+	//if(burstmode) {
+	//	(*fitweights)["RMSFirstNBinsBurst"] = 30;
+	//	(*fitweights)["burstmode"] = 20;
+	//	(*fitweights)["burstlengthmean"] = 30;
+	//	(*fitweights)["burstlengthsd"] = 5;
+	//	(*fitweights)["burstsilencemean"] = 15;
+	//	(*fitweights)["burstsilencesd"] = 5;
+	//	(*fitweights)["burstintrafreq"] = 20;
+	//}
+	//else {																			// Non-Burst fit
+	//	(*fitweights)["RMSFirstNBinsBurst"] = 0;			
+	//	(*fitweights)["burstmode"] = 0;
+	//	(*fitweights)["burstlengthmean"] = 0;
+	//	(*fitweights)["burstlengthsd"] = 0;
+	//	(*fitweights)["burstsilencemean"] = 0;
+	//	(*fitweights)["burstsilencesd"] = 0;
+	//	(*fitweights)["burstintrafreq"] = 0;
+	//}
 
 
 	fitcon = new ParamStore();
@@ -132,8 +133,8 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 		// Tom Fit Re-engineering
 
-		fitdat->score = 0;
-		fitdat->weightsum = 0;
+		//fitdat->score = 0;
+		//fitdat->weightsum = 0;
 
 		//fitdat->ISImode = (abs(histquadmode - testdata->histquadmode) / testdata->histquadmode) * 100.0;
 		//fitdat->score += fitdat->ISImode * (*fitweights)["ISImode"];                                        // not used in current Tom config
@@ -177,7 +178,8 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		RMSError = sqrt(RMSError);
 
 		fitdat->RMSFirstNBins = RMSError;
-		fitdat->score += fitdat->RMSFirstNBins * (*fitweights)["RMSFirstNBins"];
+		fitdat->scores["RMSFirstNBins"] = RMSError;
+		//fitdat->score += fitdat->RMSFirstNBins * (*fitweights)["RMSFirstNBins"];
 
 
 		// ISI Histogram Bin Range RMS
@@ -203,7 +205,8 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		RMSError = sqrt(RMSError);
 
 		fitdat->RMSBinRange = RMSError;
-		fitdat->score += fitdat->RMSBinRange * (*fitweights)["RMSBinRange"];
+		fitdat->scores["RMSBinRange"] = RMSError;
+		//fitdat->score += fitdat->RMSBinRange * (*fitweights)["RMSBinRange"];
 
 
 		// Hazard RMS
@@ -245,7 +248,8 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		RMSError += ((double)(MaxHazSize - MinHazSize)) / ((double)MinHazSize)*100;
 
 		fitdat->RMSHaz = RMSError;
-		fitdat->score += fitdat->RMSHaz * (*fitweights)["RMSHaz"];
+		fitdat->scores["RMSHaz"] = RMSError; 
+		//fitdat->score += fitdat->RMSHaz * (*fitweights)["RMSHaz"];
 
 
 		//// Burst Profile Analysis
@@ -359,28 +363,44 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 			}
 
 			fitdat->RMSIoD = RMSError / 100;
-			fitdat->score += fitdat->RMSIoD * (*fitweights)["RMSIoD"];
+			fitdat->scores["RMSIoD"] = RMSError / 100;
+			//fitdat->score += fitdat->RMSIoD * (*fitweights)["RMSIoD"];
 
 			ofp.WriteLine(text.Format("IoD %.6f\n", fitdat->RMSIoD)); 
 		}
 
 
-		// Sum weights
+		// Weighted Sum
 
-		fitdat->weightsum += (*fitweights)["RMSFirstNBins"];
-		fitdat->weightsum += (*fitweights)["RMSBinsRange"];
-		fitdat->weightsum += (*fitweights)["RMSHaz"];
-		fitdat->weightsum += (*fitweights)["RMSIoD"];
+		fitdat->score = 0;
+		fitdat->weightsum = 0;
+		wxString tag;
 
-		fitdat->weightsum += (*fitweights)["RMSFirstNBinsBurst"];
-		fitdat->weightsum += (*fitweights)["burstmode"];
-		fitdat->weightsum += (*fitweights)["burstlengthmean"];
-		fitdat->weightsum += (*fitweights)["burstlengthsd"];
-		fitdat->weightsum += (*fitweights)["burstsilencemean"];
-		fitdat->weightsum += (*fitweights)["burstsilencesd"];
-		fitdat->weightsum += (*fitweights)["burstintrafreq"];
+		for(i=0; i<fitset->measureCount; i++) {
+			tag = fitset->tags[i];
+			fitdat->score += fitset->measures[i].weight * fitdat->scores[tag];
+			fitdat->weightsum += fitset->measures[i].weight;
+		}
 
 		fitdat->score = fitdat->score / fitdat->weightsum;
+
+
+		//// Sum weights
+
+		//fitdat->weightsum += (*fitweights)["RMSFirstNBins"];
+		//fitdat->weightsum += (*fitweights)["RMSBinsRange"];
+		//fitdat->weightsum += (*fitweights)["RMSHaz"];
+		//fitdat->weightsum += (*fitweights)["RMSIoD"];
+
+		//fitdat->weightsum += (*fitweights)["RMSFirstNBinsBurst"];
+		//fitdat->weightsum += (*fitweights)["burstmode"];
+		//fitdat->weightsum += (*fitweights)["burstlengthmean"];
+		//fitdat->weightsum += (*fitweights)["burstlengthsd"];
+		//fitdat->weightsum += (*fitweights)["burstsilencemean"];
+		//fitdat->weightsum += (*fitweights)["burstsilencesd"];
+		//fitdat->weightsum += (*fitweights)["burstintrafreq"];
+
+		//fitdat->score = fitdat->score / fitdat->weightsum;
 
 		ofp.Close();
 }
