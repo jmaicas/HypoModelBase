@@ -54,6 +54,7 @@ public:
 	FitMeasure *measures;
 
 	FitSet(int size);
+	~FitSet();
 	void AddMeasure(wxString tag, wxString label, double weight);
 	FitMeasure GetMeasure(wxString tag);
 };
@@ -114,6 +115,7 @@ public:
 	double isivar;
 	
 	NeuroDat();
+	~NeuroDat();
 	void ratecalc();
 	void ratereset();
 };

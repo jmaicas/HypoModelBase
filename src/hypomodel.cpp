@@ -337,6 +337,10 @@ void HypoMain::CleanUp() {
     
 		delete mod;
     delete[] gpos;
+
+		delete expdata;
+		delete selectdata;
+		delete burstdata;
     
     //wxMenu *menuTools = new wxMenu;
     //wxMenu *menuSystem = new wxMenu;

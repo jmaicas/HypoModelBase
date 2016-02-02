@@ -402,5 +402,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 		//fitdat->score = fitdat->score / fitdat->weightsum;
 
+		delete fitcon;
+
 		ofp.Close();
 }

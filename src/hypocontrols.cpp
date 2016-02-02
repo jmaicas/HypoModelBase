@@ -396,7 +396,10 @@ void ParamSet::SetMinMax(wxString tag, double min, double max)
 
 int ParamSet::GetID(wxString tag)
 {
-	return ref[tag];
+	wxString text;
+	int index = ref[tag];
+	if(index < 0) panel->mainwin->diagbox->Write(text.Format("ParamSet bad tag index %d, tag %s\n", index, tag));
+	return index;
 }
 
 
@@ -442,6 +445,7 @@ double ParamSet::GetValue(wxString tag)
 	double value;
 
 	id = GetID(tag);
+	if(id < 0) return 0;
 	con[id]->numbox->GetValue().ToDouble(&value);
 	return value;	
 }

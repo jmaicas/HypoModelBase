@@ -894,6 +894,7 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	mainwin->scalebox->GraphSwitch();
 
 	datfile->Close();
+	delete datfile;
 }
 
 

@@ -1146,6 +1146,13 @@ DatPanel::DatPanel(ToolBox *tbox, int size)
 }
 
 
+DatPanel::~DatPanel()
+{
+	delete[] datset;
+	delete[] tags;
+}
+
+
 void DatPanel::AddDat(wxString tag, wxString value)
 {
 	ref[tag] = numdats;

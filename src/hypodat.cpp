@@ -12,6 +12,14 @@ NeuroDat::NeuroDat()
 }
 
 
+NeuroDat::~NeuroDat()
+{
+	delete[] times;
+	delete[] srate;
+	delete[] srate10;
+}
+
+
 void NeuroDat::ratereset()
 {
 	int i;
@@ -896,6 +904,13 @@ FitSet::FitSet(int size)
 	measureMax = size;
 	measures = new FitMeasure[size];
 	tags = new wxString[size];
+}
+
+
+FitSet::~FitSet()
+{
+	delete[] measures;
+	delete[] tags;
 }
 
 
