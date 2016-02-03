@@ -903,7 +903,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data
 			oldx = xbase + xoffset;
 			oldy = (int)(yplot + ybase - yrange * (yfrom));
-			mainwin->diagbox->Write(text.Format("\n XY bar graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			//mainwin->diagbox->Write(text.Format("\n XY bar graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 			for(i=0; i<graph->xcount; i++) {
 				xval = (*graph->gdatax)[i];
 				//if(xval <= prevx) break;
