@@ -265,7 +265,8 @@ enum {
 	ID_Store,
 	ID_Wheel,
 	ID_Neuron,
-	ID_FileIO
+	ID_FileIO,
+	ID_MultiRun
 };
 
 
