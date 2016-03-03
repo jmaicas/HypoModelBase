@@ -117,6 +117,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		}
 
 
+		/*
 		// Burst Mode
 		int pmode = 0;
 		burstdata->pnzcount = 0;
@@ -125,7 +126,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 			if(burstdata->profilesm[i] > 0) burstdata->pnzcount = i;
 		}
 		burstdata->pmodetime = pmode;
-		burstdata->pmoderate = burstdata->profilesm[pmode];
+		burstdata->pmoderate = burstdata->profilesm[pmode];*/
 
 
 		////////////////////////////////////////////////////////////////////////////////////
@@ -255,6 +256,16 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		//// Burst Profile Analysis
 
 		if(burstmode) {
+
+			// Burst Mode
+			int pmode = 0;
+			burstdata->pnzcount = 0;
+			for(i=0; i<histmax; i++) {
+				if(burstdata->profilesm[i] > burstdata->profilesm[pmode]) pmode = i;
+				if(burstdata->profilesm[i] > 0) burstdata->pnzcount = i;
+			}
+			burstdata->pmodetime = pmode;
+			burstdata->pmoderate = burstdata->profilesm[pmode];
 
 			// First N Bins RMS
 
