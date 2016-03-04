@@ -373,6 +373,34 @@ void GraphWindow3::PrintEPS()
 			}
 		}
 
+		double barwidth = 7;
+		double barshift = graph->barshift;
+		double bargap = 3;
+		double barpos;
+
+		if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data
+			for(i=0; i<graph->xcount; i++) {
+				xval = (*graph->gdatax)[i];
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (xval - xfrom) * xrange;
+					barshift = (barwidth * numgraphs + (numgraphs - 1) * bargap) / 2;
+					barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
+					y = (*gdatadv)[i];
+
+					out.WriteLine("newpath");
+					out.MoveTo(barpos, ybase);
+					out.LineTo(barpos, ybase + yrange * (y - yfrom));
+					out.LineTo(barpos + barwidth, ybase + yrange * (y - yfrom));
+					out.LineTo(barpos + barwidth, ybase);
+					out.WriteLine("closepath");
+					out.WriteLine("gsave");
+					out.WriteLine("fill");
+					out.WriteLine("grestore");
+					out.WriteLine("stroke");
+				}
+			}
+		}
+
 		out.WriteLine(text.Format("grestore"));
 	}
 

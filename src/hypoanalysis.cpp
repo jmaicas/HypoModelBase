@@ -1305,7 +1305,6 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	double dispersion8 = dispcalc(8000);
 	double dispersion10 = dispcalc(10000);
 
-	
 	IoDdata[0] = dispersion05;
 	IoDdata[1] = dispersion1;
 	IoDdata[2] = dispersion2;
@@ -1314,13 +1313,13 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	IoDdata[5] = dispersion8;
 	IoDdata[6] = dispersion10;
 
-	IoDdataX[0] = 10;
-	IoDdataX[1] = 20;
-	IoDdataX[2] = 30;
-	IoDdataX[3] = 40;
-	IoDdataX[4] = 50;
-	IoDdataX[5] = 60;
-	IoDdataX[6] = 70;
+	IoDdataX[0] = 5;
+	IoDdataX[1] = 15;
+	IoDdataX[2] = 25;
+	IoDdataX[3] = 35;
+	IoDdataX[4] = 45;
+	IoDdataX[5] = 55;
+	IoDdataX[6] = 65;
 
 	/*
 
