@@ -583,6 +583,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	double data;
 	int pdir, sample, xtime;
 	int xlabelgap;
+	int barwidth, bargap;
 	//SpikeDat *spikedata;
 	int diag;
 	bool drawdiag;
@@ -644,6 +645,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
 		else burstdata = NULL;
 		xtime = xto - xfrom;
+		barwidth = graph->barwidth;
+		bargap = graph->bargap;
 		//burstdata = graph->burstdata;
 		//spikedata = graph->spikedata;
 
@@ -897,10 +900,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			}
 		}
 
-		int barwidth = 10;
 		int barshift = graph->barshift;
 		int barpos;
-		int bargap = 10;
 
 		if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data
 			//mainwin->diagbox->Write(text.Format("\n XY bar graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));

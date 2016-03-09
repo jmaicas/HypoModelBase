@@ -21,7 +21,7 @@ void GraphWindow3::PrintEPS()
 	double xfrom, xto, yfrom, yto;
 	double xfromAxis, xtoAxis;
 	double srangex, srangey;
-	double binsize, bargap;
+	double binsize, histbargap;
 	int gtype, sample, gpar;
 	int xplot, yplot, xstretch, xsample;
 	double xbase, ybase;
@@ -37,6 +37,7 @@ void GraphWindow3::PrintEPS()
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
 	int gplot, colour;
+	double barwidth, bargap;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -97,6 +98,8 @@ void GraphWindow3::PrintEPS()
 		yplot = graph->yplot; 
 		xlabels = graph->xlabels;
 		ylabels = graph->ylabels;
+		barwidth = graph->barwidth;
+		bargap = graph->bargap;
 
 		//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
 		//xto = xto - xstart;
@@ -161,9 +164,9 @@ void GraphWindow3::PrintEPS()
 
 		if(gtype == 1) {                             // scaled width bars, Histogram    
 			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 0, histogram\n"));
-			bargap = 1.5;
-			if(xrange < 3) bargap = 0;
-			if(xrange < 5) bargap = 1;
+			histbargap = 1.5;
+			if(xrange < 3) histbargap = 0;
+			if(xrange < 5) histbargap = 1;
 			//out.WriteLine("0.5 setlinewidth");
 
 			for(i=0; i<(xto - xfrom); i++) {
@@ -178,8 +181,8 @@ void GraphWindow3::PrintEPS()
 				out.WriteLine("newpath");
 				out.MoveTo(xpos, ybase);
 				out.LineTo(xpos, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase);
+				out.LineTo(xpos + xrange - histbargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - histbargap, ybase);
 				out.WriteLine("closepath");
 				out.WriteLine("gsave");
 				out.WriteLine("fill");
@@ -200,9 +203,9 @@ void GraphWindow3::PrintEPS()
 			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 3, spike rate\n"));
 			int spikestep = 0;
 			int burstcolour = 0;
-			bargap = 1.5;
-			if(xrange < 3) bargap = 0;
-			if(xrange < 5) bargap = 1;
+			histbargap = 1.5;
+			if(xrange < 3) histbargap = 0;
+			if(xrange < 5) histbargap = 1;
 			//out.WriteLine("0.5 setlinewidth");
 
 			for(i=0; i<(xto - xfrom); i++) {
@@ -246,8 +249,8 @@ void GraphWindow3::PrintEPS()
 				out.WriteLine("newpath");
 				out.MoveTo(xpos, ybase);
 				out.LineTo(xpos, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase);
+				out.LineTo(xpos + xrange - histbargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - histbargap, ybase);
 				out.WriteLine("closepath");
 				out.WriteLine("gsave");
 				out.WriteLine("fill");
@@ -373,9 +376,7 @@ void GraphWindow3::PrintEPS()
 			}
 		}
 
-		double barwidth = 7;
 		double barshift = graph->barshift;
-		double bargap = 3;
 		double barpos;
 
 		if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data

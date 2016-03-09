@@ -509,7 +509,7 @@ public:
 	double xunitscale, xunitdscale;
 	int clipmode;
 	bool synchx;
-	int barwidth, barshift;
+	int barwidth, barshift, bargap;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

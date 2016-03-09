@@ -150,7 +150,8 @@ public:
 	wxBoxSizer *ParamLayout(int columns=1);
 	void OnClose(wxCloseEvent& event);
 	void SetGraph(GraphWindow3 *newgraphwin=NULL);
-	void SetParams();
+	void SetParams(GraphDat *setgraph=NULL);
+	void SetParamsCopy(GraphDat *setgraph);
 };
 
 

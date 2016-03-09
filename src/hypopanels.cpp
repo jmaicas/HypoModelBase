@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 600),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 650),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -81,10 +81,12 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset->AddNum("xsample", "Sample", graph->xsample, 0, labelwidth, numwidth);
 	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
 	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
+	paramset->AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
 	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
 	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
 	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
+	paramset->AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
 
 	paramset->AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
@@ -319,9 +321,10 @@ void GraphBox::OnPrint(wxCommandEvent& event)
 }
 
 
-void GraphBox::SetParams()
+void GraphBox::SetParams(GraphDat *setgraph)
 {
 	ParamStore *params = paramset->GetParamsNew(boxout);
+	if(setgraph) graph = setgraph;
 
 	graph->xlabels = (*params)["xlabels"];
 	graph->ylabels = (*params)["ylabels"];
@@ -339,6 +342,9 @@ void GraphBox::SetParams()
 	graph->labelfontsize = (*params)["labelfontsize"];
 	graph->scattersize = (*params)["scattersize"];
 
+	graph->barwidth = (*params)["barwidth"];
+	graph->bargap = (*params)["bargap"];
+
 	graph->clipmode = clipcheck->GetValue();
 	graph->scattermode = scattercheck->GetValue();
 	graph->strokecolour = strokepicker->GetColour();
@@ -351,13 +357,44 @@ void GraphBox::SetParams()
 }
 
 
+void GraphBox::SetParamsCopy(GraphDat *setgraph)
+{
+	ParamStore *params = paramset->GetParamsNew(boxout);
+
+	setgraph->xlabels = (*params)["xlabels"];
+	setgraph->ylabels = (*params)["ylabels"];
+	setgraph->xstep = (*params)["xstep"];
+	setgraph->ystep = (*params)["ystep"];
+	setgraph->xplot = (*params)["xplot"];
+	setgraph->yplot = (*params)["yplot"];
+	setgraph->xshift = (*params)["xshift"];
+	setgraph->xsample = (*params)["xsample"];
+	setgraph->xunitscale = (*params)["xscale"];
+	setgraph->xunitdscale = (*params)["xdscale"];
+	setgraph->plotstroke = (*params)["plotstroke"];
+	setgraph->xlabelgap = (*params)["xlabelgap"];
+	setgraph->ylabelgap = (*params)["ylabelgap"];
+	setgraph->labelfontsize = (*params)["labelfontsize"];
+	setgraph->scattersize = (*params)["scattersize"];
+	setgraph->barwidth = (*params)["barwidth"];
+	setgraph->bargap = (*params)["bargap"];
+	setgraph->clipmode = clipcheck->GetValue();
+	setgraph->scattermode = scattercheck->GetValue();
+	
+	setgraph->xtag = paramset->GetCon("xtag")->GetString();
+	setgraph->ytag = paramset->GetCon("ytag")->GetString();
+}
+
+
 void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 {
+	int g;
 	long stringnum;
 	wxString snum, text;
 
-	graph = graphwin->graphset[0]->plot[0];
+	for(g=0; g<graphwin->numgraphs; g++) SetParamsCopy(graphwin->graphset[g]->plot[0]);
 
+	graph = graphwin->graphset[0]->plot[0];      // not sure if this is needed 7/3/16
 	SetParams();
 	
 	graphwin->UpdateScroll();

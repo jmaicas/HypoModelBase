@@ -343,19 +343,20 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 			// Burst Hazard   -- no known function
 		}
 
+		int IoDcount = 7;
 
 		if(IoDmode) {
 			IoDdata[0] = dispcalc(500);
 			IoDdata[1] = dispcalc(1000);
 			IoDdata[2] = dispcalc(2000);
 			IoDdata[3] = dispcalc(4000);
-			IoDdata[4] = dispcalc(6000);
-			IoDdata[5] = dispcalc(8000);
+			IoDdata[4] = dispcalc(8000);
+			IoDdata[5] = dispcalc(6000);
 			IoDdata[6] = dispcalc(10000);
 
 			RMSError = 0;
 
-			for(i=0; i<7; i++) {
+			for(i=0; i<IoDcount; i++) {
 
 				ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDdata[i], IoDdata[i])); 
 
