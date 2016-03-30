@@ -598,15 +598,19 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	rightbox->Add(burstgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	//rightbox->AddStretchSpacer(10);
 
-	hbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	//hbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	hbox->Add(parambox, 0, wxALL, 0);
 	hbox->AddSpacer(10);
-	hbox->Add(rightbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	//hbox->Add(rightbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	hbox->Add(rightbox, 0, wxALL, 0);
 
 	wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
-	hbox2->Add(databox, 1, wxALIGN_CENTRE_VERTICAL| wxALIGN_CENTRE_HORIZONTAL);
+	//hbox2->Add(databox, 1, wxALIGN_CENTRE_VERTICAL| wxALIGN_CENTRE_HORIZONTAL);
+	hbox2->Add(databox, 1, wxALIGN_CENTRE_VERTICAL);
 	hbox2->AddSpacer(20);
 	//hbox2->AddStretchSpacer(20);
-	hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL| wxALIGN_CENTRE_HORIZONTAL);
+	//hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL);
+	hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL);
 
 	//wxButton *datoutputbutton = new wxButton(panel, ID_datoutput, "Output Data", wxDefaultPosition, wxSize(80, buttonheight));	
 	datstatus = NumPanel(100, wxALIGN_RIGHT, "");
