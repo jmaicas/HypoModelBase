@@ -755,7 +755,9 @@ void BurstBox::BurstDataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
 	if(dispdata == NULL) dispdata = spikedata; 
 	if(datpanel == NULL) datpanel = modburst;
 
-	// Display scan data
+	if(!dispdata->burstdata) return;
+
+	// Display burstscan data
 	snum.Printf("%d", dispdata->burstdata->numbursts);
 	datpanel->numbursts->SetLabel(snum);
 	snum.Printf("%.2f", dispdata->burstdata->meancount);
@@ -781,6 +783,24 @@ void BurstBox::BurstDataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
 	snum.Printf("%.2f", dispdata->burstdata->meanisi);
 	datpanel->intraisimean->SetLabel(snum);
 	snum.Printf("%.2f", dispdata->burstdata->isisd);
+	datpanel->intraisisd->SetLabel(snum);
+}
+
+
+void BurstBox::DataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
+{
+	if(dispdata == NULL) dispdata = spikedata; 
+	if(datpanel == NULL) datpanel = modburst;
+
+	// Display spike data
+	
+	snum.Printf("%d", dispdata->spikecount);
+	datpanel->intraspikes->SetLabel(snum);
+	snum.Printf("%.2f", dispdata->freq);
+	datpanel->intrafreq->SetLabel(snum);
+	snum.Printf("%.2f", dispdata->meanisi);
+	datpanel->intraisimean->SetLabel(snum);
+	snum.Printf("%.2f", dispdata->isisd);
 	datpanel->intraisisd->SetLabel(snum);
 }
 

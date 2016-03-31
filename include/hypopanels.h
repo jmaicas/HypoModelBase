@@ -374,6 +374,7 @@ public:
 
 	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst");
 	void BurstDataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
+	void DataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void BurstDataPanel(BurstPanel *);
 	void SpikeDataDisp(SpikeDat *dispdata=NULL);
 	void Scan(SpikeDat *);
