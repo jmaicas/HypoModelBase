@@ -50,6 +50,11 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
     wxString oslabel = wxGetOsDescription();
     SetStatusText(oslabel);
     mainframe = this;
+
+
+		// Menu Flag System
+		flagrefs = new RefStore();
+		hypoflags = new ParamStore;
     
     //blankevent = new wxCommandEvent();
     
@@ -348,13 +353,33 @@ void HypoMain::CleanUp() {
 }
 
 
+void HypoMain::SetMenuFlag(int id, wxString flagname, wxString flagtext, int state, wxMenu *menu)
+{
+	(*hypoflags)[flagname] = state;
+	flagrefs->AddRef(id, flagname);
+	menu->Append(id, flagtext, "Toggle " + flagtext, wxITEM_CHECK);
+	menu->Check(id, state);
+	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnFlag));
+}
+
+
+void HypoMain::OnFlag(wxCommandEvent& event)
+{
+	int id = event.GetId();
+	wxString flag = flagrefs->GetRef(id);
+
+	if((*hypoflags)[flag] == 0) (*hypoflags)[flag] = 1;
+	else (*hypoflags)[flag] = 0;
+}
+
+
 void HypoMain::FullMenu()
 {
     bool display = true;
     
     wxMenu *menuFile = new wxMenu;
     wxMenu *menuControls = new wxMenu;
-    //wxMenu *menuAnalysis = new wxMenu;
+    wxMenu *menuAnalysis = new wxMenu;
     wxMenu *menuTools = new wxMenu;
     wxMenu *menuSystem = new wxMenu;
     
@@ -373,6 +398,9 @@ void HypoMain::FullMenu()
     
     //menuAnalysis->Append(ID_Info, "Info");
     //menuAnalysis->Append(ID_Burst, "Burst");
+		//menuAnalysis->Append(ID_XYPos, "XY Pos");
+		SetMenuFlag(ID_XYPos, "xypos", "XY Pos", 1, menuAnalysis); 
+
     //menuTools->Append(ID_Info, "Info");
     menuTools->Append(ID_Burst, "Spike Analysis");
     //menuTools->Append(ID_Protocol, "Protocol");
@@ -386,7 +414,7 @@ void HypoMain::FullMenu()
     wxMenuBar *menuBar = new wxMenuBar;
     menuBar->Append(menuFile, "&File");
     menuBar->Append(menuControls, "Models");
-    //menuBar->Append(menuAnalysis, "Analysis");
+    menuBar->Append(menuAnalysis, "Analysis");
     menuBar->Append(menuTools, "Tools");
     menuBar->Append(menuSystem, "System");
     

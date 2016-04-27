@@ -132,6 +132,9 @@ public:
 	AnaDat *analysisdata;
 	SpikeDat *expdata, *selectdata;
 
+	ParamStore *hypoflags;
+	RefStore *flagrefs;
+
 	ProtocolBox *protocolbox;
 #ifdef HYPOSOUND
 	SoundBox *soundbox;
@@ -182,6 +185,9 @@ public:
 	void CleanUp();
 	void AddGraph();
 	void RemoveGraph(int);
+
+	void OnFlag(wxCommandEvent& event);
+	void SetMenuFlag(int, wxString, wxString, int state, wxMenu *menu); 
 
 	void OnMove(wxMoveEvent& event);
 	void OnSize(wxSizeEvent& event);

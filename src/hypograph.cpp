@@ -296,10 +296,19 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 	wxPoint pos = event.GetPosition();
 	mousedown = pos;
 
-	snum.Printf("LDown %d", pos.x);
+	double xdiff = graph->xto - graph->xfrom;
+  double xscale = xdiff / xplot;
+	double xgraph = (mousedown.x - xbase) * xscale + graph->xfrom;
+
+	double ydiff = graph->yto - graph->yfrom;
+  double yscale = ydiff / yplot;
+	double ygraph = (yplot - mousedown.y + ybase) * yscale + graph->yfrom;
+	//ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
+
+	snum.Printf("LDown X %d Y %d  graph %.2f %.2f", pos.x, pos.y, xgraph, ygraph);
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
 
-	int x,y,xx,yy ;
+	int x, y, xx, yy ;
   //event.GetPosition(&x,&y);
   //CalcUnscrolledPosition( x, y, &xx, &yy );
   anchorpos = pos;
@@ -312,8 +321,10 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 {
 	double xdiff, xscale, xgraphFrom, xgraphTo;
-
 	int xplaces;
+
+	double ydiff, yscale, ygraphFrom, ygraphTo;
+	int yplaces;
 
 
 	// Graph select
@@ -333,8 +344,20 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 		xgraphTo = (pos.x - xbase) * xscale + graph->xfrom;
 		if(xgraphFrom < graph->xfrom) xgraphFrom = graph->xfrom;
 		if(xgraphTo > graph->xto) xgraphTo = graph->xto;
+		//xgraph = (pos.x - xbase) * xscale + graph->xfrom;
 
-		snum.Printf("LUp %d  drag From %s To %s", pos.x, numstring(xgraphFrom, xplaces), numstring(xgraphTo, xplaces));
+		ydiff = graph->yto - graph->yfrom;
+		yscale = ydiff / yplot;
+		yplaces = numplaces(ydiff);
+		ygraphFrom = (yplot - mousedown.y + ybase) * yscale + graph->yfrom;
+		ygraphTo = (yplot - pos.y + ybase) * yscale + graph->yfrom;
+		//ygraphTo = (pos.y - ybase) * yscale + graph->yfrom;
+		if(ygraphFrom < graph->yfrom) ygraphFrom = graph->yfrom;
+		if(ygraphTo > graph->yto) ygraphTo = graph->yto;
+
+		snum.Printf("LUp x%d y%d  drag X %s To %s (%s)   Y %s To %s (%s)", pos.x, pos.y, 
+			numstring(xgraphFrom, xplaces), numstring(xgraphTo, xplaces), numstring(xgraphTo - xgraphFrom, xplaces),
+			numstring(ygraphFrom, yplaces), numstring(ygraphTo, yplaces), numstring(ygraphTo - ygraphFrom, yplaces));
 		mod->DataSelect(xgraphFrom, xgraphTo);
 	}
 	else snum.Printf("LUp %d", pos.x);
@@ -452,9 +475,11 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 	yplaces = numplaces(ydiff);
 
 	//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
-	if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
-	else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
-	mainwin->SetStatusText(snum);
+	if((*mainwin->hypoflags)["xypos"]) {
+		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
+		else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
+		mainwin->SetStatusText(snum);
+	}
 
 	if(selectband) {
 		int x,y, xx, yy;
