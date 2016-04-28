@@ -130,7 +130,7 @@ public:
 	BurstDat *burstdata;
 	SpikeDat *currentdata;
 	AnaDat *analysisdata;
-	SpikeDat *expdata, *selectdata;
+	SpikeDat *expdata, *expdata2, *selectdata;
 
 	ParamStore *hypoflags;
 	RefStore *flagrefs;

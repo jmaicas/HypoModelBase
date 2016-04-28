@@ -113,10 +113,13 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
 		// Spike Analysis Module                  July 2015
 
-		expdata = new SpikeDat();
+	expdata = new SpikeDat();
     expdata->burstdata = new BurstDat();
     selectdata = new SpikeDat();
-		burstdata = new BurstDat();
+	burstdata = new BurstDat();
+
+	expdata2 = new SpikeDat();
+	expdata2->burstdata = NULL;
    
     
     //GraphData();

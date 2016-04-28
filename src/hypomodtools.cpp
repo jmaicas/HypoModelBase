@@ -654,6 +654,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	Connect(ID_scan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnScan));
 	Connect(ID_datload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatLoad));
+	Connect(ID_datload2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatLoad));
 	Connect(ID_datoutput, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatOutput));
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(BurstBox::OnDatRadio));
 	//Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(BurstBox::OnClose));
@@ -818,6 +819,10 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	maxdata = 100000;
 	stretchdata = maxdata;
 	rawdata.setsize(maxdata);
+
+	// Load data store
+	loaddata = mainwin->expdata;
+	if(event.GetId() == ID_datload2) loaddata = mainwin->expdata2;
 
 	// Spike data file
 	filetag = datfiletag->GetValue();
