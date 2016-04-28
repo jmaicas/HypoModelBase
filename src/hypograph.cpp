@@ -485,10 +485,10 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 		int x,y, xx, yy;
 		event.GetPosition(&x,&y);
 		//CalcUnscrolledPosition( x, y, &xx, &yy );
-	  currentpos = pos;
-		if(currentpos.y > ybase + yplot) currentpos.y = ybase + yplot;
+		currentpos = pos;
+		//if(currentpos.y > ybase + yplot) currentpos.y = ybase + yplot;
 		anchorpos.y = ybase - 10;
-		currentpos.y = ybase + yplot;
+		//currentpos.y = ybase + yplot;
 		wxRect newrect(anchorpos, currentpos);
 		wxClientDC dc(this);
 		PrepareDC(dc);
