@@ -170,6 +170,7 @@ enum {
 	ID_loaddata,
 	ID_datstore,
 	ID_datload,
+	ID_datload2,
 	ID_datoutput,
 	ID_Icap,
 	ID_Idrift,

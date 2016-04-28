@@ -587,6 +587,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	}
 	else {
 		AddButton(ID_datload, "Load", 40, datbuttons, 2);
+		AddButton(ID_datload2, "Load2", 40, datbuttons, 2);
 		AddButton(ID_datoutput, "Output Data", 80, datcon, 2);
 		AddButton(ID_scan, "Burst Scan", 65, parambox, 5);
 	}
