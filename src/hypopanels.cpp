@@ -984,7 +984,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 	//TextFile ofp;
 	wxString text;
 
-	diagnostic = 0;
+	diagnostic = false;
 
 	ParamStore *oldparams = GetParams();
 
@@ -1053,7 +1053,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 			}
 			else paramset->con[id]->SetValue(readline);
 		}
-		//if(diagnostic) ofp.WriteLine(text.Format("Model Param ID %d, Value %.4f\n", id, datval)); 
+		if(diagnostic) mainwin->diagbox->Write(text.Format("Model Param ID %d, Name %s, Value %.4f\n", id, datname, datval)); 
 		if(paramfile.Eof()) return;
 		readline = paramfile.GetNextLine();	
 	}
@@ -1068,7 +1068,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 		(*modflags)[datname] = flagval;
 		id = flagrefs->GetID(datname);
 		if(id) menuModel->Check(id, flagval);
-		//if(diagnostic) ofp.WriteLine(text.Format("Model flag ID %d, Set %d\n", id, flagval)); 
+		if(diagnostic) mainwin->diagbox->Write(text.Format("Model flag ID %d, Name %s, Set %d\n", id, datname, flagval)); 
 		readline = paramfile.GetNextLine();	
 	}
 
@@ -1084,8 +1084,8 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 		(*modflags)[datname] = flagval;
 		id = checkrefs->GetID(datname);
 		//menuModel->Check(id, flagval);
-		((wxCheckBox *)checkrefs->GetBox(id))->SetValue(flagval);
-		//if(diagnostic) ofp.WriteLine(text.Format("Model flag ID %d, Set %d\n", id, flagval)); 
+		if(id) ((wxCheckBox *)checkrefs->GetBox(id))->SetValue(flagval);
+		if(diagnostic) mainwin->diagbox->Write(text.Format("Model check ID %d, Name %s, Set %d\n", id, datname, flagval)); 
 		readline = paramfile.GetNextLine();	
 	}
 	paramfile.Close();
