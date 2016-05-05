@@ -16,7 +16,9 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	bool burstmode = false;
 	bool IoDmode = true;
 
-	ofp.New("fitscore-diag.txt");
+	bool fitdiag = FALSE;
+
+	if(fitdiag) ofp.New("fitscore-diag.txt");
 
 
 	//fitweights = new ParamStore();
@@ -317,17 +319,17 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 			fitdat->burstlengthmean = (abs(testdata->burstdata->meanlength - burstdata->meanlength) / testdata->burstdata->meanlength) * 100.0;
 			fitdat->score += fitdat->burstlengthmean * (*fitweights)["burstlengthmean"];
 
-			ofp.WriteLine(text.Format("burst mod %.6f  exp %.6f  score %.6f", burstdata->meanlength, testdata->burstdata->meanlength, fitdat->burstlengthmean)); 
+			if(fitdiag) ofp.WriteLine(text.Format("burst mod %.6f  exp %.6f  score %.6f", burstdata->meanlength, testdata->burstdata->meanlength, fitdat->burstlengthmean)); 
 
 			fitdat->burstlengthsd = (abs(testdata->burstdata->sdlength - burstdata->sdlength) / testdata->burstdata->sdlength) * 100.0;
 			fitdat->score += fitdat->burstlengthsd * (*fitweights)["burstlengthsd"];
 
-			ofp.WriteLine(text.Format("burstsd mod %.6f  exp %.6f  score %.6f", burstdata->sdlength, testdata->burstdata->sdlength, fitdat->burstlengthsd)); 
+			if(fitdiag) ofp.WriteLine(text.Format("burstsd mod %.6f  exp %.6f  score %.6f", burstdata->sdlength, testdata->burstdata->sdlength, fitdat->burstlengthsd)); 
 
 			fitdat->burstsilencemean = (abs(testdata->burstdata->meansilence - burstdata->meansilence) / testdata->burstdata->meansilence) * 100.0;
 			fitdat->score += fitdat->burstsilencemean * (*fitweights)["burstsilencemean"];
 
-			ofp.WriteLine(text.Format("silence mod %.6f  exp %.6f  score %.6f", burstdata->meansilence, testdata->burstdata->meansilence, fitdat->burstsilencemean)); 
+			if(fitdiag) ofp.WriteLine(text.Format("silence mod %.6f  exp %.6f  score %.6f", burstdata->meansilence, testdata->burstdata->meansilence, fitdat->burstsilencemean)); 
 
 			fitdat->burstsilencesd = (abs(testdata->burstdata->sdsilence - burstdata->sdsilence) / testdata->burstdata->sdsilence) * 100.0;
 			fitdat->score += fitdat->burstsilencesd * (*fitweights)["burstsilencesd"];
@@ -335,7 +337,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 			fitdat->burstintrafreq = (abs(testdata->burstdata->freq - burstdata->freq) / testdata->burstdata->freq) * 100.0;
 			fitdat->score += fitdat->burstintrafreq * (*fitweights)["burstintrafreq"];
 
-			ofp.WriteLine(text.Format("intra %.6f  exp %.6f  score %.6f", burstdata->meansilence, testdata->burstdata->meansilence, fitdat->burstsilencemean)); 
+			if(fitdiag) ofp.WriteLine(text.Format("intra %.6f  exp %.6f  score %.6f", burstdata->meansilence, testdata->burstdata->meansilence, fitdat->burstsilencemean)); 
 
 			//MoF.Fitness = (Math.Abs(ExpBurst.MeanExtraBurstNoise - TgtBurst.MeanExtraBurstNoise) / TgtBurst.MeanExtraBurstNoise) * 100.0;
 
@@ -358,7 +360,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 			for(i=0; i<IoDcount; i++) {
 
-				ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDdata[i], IoDdata[i])); 
+				if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDdata[i], IoDdata[i])); 
 
 				if(testdata->IoDdata[i] > IoDdata[i]) {
 					Big = testdata->IoDdata[i];
@@ -371,14 +373,14 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 				Error = (Big - Small) / Big * 100;
 				RMSError += Error * Error;
-				ofp.WriteLine(text.Format("Error %.6f  RMSError %.6f\n", Error, RMSError)); 
+				if(fitdiag) ofp.WriteLine(text.Format("Error %.6f  RMSError %.6f\n", Error, RMSError)); 
 			}
 
 			fitdat->RMSIoD = RMSError / 100;
 			fitdat->scores["RMSIoD"] = RMSError / 100;
 			//fitdat->score += fitdat->RMSIoD * (*fitweights)["RMSIoD"];
 
-			ofp.WriteLine(text.Format("IoD %.6f\n", fitdat->RMSIoD)); 
+			if(fitdiag) ofp.WriteLine(text.Format("IoD %.6f\n", fitdat->RMSIoD)); 
 		}
 
 
@@ -416,5 +418,5 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 		delete fitcon;
 
-		ofp.Close();
+		if(fitdiag) ofp.Close();
 }
