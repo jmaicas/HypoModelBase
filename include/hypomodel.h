@@ -159,6 +159,7 @@ public:
 	Model *mod;
 
 	HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size);
+	~HypoMain();
 
 	void OnPaint2(wxPaintEvent& event);
 	void SetStatus(wxString);

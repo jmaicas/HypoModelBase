@@ -25,7 +25,7 @@
 IMPLEMENT_APP(HypoApp)
 
 
-	MainFrame *mainframe;
+MainFrame *mainframe;
 
 
 HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size)
@@ -293,6 +293,19 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 }
 
 
+HypoMain::~HypoMain()
+{
+
+	// See HypoMain::CleanUp();
+
+	//delete flagrefs;
+	//delete hypoflags;
+
+	//delete expdata;
+	//delete expdata2;
+	//delete selectdata;
+}
+
 
 void HypoMain::ToolLoad(ParamStore *toolflags)
 {
@@ -346,7 +359,11 @@ void HypoMain::CleanUp() {
 	delete mod;
 	delete[] gpos;
 
+	delete flagrefs;
+	delete hypoflags;
+
 	delete expdata;
+	delete expdata2;
 	delete selectdata;
 	delete burstdata;
 
