@@ -671,4 +671,79 @@ public:
 };
 
 
+class FileDat{
+public:
+	wxString name;
+	wxString path;
+	int index;
+
+	FileDat() {
+		name = "";
+		path = "";
+		index = -1;
+	};
+
+	FileDat(wxString fname, wxString fpath) {
+		name = fname;
+		path = fpath;
+		index = -1;
+	};
+
+	bool Compare(FileDat test) {
+		if(name == test.name && path == test.path) return true;
+		else return false;
+	}
+
+	bool operator==(FileDat test)  {
+		return Compare(test);
+	};
+
+	wxString String() {
+		return path + "\\" + name;
+	}
+};
+
+
+class FileBase{
+public:
+	int numfiles;
+	wxString name[100];
+	wxString path[100];
+	bool newentry;
+
+	std::vector <FileDat> filestore;
+
+	FileBase(int size) {
+		filestore.resize(size);
+		numfiles = 0;
+		newentry = false;
+	};
+
+	FileDat *Add(FileDat newfile) {
+		FileDat *check = Find(newfile);
+		if(check) return check;
+		filestore[numfiles] = newfile;
+		filestore[numfiles].index = numfiles;
+		newentry = true;
+		return &(filestore[numfiles++]);
+	}
+
+	FileDat *Find(FileDat file) {
+		for(int i=0; i<numfiles; i++) 
+			if(filestore[i] == file) return &(filestore[i]);
+		return NULL;
+	};
+
+	FileDat operator[](int index) {
+		if(index < 0) index = 0;
+		return filestore[index];
+	};
+
+	void Store(FileDat);
+	void Load(FileDat);
+};
+
+
+
+
 #endif

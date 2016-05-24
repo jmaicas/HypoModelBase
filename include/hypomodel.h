@@ -10,6 +10,7 @@
 
 #include <wx/wx.h>
 #include "hypograph.h"
+#include "hypoplot.h"
 #include "hypopanels.h"
 #include "hypomods.h"
 #include "hypodat.h"

@@ -78,6 +78,7 @@ public:
 	int spikedisp;
 
 	void AddGraph(graphdisp *);
+	void SetGraph(int, graphdisp *);
 	void FrontGraph(graphdisp *);
 
 	GraphWindow3(HypoMain *main, wxFrame *parent, Model *, wxPoint pos, wxSize size, graphdisp *gdisp, int index);

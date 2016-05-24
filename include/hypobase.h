@@ -312,6 +312,7 @@ class GraphBase;
 class ModGenBox;
 class DiagBox;
 class ToolSet;
+class PlotBox;
 
 
 //DiagBox *gdiag;
@@ -343,12 +344,13 @@ public:
 	wxStatusBar *statusbar;
 	//ToolSet toolset;
 	ToolSet *toolset;
-  DiagBox *diagbox;
+	DiagBox *diagbox;
 	wxColour colourpen[10];
 
 	// Display
 	ScaleBox *scalebox;
 	GraphBox *graphbox;
+	PlotBox *plotbox;
 	GraphWindow3 *graphwin[10];
     
 	int basic;

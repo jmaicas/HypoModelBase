@@ -35,8 +35,8 @@ DispWin::DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, cons
 
 	/*
 	for(graph = 0; graph<numdraw; graph++) {
-		graphwin[graph] = new GraphWindow3(mainwin, this, mainwin->mod, wxPoint(0, graph*250 + 10), wxSize(100, 255), &gpos[graph+startpos], graph+startpos);
-		graphsizer->Add(graphwin[graph], 1, wxEXPAND);
+	graphwin[graph] = new GraphWindow3(mainwin, this, mainwin->mod, wxPoint(0, graph*250 + 10), wxSize(100, 255), &gpos[graph+startpos], graph+startpos);
+	graphsizer->Add(graphwin[graph], 1, wxEXPAND);
 	}*/
 
 	CreateStatusBar();
@@ -83,7 +83,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	currentgraph = 0;
 	spikedisp = 0;
 	gsynch = 1;
-	
+
 	selectband = false;
 
 	colourpen = mainwin->colourpen;
@@ -95,26 +95,26 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	/*
 	menuPlot = new wxMenu;
 	if(mainwin->diagnostic) {
-		menuPlot->Append(ID_GraphRemove, "Delete Graph");
-		//menuPlot->Append(ID_GraphPrint, "Print Graph");
-		menuPlot->Append(ID_GraphEPS, "Export EPS");
-		menuPlot->Append(ID_Scale, "Plot Panel");
-		menuPlot->AppendSeparator();
+	menuPlot->Append(ID_GraphRemove, "Delete Graph");
+	//menuPlot->Append(ID_GraphPrint, "Print Graph");
+	menuPlot->Append(ID_GraphEPS, "Export EPS");
+	menuPlot->Append(ID_Scale, "Plot Panel");
+	menuPlot->AppendSeparator();
 	}
 	for(i=0; i<mod->graphbase->numsets; i++) {
-		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
-		//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("menu set Index %d Name %s\n", 1000+i, mod->graphbase->setstore[i].name));
-		/*graphset = mod->graphbase->GetSet(i);
-		if(graphset->single) 
-		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
-		else {
-		newsub = new wxMenu;
-		for(j=0; j<graphset->numgraphs; j++) {
-		//newsub->Append(wxID_ANY, mod->graphbase->graphset
-		newsub->AppendRadioItem(wxID_ANY, (*mod->graphbase)[graphset->gindex[j]]->gname);
-		}
-		menuPlot->AppendSubMenu(newsub, mod->graphbase->setstore[i].name); 
-		}*/
+	menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
+	//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("menu set Index %d Name %s\n", 1000+i, mod->graphbase->setstore[i].name));
+	/*graphset = mod->graphbase->GetSet(i);
+	if(graphset->single) 
+	menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
+	else {
+	newsub = new wxMenu;
+	for(j=0; j<graphset->numgraphs; j++) {
+	//newsub->Append(wxID_ANY, mod->graphbase->graphset
+	newsub->AppendRadioItem(wxID_ANY, (*mod->graphbase)[graphset->gindex[j]]->gname);
+	}
+	menuPlot->AppendSubMenu(newsub, mod->graphbase->setstore[i].name); 
+	}*/
 	//}
 
 
@@ -267,7 +267,7 @@ void GraphWindow3::OnGraph(wxCommandEvent& event)
 	xfrom = gpos->GetFront()->xfrom;
 	xto = gpos->GetFront()->xto;
 
-	
+
 	graphset = mod->graphbase->GetSet(id-1000);
 	gdex = graphset->GetPlot(mainwin->scalebox->GetFlags());
 	gpos->Front((*mod->graphbase)[gdex]);
@@ -297,11 +297,11 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 	mousedown = pos;
 
 	double xdiff = graph->xto - graph->xfrom;
-  double xscale = xdiff / xplot;
+	double xscale = xdiff / xplot;
 	double xgraph = (mousedown.x - xbase) * xscale + graph->xfrom;
 
 	double ydiff = graph->yto - graph->yfrom;
-  double yscale = ydiff / yplot;
+	double yscale = ydiff / yplot;
 	double ygraph = (yplot - mousedown.y + ybase) * yscale + graph->yfrom;
 	//ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
 
@@ -309,12 +309,12 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
 
 	int x, y, xx, yy ;
-  //event.GetPosition(&x,&y);
-  //CalcUnscrolledPosition( x, y, &xx, &yy );
-  anchorpos = pos;
-  currentpos = anchorpos;
-  selectband = true;
-  //CaptureMouse() ;
+	//event.GetPosition(&x,&y);
+	//CalcUnscrolledPosition( x, y, &xx, &yy );
+	anchorpos = pos;
+	currentpos = anchorpos;
+	selectband = true;
+	//CaptureMouse() ;
 }
 
 
@@ -330,6 +330,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 	// Graph select
 
 	if(mainwin->graphbox) mainwin->graphbox->SetGraph(this);
+	if(mainwin->plotbox) mainwin->plotbox->SetGraph(this);
 
 	// Data Selection drag 
 
@@ -370,7 +371,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 	PrepareDC(dc);
 	wxDCOverlay overlaydc(overlay, &dc);
 	overlaydc.Clear();}
-  overlay.Reset();
+	overlay.Reset();
 }
 
 
@@ -413,6 +414,13 @@ void GraphWindow3::AddGraph(graphdisp *newgraph)
 		graphset[numgraphs] = newgraph;
 		numgraphs++;
 	}
+}
+
+
+void GraphWindow3::SetGraph(int index, graphdisp *newgraph)
+{
+	if(index > numgraphs) AddGraph(newgraph);
+	else graphset[index] = newgraph;
 }
 
 
@@ -875,11 +883,11 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					for(j=1; j<xnum; j++) {
 						data = (*gdatadv)[xindex + j];
 						if(drawdiag) fprintf(ofp, "xdraw %d, xnum %d, data %.4f\n", i, j, data);
-                        if(dir) {
+						if(dir) {
 							if(data > mpoint) mpoint = data;
 							else if(data < mpoint) mpoint = data;
 							//if(!dir && (*gdatadv)[xindex + j] < mpoint) mpoint = (*gdatadv)[xindex + j];
-                        }
+						}
 					}
 					if(preval <= mpoint || preval < 0.000001) dir = 1; else dir = 0;
 					y = mpoint;
@@ -900,9 +908,11 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			if(drawdiag) fclose(ofp);
 		}
 
-		double prevx;
+		double prevx, xvalnext;
+		int xposnext;
 
 		if(gtype == 2 && graph->gdatax) {				                            // line graph with X data
+			mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 			oldx = xbase + xoffset;
 			oldy = (int)(yplot + ybase - yrange * (yfrom));
 			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
@@ -910,14 +920,22 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				xval = (*graph->gdatax)[i];
 				//if(xval <= prevx) break;
 				if(xval >= xfrom && xval <= xto) {
-					xpos = (int)(xval - xfrom) * xrange;
-					//mainwin->diagbox->Write(text.Format("\n X %d val %.2f pos %d\n", i, xval, xpos));
+					xpos = (int)((xval - xfrom) * xrange);
 					y = (*gdatadv)[i];
-					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
+					/*
+					xposnext = (int)((*graph->gdatax)[i+1] - xfrom) * xrange;                  // proto code for scaling dense data for screen display 25/5/16
+					while(xposnext == xpos) {
+						i++;
+						xposnext = (int)((*graph->gdatax)[i+1] - xfrom) * xrange;
+					}*/
+
+					//mainwin->diagbox->Write(text.Format("\n X %d val %.2f pos %d\n", i, xval, xpos));
+					//mainwin->diagbox->Write(text.Format("XY graph line X %.4f Y %.4f\n", xval, y));
+
 					dc.SetPen(colourpen[colour]);
 					DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
 					dc.SetPen(colourpen[black]);
-				  if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+					if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
 					oldx = xpos + xbase + xoffset;
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}
@@ -945,28 +963,28 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 						DrawLine(dc, gc, barpos + k, yplot + ybase, barpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
 					}
 					//dc.SetPen(colourpen[black]);
-				  //if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);			
+					//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);			
 				}
 			}
 		}
 
 		/*
 		if(gtype == 7) {                             // scaled width bars    
-			for(i=0; i<(xto - xfrom); i++) {
-				if(gpar == -1) y = (double)gdata[i + (int)xfrom];
-				if(gpar == -2) y = gdatad[i + (int)xfrom];
-				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
-				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
-				xpos = i * xrange + xbase;
-				if(xrange <= 1) {
-					DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
-				}
-				else {
-					for(k=0; k<xrange; k++) {
-						DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
-					}
-				}
-			}
+		for(i=0; i<(xto - xfrom); i++) {
+		if(gpar == -1) y = (double)gdata[i + (int)xfrom];
+		if(gpar == -2) y = gdatad[i + (int)xfrom];
+		if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+		if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+		xpos = i * xrange + xbase;
+		if(xrange <= 1) {
+		DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
+		}
+		else {
+		for(k=0; k<xrange; k++) {
+		DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
+		}
+		}
+		}
 		}*/
 
 

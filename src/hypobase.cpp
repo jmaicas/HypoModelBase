@@ -30,6 +30,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	diagbox->Write("Diagnostic Box OK\n\n");
 
 	graphbox = NULL;
+	plotbox = NULL;
 
 	colourpen[0].Set("#000000");       // 0 black
 	colourpen[1].Set("#F50000");       // 1 red
