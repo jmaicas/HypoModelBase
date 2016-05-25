@@ -20,6 +20,7 @@ public:
 	TagBox *datatag, *datapath;
 	GraphDat *graph;
 	GraphWindow3 *graphwin;
+	GraphDisp *graphdisp;
 
 	PlotBox(PlotModel *mod, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//~PlotBox();

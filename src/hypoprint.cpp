@@ -36,7 +36,7 @@ void GraphWindow3::PrintEPS()
 	double yoffset;
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
-	int gplot, colour;
+	int gplot, gdisp, colour;
 	double barwidth, bargap;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
@@ -72,8 +72,11 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine("");
 
 
-	for(gplot=0; gplot<numgraphs; gplot++) {
-		graph = graphset[gplot]->plot[0];
+	//for(gplot=0; gplot<numdisps; gplot++) {
+	for(gdisp=0; gdisp<numdisps; gdisp++)
+	for(gplot=0; gplot<dispset[gdisp]->numplots; gplot++) {
+
+		graph = dispset[gdisp]->plot[gplot];
 
 		// Get Graph parameters
 		//graph = graphset[0]->plot[0];
@@ -384,7 +387,7 @@ void GraphWindow3::PrintEPS()
 				xval = (*graph->gdatax)[i];
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (xval - xfrom) * xrange;
-					barshift = (barwidth * numgraphs + (numgraphs - 1) * bargap) / 2;
+					barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
 					barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
 					y = (*gdatadv)[i];
 

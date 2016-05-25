@@ -63,7 +63,7 @@ public:
 	wxString GetPath();
 	virtual void RunModel();
 	virtual void Output();
-	virtual void GSwitch(graphdisp *gpos, ParamStore *gflags);
+	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags);
 	virtual int ModeSum(ParamStore *gflags);
 	virtual int SoundLink(SpikeDat **, datdouble **);
 	virtual void ModStore();

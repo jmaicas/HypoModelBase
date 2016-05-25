@@ -96,7 +96,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
 	diagbox->Write("HypoMain initialisation\n\n");
 
-	gpos = new graphdisp[numgraphs];
+	gpos = new GraphDisp[numgraphs];
 	//greg = new GraphDat[100];
 	//graphbase = new GraphBase(200);
 	//greg = graphbase->graphstore;

@@ -41,7 +41,7 @@ Model::~Model()
 }
 
 
-void Model::GSwitch(graphdisp *gpos, ParamStore *gflags)
+void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
 {
 	int i, gdex;
 	GraphSet *graphset;

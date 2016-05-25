@@ -54,7 +54,7 @@ void DispWin::GraphUpdate()
 }
 
 
-GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoint pos, wxSize size, graphdisp *gdisp, int index)
+GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoint pos, wxSize size, GraphDisp *gdisp, int index)
 	: wxPanel(parent, wxID_ANY, pos, size)
 {
 	mainwin = main;
@@ -79,7 +79,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	ybase = 10;
 	xstretch = mainwin->xstretch;
 
-	numgraphs = 0;
+	numdisps = 0;
 	currentgraph = 0;
 	spikedisp = 0;
 	gsynch = 1;
@@ -230,7 +230,7 @@ void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Print Graph %d\n", graphindex));
 
-	graph = graphset[0]->plot[0];
+	graph = dispset[0]->plot[0];
 
 	// Pass two printout objects: for preview, and possible printing.
 	wxPrintDialogData printDialogData(*mainwin->printdata);
@@ -408,26 +408,26 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 }
 
 
-void GraphWindow3::AddGraph(graphdisp *newgraph)
+void GraphWindow3::AddGraph(GraphDisp *newgraph)
 {
-	if(numgraphs < 5) {
-		graphset[numgraphs] = newgraph;
-		numgraphs++;
+	if(numdisps < 5) {
+		dispset[numdisps] = newgraph;
+		numdisps++;
 	}
 }
 
 
-void GraphWindow3::SetGraph(int index, graphdisp *newgraph)
+void GraphWindow3::SetGraph(int index, GraphDisp *newgraph)
 {
-	if(index > numgraphs) AddGraph(newgraph);
-	else graphset[index] = newgraph;
+	if(index > numdisps) AddGraph(newgraph);
+	else dispset[index] = newgraph;
 }
 
 
-void GraphWindow3::FrontGraph(graphdisp *newgraph)
+void GraphWindow3::FrontGraph(GraphDisp *newgraph)
 {
-	graphset[0] = newgraph;
-	if(numgraphs == 0) numgraphs = 1;
+	dispset[0] = newgraph;
+	if(numdisps == 0) numdisps = 1;
 }
 
 
@@ -544,8 +544,8 @@ void GraphWindow3::OnScroll(wxScrollEvent &event)
 	//snum.Printf("graph scroll = %d", scrollpos);
 	//mainwin->SetStatusText(snum);	
 
-	for(plotindex=0; plotindex<numgraphs; plotindex++) {
-		graph = graphset[plotindex]->plot[0];
+	for(plotindex=0; plotindex<numdisps; plotindex++) {
+		graph = dispset[plotindex]->plot[0];
 		xdiff = graph->xto - graph->xfrom;
 		graph->xfrom = scrollpos;
 		graph->xto = scrollpos + xdiff;
@@ -608,7 +608,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	double binsize;
 	int xbasefix;
 	int xview, yview, oldx, oldy;
-	int gplot;
+	int gdisp, gplot;
 	int ylabels, xlabels;
 	double xval, xscale, xdis;
 	double yval, yscale;
@@ -647,9 +647,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	xlabels = 10;
 	ylabels = mainwin->ylabels;
 
-	for(gplot=0; gplot<numgraphs; gplot++) {
+	for(gdisp=0; gdisp<numdisps; gdisp++)
+	for(gplot=0; gplot<dispset[gdisp]->numplots; gplot++) {
 		//graph = gpos->plot[gplot];
-		graph = graphset[gplot]->plot[0];
+		graph = dispset[gdisp]->plot[gplot];
 		gpar = graph->gparam;
 		if(gpar == -1) gdata = graph->gdata;
 		if(gpar == -2) gdatad = graph->gdatad;
@@ -953,7 +954,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				//if(xval <= prevx) break;
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (int)(xval - xfrom) * xrange;
-					barshift = (barwidth * numgraphs + (numgraphs - 1) * bargap) / 2;
+					barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
 					barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));

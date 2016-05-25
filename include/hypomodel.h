@@ -117,7 +117,7 @@ public:
 	//GraphBox *graphbox;
 	//ToolBox *toolset[10];
 	//GraphWindow3 *graphwin[10];
-	graphdisp *gpos;
+	GraphDisp *gpos;
 	GraphDat *greg;
 	GraphBase *graphbase;
 	DispWin *dispwin;

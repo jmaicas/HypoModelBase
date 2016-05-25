@@ -608,7 +608,7 @@ void GraphDat::Init()
 }
 
 
-graphdisp::graphdisp()
+GraphDisp::GraphDisp()
 {
 	numplots = 0;
 	currentplot = 0;
@@ -616,7 +616,7 @@ graphdisp::graphdisp()
 }
 
 
-void graphdisp::Add(GraphDat *newplot)
+void GraphDisp::Add(GraphDat *newplot)
 {
 	if(numplots < 5) {
 		plot[numplots] = newplot;
@@ -625,14 +625,38 @@ void graphdisp::Add(GraphDat *newplot)
 }
 
 
-void graphdisp::Front(GraphDat *newplot)
+void GraphDisp::Set(int index, GraphDat *newplot)
+{
+	if(numplots <= index) Add(newplot);
+	else plot[index] = newplot;
+}
+
+
+void GraphDisp::XYSynch()      // Synchronise X and Y axes for all plots
+{
+	int i;
+	GraphDat *graph, *graph0;
+
+	graph0 = plot[0];
+	
+	for(i=1; i<numplots; i++) {
+		graph = plot[i];
+		graph->yfrom = graph0->yfrom; 
+		graph->yto = graph0->yto; 
+		graph->xfrom = graph0->xfrom; 
+		graph->xto = graph0->xto; 
+	}
+}
+
+
+void GraphDisp::Front(GraphDat *newplot)
 {
 	plot[0] = newplot;
 	if(numplots == 0) numplots = 1;
 }
 
 
-GraphDat *graphdisp::GetFront()
+GraphDat *GraphDisp::GetFront()
 {
 	return plot[0];
 }

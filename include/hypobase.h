@@ -268,7 +268,8 @@ enum {
 	ID_Neuron,
 	ID_FileIO,
 	ID_MultiRun,
-	ID_XYPos
+	ID_XYPos,
+	ID_AddPlot
 };
 
 

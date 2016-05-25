@@ -36,7 +36,7 @@ public:
 	//wxBufferedPaintDC dc;
 	ScaleBox *scalebox;
 	wxScrollBar *scrollbar;
-	graphdisp *gpos;
+	GraphDisp *gpos;
 	GraphDat *graph;
 	//GraphBase *gbase;
 	Model *mod;
@@ -72,16 +72,16 @@ public:
 	wxBitmapButton *xzoomin;
 	int ypos;
 	int xpos;
-	graphdisp *graphset[5];
-	int numgraphs;
+	GraphDisp *dispset[5];
+	int numdisps;
 	int currentgraph;
 	int spikedisp;
 
-	void AddGraph(graphdisp *);
-	void SetGraph(int, graphdisp *);
-	void FrontGraph(graphdisp *);
+	void AddGraph(GraphDisp *);
+	void SetGraph(int, GraphDisp *);
+	void FrontGraph(GraphDisp *);
 
-	GraphWindow3(HypoMain *main, wxFrame *parent, Model *, wxPoint pos, wxSize size, graphdisp *gdisp, int index);
+	GraphWindow3(HypoMain *main, wxFrame *parent, Model *, wxPoint pos, wxSize size, GraphDisp *gdisp, int index);
 	~GraphWindow3();
 
 	void OnPaint(wxPaintEvent& event);
@@ -142,15 +142,17 @@ public:
 	ParamText *modpathcon;
 	GraphBox(GraphWindow3 *, const wxString&);
 
-
 	void OnOK(wxCommandEvent& event);
 	void OnPrint(wxCommandEvent& event);
 	void OnRadio(wxCommandEvent& event);
+	void OnSynch(wxCommandEvent& event);
 	void OnChoice(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
+	void OnSpin(wxSpinEvent& event);
 	wxBoxSizer *ParamLayout(int columns=1);
 	void OnClose(wxCloseEvent& event);
 	void SetGraph(GraphWindow3 *newgraphwin=NULL);
+	void SetControls();
 	void SetParams(GraphDat *setgraph=NULL);
 	void SetParamsCopy(GraphDat *setgraph);
 };
@@ -193,7 +195,7 @@ public:
 
 	wxString snum, redtag, text;
 	wxFont boxfont, confont;
-	graphdisp *gpos;
+	GraphDisp *gpos;
 	//GraphDat *greg;
 	std::vector <GraphDat> greg;
 	GraphBase *gbase;
@@ -209,7 +211,7 @@ public:
 	wxToggleButton *syncbutton;
 	wxCheckBox *gsync[10];
 
-	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, graphdisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, short boxtype=0);
+	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, short boxtype=0);
 	~ScaleBox();
 
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);
@@ -287,7 +289,7 @@ public:
 	int i;
 	int startpos, numdraw;
 	wxString snum;
-	graphdisp *gpos;
+	GraphDisp *gpos;
 	ScaleBox *scalebox;
 	GraphWindow3 *graphwin[10];
 	GraphPanel *graphpanel[10];

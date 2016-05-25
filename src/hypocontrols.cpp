@@ -334,7 +334,7 @@ void ParamCon::OnSpin(wxSpinEvent& event)
 	wxString text;
 
 	int spindir = event.GetPosition();
-	if(mainwin->diagnostic) mainwin->diagbox->textbox->AppendText(text.Format("\nspin click %d\n", spindir));
+	if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText(text.Format("\nspin click %d\n", spindir));
 
 	event.Skip();
 }
@@ -357,7 +357,7 @@ void ParamCon::OnSpinDown(wxSpinEvent& WXUNUSED(event))
 {
 	double value, newvalue;
 
-	if(mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("spin down\n");
+	if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("spin down\n");
 
 	numbox->GetValue().ToDouble(&value);
 	newvalue = value - numstep;

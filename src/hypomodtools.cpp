@@ -245,7 +245,7 @@ void ModGenBox::GenModCode()
 	page[pageindex]->AppendText(text);
 	text.Printf("\n\nclass %sModel : public Model\n{\npublic:\n\t%sModel(int, wxString, HypoMain *);\n", modname, modname);
 	page[pageindex]->AppendText(text);
-	text.Printf("\n\tvoid RunModel();\n\tvoid GraphData();\n\tvoid GSwitch(graphdisp *gpos, ParamStore *gflags);\n};\n");
+	text.Printf("\n\tvoid RunModel();\n\tvoid GraphData();\n\tvoid GSwitch(GraphDisp *gpos, ParamStore *gflags);\n};\n");
 	page[pageindex]->AppendText(text);
 
 

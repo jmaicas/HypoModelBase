@@ -448,7 +448,7 @@ public:
 };
 
 
-class GraphDat{
+class GraphDat{                               // Basic single graph class
 public:
 	GraphDat();
 	GraphDat(datdouble *, double, double, double, double, wxString, int type, double bin = 1, int colour = red, int xscale = 1, int xdis = 0);
@@ -522,10 +522,17 @@ public:
 
 
 class GraphBase;
-class graphdisp;
+class GraphDisp;
 
 
-class GraphSet{
+/* 
+
+GraphSet used to store set of graphs such that the set makes a single menu entry and the displayed graph can be selected using scale panel buttons
+
+*/
+
+
+class GraphSet{                   // Stores a set of GraphDat objects using an array of their GraphBase indexes
 public:
 	int sdex;
 	wxString tag;
@@ -539,7 +546,7 @@ public:
 	int gcodes[20];
 	int modesum;
 	bool single;
-	wxString modeflag[10];
+	wxString modeflag[10];          // Set of flags is used to control the selected, displayed graph 
 	int modeweight[10];
 
 	GraphSet() {};
@@ -562,7 +569,7 @@ public:
 };
 
 
-class GraphBase{
+class GraphBase{            // Dual purpose serial storage database for all GraphDat objects and all GraphSet objects
 public:
 	int numsets;
 	int setstoresize;
@@ -644,7 +651,7 @@ public:
 };
 
 
-class graphdisp{
+class GraphDisp{             // used for multiple layered plots for simultaneous display
 public:
 	/*int data;
 	wxTextCtrl *yf;
@@ -662,12 +669,15 @@ public:
 	int currentplot;
 	int spikedisp;
 	int sdex;
+	int maxplots;
 	//BurstDat *burstdata;
 	
-	graphdisp();
+	GraphDisp();
 	void Add(GraphDat *);
 	void Front(GraphDat *);
 	GraphDat *GetFront();
+	void Set(int index, GraphDat *newplot);   // Set(0, newplot) equivalent to Front(newplot)
+	void XYSynch();
 };
 
 
