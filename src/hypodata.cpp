@@ -18,7 +18,7 @@ using namespace std;
 
 
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
-: ParamBox(mod, title, pos, size, "cellbox")
+	: ParamBox(mod, title, pos, size, "cellbox")
 {
 	int datwidth;
 
@@ -45,13 +45,13 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	datagrid->Add(mean);
 	datagrid->Add(new wxStaticText(panel, -1, "Std Dev"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	datagrid->Add(sd);
-	
+
 	datneuron = new wxTextCtrl(panel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
 	datspin = new wxSpinButton(panel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
 	wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
 	datbox->Add(datspin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datbox->AddSpacer(5);
-	
+
 	wxBoxSizer *neurobox = new wxBoxSizer(wxHORIZONTAL);
 	neurobox->Add(new wxStaticText(panel, wxID_ANY, "Neuron"), 1, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	neurobox->Add(datneuron, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
@@ -74,7 +74,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	mainbox->AddStretchSpacer();
 	mainbox->Add(colbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	mainbox->AddStretchSpacer();
-	
+
 	panel->Layout();
 
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(CellBox::OnEnter));
@@ -146,7 +146,7 @@ void CellBox::OnEnter(wxCommandEvent& event)
 
 
 OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols)
-: ParamBox(mod, title, pos, size, "outbox")
+	: ParamBox(mod, title, pos, size, "outbox")
 {
 	int gridrows, gridcols;
 
@@ -201,7 +201,7 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	//controlbox->Add(storebox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	controlbox->AddSpacer(10);
 	//controlbox->Add(buttonbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-  controlbox->Add(leftbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	controlbox->Add(leftbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	controlbox->AddSpacer(10);
 	//controlbox->Add(vdu, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	//controlbox->Add(displaybox, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
@@ -281,7 +281,7 @@ void OutBox::HistLoad()
 			readline = readline.AfterFirst(' ');
 			readline.Trim();
 			initparams = readline;
-		  paramstoretag->Insert(initparams, 0);
+			paramstoretag->Insert(initparams, 0);
 			readline = infile.ReadLine();
 			//tofp.WriteLine(readline);
 		}
@@ -383,7 +383,7 @@ void OutBox::GridStore()
 		redtag = filetag;
 		return;
 	}
-	
+
 	redtag = "";
 	paramstoretag->SetForegroundColour(blackpen);
 	paramstoretag->SetValue("");
@@ -436,8 +436,8 @@ void OutBox::GridLoad()
 	/*
 	filename = filetag + "-grid.txt";
 	if(!ifp.Open(filename)) {
-		paramstoretag->SetValue("Not found");
-		return;
+	paramstoretag->SetValue("Not found");
+	return;
 	}*/
 
 	filename = filetag.ToStdString() + "-grid.txt";
@@ -451,7 +451,7 @@ void OutBox::GridLoad()
 	short tagpos = paramstoretag->FindString(filetag);
 	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
 	paramstoretag->Insert(filetag, 0);
-	
+
 	redtag = "";
 	paramstoretag->SetForegroundColour(blackpen);
 	paramstoretag->SetValue("");
@@ -461,8 +461,8 @@ void OutBox::GridLoad()
 
 	WriteVDU("Reading file...");
 
-	
-  numlines = count(istreambuf_iterator<char>(infile), istreambuf_iterator<char>(), '\n');
+
+	numlines = count(istreambuf_iterator<char>(infile), istreambuf_iterator<char>(), '\n');
 	infile.clear();
 	infile.seekg(0, ios::beg);
 	linecount = 0;
@@ -513,7 +513,7 @@ void OutBox::GridLoadFast()
 	int numlines, linecount, cellcount;
 
 	filetag = paramstoretag->GetValue();
-	
+
 
 	filename = filetag.ToStdString() + "-grid.txt";
 	ifstream readfile(filename.c_str());
@@ -522,11 +522,20 @@ void OutBox::GridLoadFast()
 		return;
 	}
 
+	/*
+	char c;
+	diagbox->Write("File start:\n");
+	while (readfile.get(c)) {
+		diagbox->Write(text.Format("%d ", c));
+		if(c == '\n') diagbox->Write("\n");
+	}
+	diagbox->Write("EOF\n");*/
+
 	// Param file history
 	short tagpos = paramstoretag->FindString(filetag);
 	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
 	paramstoretag->Insert(filetag, 0);
-	
+
 	redtag = "";
 	paramstoretag->SetForegroundColour(blackpen);
 	paramstoretag->SetValue("");
@@ -536,31 +545,65 @@ void OutBox::GridLoadFast()
 
 	WriteVDU("Reading file...");
 
-  numlines = count(istreambuf_iterator<char>(readfile), istreambuf_iterator<char>(), '\n');
+	numlines = count(istreambuf_iterator<char>(readfile), istreambuf_iterator<char>(), '\n');
+	if(!numlines) {
+		WriteVDU("File empty");
+		return;
+	}
 	readfile.clear();
-	readfile.seekg(0, ios::beg);
+	//readfile.seekg(0, ios::beg);
 	linecount = 0;
 
 	//string filetext = (ReadFile(filename.c_str()));
 	//istringstream filetext(ReadFile(filename.c_str()));
 
 	//ifstream infile(filename, std::ios::in | std::ios::binary);
-  
-	
-		string contents;
-		readfile.seekg(0, ios::end);
-		contents.resize(readfile.tellg());
-		readfile.seekg(0, ios::beg);
-		readfile.read(&contents[0], contents.size());
-		readfile.close();
-		istringstream infile(contents);
-	
+
+	/*
+	string contents;
+	readfile.seekg(0, ios::end);
+	contents.resize(readfile.tellg());
+	readfile.seekg(0, ios::beg);
+	readfile.read(&contents[0], contents.size());
+	readfile.close();
+	istringstream infile(contents);
+	*/
+
+	string contents;
+	readfile.seekg(0, readfile.end);
+	contents.resize(readfile.tellg());
+	readfile.seekg(0, readfile.beg);
+	readfile.read(&contents[0], contents.size());
+	readfile.close();
+	istringstream infile(contents);
+
+	/*
+	diagbox->Write("Contents codes:\n");
+	for(i=0; i<contents.length(); i++) {
+		diagbox->Write(text.Format("%d ", contents[i]));
+		if(contents[i] == '\n') diagbox->Write("\n");
+	}
+	diagbox->Write("EOF Contents\n");
+
+	diagbox->Write(text.Format("File length %d size %d numlines %d :\n%s\n", (int)contents.length(), (int)contents.size(), numlines, contents));
+	*/
+
 	cellcount = 0;
 
 	//readline = ifp.ReadLine();
 	while(getline(infile, line)) {
+		//diagbox->Write(text.Format(" line length %d first %d\n", (int)line.length(), (char)line[0]));
 		wxString readline(line);
-		if(readline.IsEmpty()) break;
+		/*
+		diagbox->Write("Line codes:");
+		for(i=0; i<readline.Len(); i++) diagbox->Write(text.Format("%d ", readline[i]));
+		diagbox->Write("\n");
+		*/
+		//readline.Trim(false);
+		//readline.Trim();
+		//diagbox->Write("readline " + readline);
+		if(readline.IsEmpty() || !readline[0]) break;
+		//else diagbox->Write(text.Format(" length %d ", (int)readline.Len()));
 		//diagbox->Write(readline + "\n");
 		datstring = readline.BeforeFirst(' ');
 		datstring.ToLong(&numdat);
@@ -575,7 +618,7 @@ void OutBox::GridLoadFast()
 		readline.Trim();
 		cell = readline;
 		textgrid->SetCell(row, col, cell);
-		//diagbox->Write(text.Format("setcell %d %d %s\n", row, col, cell));
+		//diagbox->Write(text.Format(" setcell %d %d %s\n", row, col, cell));
 		cellcount++;
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		//readline = ifp.ReadLine();
@@ -584,8 +627,8 @@ void OutBox::GridLoadFast()
 		gauge->SetValue(100 * linecount / numlines);
 	}
 	//infile.close();
-	diagbox->Write("OK\n");
-	//WriteVDU(text.Format("OK, %d cells\n", cellcount));
-	WriteVDU("OK\n");
+	//diagbox->Write("OK\n");
+	WriteVDU(text.Format("OK, %d cells\n", cellcount));
+	//WriteVDU("OK\n");
 	gauge->SetValue(0);
 }

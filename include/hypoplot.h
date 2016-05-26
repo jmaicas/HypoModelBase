@@ -22,9 +22,10 @@ public:
 	GraphWindow3 *graphwin;
 	GraphDisp *graphdisp;
 
+	int plotcount;
+
 	PlotBox(PlotModel *mod, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//~PlotBox();
-
 	void OnPlotXY(wxCommandEvent& event);
 	void OnPlotY(wxCommandEvent& event);
 	void OnBin(wxCommandEvent& event);

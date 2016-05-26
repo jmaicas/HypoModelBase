@@ -420,6 +420,9 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	
 	setgraph->xtag = paramset->GetCon("xtag")->GetString();
 	setgraph->ytag = paramset->GetCon("ytag")->GetString();
+	
+	setgraph->xtickmode = graph->xtickmode;
+	setgraph->ytickmode = graph->ytickmode;	
 }
 
 

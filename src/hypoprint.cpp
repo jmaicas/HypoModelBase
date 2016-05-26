@@ -49,7 +49,7 @@ void GraphWindow3::PrintEPS()
 	xstretch = mainwin->xstretch;
 	xlabels = 10;
 	ylabels = mainwin->ylabels;
-	xoffset = 1;
+	xoffset = 0;
 	axisstroke = 0.75;
 	//yoffset = axisstroke / 2;
 	yoffset = 0;
@@ -351,7 +351,7 @@ void GraphWindow3::PrintEPS()
 					xpos = (xval - xfrom) * xrange;
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
-					out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
+					if(i > 0) out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));        // First point sets start position
 					//dc.SetPen(colourpen[black]);
 					//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
 					oldx = xpos + xbase + xoffset;
