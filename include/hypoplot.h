@@ -5,6 +5,7 @@
 
 
 #include "hypograph.h"
+#include "hypopanels.h"
 
 
 class PlotModel;

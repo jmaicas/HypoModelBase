@@ -345,7 +345,7 @@ void GraphWindow3::PrintEPS()
 			oldx = xbase;
 			oldy = ybase; // - yrange * (yfrom);
 			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
-			for(i=0; i<graph->xcount; i++) {
+			for(i=0; i<graph->xcount; i+=xsample) {
 				xval = (*graph->gdatax)[i];
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (xval - xfrom) * xrange;

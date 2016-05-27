@@ -8,9 +8,12 @@
 //#include "wx/wx.h"
 //#include "hypobase.h"
 #include "hypocontrols.h"
+#include "hypopanels.h"
 #include <wx/clipbrd.h>
 #include <wx/grid.h>
 
+
+class OutBox;
 
 
 class DiagBox: public ToolBox
@@ -33,10 +36,12 @@ public:
 
 		wxGridStringTable *undogrid;
 		wxTextCtrl *vdu;
+		OutBox *outbox;
 		wxGauge *gauge;
 
 		void OnRightClick(wxGridEvent& event);
 		void OnLeftClick(wxGridEvent& event);
+		void OnLabelClick(wxGridEvent& event);
 		void OnKey(wxKeyEvent& event);
 		void OnTypeKey(wxKeyEvent &event);
 		void OnSelectAll(wxCommandEvent& event);

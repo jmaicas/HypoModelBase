@@ -14,7 +14,7 @@ using namespace std;
 
 class Model;
 class HypoMain;
-
+class TextGrid;
 
 class OptionPanel : public wxDialog
 {
@@ -221,6 +221,7 @@ public:
 	TextGrid *textgrid;
 	DiagBox *diagbox;
 	wxNotebook *notebook;
+	//PlotBox *plotbox;
 
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20);
 
@@ -238,6 +239,7 @@ public:
 	void OnCopy(wxCommandEvent& event);
 	void OnButton(wxCommandEvent& event);
 	int ColumnData(int, datdouble *);
+	virtual void ColumnSelect(int);
 };
 
 

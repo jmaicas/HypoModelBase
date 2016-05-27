@@ -224,7 +224,7 @@ long ParseLong(wxString *readline, wxUniChar tag)
 	wxString numstring;
 	long numdat;
 
-	*readline = readline->AfterFirst(tag);
+	if(tag) *readline = readline->AfterFirst(tag);           // NULL tag just reads next long
 	readline->Trim(false);
 	numstring = readline->BeforeFirst(' ');
 	numstring.ToLong(&numdat);

@@ -223,6 +223,7 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 
 	textgrid->vdu = vdu;
 	textgrid->gauge = gauge;
+	textgrid->outbox = this;
 
 	Connect(ID_paramstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnGridStore));
 	Connect(ID_paramload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnGridLoad));
@@ -338,6 +339,16 @@ void OutBox::OnGridLoad(wxCommandEvent& event)
 	int ioflag = true;
 	if(ioflag) GridLoadFast();
 	else GridLoad();
+
+	//textgrid->AutoSizeColumns(false);
+}
+
+
+void OutBox::ColumnSelect(int col)
+{
+	wxString text;
+	
+	WriteVDU(text.Format("Column Select %d\n", col));
 }
 
 
@@ -368,6 +379,7 @@ void OutBox::GridStore()
 	wxString celltext, text, filename, filetag;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, sfilename;
+	Index columnindex;
 
 	filetag = paramstoretag->GetValue();
 	filename = filetag + "-grid.txt";
@@ -408,16 +420,22 @@ void OutBox::GridStore()
 			//if(!celltext.IsEmpty()) ofp.WriteLine(text.Format("%d %d %s", row, col, celltext));
 			if(!celltext.IsEmpty()) {
 				text.Printf("%d %d %s\n", row, col, celltext);
+				columnindex.Add(col);
 				outfile << text.ToStdString();
 			}
 		}
 	}
 
+	outfile.close();
 	gauge->SetValue(0);
 	WriteVDU("OK\n");
 
-	//ofp.Close();
-	outfile.close();
+	ofp.New(filetag + "-gridsize.txt");
+	for(i=0; i<columnindex.count; i++) {
+		col = columnindex.list[i];
+		ofp.WriteLine(text.Format("col %d %d", col, textgrid->GetColSize(col)));
+	}
+	ofp.Close();
 }
 
 
@@ -504,10 +522,10 @@ void OutBox::GridLoad()
 void OutBox::GridLoadFast()
 {
 	TextFile ifp;
-	int row, col;
+	int row, col, width;
 	long numdat;
 	wxString text, filetag, cell;
-	wxString datstring;
+	wxString datstring, readline;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, filename;
 	int numlines, linecount, cellcount;
@@ -631,4 +649,19 @@ void OutBox::GridLoadFast()
 	WriteVDU(text.Format("OK, %d cells\n", cellcount));
 	//WriteVDU("OK\n");
 	gauge->SetValue(0);
+
+	if(!ifp.Open(filetag + "-gridsize.txt")) return;
+	
+	readline = ifp.ReadLine();
+	while(!readline.IsEmpty()) {
+		col = ParseLong(&readline, 'l');
+		width = ParseLong(&readline, 0);
+		WriteVDU(text.Format("col %d %d\n", col, width));
+		textgrid->SetColSize(col, width);
+		if(ifp.End()) break;
+		readline = ifp.ReadLine();
+	}
+
+	ifp.Close();
+
 }

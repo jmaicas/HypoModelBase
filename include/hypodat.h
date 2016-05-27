@@ -677,7 +677,7 @@ public:
 	void Front(GraphDat *);
 	GraphDat *GetFront();
 	void Set(int index, GraphDat *newplot);   // Set(0, newplot) equivalent to Front(newplot)
-	void XYSynch();
+	void XYSynch(GraphDat *graph = NULL);
 };
 
 

@@ -312,6 +312,10 @@ void GraphBox::OnSynch(wxCommandEvent& WXUNUSED(event))
 
 	GraphDisp *graphdisp = graphwin->dispset[0];
 	for(i=0; i<graphdisp->numplots; i++) SetParamsCopy(graphdisp->plot[i]);
+
+	graphdisp->XYSynch(graph);
+
+	graphwin->UpdateScroll();
 }
 
 

@@ -632,12 +632,13 @@ void GraphDisp::Set(int index, GraphDat *newplot)
 }
 
 
-void GraphDisp::XYSynch()      // Synchronise X and Y axes for all plots
+void GraphDisp::XYSynch(GraphDat *graph0)      // Synchronise X and Y axes for all plots
 {
 	int i;
-	GraphDat *graph, *graph0;
+	GraphDat *graph;
 
-	graph0 = plot[0];
+	//graph0 = plot[0];
+	if(!graph0) graph0 = plot[0];
 	
 	for(i=1; i<numplots; i++) {
 		graph = plot[i];

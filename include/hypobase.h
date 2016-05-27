@@ -581,6 +581,24 @@ public:
 };
 
 
+class Index{
+	int i;
+public:
+	int count;
+	int list[100];
+
+	Index() {
+		count = 0;
+	};
+
+	void Add(int entry) {
+		for(i=0; i<count; i++)
+			if(entry == list[i]) return;
+		list[count++] = entry;		
+	};
+};
+
+
 class RefEntry{
 public:
 	int id;

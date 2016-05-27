@@ -3,6 +3,7 @@
 
 #include "wx/wx.h"
 #include <hypotools.h>
+
 #include "hypodef.h"
 
 
@@ -40,6 +41,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 
 	undogrid = new wxGridStringTable(size.x, size.y);
 	vdu = NULL;
+	outbox = NULL;
 
 	rightmenu = new wxMenu;
 	rightmenu->Append(ID_SelectAll, "Select All", "Grid Select", wxITEM_NORMAL);
@@ -52,6 +54,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	//Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(TextGrid::OnRightClick));
 	Connect(wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler(TextGrid::OnRightClick));
 	Connect(wxEVT_GRID_CELL_LEFT_CLICK, wxGridEventHandler(TextGrid::OnLeftClick));
+	Connect(wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler(TextGrid::OnLabelClick));
 	Connect(ID_SelectAll, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnSelectAll));
 	Connect(ID_Copy, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnCopy));
 	Connect(ID_Paste, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnPaste));
@@ -235,7 +238,6 @@ void TextGrid::Copy()
 		}
 	}
 
-
 	if(ostype == Mac) {
 		if (wxTheClipboard->Open()) {
 			wxTextDataObject *clipboard_data = new wxTextDataObject();
@@ -325,6 +327,19 @@ void TextGrid::Paste()
 void TextGrid::OnUndo(wxCommandEvent& event)
 {
 	Undo();
+}
+
+
+void TextGrid::OnLabelClick(wxGridEvent& event)
+{
+	int r, c;
+
+	//if(vdu) vdu->AppendText("Label Click\n");
+	c = event.GetCol();
+
+	if(outbox && c >= 0) outbox->ColumnSelect(event.GetCol());
+
+	event.Skip();
 }
 
 
