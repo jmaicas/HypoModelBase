@@ -118,6 +118,7 @@ public:
 	int buttonheight;
 	int column;
 	wxFont boxfont, confont;
+	bool autosynch;
 
 	wxBoxSizer *mainbox;
 	wxBoxSizer *parambox;
@@ -155,6 +156,7 @@ public:
 	void SetControls();
 	void SetParams(GraphDat *setgraph=NULL);
 	void SetParamsCopy(GraphDat *setgraph);
+	void SynchLayers();
 };
 
 

@@ -480,11 +480,12 @@ void GraphWindow3::PrintEPS()
 	for(i=0; i<=ylabels; i+=1) {
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
-		yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale;
-		if(graph->ytickmode) yval = yfrom + graph->ystep * i;
-		if(yto - yfrom < 0.1) snum.Printf("%.3f", yval);
-		else if(yto - yfrom < 1) snum.Printf("%.2f", yval);
-		else if(yto - yfrom < 10) snum.Printf("%.1f", yval);
+		yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;
+		if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+		srangey = (yto - yfrom) / yscale * graph->yunitscale;
+		if(srangey < 0.1) snum.Printf("%.3f", yval);
+		else if(srangey < 1) snum.Printf("%.2f", yval);
+		else if(srangey < 10) snum.Printf("%.1f", yval);
 		else snum.Printf("%.0f", yval);
 		out.MoveTo(xbase - xylab, ybase + ycoord - 2.75);
 		out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));

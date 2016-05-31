@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 680),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 720),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -27,6 +27,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	wxString text;
 
 	ostype = GetSystem();
+	autosynch = true;
 
 	buttonheight = 23;
 	boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
@@ -52,9 +53,9 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	if(ostype == Mac) labelwidth = 50;
 	graph = graphwin->dispset[0]->plot[0];
 	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth, numwidth);
-	paramset->AddNum("xstep", "X Step", graph->xstep, 1, labelwidth, numwidth);
+	paramset->AddNum("xstep", "X Step", graph->xstep, 2, labelwidth, numwidth);
 	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth, numwidth);
-	paramset->AddNum("ystep", "Y Step", graph->ystep, 1, labelwidth, numwidth);
+	paramset->AddNum("ystep", "Y Step", graph->ystep, 2, labelwidth, numwidth);
 	wxBoxSizer *tickparams = ParamLayout(2);
 
 	wxStaticBoxSizer *xradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
@@ -78,12 +79,14 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	numwidth = 50;
 
 	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth, numwidth);
-	paramset->AddNum("xsample", "Sample", graph->xsample, 0, labelwidth, numwidth);
+	paramset->AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
+	paramset->AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
 	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
 	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
 	paramset->AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
 	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
+	paramset->AddNum("yscale", "YScale", graph->yunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
 	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
 	paramset->AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
@@ -255,6 +258,8 @@ void GraphBox::SetControls()
 	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
 	paramset->GetCon("labelfontsize")->SetValue(graph->labelfontsize);
 	paramset->GetCon("scattersize")->SetValue(graph->scattersize);
+	paramset->GetCon("yscale")->SetValue(graph->yunitscale);
+	paramset->GetCon("yshift")->SetValue(graph->yshift);
 
 	clipcheck->SetValue(graph->clipmode);
 	scattercheck->SetValue(graph->scattermode);
@@ -306,8 +311,8 @@ void GraphBox::OnSpin(wxSpinEvent& event)
 }
 
 
-void GraphBox::OnSynch(wxCommandEvent& WXUNUSED(event))
-{
+void GraphBox::SynchLayers() {
+
 	int i;
 
 	GraphDisp *graphdisp = graphwin->dispset[0];
@@ -316,6 +321,12 @@ void GraphBox::OnSynch(wxCommandEvent& WXUNUSED(event))
 	graphdisp->XYSynch(graph);
 
 	graphwin->UpdateScroll();
+}
+
+
+void GraphBox::OnSynch(wxCommandEvent& WXUNUSED(event))
+{
+	SynchLayers();
 }
 
 
@@ -382,6 +393,8 @@ void GraphBox::SetParams(GraphDat *setgraph)
 	graph->ylabelgap = (*params)["ylabelgap"];
 	graph->labelfontsize = (*params)["labelfontsize"];
 	graph->scattersize = (*params)["scattersize"];
+	graph->yunitscale = (*params)["yscale"];
+	graph->yshift = (*params)["yshift"];
 
 	graph->barwidth = (*params)["barwidth"];
 	graph->bargap = (*params)["bargap"];
@@ -409,9 +422,11 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	setgraph->xplot = (*params)["xplot"];
 	setgraph->yplot = (*params)["yplot"];
 	setgraph->xshift = (*params)["xshift"];
+	setgraph->yshift = (*params)["yshift"];
 	setgraph->xsample = (*params)["xsample"];
 	setgraph->xunitscale = (*params)["xscale"];
 	setgraph->xunitdscale = (*params)["xdscale"];
+	setgraph->yunitscale = (*params)["yscale"];
 	setgraph->plotstroke = (*params)["plotstroke"];
 	setgraph->xlabelgap = (*params)["xlabelgap"];
 	setgraph->ylabelgap = (*params)["ylabelgap"];
@@ -435,6 +450,8 @@ void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 	int g;
 	long stringnum;
 	wxString snum, text;
+
+	if(autosynch) SynchLayers();
 
 	for(g=0; g<graphwin->numdisps; g++) SetParamsCopy(graphwin->dispset[g]->plot[0]);
 

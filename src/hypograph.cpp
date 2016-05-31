@@ -743,11 +743,12 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			ycoord = i * yplot / ylabels;
 			if(graph->ytickmode) ycoord = (int)(yplotstep * i);
 			dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
-			yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale;
-			if(graph->ytickmode) yval = yfrom + graph->ystep * i;
-			if(yto - yfrom < 0.1) snum.Printf("%.3f", yval);
-			else if(yto - yfrom < 1) snum.Printf("%.2f", yval);
-			else if(yto - yfrom < 10) snum.Printf("%.1f", yval);
+			yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale - graph->yshift;
+			if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+			srangey = (yto - yfrom) / yscale * graph->yunitscale;
+			if(srangey < 0.1) snum.Printf("%.3f", yval);
+			else if(srangey < 1) snum.Printf("%.2f", yval);
+			else if(srangey < 10) snum.Printf("%.1f", yval);
 			else snum.Printf("%.0f", yval);
 			textsize = dc.GetTextExtent(snum);
 			if(ostype == Mac)

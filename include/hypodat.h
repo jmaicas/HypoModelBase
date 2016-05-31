@@ -507,6 +507,7 @@ public:
 	double xlabelgap, ylabelgap;
 	double labelfontsize, tickfontsize;
 	double xunitscale, xunitdscale;
+	double yunitscale, yshift;
 	int clipmode;
 	bool synchx;
 	int barwidth, barshift, bargap;
