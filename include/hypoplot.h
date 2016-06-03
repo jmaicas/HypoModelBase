@@ -24,6 +24,7 @@ public:
 	GraphDisp *graphdisp;
 
 	int plotcount;
+	int plotlayer;
 
 	PlotBox(PlotModel *mod, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//~PlotBox();
