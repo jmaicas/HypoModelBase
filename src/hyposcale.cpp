@@ -1294,7 +1294,7 @@ void ScaleBox::PanelUpdate()
 			plot0 = graphwin[i]->dispset[0]->plot[0];
 
 
-			if(graph->yto < 1) {
+			if(abs(graph->yto - graph->yfrom) < 10) {
 				snum.Printf("%.2f", graph->yfrom);
 				graphwin[i]->yf->SetValue(snum);
 				snum.Printf("%.2f", graph->yto);
@@ -1312,7 +1312,11 @@ void ScaleBox::PanelUpdate()
 			snum.Printf("%.1f", graph->yto);
 			graphwin[i]->yt->SetValue(snum);*/
 
-			if(graph->xto < 1) {
+			if(abs(graph->xto - graph->xfrom) < 1) {
+				graphwin[i]->xf->SetValue(text.Format("%.3f", graph->xfrom));
+				graphwin[i]->xt->SetValue(text.Format("%.3f", graph->xto));
+			}
+			else if(abs(graph->xto - graph->xfrom) < 10) {
 				graphwin[i]->xf->SetValue(text.Format("%.2f", graph->xfrom));
 				graphwin[i]->xt->SetValue(text.Format("%.2f", graph->xto));
 			}

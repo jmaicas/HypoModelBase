@@ -92,6 +92,9 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset->AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
 
+	paramset->GetCon("xshift")->SetMinMax(-100000, 100000);
+	paramset->GetCon("yshift")->SetMinMax(-100000, 100000);
+
 	paramset->AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
 	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
 	clipcheck->SetFont(confont);
