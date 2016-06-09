@@ -16,7 +16,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	bool burstmode = false;
 	bool IoDmode = true;
 
-	bool fitdiag = FALSE;
+	bool fitdiag = true;
 
 	if(fitdiag) ofp.New("fitscore-diag.txt");
 
