@@ -212,6 +212,8 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		//fitdat->score += fitdat->RMSBinRange * (*fitweights)["RMSBinRange"];
 
 
+		double errcalc;
+
 		// Hazard RMS
 
 		RMSError = 0;
@@ -244,6 +246,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 			RMSError += Error * Error;
 		}
 
+		errcalc = RMSError;
 		RMSError /= MinHazSize;
 		RMSError = sqrt(RMSError);
 
@@ -253,6 +256,8 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		fitdat->RMSHaz = RMSError;
 		fitdat->scores["RMSHaz"] = RMSError; 
 		//fitdat->score += fitdat->RMSHaz * (*fitweights)["RMSHaz"];
+
+		if(fitdiag) ofp.WriteLine(text.Format("Haz RMS RMSRrror %.6f Pre SQRT %.6f", RMSError, errcalc)); 
 
 
 		//// Burst Profile Analysis
