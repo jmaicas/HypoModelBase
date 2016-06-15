@@ -14,9 +14,9 @@ NeuroDat::NeuroDat()
 
 NeuroDat::~NeuroDat()
 {
-	//delete[] times;
-	//delete[] srate;
-	//delete[] srate10;
+	delete[] times;
+	delete[] srate;
+	delete[] srate10;
 }
 
 
