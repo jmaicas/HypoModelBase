@@ -179,6 +179,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				ScaleButton(ID_allburst, "All / Burst", 55, vbox);
 				}	*/	
 
+				// GraphButton replaces ScaleButton, gradual phase out    16/6/16
+
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
 					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
@@ -198,7 +200,10 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			//vbox->AddSpacer(2);
 			if(i == 2) {		
 				wxBoxSizer *secbox = new wxBoxSizer(wxHORIZONTAL); 
-				ScaleButton(ID_expdat, "Exp", 45, vbox);
+				wxBoxSizer *quadbox = new wxBoxSizer(wxHORIZONTAL); 
+				GraphButton("quadtog", 0, ID_quad, "Quad", 35, quadbox);
+				ScaleButton(ID_expdat, "Exp", 35, quadbox);
+				vbox->Add(quadbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 				ScaleButton(ID_profile, "Profile", 55, vbox);
 				//wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
 				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
