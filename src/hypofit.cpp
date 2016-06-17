@@ -17,7 +17,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	bool burstmode = false;
 	bool IoDmode = true;
 
-	bool fitdiag = true;
+	bool fitdiag = false;
 
 	if(fitdiag) ofp.New("fitscore-diag.txt");
 
@@ -74,6 +74,15 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	*/
 
 
+	if(!spikecount) {
+		fitdat->scores["RMSFirstNBins"] = -1;
+		fitdat->scores["RMSBinRange"] = -1;
+		fitdat->scores["RMSHaz"] = -1; 
+		fitdat->scores["RMSIoD"] = -1;
+		fitdat->score = 1000;
+		return;
+	}
+
 
 	// Spike Data Processing //////////////////////////////////////////////////////////////////  Duplicate of neurocalc processing for GPU generated data
 
@@ -86,15 +95,15 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	// Mode for fitness
 	maxcount = 0;
 	for(i=0; i<histmax; i++) {
-		if(i < 20) diagbox->Write(text.Format("all cell bin %d histquadsm %.8f\n", i, histquadsm[i]));
+		//if(i < 20) diagbox->Write(text.Format("all cell bin %d histquadsm %.8f\n", i, histquadsm[i]));
 		if(histquadsm[i] > maxcount) {
 			maxcount = histquadsm[i];
 			histquadmode = i;
-			diagbox->Write(text.Format("new mode bin %d histquadsm %.4f\n", i, histquadsm[i]));
+			//diagbox->Write(text.Format("new mode bin %d histquadsm %.4f\n", i, histquadsm[i]));
 		}
 	}
 
-	diagbox->Write(text.Format("histquadmode %.2f\n", histquadmode));
+	//diagbox->Write(text.Format("histquadmode %.2f\n", histquadmode));
 
 	// quad bin x
 	for (i=0; i<histmax; i++) histquadx[i] = i * initbinwidth + (i * (i - 1) / 2) * bininc;

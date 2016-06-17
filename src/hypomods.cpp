@@ -154,22 +154,24 @@ void Model::GHistLoad(wxComboBox *gstag)
 	//else filepath = path;
 	filepath = GetPath();
 
-	if(mainwin->diagnostic) tofp.New("histdiag.txt");
+	bool diagflag = false;
+
+	if(diagflag) tofp.New("histdiag.txt");
 
 	filename = modname + "gshist.ini";
 	
 	check = infile.Open(filepath + "/" + filename);
 	if(!check) return;
 	readline = infile.ReadLine();
-	if(mainwin->diagnostic) tofp.WriteLine(readline);
+	if(mainwin->diagnostic && diagflag) tofp.WriteLine(readline);
 	while(!readline.IsEmpty()) {
 		readline = readline.AfterFirst(' ');
 		//readline.Trim();
 		initgraph = readline;
 		gstag->Insert(initgraph, 0);
-		if(mainwin->diagnostic) tofp.WriteLine(text.Format("insert %s", initgraph));
+		if(diagflag) tofp.WriteLine(text.Format("insert %s", initgraph));
 		readline = infile.ReadLine();
-		if(mainwin->diagnostic) tofp.WriteLine(readline);
+		if(diagflag) tofp.WriteLine(readline);
 	}
 	infile.Close();	
 
@@ -190,7 +192,7 @@ void Model::GHistLoad(wxComboBox *gstag)
 
 	gstag->SetLabel(initgraph);
 
-	if(mainwin->diagnostic) tofp.Close();
+	if(diagflag) tofp.Close();
 }
 
 /*
