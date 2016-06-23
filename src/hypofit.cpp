@@ -74,7 +74,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	*/
 
 
-	if(!spikecount) {
+	if(spikecount < 10) {
 		fitdat->scores["RMSFirstNBins"] = -1;
 		fitdat->scores["RMSBinRange"] = -1;
 		fitdat->scores["RMSHaz"] = -1; 
