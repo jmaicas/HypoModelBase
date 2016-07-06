@@ -204,7 +204,7 @@ void SpikeDat::IntraBurstAnalysis()
 
 	if(scandiag) outfile.New("intradat.txt");
 
-	if(diagbox) diagbox->Write("Intra Burst Analysis\n");
+	//if(diagbox) diagbox->Write("Intra Burst Analysis\n");
 
 	 // Intraburst Re-Analysis  
 
@@ -223,7 +223,7 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->haz5[i] = 0;
 	}
 
-	if(diagbox) diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
+	//if(diagbox) diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
 
 	for(i=0; i<spikecount-1; i++) {
 		if(burstdata->spikes[i] > 0 && isis[i] < maxspikes) {
@@ -264,7 +264,7 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->meanisi = 0;
 	}
 
-	if(diagbox) diagbox->Write(text.Format("intcount %d\n", intcount));
+	//if(diagbox) diagbox->Write(text.Format("intcount %d\n", intcount));
 	
 	//burstdata->intraspikes = intracount;
 	//burstdata->intraspikes = scount;
