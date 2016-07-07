@@ -793,6 +793,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		9 - bar chart with x data
 
+		10 - scatter plot with x data
+
 		*/
 
 		if(gtype == 1) {                             // scaled width bars, Histogram    
@@ -942,6 +944,20 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}
 				prevx = xval;
+			}
+		}
+
+		if(gtype == 10 && graph->gdatax) {				                            // scatter graph with X data
+			mainwin->diagbox->Write(text.Format("Graph Type 10  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
+			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			for(i=0; i<graph->xcount; i++) {
+				xval = (*graph->gdatax)[i];
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (int)((xval - xfrom) * xrange);
+					y = (*gdatadv)[i];
+					dc.SetPen(colourpen[colour]);
+					dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);			
+				}
 			}
 		}
 

@@ -365,7 +365,7 @@ void GraphWindow3::PrintEPS()
 				for(i=0; i<graph->xcount; i++) {
 					xval = (*graph->gdatax)[i];
 					if(xval >= xfrom && xval <= xto) {
-						xpos = (int)(xval - xfrom) * xrange;
+						xpos = (xval - xfrom) * xrange;
 						y = (*gdatadv)[i];		
 						out.WriteLine("newpath");
 						out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
@@ -375,6 +375,26 @@ void GraphWindow3::PrintEPS()
 						out.WriteLine("grestore");
 						out.WriteLine("stroke");
 					}
+				}
+			}
+		}
+
+		if(gtype == 10 && graph->gdatax) {				                            // scatter graph with X data
+			out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
+			//out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+			for(i=0; i<graph->xcount; i+=xsample) {
+				xval = (*graph->gdatax)[i];
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (xval - xfrom) * xrange;
+					y = (*gdatadv)[i];		
+					//mainwin->diagbox->Write(text.Format("EPS Scatter y %.5f ypos %.5f\n", y, ybase + yrange * (y - yfrom)));
+					out.WriteLine("newpath");
+					out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
+					out.WriteLine("gsave");
+					out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
+					out.WriteLine("fill");
+					out.WriteLine("grestore");
+					out.WriteLine("stroke");
 				}
 			}
 		}

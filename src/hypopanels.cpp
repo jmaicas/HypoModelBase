@@ -163,6 +163,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	typeset.Add("Histogram", 1);
 	typeset.Add("Spike Rate", 3);
 	typeset.Add("Bar with X data", 9);
+	typeset.Add("Scatter with X data", 10);
 
 	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), typeset.numtypes, typeset.names);
 	typechoice->SetSelection(typeset.GetIndex(graph->type));
