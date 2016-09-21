@@ -187,7 +187,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		}
 
 		//If both are less than the cutoff then use alternate rules
-		if (Big < CutOff) Error = Big - Small * 100.0;
+		if (Big < CutOff) Error = (Big - Small) * 100.0;
 		else Error = (Big - Small) / Big * 100.0;
 		RMSError += Error * Error;
 	}
@@ -214,7 +214,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		}
 
 		//If both are less than the cutoff then use alternate rules
-		if (Big < CutOff) Error = Big - Small * 100.0;
+		if (Big < CutOff) Error = (Big - Small) * 100.0;
 		else Error = (Big - Small) / Big * 100.0;
 		RMSError += Error * Error;
 	}
@@ -256,7 +256,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		}
 
 		//If both are less than the cutoff then use alternate rules
-		if (Big < CutOff) Error = Big - Small * 100.0;
+		if (Big < CutOff) Error = (Big - Small) * 100.0;
 		else Error = (Big - Small) / Big * 100.0;
 		RMSError += Error * Error;
 	}
