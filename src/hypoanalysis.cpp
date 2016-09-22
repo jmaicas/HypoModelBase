@@ -1074,6 +1074,10 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	double FourA = 2*bininc;
 	double TwoA = bininc;
 
+	//This equation defines an ever increasing bin width                        Comment from Tom's code, SimulateIGF2.cs
+    //Even though it is quantised, it will increase by BinSpacing               BinSpacing likely equals bininc
+    //every bin.
+
 	for(i=1; i<spikecount; i++) {
 		float fBinNo = (-b + sqrt(BSquared + FourA * isis[i]))/TwoA;
 		int iBinNo = fBinNo;
