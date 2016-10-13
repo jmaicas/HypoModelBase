@@ -1055,8 +1055,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	}*/
 
 	isisd = sqrt(variance - mean * mean);
-	freq = 1000/mean;
 	if(mean == 0) freq = 0;
+	else freq = 1000/mean;
 	meanisi = mean;
 	isivar = variance;
 

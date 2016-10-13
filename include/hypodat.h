@@ -263,7 +263,8 @@ public:
 	int maxspikes;
 	char name[100];
 	double start;
-	double freq;
+	double freq;              // mean frequency of detected spikes
+	double spikefreq;         // mean frequency over run time
 	double meanisi;
 	double isivar;
 	double isisd;

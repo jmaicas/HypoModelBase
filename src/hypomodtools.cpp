@@ -798,7 +798,7 @@ void BurstBox::DataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
 	
 	snum.Printf("%d", dispdata->spikecount);
 	datpanel->intraspikes->SetLabel(snum);
-	snum.Printf("%.2f", dispdata->freq);
+	snum.Printf("%.2f", dispdata->spikefreq);
 	datpanel->intrafreq->SetLabel(snum);
 	snum.Printf("%.2f", dispdata->meanisi);
 	datpanel->intraisimean->SetLabel(snum);
