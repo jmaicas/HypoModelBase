@@ -171,6 +171,8 @@ SpikeDat::SpikeDat()
 	IoDdata.setsize(100);
 	IoDdataX.setsize(100);
 
+	meanV.setsize(5000);
+
 	burstdata = NULL;
 	vasomean.data.resize(250);
 	vasomean.max = 200;

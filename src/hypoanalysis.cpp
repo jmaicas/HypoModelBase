@@ -627,6 +627,28 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 }
 
 
+void SpikeDat::MeanSpikeForm(datdouble V, int substeps)
+{
+	int i, j, numspikes;
+	int timerange = 100;        // max 200
+	wxString text;
+	
+	for(i=0; i<5000; i++) meanV[i] = 0;
+	numspikes = 0;
+
+	//diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d\n", spikecount));
+
+	for(i=0; i<spikecount; i++) {
+		if(times[i] < timerange) continue;
+		if(times[i] > 1000000) break;
+		for(j=0; j<timerange*substeps; j++) meanV[j] += V[times[i] - (timerange*substeps)/2 + j];
+		numspikes++;
+	}
+
+	for(i=0; i<200; i++) meanV[i] = meanV[i] / numspikes;
+}
+
+
 void SpikeDat::output(wxString filetag, wxString path) 
 {
 	int i;
