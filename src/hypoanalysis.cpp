@@ -640,6 +640,8 @@ void SpikeDat::MeanSpikeForm(datdouble V, int substeps)
 
 	for(i=0; i<spikecount; i++) {
 		if(times[i] < timerange) continue;
+		if(i > 0 && times[i] - times[i-1] < timerange/2) continue;
+		if(i < spikecount-1  && times[i+1] - times[i] < timerange/2) continue;
 		if(times[i] > 1000000) break;
 		for(j=0; j<timerange*substeps; j++) meanV[j] += V[(times[i] - timerange/2) * substeps + j];
 		numspikes++;
