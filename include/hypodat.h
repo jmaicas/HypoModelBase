@@ -295,7 +295,7 @@ public:
 	void FitScore(SpikeDat *, FitDat *, FitSet *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
-	void MeanSpikeForm(datdouble V, int substeps = 1);
+	void MeanSpikeForm(datdouble V, int filter = false, int substeps = 1);
 	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	void Clear();

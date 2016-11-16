@@ -627,7 +627,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 }
 
 
-void SpikeDat::MeanSpikeForm(datdouble V, int substeps)
+void SpikeDat::MeanSpikeForm(datdouble V, int filter, int substeps)
 {
 	int i, j, numspikes;
 	int timerange = 100;        // max 200
@@ -640,12 +640,16 @@ void SpikeDat::MeanSpikeForm(datdouble V, int substeps)
 
 	for(i=0; i<spikecount; i++) {
 		if(times[i] < timerange) continue;
-		if(i > 0 && times[i] - times[i-1] < timerange/2) continue;
-		if(i < spikecount-1  && times[i+1] - times[i] < timerange/2) continue;
+		if(filter) {
+			if(i > 0 && (times[i] - times[i-1] < timerange/2)) continue;
+			if(i < spikecount-1  && (times[i+1] - times[i] < timerange/2)) continue;
+		}
 		if(times[i] > 1000000) break;
 		for(j=0; j<timerange*substeps; j++) meanV[j] += V[(times[i] - timerange/2) * substeps + j];
 		numspikes++;
 	}
+
+	diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d  filter %d\n", spikecount, numspikes));
 
 	for(i=0; i<5000; i++) meanV[i] = meanV[i] / numspikes;
 }
