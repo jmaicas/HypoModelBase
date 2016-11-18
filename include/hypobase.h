@@ -75,7 +75,8 @@ enum {
 	vProto = 1,
 	vTom = 2,
 	vABC = 3,
-	vIGF = 4
+	vIGF = 4,
+	vBasic = 5
 };
 
 
