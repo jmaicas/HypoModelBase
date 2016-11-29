@@ -293,6 +293,7 @@ public:
 	void IntraBurstAnalysis();
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *, FitSet *);
+	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	void MeanSpikeForm(datdouble V, int filter = false, int substeps = 1);
