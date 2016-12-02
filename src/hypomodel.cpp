@@ -354,14 +354,12 @@ void HypoMain::CleanUp() {
 
 	//for(i=0; i<numdraw; i++) delete graphwin[i];
 
-	if(graphbox) graphbox->Destroy();
+	//if(graphbox) graphbox->Destroy();
 
 	delete mod;
 	delete[] gpos;
-
 	delete flagrefs;
 	delete hypoflags;
-
 	delete expdata;
 	delete expdata2;
 	delete selectdata;

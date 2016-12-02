@@ -97,9 +97,14 @@ public:
 
 class NeuroDat{
 public:
-	double *times;
-	int *srate;
-	int *srate10;
+	//double *times;
+	//int *srate;
+	//int *srate10;
+
+	std::vector<double> times;
+	std::vector<int> srate;
+	std::vector<int> srate10;
+
 	int srate100[10000];
 	int count;
 	int spikecount;

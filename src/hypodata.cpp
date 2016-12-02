@@ -100,9 +100,11 @@ void CellBox::NeuroData()
 	ParamStore *calcparams = GetParams();
 
 	currcell->normscale = (*calcparams)["normscale"];
-	currcell->neurocalc(&((*cells)[neuroindex]));
+	//currcell->neurocalc(&((*cells)[neuroindex]));
+	currcell->neurocalc(&(*cells)[neuroindex]);
 	currcell->id = neuroindex;
-	PanelData(&((*cells)[neuroindex]));
+	//PanelData(&((*cells)[neuroindex]));
+	PanelData(&(*cells)[neuroindex]);
 	mainwin->scalebox->GraphUpdate();	
 }
 

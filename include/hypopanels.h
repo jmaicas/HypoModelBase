@@ -198,7 +198,7 @@ public:
 	int cellcount;
 	SpikeDat *currcell;
 	//NeuroDat *cells;
-	vector<NeuroDat> *cells;
+	vector<NeuroDat>*cells;
 
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
