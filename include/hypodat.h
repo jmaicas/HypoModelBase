@@ -487,6 +487,7 @@ public:
 	wxString gname;
 	wxString xtag, ytag;
 	int samprate;    // 0 for no limit
+	int xstop;
 	int type;        // 0 for normal, 1 for histogram    // 26/2/15 Update this!
 
 	// 1 for histogram

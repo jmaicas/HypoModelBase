@@ -215,7 +215,7 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	if(initval < 0) min = -1000000;
 	if(initval < min) min = initval * 10;
 	if(initval > max) max = initval * 100;
-
+	oldvalue = initval;
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	snum.Printf("%.1f", initval);
@@ -629,6 +629,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	child = chi;
 	boxname = title;
 	canclose = true;
+	vdu = NULL;
 
 	//main->diagbox->Write("ToolBox init\n");
 
@@ -646,6 +647,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	boxtype = 0;
 	boxname = title;
 	canclose = close;
+	vdu = NULL;
 	
 	Init();
 }

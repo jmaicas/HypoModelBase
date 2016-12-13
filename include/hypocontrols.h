@@ -230,7 +230,7 @@ public:
 	int ostype;
 	int type;
 	int numwidth, labelwidth;
-  int pad;
+	int pad;
 	wxFont textfont, smalltextfont;
 	wxTextCtrl *numbox;
 	wxSpinButton *spin;
@@ -250,7 +250,7 @@ public:
 	ParamCon(ToolPanel *panel, wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth);
 	void OnSpinUp(wxSpinEvent& event);
 	void OnSpinDown(wxSpinEvent& event);
-  void OnSpin(wxSpinEvent& event);
+	void OnSpin(wxSpinEvent& event);
 	double GetValue();
 	wxString GetString();
 	void SetValue(double val);

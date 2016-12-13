@@ -427,14 +427,17 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 }
 
 
-OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols)
+OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols, bool bmode)
 	: ParamBox(mod, title, pos, size, "outbox")
 {
 	int gridrows, gridcols;
+	wxBoxSizer *vdubox;
 
 	redtag = "";
 	gridrows = rows;
 	gridcols = cols;
+	bookmode = bmode;
+	vdumode = bookmode;
 	delete parambox;
 
 	//InitMenu();
@@ -442,17 +445,25 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 
 	diagbox = mod->diagbox;
 
-	notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
+	if(bookmode) notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
 
 	//textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
-	textgrid = new TextGrid(notebook, wxSize(gridrows, gridcols));
-	notebook->AddPage(textgrid, text.Format("Data %d", 0));
+	
+	if(bookmode) {
+		textgrid = new TextGrid(notebook, wxSize(gridrows, gridcols));
+		notebook->AddPage(textgrid, text.Format("Data %d", 0));
+	}
+	else textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
+
 	//for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
 	//for(i=0; i<gridcols; i++) textgrid->SetColSize(i, 60);
 	textgrid->SetDefaultRowSize(20, true);
 	textgrid->SetDefaultColSize(60, true);
-	textgrid->SetRowLabelSize(80); 
-
+	//textgrid->SetRowLabelSize(80); 
+	textgrid->SetRowLabelSize(50); 
+	textgrid->vdu = NULL;
+	textgrid->gauge = NULL;
+	gauge = NULL;
 
 	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *storebox = StoreBox();
@@ -463,22 +474,25 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	buttonbox->AddSpacer(2);
 	AddButton(ID_Copy, "Copy", 40, buttonbox);
 
-	vdu = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(-1, -1), wxBORDER_RAISED|wxTE_MULTILINE);
-	vdu->SetFont(confont);
-	vdu->SetForegroundColour(wxColour(0,255,0)); // set text color
-	vdu->SetBackgroundColour(wxColour(0,0,0)); // set text back color
-	//wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
-	//statusbox->Add(status, 1, wxEXPAND);
+	if(vdumode) {
+		vdu = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(-1, -1), wxBORDER_RAISED|wxTE_MULTILINE);
+		vdu->SetFont(confont);
+		vdu->SetForegroundColour(wxColour(0,255,0)); // set text color
+		vdu->SetBackgroundColour(wxColour(0,0,0)); // set text back color
+	
+		//wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
+		//statusbox->Add(status, 1, wxEXPAND);
 
-	gauge = new wxGauge(panel, wxID_ANY, 10);
-	wxBoxSizer *displaybox = new wxBoxSizer(wxVERTICAL);
-	//displaybox->Add(vdu, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	displaybox->Add(vdu, 1, wxEXPAND);
-	//displaybox->Add(gauge, 0, wxEXPAND);
+		gauge = new wxGauge(panel, wxID_ANY, 10);
+		vdubox = new wxBoxSizer(wxVERTICAL);
+		//displaybox->Add(vdu, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+		vdubox->Add(vdu, 1, wxEXPAND);
+		//displaybox->Add(gauge, 0, wxEXPAND);
+	}
 
 	wxBoxSizer *leftbox = new wxBoxSizer(wxVERTICAL);
 	leftbox->Add(buttonbox, 0);  
-	leftbox->Add(gauge, 0, wxEXPAND);
+	if(vdumode) leftbox->Add(gauge, 0, wxEXPAND);
 
 	//controlbox->Add(storebox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	controlbox->AddSpacer(10);
@@ -487,11 +501,11 @@ OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSi
 	controlbox->AddSpacer(10);
 	//controlbox->Add(vdu, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	//controlbox->Add(displaybox, 100, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	controlbox->Add(displaybox, 100, wxEXPAND);
+	if(vdumode) controlbox->Add(vdubox, 100, wxEXPAND);
 	controlbox->AddSpacer(10);
 
-	//mainbox->Add(textgrid, 1, wxEXPAND);
-	mainbox->Add(notebook, 1, wxEXPAND);
+	if(bookmode) mainbox->Add(notebook, 1, wxEXPAND);
+	else mainbox->Add(textgrid, 1, wxEXPAND);
 	mainbox->Add(controlbox, 0);
 	mainbox->AddSpacer(2);
 
@@ -695,7 +709,7 @@ void OutBox::GridStore()
 	WriteVDU("Writing file...");
 
 	for(row=0; row<textgrid->GetNumberRows(); row++) {
-		gauge->SetValue(100 * (row + 1) / textgrid->GetNumberRows());
+		if(gauge) gauge->SetValue(100 * (row + 1) / textgrid->GetNumberRows());
 		for(col=0; col<textgrid->GetNumberCols(); col++) {
 			celltext = textgrid->GetCellValue(row, col);
 			celltext.Trim();                                                                     // Fixes odd line endings in pasted data  23/4/15
@@ -709,7 +723,7 @@ void OutBox::GridStore()
 	}
 
 	outfile.close();
-	gauge->SetValue(0);
+	if(gauge) gauge->SetValue(0);
 	WriteVDU("OK\n");
 
 	ofp.New(filetag + "-gridsize.txt");
@@ -790,13 +804,13 @@ void OutBox::GridLoad()
 		//readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");
 		linecount++;
-		gauge->SetValue(100 * linecount / numlines);
+		if(gauge) gauge->SetValue(100 * linecount / numlines);
 	}
 	infile.close();
 	diagbox->Write("OK\n");
 	//WriteVDU("OK\n");
 	WriteVDU(text.Format("OK, %d cells\n", cellcount));
-	gauge->SetValue(0);
+	if(gauge) gauge->SetValue(0);
 }
 
 
@@ -924,13 +938,13 @@ void OutBox::GridLoadFast()
 		//readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");
 		linecount++;
-		gauge->SetValue(100 * linecount / numlines);
+		if(gauge) gauge->SetValue(100 * linecount / numlines);
 	}
 	//infile.close();
 	//diagbox->Write("OK\n");
 	WriteVDU(text.Format("OK, %d cells\n", cellcount));
 	//WriteVDU("OK\n");
-	gauge->SetValue(0);
+	if(gauge) gauge->SetValue(0);
 
 	if(!ifp.Open(filetag + "-gridsize.txt")) return;
 

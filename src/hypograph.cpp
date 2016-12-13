@@ -1069,8 +1069,11 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 			}
 
+			double xtodraw = xto;
+			if(graph->xstop && xto > graph->xstop) xtodraw = graph->xstop;
+
 			dc.SetPen(colourpen[black]);
-			for(i=0; i<=(xto - xfrom) / sample; i++) {		
+			for(i=0; i<=(xtodraw - xfrom) / sample; i++) {		
 				xindex = i + ceil(xfrom / sample);
 				xpos = (int)(xindex * sample - xfrom) * xrange;
 				mpoint = (*gdatadv)[xindex];

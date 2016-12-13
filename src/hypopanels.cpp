@@ -582,7 +582,7 @@ void ParamBox::SetStatus(wxString text)
 
 void ParamBox::WriteVDU(wxString text)
 {
-	vdu->AppendText(text);
+	if(vdu) vdu->AppendText(text);
 }
 
 

@@ -367,6 +367,7 @@ GraphDat::GraphDat()             // See more specific versions below
 	gparam = 0;
 	xscale = 1;
 	xdis = 0;
+	xstop = 0;
 	negscale = 0;
 	//burstdata = NULL;
 	spikedata = NULL;
@@ -619,6 +620,7 @@ void GraphDat::Init()
 	barshift = 0;
 	barwidth = 10;
 	bargap = 10;
+	xstop = 0;
 }
 
 
