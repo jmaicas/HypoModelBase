@@ -147,7 +147,7 @@ void TextGrid::ParseLine(int row, int col, wxString readline)
 	while(!readline.IsEmpty()) {
 		text = readline.BeforeFirst(' ');
 		text.Trim();
-		SetCellValue(row, col++, text);
+		SetCell(row, col++, text);
 		readline = readline.AfterFirst(' ');
 	}
 }

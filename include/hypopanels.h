@@ -88,6 +88,7 @@ public:
 	RefStore *flagrefs;
 	RefStore *checkrefs;
 	RefStore *panelrefs;
+	wxNotebook *notebook;
 	//FlagSet *flagset;
 
 	int autorun;
@@ -202,6 +203,8 @@ public:
 
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
+	TagBox *neurodatatag;
+	TextGrid *textgrid;
 
 	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	void NeuroData();
@@ -210,6 +213,10 @@ public:
 	void OnNext(wxSpinEvent& event);
 	void OnPrev(wxSpinEvent& event);
 	void OnEnter(wxCommandEvent& event);
+	void OnLoadData(wxCommandEvent& event);
+	void OnBrowse(wxCommandEvent& event);
+	void LoadDataList(FileDat *);
+	void LoadNeuroData(FileDat file, int col);
 };
 
 

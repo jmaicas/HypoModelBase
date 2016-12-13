@@ -123,6 +123,7 @@ public:
 	DispWin *dispwin;
 	GraphWindow3 *graphwin2[10];
 	SpikeDat *focusdata;
+	FileBase *filebase;
 	//graphdisp *gpos2;
 
 	// Tools and Analysis 

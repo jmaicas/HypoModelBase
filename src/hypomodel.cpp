@@ -101,6 +101,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//graphbase = new GraphBase(200);
 	//greg = graphbase->graphstore;
 
+	filebase = new FileBase(100);
+
 
 	//currdata = new CurrentDat();
 	//realdata = new SpikeDat();

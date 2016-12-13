@@ -18,17 +18,31 @@ using namespace std;
 
 
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
-	: ParamBox(mod, title, pos, size, "cellbox")
+	: ParamBox(mod, title, pos, size, "cellbox", 1)
 {
 	int datwidth;
 
 	diagbox = mod->diagbox;
 	cellcount = 0;
+	paramindex = 0;
+	textgrid = NULL;
 
+
+	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
+	wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
+
+	ToolPanel *analysispanel = new ToolPanel(mainwin, tabpanel);
+	analysispanel->SetFont(boxfont);
+	wxBoxSizer *analysisbox = new wxBoxSizer(wxVERTICAL);
+	analysispanel->SetSizer(analysisbox);
+	activepanel = analysispanel;
+	paramset->panel = analysispanel;
+
+	wxBoxSizer *histparambox = new wxBoxSizer(wxVERTICAL);
 	paramset->AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
 	paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
 	//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
-	ParamLayout(1);
+	PanelParamLayout(histparambox);
 
 	datwidth = 50;
 	spikes = NumPanel(datwidth, wxALIGN_RIGHT);
@@ -37,26 +51,26 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	sd = NumPanel(datwidth, wxALIGN_RIGHT);
 
 	wxGridSizer *datagrid = new wxGridSizer(2, 5, 5);
-	datagrid->Add(new wxStaticText(panel, -1, "Spikes"), 0, wxALIGN_CENTRE);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Spikes"), 0, wxALIGN_CENTRE);
 	datagrid->Add(spikes);
-	datagrid->Add(new wxStaticText(panel, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	datagrid->Add(freq);
-	datagrid->Add(new wxStaticText(panel, -1, "Mean"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Mean"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	datagrid->Add(mean);
-	datagrid->Add(new wxStaticText(panel, -1, "Std Dev"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Std Dev"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	datagrid->Add(sd);
 
-	datneuron = new wxTextCtrl(panel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
-	datspin = new wxSpinButton(panel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+	datneuron = new wxTextCtrl(activepanel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
+	datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
 	wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
 	datbox->Add(datspin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datbox->AddSpacer(5);
 
 	wxBoxSizer *neurobox = new wxBoxSizer(wxHORIZONTAL);
-	neurobox->Add(new wxStaticText(panel, wxID_ANY, "Neuron"), 1, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	neurobox->Add(new wxStaticText(activepanel, wxID_ANY, "Neuron"), 1, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	neurobox->Add(datneuron, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 
-	wxStaticBoxSizer *databox = new wxStaticBoxSizer(wxVERTICAL, panel, "");
+	wxStaticBoxSizer *databox = new wxStaticBoxSizer(wxVERTICAL, activepanel, "");
 	databox->AddSpacer(2);
 	databox->Add(neurobox, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 5);
 	databox->AddSpacer(5);
@@ -68,19 +82,186 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	//colbox->AddStretchSpacer();
 	colbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	colbox->AddSpacer(10);
-	colbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	colbox->Add(histparambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	//colbox->AddStretchSpacer();
 
-	mainbox->AddStretchSpacer();
-	mainbox->Add(colbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	mainbox->AddStretchSpacer();
+	analysisbox->AddStretchSpacer();
+	analysisbox->Add(colbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	analysisbox->AddStretchSpacer();
+	analysispanel->Layout();
 
-	panel->Layout();
+	//
+
+	ToolPanel *loadpanel = new ToolPanel(mainwin, tabpanel);
+	loadpanel->SetFont(boxfont);
+	wxBoxSizer *loadbox = new wxBoxSizer(wxVERTICAL);
+	loadpanel->SetSizer(loadbox);
+	activepanel = loadpanel;
+	paramset->panel = loadpanel;
+
+
+	wxBoxSizer *datatagbox = new wxBoxSizer(wxHORIZONTAL);
+	neurodatatag = new TagBox(activepanel, ID_Select, "", wxDefaultPosition, wxSize(150, -1), "neurodatatag", mod->GetPath());
+	datatagbox->Add(neurodatatag, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
+	if(ostype == Mac) {
+		AddButton(ID_Load, "Load", 60, datatagbox);
+		AddButton(ID_FileBrowse, "Browse", 60, datatagbox);
+	}
+	else {
+		AddButton(ID_Load, "Load", 40, datatagbox);
+		datatagbox->AddSpacer(2);
+		AddButton(ID_FileBrowse, "Browse", 50, datatagbox);
+	}
+
+	loadbox->AddStretchSpacer();
+	loadbox->Add(datatagbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	loadbox->AddStretchSpacer();
+	loadpanel->Layout();
+
+	tabpanel->Freeze();
+	tabpanel->AddPage(analysispanel, "Analysis" , true);
+	tabpanel->AddPage(loadpanel, "Data Load" , true);
+	tabpanel->Thaw();
+
+	winman->AddPane(tabpanel, wxAuiPaneInfo().Name("tabpane").CentrePane().PaneBorder(false));
+
+	winman->Update();
 
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(CellBox::OnEnter));
 	Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(CellBox::OnNext));
 	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(CellBox::OnPrev));
+	Connect(ID_Load, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnLoadData));
 }
+
+
+/*CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
+: ParamBox(mod, title, pos, size, "cellbox")
+{
+int datwidth;
+
+diagbox = mod->diagbox;
+cellcount = 0;
+paramindex = 0;
+
+
+notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
+
+
+ToolPanel *analysispanel = new ToolPanel(mainwin, notebook);
+analysispanel->SetFont(boxfont);
+wxBoxSizer *analysisbox = new wxBoxSizer(wxVERTICAL);
+analysispanel->SetSizer(analysisbox);
+activepanel = analysispanel;
+paramset->panel = analysispanel;
+
+
+notebook->AddPage(analysispanel, "Analysis");
+
+//chromesizer->AddStretchSpacer();
+//chromesizer->Add(chromestatbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+//chromesizer->AddStretchSpacer();
+
+
+wxBoxSizer *histparambox = new wxBoxSizer(wxVERTICAL);
+paramset->AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
+paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
+//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
+PanelParamLayout(histparambox);
+
+
+datwidth = 50;
+spikes = NumPanel(datwidth, wxALIGN_RIGHT);
+mean = NumPanel(datwidth, wxALIGN_RIGHT);
+freq = NumPanel(datwidth, wxALIGN_RIGHT);
+sd = NumPanel(datwidth, wxALIGN_RIGHT);
+
+wxGridSizer *datagrid = new wxGridSizer(2, 5, 5);
+datagrid->Add(new wxStaticText(activepanel, -1, "Spikes"), 0, wxALIGN_CENTRE);
+datagrid->Add(spikes);
+datagrid->Add(new wxStaticText(activepanel, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+datagrid->Add(freq);
+datagrid->Add(new wxStaticText(activepanel, -1, "Mean"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+datagrid->Add(mean);
+datagrid->Add(new wxStaticText(activepanel, -1, "Std Dev"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+datagrid->Add(sd);
+
+datneuron = new wxTextCtrl(activepanel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
+datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
+datbox->Add(datspin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+datbox->AddSpacer(5);
+
+wxBoxSizer *neurobox = new wxBoxSizer(wxHORIZONTAL);
+neurobox->Add(new wxStaticText(activepanel, wxID_ANY, "Neuron"), 1, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+neurobox->Add(datneuron, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+wxStaticBoxSizer *databox = new wxStaticBoxSizer(wxVERTICAL, activepanel, "");
+databox->AddSpacer(2);
+databox->Add(neurobox, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 5);
+databox->AddSpacer(5);
+databox->Add(datbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 0);
+databox->AddSpacer(5);
+databox->Add(datagrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+wxBoxSizer *colbox = new wxBoxSizer(wxHORIZONTAL); 
+//colbox->AddStretchSpacer();
+colbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+colbox->AddSpacer(10);
+colbox->Add(histparambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+//colbox->AddStretchSpacer();
+
+
+
+analysisbox->AddStretchSpacer();
+analysisbox->Add(colbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+analysisbox->AddStretchSpacer();
+
+analysispanel->Layout();
+
+mainbox->Add(notebook, 1, wxEXPAND);
+
+//panel->Layout();
+
+
+Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(CellBox::OnEnter));
+Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(CellBox::OnNext));
+Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(CellBox::OnPrev));
+}*/
+
+
+void CellBox::OnLoadData(wxCommandEvent& event)
+{
+	wxString filetag, filepath, text;
+	short tagpos;
+	FileDat *file;
+
+	filetag = neurodatatag->GetValue();
+	//filepath = paramset->GetCon("datapath")->GetString();
+	filepath = "C:/Data/VMN";
+	FileDat newfile = FileDat(filetag, filepath);
+
+	tagpos = neurodatatag->FindString(filetag);
+
+	file = mainwin->filebase->Add(FileDat(filetag, filepath));
+
+	if(tagpos != wxNOT_FOUND) neurodatatag->Delete(tagpos);
+
+	//file = new FileDat(filetag, filepath);
+	//mainwin->diagbox->Write(text.Format("Entry name %s path %s\n", filetag, filepath));
+	//file = new FileDat(filetag, filepath);
+	//mainwin->diagbox->Write(text.Format("FileDat name %s path %s\n", file->name, file->path));
+
+	neurodatatag->Insert(filetag, 0, file);
+	neurodatatag->SetValue(filetag);
+
+	//if(mainwin->diagbox) mainwin->diagbox->Write("filetag " + filetag);
+	//if(mainwin->diagbox) mainwin->diagbox->Write("\nOn Load\n");
+	//LoadData(file);
+	LoadDataList(file);
+
+	//mod->filebase->newentry = false;
+}
+
 
 
 void CellBox::PanelData(NeuroDat *data)
@@ -144,6 +325,105 @@ void CellBox::OnEnter(wxCommandEvent& event)
 		return;
 	}
 	else NeuroData();
+}
+
+
+void CellBox::LoadDataList(FileDat *file)
+{
+	int i, row, col;
+	int start, filecount;
+	wxString filepath;
+	wxString datstring, readline, text;
+	string line, filename;
+	long timeval;
+	double dataval;
+
+	if(!file) {
+		mainwin->diagbox->Write("Bad file\n");
+		return;
+	}
+	if(file->path == "") {
+		mainwin->diagbox->Write("No file path\n");
+		return;
+	}
+	if(file->name == "") {
+		mainwin->diagbox->Write("No file name\n");
+		return;
+	}
+
+	mainwin->diagbox->Write(text.Format("FileDat path %s name %s\n", file->path, file->name));
+
+	row = 0;
+	col = 0;
+	filecount = 0;
+	filename = file->String().ToStdString();
+
+	ifstream infile(filename.c_str());
+	if(infile.is_open()) {
+		while(getline(infile, line)) {
+			wxString readline(line);
+			mainwin->diagbox->Write(readline + "\n");
+			LoadNeuroData(FileDat(readline, file->path), filecount++);
+			//textgrid->ParseLine(row++, col, line);
+			//if(i%100000 == 0) mainwin->diagbox->Write(text.Format("Line %d\n", i)); 
+		}
+		//mainwin->diagbox->Write(line + "\n");
+		infile.close();
+	}
+	else {
+		mainwin->diagbox->Write("\nUnable to open file\n"); 
+		mainwin->diagbox->Write(text.Format("filename %s\n", filename));
+	}
+	mainwin->diagbox->Write("\nFile OK\n"); 
+}
+
+
+void CellBox::LoadNeuroData(FileDat file, int col)
+{
+	int i, row;
+	int start;
+	wxString filepath;
+	wxString datstring, readline, text;
+	string line, filename;
+	long timeval;
+	double dataval;
+
+	if(file.path == "") {
+		mainwin->diagbox->Write("No file path\n");
+		return;
+	}
+	if(file.name == "") {
+		mainwin->diagbox->Write("No file name\n");
+		return;
+	}
+
+	mainwin->diagbox->Write(text.Format("FileDat path %s name %s\n", file.path, file.name));
+
+	row = 0;
+	//col = 0;
+	filename = file.String().ToStdString();
+
+	ifstream infile(filename.c_str());
+	if(infile.is_open()) {
+		while(getline(infile, line)) {
+			//wxString readline(line);
+			//mainwin->diagbox->Write(readline + "\n");
+			//LoadNeuroData(FileDat(readline, file->path));
+			if(line == ":") {
+				mainwin->diagbox->Write("Dumping :\n");
+				continue;
+			}
+			textgrid->ParseLine(row++, col, line);
+			//if(i%100000 == 0) mainwin->diagbox->Write(text.Format("Line %d\n", i)); 
+		}
+		//mainwin->diagbox->Write(line + "\n");
+		infile.close();
+	}
+	else {
+		mainwin->diagbox->Write("\nUnable to open file\n"); 
+		mainwin->diagbox->Write(text.Format("filename %s\n", filename));
+	}
+	mainwin->diagbox->Write("\nFile OK\n"); 
 }
 
 
@@ -349,7 +629,7 @@ void OutBox::OnGridLoad(wxCommandEvent& event)
 void OutBox::ColumnSelect(int col)
 {
 	wxString text;
-	
+
 	WriteVDU(text.Format("Column Select %d\n", col));
 }
 
@@ -546,8 +826,8 @@ void OutBox::GridLoadFast()
 	char c;
 	diagbox->Write("File start:\n");
 	while (readfile.get(c)) {
-		diagbox->Write(text.Format("%d ", c));
-		if(c == '\n') diagbox->Write("\n");
+	diagbox->Write(text.Format("%d ", c));
+	if(c == '\n') diagbox->Write("\n");
 	}
 	diagbox->Write("EOF\n");*/
 
@@ -600,8 +880,8 @@ void OutBox::GridLoadFast()
 	/*
 	diagbox->Write("Contents codes:\n");
 	for(i=0; i<contents.length(); i++) {
-		diagbox->Write(text.Format("%d ", contents[i]));
-		if(contents[i] == '\n') diagbox->Write("\n");
+	diagbox->Write(text.Format("%d ", contents[i]));
+	if(contents[i] == '\n') diagbox->Write("\n");
 	}
 	diagbox->Write("EOF Contents\n");
 
@@ -653,7 +933,7 @@ void OutBox::GridLoadFast()
 	gauge->SetValue(0);
 
 	if(!ifp.Open(filetag + "-gridsize.txt")) return;
-	
+
 	readline = ifp.ReadLine();
 	while(!readline.IsEmpty()) {
 		col = ParseLong(&readline, 'l');

@@ -519,6 +519,19 @@ ToolPanel::ToolPanel(MainFrame *main, wxWindow *parent)
 }
 
 
+ToolPanel::ToolPanel(wxNotebook *book, const wxPoint& pos, const wxSize& size)
+	: wxPanel(book, wxID_ANY, pos, size)
+{
+	toolbox = NULL;
+	mainwin = NULL;
+	controlborder = 2;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
+	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+}
+
+
 ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
 	: wxPanel(box, wxID_ANY, pos, size)
 {

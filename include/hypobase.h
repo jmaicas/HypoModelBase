@@ -587,7 +587,7 @@ class Index{
 	int i;
 public:
 	int count;
-	int list[100];
+	int list[1000];
 
 	Index() {
 		count = 0;
