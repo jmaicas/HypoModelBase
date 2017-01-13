@@ -942,8 +942,8 @@ void OutBox::GridLoadFast()
 	}
 	//infile.close();
 	//diagbox->Write("OK\n");
-	WriteVDU(text.Format("OK, %d cells\n", cellcount));
-	//WriteVDU("OK\n");
+	//WriteVDU(text.Format("OK, %d grid cells\n", cellcount));
+	WriteVDU("OK\n");
 	if(gauge) gauge->SetValue(0);
 
 	if(!ifp.Open(filetag + "-gridsize.txt")) return;
@@ -952,7 +952,7 @@ void OutBox::GridLoadFast()
 	while(!readline.IsEmpty()) {
 		col = ParseLong(&readline, 'l');
 		width = ParseLong(&readline, 0);
-		WriteVDU(text.Format("col %d %d\n", col, width));
+		//WriteVDU(text.Format("col %d %d\n", col, width));
 		textgrid->SetColSize(col, width);
 		if(ifp.End()) break;
 		readline = ifp.ReadLine();

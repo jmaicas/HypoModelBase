@@ -77,6 +77,7 @@ public:
 	wxString name;
 	short histmode;
 	bool defstore;
+	int diagmode;
 
 	HypoMain *mainwin;
 	Model *mod;
