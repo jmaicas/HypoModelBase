@@ -103,6 +103,7 @@ public:
 	wxStaticText *freq;
 	wxStaticText *sd;
 	wxStaticText *runcount;
+	wxStaticText *label;
 
 	wxMenu *menuControls;
 	wxMenu *menuModel;

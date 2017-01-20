@@ -20,7 +20,7 @@ using namespace std;
 CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 	: ParamBox(mod, title, pos, size, "cellbox", 1)
 {
-	int datwidth;
+	int datwidth, labelwidth;
 
 	diagbox = mod->diagbox;
 	cellcount = 0;
@@ -45,12 +45,16 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	PanelParamLayout(histparambox);
 
 	datwidth = 50;
+	labelwidth = 70;
+	label = NumPanel(labelwidth, wxALIGN_CENTRE);
 	spikes = NumPanel(datwidth, wxALIGN_RIGHT);
 	mean = NumPanel(datwidth, wxALIGN_RIGHT);
 	freq = NumPanel(datwidth, wxALIGN_RIGHT);
 	sd = NumPanel(datwidth, wxALIGN_RIGHT);
 
 	wxGridSizer *datagrid = new wxGridSizer(2, 5, 5);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Name"), 0, wxALIGN_CENTRE);
+	datagrid->Add(label);
 	datagrid->Add(new wxStaticText(activepanel, -1, "Spikes"), 0, wxALIGN_CENTRE);
 	datagrid->Add(spikes);
 	datagrid->Add(new wxStaticText(activepanel, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
@@ -120,7 +124,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 
 	tabpanel->Freeze();
 	tabpanel->AddPage(analysispanel, "Analysis" , true);
-	tabpanel->AddPage(loadpanel, "Data Load" , true);
+	tabpanel->AddPage(loadpanel, "Data Load" , false);
 	tabpanel->Thaw();
 
 	winman->AddPane(tabpanel, wxAuiPaneInfo().Name("tabpane").CentrePane().PaneBorder(false));
@@ -269,6 +273,8 @@ void CellBox::PanelData(NeuroDat *data)
 	if(data->netflag) snum = "sum";
 	else snum = numstring(neuroindex, 0);
 	datneuron->SetLabel(snum);
+
+	label->SetLabel(data->name);
 	spikes->SetLabel(snum.Format("%d", data->spikecount));
 	freq->SetLabel(snum.Format("%.2f", data->freq));
 	mean->SetLabel(snum.Format("%.1f", data->meanisi));
@@ -404,6 +410,12 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 	filename = file.String().ToStdString();
 
 	ifstream infile(filename.c_str());
+
+	if(!infile.is_open()) {
+		filename = filename + ".txt";
+		infile.open(filename.c_str());
+	}
+
 	if(infile.is_open()) {
 		while(getline(infile, line)) {
 			//wxString readline(line);
@@ -411,6 +423,11 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 			//LoadNeuroData(FileDat(readline, file->path));
 			if(line == ":") {
 				mainwin->diagbox->Write("Dumping :\n");
+				continue;
+			}
+			if(line.front() == '\'') {
+				mainwin->diagbox->Write("Label detect\n");
+				textgrid->ParseLabel(row++, col, line);
 				continue;
 			}
 			textgrid->ParseLine(row++, col, line);

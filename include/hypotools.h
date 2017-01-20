@@ -57,6 +57,7 @@ public:
 		void SetBold();
 		void ClearCol(int);
 		void ParseLine(int row, int col, wxString line);
+		void ParseLabel(int row, int col, wxString line);
 		void SetCell(int row, int col, wxString data);
 		wxString GetCell(int row, int col);
 };

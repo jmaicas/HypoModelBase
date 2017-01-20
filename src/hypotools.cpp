@@ -151,6 +151,18 @@ void TextGrid::ParseLine(int row, int col, wxString readline)
 		readline = readline.AfterFirst(' ');
 	}
 }
+
+
+void TextGrid::ParseLabel(int row, int col, wxString readline)
+{
+	int i;
+	wxString text, label;
+
+	label = readline.AfterFirst('\'');
+	label = label.BeforeFirst('\'');
+	label.Trim();
+	SetCell(row, col++, label);
+}
  
 
 void TextGrid::ClearCol(int col)
