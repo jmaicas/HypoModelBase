@@ -46,6 +46,42 @@ public:
 };
 
 
+class FitCon{
+public:
+	wxString tag, label;
+	double value;
+
+	FitCon() {
+		tag = "";
+		label = "";
+		value = 0;
+	};
+
+	FitCon(wxString newtag, wxString newlabel, double newvalue) {
+		tag = newtag;
+		label = newlabel;
+		value = newvalue;
+	};
+};
+
+
+class FitConSet{
+public:
+	int count, max;
+	ParamStore ref;
+	wxString *tags;
+	FitCon *cons;
+	//ParamStore fitcon;
+	//double *values;
+
+	FitConSet(int size);
+	~FitConSet();
+
+	void AddCon(wxString tag, wxString label, double value);
+	FitCon GetCon(wxString tag);
+};
+
+
 class FitSet{
 public:
 	int measureCount, measureMax;
@@ -297,7 +333,7 @@ public:
 	void BurstScan(BurstBox *);
 	void IntraBurstAnalysis();
 	void IntraSelectAnalysis();
-	void FitScore(SpikeDat *, FitDat *, FitSet *);
+	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();

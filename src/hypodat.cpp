@@ -946,6 +946,37 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 }
 
 
+FitConSet::FitConSet(int size)
+{
+	count = 0;
+	max = size;
+	tags = new wxString[size];
+	cons = new FitCon[size];
+}
+
+
+FitConSet::~FitConSet()
+{
+	delete[] cons;
+	delete[] tags;
+}
+
+
+void FitConSet::AddCon(wxString tag, wxString label, double value)
+{
+	ref[tag] = count;
+	tags[count] = tag;
+	cons[count] = FitCon(tag, label, value);
+	count++;
+}
+
+
+FitCon FitConSet::GetCon(wxString tag)
+{
+	return cons[(int)ref[tag]];
+}
+
+
 FitSet::FitSet(int size)
 {
 	measureCount = 0;

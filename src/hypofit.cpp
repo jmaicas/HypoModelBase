@@ -641,7 +641,7 @@ void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 
 
-void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
+void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitConSet *conset)
 {
 	int i;
 	int histmax = 512;
@@ -688,11 +688,15 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 
 
 	fitcon = new ParamStore();
-	(*fitcon)["RMSFirstNBins"] = 30;
-	(*fitcon)["RMSBinRangeStart"] = 30;
-	(*fitcon)["RMSBinRangeFinish"] = 125;
+	//(*fitcon)["RMSFirstNBins"] = 30;
+	//(*fitcon)["RMSBinRangeStart"] = 30;
+	//(*fitcon)["RMSBinRangeFinish"] = 125;
 	(*fitcon)["HazMin"];
 	(*fitcon)["RMSFirstNBinsBurst"] = 20;
+
+	(*fitcon)["RMSFirstNBins"] = conset->GetCon("RMSFirstNBins").value;
+	(*fitcon)["RMSBinRangeStart"] = conset->GetCon("RMSBinRangeStart").value;
+	(*fitcon)["RMSBinRangeFinish"] = conset->GetCon("RMSBinRangeFinish").value;
 
 	double chisum = 0;
 	int bincount = 300;
