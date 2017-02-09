@@ -698,6 +698,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 	(*fitcon)["RMSBinRangeStart"] = conset->GetCon("RMSBinRangeStart").value;
 	(*fitcon)["RMSBinRangeFinish"] = conset->GetCon("RMSBinRangeFinish").value;
 
+
 	double chisum = 0;
 	int bincount = 300;
 	int sumcount = 0;

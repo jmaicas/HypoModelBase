@@ -620,6 +620,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	//SpikeDat *spikedata;
 	int diag;
 	bool drawdiag;
+	int highon;    // 9/2/17  Prototype highlighting code
 	int xylab;
 
 	wxString snum, gname, text;
@@ -763,6 +764,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		dc.DrawText(gname, xplot + 50 - textsize.GetWidth(), 30 + 15 * gplot); 
 
 		dc.SetPen(colourpen[colour]);
+		highon = 0;
 
 		// Set drawing scales
 		xto /= binsize;
@@ -804,6 +806,16 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
 				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
 				xpos = i * xrange + xbase;
+
+				if(i == graph->highstart) {					// new highlighting code  9/2/17
+					highon = 1;   
+					dc.SetPen(colourpen[graph->highcolour]);
+				}
+				if(i == graph->highstop) {
+					highon = 0;
+					dc.SetPen(colourpen[colour]);
+				}
+				
 				if(xrange <= 1) {
 					DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
 				}

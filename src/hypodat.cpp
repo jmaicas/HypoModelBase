@@ -621,6 +621,9 @@ void GraphDat::Init()
 	barwidth = 10;
 	bargap = 10;
 	xstop = 0;
+	highstart = 0;
+	highstop = 0;
+	highcolour = red;
 }
 
 

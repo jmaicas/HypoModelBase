@@ -559,6 +559,8 @@ public:
 	bool synchx;
 	int barwidth, barshift, bargap;
 
+	int highstart, highstop, highcolour;
+
 	BurstDat *burstdata;
 	SpikeDat *spikedata;
 
