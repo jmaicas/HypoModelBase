@@ -314,7 +314,7 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 	anchorpos = pos;
 	currentpos = anchorpos;
 	selectband = true;
-	//CaptureMouse() ;
+	CaptureMouse();
 }
 
 
@@ -334,6 +334,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 
 	// Data Selection drag 
 
+	
 	wxPoint pos = event.GetPosition();
 	if(pos.x - mousedown.x > 5) {
 		graph = gpos->plot[0];
@@ -366,7 +367,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
 
 	selectband = false;
-	//ReleaseMouse();
+	ReleaseMouse();
 	{wxClientDC dc(this);
 	PrepareDC(dc);
 	wxDCOverlay overlaydc(overlay, &dc);
@@ -469,49 +470,60 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 	wxPoint pos;
 
 	pos = event.GetPosition();
-	graph = gpos->plot[0];
-	gid = graph->gindex;
 
-	xdiff = graph->xto - graph->xfrom;
-	xscale = xdiff / xplot;
-	xgraph = (pos.x - xbase) * xscale + graph->xfrom;
-	xplaces = numplaces(xdiff);
-
-	ydiff = graph->yto - graph->yfrom;
-	yscale = ydiff / yplot;
-	ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
-	yplaces = numplaces(ydiff);
-
-	//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
 	if((*mainwin->hypoflags)["xypos"]) {
+		graph = gpos->plot[0];
+		gid = graph->gindex;
+
+		xdiff = graph->xto - graph->xfrom;
+		xscale = xdiff / xplot;
+		xgraph = (pos.x - xbase) * xscale + graph->xfrom;
+		xplaces = numplaces(xdiff);
+
+		ydiff = graph->yto - graph->yfrom;
+		yscale = ydiff / yplot;
+		ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
+		yplaces = numplaces(ydiff);
+
+		//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
+	
 		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
 		else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
 		mainwin->SetStatusText(snum);
 	}
 
 	if(selectband) {
-		int x,y, xx, yy;
-		event.GetPosition(&x,&y);
+		//int x,y, xx, yy;
+		//event.GetPosition(&x,&y);
 		//CalcUnscrolledPosition( x, y, &xx, &yy );
+
 		currentpos = pos;
-		//if(currentpos.y > ybase + yplot) currentpos.y = ybase + yplot;
-		anchorpos.y = ybase - 10;
-		//currentpos.y = ybase + yplot;
+		if(currentpos.y > ybase + yplot - 1) currentpos.y = ybase + yplot - 1;
+		if(currentpos.y < ybase + 1) currentpos.y = ybase + 1;
+		if(currentpos.x > xbase + xplot - 1) currentpos.x = xbase + xplot - 1;
+		if(currentpos.x < xbase + 1) currentpos.x = xbase + 1;
+		anchorpos.y = ybase + 1; // - 10;
+		currentpos.y = ybase + yplot - 1;
+
 		wxRect newrect(anchorpos, currentpos);
-		wxClientDC dc(this);
-		PrepareDC(dc);
-		//wxDCOverlay overlaydc(overlay, &dc, xbase, ybase, xplot, yplot);
-		wxDCOverlay overlaydc(overlay, &dc);
-		overlaydc.Clear();
+		{
+			wxClientDC dc(this);
+			PrepareDC(dc);
+			wxDCOverlay overlaydc(overlay, &dc, xbase, ybase, xplot, yplot);
+			//wxDCOverlay overlaydc(overlay, &dc);
+			overlaydc.Clear();
 #ifdef __WXMAC__
-		dc.SetPen(*wxGREY_PEN);
-		dc.SetBrush(wxColour(192,192,192,64));
+			dc.SetPen(*wxGREY_PEN);
+			dc.SetBrush(wxColour(192,192,192,64));
 #else
-		dc.SetPen(wxPen(*wxBLUE, 2));
-		dc.SetBrush(*wxTRANSPARENT_BRUSH);
-		//dc.SetBrush( *wxBLUE_BRUSH );
-#endif
-		dc.DrawRectangle(newrect);
+			//dc.SetPen(wxPen(*wxBLUE, 2));
+			dc.SetPen(wxPen(*wxLIGHT_GREY, 2));
+			dc.SetBrush(*wxTRANSPARENT_BRUSH);
+			//dc.SetBrush( *wxBLUE_BRUSH );
+#endif	
+			//dc.SetAlpha(0xA0);
+			dc.DrawRectangle(newrect);
+		}
 	}
 }
 

@@ -200,6 +200,7 @@ public:
 	int neuroindex;
 	int cellcount;
 	SpikeDat *currcell;
+	SpikeDat *selected;
 	//NeuroDat *cells;
 	vector<NeuroDat>*cells;
 
@@ -207,6 +208,11 @@ public:
 	wxSpinButton *datspin;
 	TagBox *neurodatatag;
 	TextGrid *textgrid;
+
+	wxStaticBoxSizer *selectbox1, *selectbox2;
+	int currselect;
+	//BurstDat **selectdata;
+	BurstDat *selectdata[5];
 
 	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	void NeuroData();
@@ -219,6 +225,14 @@ public:
 	void OnBrowse(wxCommandEvent& event);
 	void LoadDataList(FileDat *);
 	void LoadNeuroData(FileDat file, int col);
+
+	void OnAdd(wxCommandEvent& event);
+	void OnSub(wxCommandEvent& event);
+	void OnClear(wxCommandEvent& event);
+	void OnInvert(wxCommandEvent& event);
+	void AnalyseSelection();
+	void SetSelect(double, double);
+	void OnClick(wxPoint);
 };
 
 
