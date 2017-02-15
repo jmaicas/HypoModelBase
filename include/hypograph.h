@@ -48,7 +48,7 @@ public:
 	int ostype;
 	int gsynch;
 	int xstretch;
-	wxPoint mousedown, startpos;
+	wxPoint mousedown;
 	//wxOverlay *overlay;
 	wxFont textfont, smallfont;
 	wxColour *colourpen;
