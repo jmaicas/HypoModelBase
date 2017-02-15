@@ -1343,17 +1343,17 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		IoDdata[1] = dispersion1;
 		IoDdata[2] = dispersion2;
 		IoDdata[3] = dispersion4;
-		IoDdata[4] = dispersion8;
-		IoDdata[5] = dispersion6;
-		IoDdata[6] = dispersion10;                // order rearranged to match Trystan figure  March 2016
+		IoDdata[4] = dispersion6;
+		IoDdata[5] = dispersion8;
+		IoDdata[6] = dispersion10;                // order rearranged to match Trystan figure  March 2016    Reset Feb 2017
 
 		IoDdataX[0] = 5;
 		IoDdataX[1] = 15;
 		IoDdataX[2] = 25;
 		IoDdataX[3] = 35;
 		IoDdataX[4] = 45;
-		//IoDdataX[5] = 55;
-		//IoDdataX[6] = 65;
+		IoDdataX[5] = 55;
+		IoDdataX[6] = 65;
 
 		/*
 

@@ -293,8 +293,12 @@ wxRealPoint GraphWindow3::GraphPos(wxPoint)
 
 void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 {
-	wxPoint pos = event.GetPosition();
+	wxPoint pos; 
+	
+	//CaptureMouse();
+	pos = event.GetPosition();
 	mousedown = pos;
+	//startpos = pos;
 
 	double xdiff = graph->xto - graph->xfrom;
 	double xscale = xdiff / xplot;
@@ -314,7 +318,7 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 	anchorpos = pos;
 	currentpos = anchorpos;
 	selectband = true;
-	//CaptureMouse() ;
+	//CaptureMouse();
 }
 
 
@@ -357,20 +361,28 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 		if(ygraphTo > graph->yto) ygraphTo = graph->yto;
 
 		snum.Printf("LUp x%d y%d  drag X %s To %s (%s)   Y %s To %s (%s)", pos.x, pos.y, 
-			numstring(xgraphFrom, xplaces), numstring(xgraphTo, xplaces), numstring(xgraphTo - xgraphFrom, xplaces),
-			numstring(ygraphFrom, yplaces), numstring(ygraphTo, yplaces), numstring(ygraphTo - ygraphFrom, yplaces));
+		numstring(xgraphFrom, xplaces), numstring(xgraphTo, xplaces), numstring(xgraphTo - xgraphFrom, xplaces),
+		numstring(ygraphFrom, yplaces), numstring(ygraphTo, yplaces), numstring(ygraphTo - ygraphFrom, yplaces));
 		mod->DataSelect(xgraphFrom, xgraphTo);
 	}
 	else snum.Printf("LUp %d", pos.x);
 
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
 
+	/*
+	if(HasCapture()) ReleaseMouse();
+    wxClientDC dc(this); 
+	wxDCOverlay odc(overlay, &dc);
+	odc.Clear();
+	overlay.Reset();*/
+
+    
 	selectband = false;
 	//ReleaseMouse();
-	{wxClientDC dc(this);
-	PrepareDC(dc);
-	wxDCOverlay overlaydc(overlay, &dc);
-	overlaydc.Clear();}
+	wxClientDC dc(this);
+	//PrepareDC(dc);
+	wxDCOverlay odc(overlay, &dc);
+	odc.Clear();
 	overlay.Reset();
 }
 
@@ -405,6 +417,75 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 	menuPlot->Check(1000 + gpos->sdex, true);
 	mainwin->diagbox->Write(text.Format("graph menu set %d\n", gpos->sdex));
 	PopupMenu(menuPlot, pos.x + 20, pos.y);
+}
+
+
+void GraphWindow3::OnMouseMove(wxMouseEvent &event)
+{
+	double xdiff, xscale, xgraph;
+	double ydiff, yscale, ygraph;
+	int xplaces, yplaces;
+	short gid;
+	wxPoint pos;
+
+	pos = event.GetPosition();
+	graph = gpos->plot[0];
+	gid = graph->gindex;
+
+	xdiff = graph->xto - graph->xfrom;
+	xscale = xdiff / xplot;
+	xgraph = (pos.x - xbase) * xscale + graph->xfrom;
+	xplaces = numplaces(xdiff);
+
+	ydiff = graph->yto - graph->yfrom;
+	yscale = ydiff / yplot;
+	ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
+	yplaces = numplaces(ydiff);
+
+	//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
+	if((*mainwin->hypoflags)["xypos"]) {
+		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
+		else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
+		mainwin->SetStatusText(snum);
+	}
+
+	/*
+	if(event.Dragging() && event.LeftIsDown()) {
+		wxRect rect = wxRect(startpos, pos);
+		wxClientDC dc(this);
+		wxDCOverlay odc(overlay, &dc);
+		odc.Clear();
+		//dc = wxGCDC(dc);
+		dc.SetPen(wxPen("black", 2));
+        dc.SetBrush(wxBrush(wxColour(0xC0, 0xC0, 0xC0, 0x80)));
+		dc.DrawRectangle(rect);
+	}*/
+
+	if(selectband) {
+		//int x, y, xx, yy;
+		//event.GetPosition(&x,&y);
+		//CalcUnscrolledPosition( x, y, &xx, &yy );
+		currentpos = pos;
+		//if(currentpos.y > ybase + yplot) currentpos.y = ybase + yplot;
+		anchorpos.y = ybase - 10;
+		//currentpos.y = ybase + yplot;
+		wxRect newrect(anchorpos, currentpos);
+		wxClientDC dc(this);
+		//PrepareDC(dc);
+		//wxDCOverlay overlaydc(overlay, &dc, xbase, ybase, xplot, yplot);
+		wxDCOverlay odc(overlay, &dc);
+		//odc.Clear();
+#ifdef __WXMAC__
+		dc.SetPen(*wxGREY_PEN);
+		dc.SetBrush(wxColour(192,192,192,64));
+#else
+		dc.SetPen(wxPen(*wxBLUE, 2));
+		dc.SetBrush(*wxTRANSPARENT_BRUSH);
+		//dc.SetBrush( *wxBLUE_BRUSH );
+#endif
+		dc.DrawRectangle(newrect);
+	}
+	
 }
 
 
@@ -457,62 +538,6 @@ void GraphWindow3::UpdateScroll(int pos)
 	scrollbar->SetScrollbar(graph->scrollpos, section, scrollxto + section + xdiff/5, section);
 
 	Refresh();
-}
-
-
-void GraphWindow3::OnMouseMove(wxMouseEvent &event)
-{
-	double xdiff, xscale, xgraph;
-	double ydiff, yscale, ygraph;
-	int xplaces, yplaces;
-	short gid;
-	wxPoint pos;
-
-	pos = event.GetPosition();
-	graph = gpos->plot[0];
-	gid = graph->gindex;
-
-	xdiff = graph->xto - graph->xfrom;
-	xscale = xdiff / xplot;
-	xgraph = (pos.x - xbase) * xscale + graph->xfrom;
-	xplaces = numplaces(xdiff);
-
-	ydiff = graph->yto - graph->yfrom;
-	yscale = ydiff / yplot;
-	ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
-	yplaces = numplaces(ydiff);
-
-	//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
-	if((*mainwin->hypoflags)["xypos"]) {
-		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
-		else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
-		mainwin->SetStatusText(snum);
-	}
-
-	if(selectband) {
-		int x,y, xx, yy;
-		event.GetPosition(&x,&y);
-		//CalcUnscrolledPosition( x, y, &xx, &yy );
-		currentpos = pos;
-		//if(currentpos.y > ybase + yplot) currentpos.y = ybase + yplot;
-		anchorpos.y = ybase - 10;
-		//currentpos.y = ybase + yplot;
-		wxRect newrect(anchorpos, currentpos);
-		wxClientDC dc(this);
-		PrepareDC(dc);
-		//wxDCOverlay overlaydc(overlay, &dc, xbase, ybase, xplot, yplot);
-		wxDCOverlay overlaydc(overlay, &dc);
-		overlaydc.Clear();
-#ifdef __WXMAC__
-		dc.SetPen(*wxGREY_PEN);
-		dc.SetBrush(wxColour(192,192,192,64));
-#else
-		dc.SetPen(wxPen(*wxBLUE, 2));
-		dc.SetBrush(*wxTRANSPARENT_BRUSH);
-		//dc.SetBrush( *wxBLUE_BRUSH );
-#endif
-		dc.DrawRectangle(newrect);
-	}
 }
 
 
@@ -983,8 +1008,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				//if(xval <= prevx) break;
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (int)(xval - xfrom) * xrange;
-					barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
-					barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
+					//barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
+					//barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
+					barshift = (barwidth * gdisp + (gdisp - 1) * bargap) / 2;
+					barpos = xbase + xpos - barshift + gplot * barwidth;
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
 					dc.SetPen(colourpen[colour]);
