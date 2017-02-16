@@ -204,7 +204,7 @@ void SpikeDat::IntraBurstAnalysis()
 
 	if(scandiag) outfile.New("intradat.txt");
 
-	//if(diagbox) diagbox->Write("Intra Burst Analysis\n");
+	diagbox->Write("Intra Burst Analysis\n");
 
 	// Intraburst Re-Analysis  
 
@@ -219,6 +219,8 @@ void SpikeDat::IntraBurstAnalysis()
 	for(i=0; i<10000; i++) {
 		burstdata->hist1[i] = 0;
 		burstdata->hist5[i] = 0;
+		burstdata->hist1norm[i] = 0;
+		burstdata->hist5norm[i] = 0;
 		burstdata->haz1[i] = 0;
 		burstdata->haz5[i] = 0;
 	}
@@ -264,22 +266,12 @@ void SpikeDat::IntraBurstAnalysis()
 		burstdata->meanisi = 0;
 	}
 
-	//if(diagbox) diagbox->Write(text.Format("intcount %d\n", intcount));
-
-	//burstdata->intraspikes = intracount;
-	//burstdata->intraspikes = scount;
-	//burstdata->isisd = sqrt(variance - mean * mean);
-	//burstdata->freq = 1000/mean;
-	//burstdata->meanisi = mean;
-	//fprintf(ofp, "\nIntra burst time total = %.2f\n", inttime);
 	burstdata->burstdisp = 1;
 	burstdata->times = times;
 	burstdata->maxtime = times[spikecount-1];
-	//burstbox->BurstDataDisp();
-	//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
+	
 	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
-	//fprintf(ofp, "maxtime %.2f\n", burstdata->maxtime);
-	//for(i=0; i<spikecount; i++) burstdata->times[i] = times[i];
+
 
 	// Hazard
 
@@ -305,6 +297,13 @@ void SpikeDat::IntraBurstAnalysis()
 		if(i/binsize > burstdata->hist5.max) burstdata->hist5.max = i/binsize;
 		if(burstdata->hist5.data.size() < burstdata->hist5.max + 1)	burstdata->hist5.data.resize(burstdata->hist5.max + 1);
 		burstdata->hist5.data[i/binsize] = burstdata->hist5.data[i/binsize] + burstdata->hist1.data[i];		
+	}
+
+
+	// Normalise
+	for(i=0; i<=burstdata->hist1.max; i++) {
+		burstdata->hist1norm[i] = normscale * burstdata->hist1[i] / intcount;
+		burstdata->hist5norm[i] = normscale * burstdata->hist5[i] / intcount;
 	}
 
 	if(scandiag) outfile.Close();
@@ -1308,54 +1307,23 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 		// Index of Dispersion Code
 
-		/*
-		IoDDat IoD_05(500, this);
-		IoD_05.dispcalc();
-
-		IoDDat IoD_1(1000, this);
-		IoD_1.dispcalc();
-
-		IoDDat IoD_2(2000, this);
-		IoD_2.dispcalc();
-
-		IoDDat IoD_4(4000, this);
-		IoD_4.dispcalc();
-
-		IoDDat IoD_6(6000, this);
-		IoD_6.dispcalc();
-
-		IoDDat IoD_8(8000, this);
-		IoD_8.dispcalc();
-
-		IoDDat IoD_10(10000, this);
-		IoD_10.dispcalc();*/
-
-
-		double dispersion05 = dispcalc(500);
-		double dispersion1 = dispcalc(1000);
-		double dispersion2 = dispcalc(2000);
-		double dispersion4 = dispcalc(4000);
-		double dispersion6 = dispcalc(6000);
-		double dispersion8 = dispcalc(8000);
-		double dispersion10 = dispcalc(10000);
-
-		IoDdata[0] = dispersion05;
-		IoDdata[1] = dispersion1;
-		IoDdata[2] = dispersion2;
-		IoDdata[3] = dispersion4;
-		IoDdata[4] = dispersion8;
-		IoDdata[5] = dispersion6;
-		IoDdata[6] = dispersion10;                // order rearranged to match Trystan figure  March 2016
+		IoDdata[0] = dispcalc(500);
+		IoDdata[1] = dispcalc(1000);
+		IoDdata[2] = dispcalc(2000);
+		IoDdata[3] = dispcalc(4000);
+		IoDdata[4] = dispcalc(6000);
+		IoDdata[5] = dispcalc(8000);
+		IoDdata[6] = dispcalc(10000);              // order rearranged to match Trystan figure  March 2016   // restored Feb 2017
 
 		IoDdataX[0] = 5;
 		IoDdataX[1] = 15;
 		IoDdataX[2] = 25;
 		IoDdataX[3] = 35;
 		IoDdataX[4] = 45;
-		//IoDdataX[5] = 55;
-		//IoDdataX[6] = 65;
+		IoDdataX[5] = 55;
+		IoDdataX[6] = 65;
 
-		/*
+		/*   Jorge IoD code
 
 		for(i=0; i<100000; i++) {
 		spikerate05.data[i] = 0;
@@ -1569,11 +1537,13 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 {
 	int setindex;
 	int shift;
+	wxString text;
 
 	if(light) shift = 5;
 	else shift = 0;
 
 	//graphbase->NewSet(tag, reftag);
+	diagbox->Write(text.Format("\nGraphSet tag %s test %d\n", btag, burstdata->test));
 
 	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
 	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", reftag);
@@ -1581,10 +1551,10 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spike Rate 100ms", this, 0.1, red + shift), reftag + "rate100ms", reftag);
 	graphbase->Add(GraphDat(&srate10, 0, 5, 0, 20, tag + "Spike Rate 10ms", this, 0.1, red + shift), reftag + "rate10ms", reftag);
 	graphbase->Add(GraphDat(&srate1, 0, 0.5, 0, 3, tag + "Spikes 1ms", this, 0.001, red + shift), reftag + "spikes1ms", reftag);
-	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "ISI Histogram 1ms", 1, 1, colour + shift), reftag + "hist1ms", reftag);
-	graphbase->Add(GraphDat(&hist5, 0, 500, 0, 500, tag + "ISI Histogram 5ms", 1, 5, colour + shift), reftag + "hist5ms", reftag);
-	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Hazard 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);
-	graphbase->Add(GraphDat(&haz5, 0, 500, 0, 0.2, tag + "Hazard 5ms", 1, 5, colour + shift), reftag + "haz5ms", reftag);
+	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "Hist 1ms", 1, 1, colour + shift), reftag + "hist1ms", reftag);
+	graphbase->Add(GraphDat(&hist5, 0, 500, 0, 500, tag + "Hist 5ms", 1, 5, colour + shift), reftag + "hist5ms", reftag);
+	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Haz 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);
+	graphbase->Add(GraphDat(&haz5, 0, 500, 0, 0.2, tag + "Haz 5ms", 1, 5, colour + shift), reftag + "haz5ms", reftag);
 	graphbase->Add(GraphDat(&winfreq, 0, 500, 0, 20, tag + "Win Freq", 4, 1, green + shift), reftag + "winfreq", reftag);
 	graphbase->Add(GraphDat(&burstdata->hist1, 0, 500, 0, 100, btag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "bursthist1ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->hist5, 0, 500, 0, 500, btag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "bursthist5ms", reftag);
@@ -1605,8 +1575,10 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, colour + shift), reftag + "histquadlinear", reftag);
 	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, colour + shift), reftag + "hazquad", reftag);
 
-	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
-	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
+	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
+	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
+	graphbase->Add(GraphDat(&burstdata->hist1norm, 0, 500, 0, 100, btag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "burstnormhist1ms", reftag);
+	graphbase->Add(GraphDat(&burstdata->hist5norm, 0, 500, 0, 500, btag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "burstnormhist5ms", reftag);
 
 	(*graphbase)[reftag + "rate1s"]->synchx = false;
 	(*graphbase)[reftag + "spikes1ms"]->synchx = false;

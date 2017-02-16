@@ -213,6 +213,8 @@ public:
 	int currselect;
 	//BurstDat **selectdata;
 	BurstDat *selectdata[5];
+	int *selectspikes[2];
+	
 
 	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	void NeuroData();

@@ -31,6 +31,14 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	selectdata[0] = new BurstDat(true);
     selectdata[1] = new BurstDat(true);
 
+	selectspikes[0] = new int[100000];
+	selectspikes[1] = new int[100000];
+
+	for(i=0; i<100000; i++) {
+		selectspikes[0][i] = 0;
+		selectspikes[1][i] = 0;
+	}
+
 	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
 	wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
 
@@ -207,7 +215,7 @@ void CellBox::OnClick(wxPoint pos)
 	if(selrect1.Contains(pos)) currselect = 0;
 	if(selrect2.Contains(pos)) currselect = 1;
 
-	currcell->burstdata = selectdata[currselect];
+	currcell->burstdata->spikes = selectspikes[currselect];
 
 	mainwin->SetStatusText(text.Format("Lysis Box Click x %d y %d  Select %d", pos.x, pos.y, currselect));
 	mod->mainwin->scalebox->BurstDisp(1);
@@ -246,10 +254,11 @@ void CellBox::OnSub(wxCommandEvent& event)
 	for(i=0; i<numspikes; i++) {
 		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {
 			selectdata[sel]->spikes[i] = 0;
+			selectspikes[sel][i] = 0;
 		}
 	}
 
-	currcell->burstdata = selectdata[sel];
+	currcell->burstdata->spikes = selectspikes[sel];
 	diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", sel, sfrom, sto));
 
 	mainwin->scalebox->BurstDisp(1);
@@ -263,7 +272,9 @@ void CellBox::OnInvert(wxCommandEvent& event)
 	int sel = event.GetId() - 400;
 	int numspikes = currcell->spikecount;
 
-	for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = (sel + 1) - selectdata[sel]->spikes[i];
+	//for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = (sel + 1) - selectdata[sel]->spikes[i];
+
+	for(i=0; i<numspikes; i++) selectspikes[sel][i] = (sel + 1) - selectspikes[sel][i];
 
 	mainwin->scalebox->BurstDisp(1);
 	AnalyseSelection();
@@ -276,7 +287,9 @@ void CellBox::OnClear(wxCommandEvent& event)
 	int sel = event.GetId() - 300;
 	int numspikes = currcell->spikecount;
 
-	for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = 0;
+	//for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = 0;
+
+	for(i=0; i<numspikes; i++) selectspikes[sel][i] = 0;
 
 	mainwin->scalebox->BurstDisp(1);
 	AnalyseSelection();
@@ -318,12 +331,13 @@ void CellBox::OnAdd(wxCommandEvent& event)
 		//mod->diagbox->Write(text.Format("spike time %.4f\n", mod->spikedata->times[i]));
 		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {
 			selectdata[sel]->spikes[i] = sel + 1;
+			selectspikes[sel][i] = sel + 1;
 			//mod->diagbox->Write(text.Format("select spike %d\n", i));
 		}
 		//else seldata[sel]->spikes[i] = 0;
 	}
 
-	currcell->burstdata = selectdata[sel];
+	currcell->burstdata->spikes = selectspikes[sel];
 
 	/*
 	for(i=sfrom; i<sto; i++) {
@@ -360,6 +374,10 @@ void CellBox::AnalyseSelection()
 	
 	currcell->IntraBurstAnalysis();
 	//mod->SelectBurst(selectdata[currselect]);
+
+	//for(i=0; i<1000; i++) currcell->burstdata->hist5[i] = 20;
+
+	diagbox->Write(text.Format("\nSelect analyse %d spikes %.2fHz test %d\n", currcell->burstdata->intraspikes, currcell->burstdata->freq, currcell->burstdata->test));
 
 	//if(currselect == 0) mod->burstbox->BurstDataDisp(mod->spikedata, mod->burstbox->modburst);
 	//if(currselect == 1) mod->burstbox->BurstDataDisp(mod->spikedata, mod->burstbox->evoburst);

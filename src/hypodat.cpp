@@ -267,8 +267,8 @@ BurstDat::BurstDat(bool select)
 	hist5norm.data.resize(10000);
 	haz1.data.resize(10000);
 	haz5.data.resize(10000);
-	spikes.data.resize(100000);
-	spikes.max = 100000;
+	//spikes.data.resize(100000);
+	//spikes.max = 100000;
 	profile.data.resize(1000);
 	profile.max = 500;
 	tailprofile.data.resize(1000);
@@ -293,12 +293,15 @@ BurstDat::BurstDat(bool select)
 	maxbursts = 1000;
 	//bustore = new burst[maxbursts];
 	bustore.resize(maxbursts);
+	burstspikes = new int[100000];
+	spikes = burstspikes;
 }
 
 
 BurstDat::~BurstDat()
 {
 	//delete[] bustore;
+	delete [] burstspikes;
 }
 
 
@@ -778,7 +781,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	nameindex[newgraph.gname] = numgraphs;
 	indextag[numgraphs] = tag;
 
-	if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
+	//if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
 	
 	numgraphs++;
 	return numgraphs-1; 
@@ -801,7 +804,7 @@ GraphSet *GraphBase::NewSet(wxString name, wxString tag)
 	setindextag[numsets] = tag;
 	numsets++;
 
-	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("new set name %s tag %s numsets %d\n", name, tag, numsets));
+	//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("new set name %s tag %s numsets %d\n", name, tag, numsets));
 
 	return &setstore[numsets-1];
 }

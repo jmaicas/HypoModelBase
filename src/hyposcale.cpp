@@ -287,8 +287,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
 				}
 				else {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
-					GraphButton("allselect", 0, ID_allselect, "All / Select", 54, vbox);
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 60, vbox);
+					GraphButton("allselect", 0, ID_allselect, "All / Select", 60, vbox);
 					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
 				}		

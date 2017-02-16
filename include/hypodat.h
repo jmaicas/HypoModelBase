@@ -409,7 +409,7 @@ public:
 	datdouble haz5;
 	datdouble hist5;
 	datdouble hist5norm;
-	datdouble spikes;
+	//datdouble spikes;
 	datdouble times;
 	datdouble profile;
 	datdouble tailprofile;
@@ -418,14 +418,17 @@ public:
 	datdouble profilesm;
 	datdouble tailprofilesm;
 
+	int *spikes;
+	int *burstspikes;
+
 	//burst *bustore;
 	std::vector <burst> bustore;
 
 	//datdouble tailspikesum;
 	datdouble tailmean;
-  datdouble tailstdev;
-  datdouble tailstder;
-  datint tailnum;
+	datdouble tailstdev;
+	datdouble tailstder;
+	datint tailnum;
 	
 	int intraspikes;
 	int numbursts;
@@ -444,6 +447,7 @@ public:
 	double pmoderate;
 	double pmodetime;
 	int pnzcount;
+	int test;
 	
 	BurstDat(bool select=false);
 	~BurstDat();
