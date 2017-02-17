@@ -370,9 +370,9 @@ void CellBox::AnalyseSelection()
 	double isi, timepoint;
 	double intracount, intratime;
 	wxString text;
-	BurstDat *burstdata;
+	//BurstDat *burstdata;
 	
-	currcell->IntraBurstAnalysis();
+	currcell->burstdata->IntraBurstAnalysis();
 	//mod->SelectBurst(selectdata[currselect]);
 
 	//for(i=0; i<1000; i++) currcell->burstdata->hist5[i] = 20;

@@ -289,6 +289,8 @@ BurstDat::BurstDat(bool select)
 
 	profilesm.setsize(500);
 	tailprofilesm.setsize(500);
+	IoDdata.setsize(100);
+	IoDdataX.setsize(100);
 
 	maxbursts = 1000;
 	//bustore = new burst[maxbursts];
@@ -1014,3 +1016,32 @@ FitMeasure FitSet::GetMeasure(wxString tag)
 }
 
 
+
+double IoDcalc(int binsize, int spikecount, datdouble *times)
+{
+	int i;
+	int maxbin = 10000;
+	int spikerate[10000];
+	int laststep;
+	double mean, variance, dispersion = 0;
+	double timeshift = 0;
+
+	if((*times)[0] > 1000) timeshift = (*times)[0] - 1000;        // for data where recording starts at non-zero time point
+
+	// calculate spike rate for binsize
+	for(i=0; i<maxbin; i++) spikerate[i] = 0;
+	for(i=0; i<spikecount; i++) if(((*times)[i] - timeshift) / binsize < maxbin) spikerate[(int)(((*times)[i] - timeshift) + 0.5) / binsize]++;
+	laststep = ((int)((*times)[spikecount - 1] - timeshift)/ binsize) - 4;
+	if(laststep > maxbin) laststep = maxbin;
+
+	// calculate index of dispersion
+	mean = 0;
+	variance = 0;
+	for(i=0; i<laststep; i++) mean = mean +  spikerate[i];	//mean
+	mean = mean / laststep;
+	for(i=0; i<laststep; i++) variance += (mean - spikerate[i]) * (mean - spikerate[i]);	// variance
+	variance = variance / laststep;
+	dispersion = variance / mean;		// dispersion
+
+	return dispersion;
+}

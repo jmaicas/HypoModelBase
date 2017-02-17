@@ -189,7 +189,7 @@ int i;
 }
 */
 
-void SpikeDat::IntraBurstAnalysis()
+void BurstDat::IntraBurstAnalysis()
 {
 	int i;
 	//int numspikes, 
@@ -204,7 +204,7 @@ void SpikeDat::IntraBurstAnalysis()
 
 	if(scandiag) outfile.New("intradat.txt");
 
-	diagbox->Write("Intra Burst Analysis\n");
+	spikedata->diagbox->Write("Intra Burst Analysis\n");
 
 	// Intraburst Re-Analysis  
 
@@ -217,34 +217,34 @@ void SpikeDat::IntraBurstAnalysis()
 	bindex = 1;
 
 	for(i=0; i<10000; i++) {
-		burstdata->hist1[i] = 0;
-		burstdata->hist5[i] = 0;
-		burstdata->hist1norm[i] = 0;
-		burstdata->hist5norm[i] = 0;
-		burstdata->haz1[i] = 0;
-		burstdata->haz5[i] = 0;
+		hist1[i] = 0;
+		hist5[i] = 0;
+		hist1norm[i] = 0;
+		hist5norm[i] = 0;
+		haz1[i] = 0;
+		haz5[i] = 0;
 	}
 
 	//if(diagbox) diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
 
-	for(i=0; i<spikecount-1; i++) {
-		if(burstdata->spikes[i] > 0 && isis[i] < maxspikes) {
-			if(!burstdata->selectmode && i == burstdata->bustore[bindex].end) {
+	for(i=0; i<spikedata->spikecount-1; i++) {
+		if(spikes[i] > 0 && spikedata->isis[i] < spikedata->maxspikes) {
+			if(!selectmode && i == bustore[bindex].end) {
 				//fprintf(ofp, "New burst %d, time total %.2f\n", bindex, inttime);
 				bindex++;
 				if(scandiag) outfile.WriteLine(text.Format("i %d burstend", i));
 			}
 			else {
 				intcount++;
-				if(burstdata->hist1.max < (int)isis[i]) burstdata->hist1.max = (int)isis[i];
-				if(burstdata->hist1.data.size() < burstdata->hist1.max + 1) burstdata->hist1.data.resize(burstdata->hist1.max + 1);
-				burstdata->hist1[(int)isis[i]]++;	
-				inttime = inttime + isis[i];
+				if(hist1.max < (int)spikedata->isis[i]) hist1.max = (int)spikedata->isis[i];
+				if(hist1.data.size() < hist1.max + 1) hist1.data.resize(hist1.max + 1);
+				hist1[(int)spikedata->isis[i]]++;	
+				inttime = inttime + spikedata->isis[i];
 				//if(spikedata->isis[i] > maxint) fprintf(ofp, "burst %d index %d isi %.2f total %.2f\n", 
 				//	bindex-1, i, spikedata->isis[i], inttime);  
-				mean = mean + isis[i];
-				if(scandiag) outfile.WriteLine(text.Format("i %d isi %.4f", i, isis[i]));
-				variance = variance + isis[i] * isis[i];
+				mean = mean + spikedata->isis[i];
+				if(scandiag) outfile.WriteLine(text.Format("i %d isi %.4f", i, spikedata->isis[i]));
+				variance = variance + spikedata->isis[i] * spikedata->isis[i];
 			}
 		}
 	}
@@ -254,57 +254,75 @@ void SpikeDat::IntraBurstAnalysis()
 	mean = mean / intcount;
 	variance = variance / intcount;
 
-	burstdata->intraspikes = intcount + burstdata->numbursts;
+	intraspikes = intcount + numbursts;
 	if(intcount > 0) {
-		burstdata->isisd = sqrt(variance - mean * mean);
-		burstdata->freq = 1000/mean;
-		burstdata->meanisi = mean;
+		isisd = sqrt(variance - mean * mean);
+		freq = 1000/mean;
+		meanisi = mean;
 	}
 	else {
-		burstdata->isisd = 0;
-		burstdata->freq = 0;
-		burstdata->meanisi = 0;
+		isisd = 0;
+		freq = 0;
+		meanisi = 0;
 	}
 
-	burstdata->burstdisp = 1;
-	burstdata->times = times;
-	burstdata->maxtime = times[spikecount-1];
+	burstdisp = 1;
+	times = spikedata->times;
+	maxtime = times[spikedata->spikecount-1];
 	
-	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
+	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, times[i]));
 
 
 	// Hazard
 
 	double hazcount = 0;
 	//double haznorm = 10/freq;
-	burstdata->haz1.max = burstdata->hist1.max;
-	if(burstdata->haz1.data.size() < burstdata->haz1.max + 1) burstdata->haz1.data.resize(burstdata->haz1.max + 1);
+	haz1.max = hist1.max;
+	if(haz1.data.size() < haz1.max + 1) haz1.data.resize(haz1.max + 1);
 
-	for(i=0; i<=burstdata->hist1.max; i++) {
-		burstdata->haz1.data[i] = burstdata->hist1.data[i] / (burstdata->intraspikes - hazcount); 	
-		hazcount = hazcount + burstdata->hist1.data[i];
+	for(i=0; i<=hist1.max; i++) {
+		haz1.data[i] = hist1.data[i] / (intraspikes - hazcount); 	
+		hazcount = hazcount + hist1.data[i];
 	}
 
-	for(i=0; i<=burstdata->hist1.max; i++) {
+	for(i=0; i<=hist1.max; i++) {
 		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
-		if(i/binsize > burstdata->haz5.max) burstdata->haz5.max = i/binsize;
-		if(burstdata->haz5.data.size() < burstdata->haz5.max + 1)	burstdata->haz5.data.resize(burstdata->haz5.max + 1);
-		burstdata->haz5.data[i/binsize] = burstdata->haz5.data[i/binsize] + burstdata->haz1.data[i]; // * haznorm;	
+		if(i/binsize > haz5.max) haz5.max = i/binsize;
+		if(haz5.data.size() < haz5.max + 1)	haz5.data.resize(haz5.max + 1);
+		haz5.data[i/binsize] = haz5.data[i/binsize] + haz1.data[i]; // * haznorm;	
 	}
 
-	for(i=0; i<=burstdata->hist1.max; i++) {
+	for(i=0; i<=hist1.max; i++) {
 		//hist[i] = hist[i] / norm;
-		if(i/binsize > burstdata->hist5.max) burstdata->hist5.max = i/binsize;
-		if(burstdata->hist5.data.size() < burstdata->hist5.max + 1)	burstdata->hist5.data.resize(burstdata->hist5.max + 1);
-		burstdata->hist5.data[i/binsize] = burstdata->hist5.data[i/binsize] + burstdata->hist1.data[i];		
+		if(i/binsize > hist5.max) hist5.max = i/binsize;
+		if(hist5.data.size() < hist5.max + 1) hist5.data.resize(hist5.max + 1);
+		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
+	}
+
+	// Normalised histograms
+	for(i=0; i<=hist1.max; i++) {
+		hist1norm[i] = spikedata->normscale * hist1[i] / intcount;
+		hist5norm[i] = spikedata->normscale * hist5[i] / intcount;
 	}
 
 
-	// Normalise
-	for(i=0; i<=burstdata->hist1.max; i++) {
-		burstdata->hist1norm[i] = normscale * burstdata->hist1[i] / intcount;
-		burstdata->hist5norm[i] = normscale * burstdata->hist5[i] / intcount;
-	}
+	// Index of Dispersion
+
+	IoDdata[0] = IoDcalc(500, intraspikes, &times);
+	IoDdata[1] = IoDcalc(1000, intraspikes, &times);
+	IoDdata[2] = IoDcalc(2000, intraspikes, &times);
+	IoDdata[3] = IoDcalc(4000, intraspikes, &times);
+	IoDdata[4] = IoDcalc(6000, intraspikes, &times);
+	IoDdata[5] = IoDcalc(8000, intraspikes, &times);
+	IoDdata[6] = IoDcalc(10000, intraspikes, &times);
+
+	IoDdataX[0] = 5;            // x positions for displaying IoD range as bar chart
+	IoDdataX[1] = 15;
+	IoDdataX[2] = 25;
+	IoDdataX[3] = 35;
+	IoDdataX[4] = 45;
+	IoDdataX[5] = 55;
+	IoDdataX[6] = 65;
 
 	if(scandiag) outfile.Close();
 }
@@ -620,7 +638,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		fprintf(ofp, "Intra burst rate : %.2f\n\n", burstfreq);
 	}
 
-	IntraBurstAnalysis();
+	burstdata->IntraBurstAnalysis();
 
 	if(ofp) fclose(ofp);
 }

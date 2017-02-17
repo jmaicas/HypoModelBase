@@ -9,6 +9,7 @@
 #include <vector>
 
 
+
 class ModDat{
 public:
 	int model;
@@ -331,7 +332,6 @@ public:
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
-	void IntraBurstAnalysis();
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *);
@@ -417,6 +417,8 @@ public:
 	datdouble length;
 	datdouble profilesm;
 	datdouble tailprofilesm;
+	datdouble IoDdata;
+	datdouble IoDdataX;
 
 	int *spikes;
 	int *burstspikes;
@@ -452,6 +454,7 @@ public:
 	BurstDat(bool select=false);
 	~BurstDat();
 	int spikeburst(int);
+	void IntraBurstAnalysis();
 	//void Scan(BurstBox *);
 };
 
@@ -807,6 +810,9 @@ public:
 	void Load(FileDat);
 };
 
+
+
+double IoDcalc(int binsize, int spikecount, datdouble *spiketimes);
 
 
 
