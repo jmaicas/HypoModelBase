@@ -1248,8 +1248,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		}
 
 		if(neurodat) {
-			for(i=0; i<100000; i++)	srate10s[i] = datneuron->srate10[i];
-			for(i=0; i<10000; i++)	srate100s[i] = datneuron->srate100[i];
+			//for(i=0; i<100000; i++)	srate10s[i] = datneuron->srate10[i];
+			//for(i=0; i<10000; i++)	srate100s[i] = datneuron->srate100[i];            // What is this for? 20/2/17   Vaso net maybe?
 		}
 
 		//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d \n", i, times[i], (int)(times[i]+0.5)));

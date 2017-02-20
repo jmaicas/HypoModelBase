@@ -136,7 +136,7 @@ public:
 	wxStaticText *TextLabel(wxString);
 	wxStaticText *StatusBar();
 	wxTextCtrl *TextInput(int width = 80, int height = -1, wxString label = "---");
-  TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
+	TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
 	
 	ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool serve=false, bool child=false);
 	ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);

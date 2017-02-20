@@ -272,7 +272,11 @@ enum {
 	ID_MultiRun,
 	ID_XYPos,
 	ID_AddPlot,
-	ID_quad
+	ID_quad,
+	ID_Add1,
+	ID_Add2,
+	ID_Sub1,
+	ID_Sub2
 };
 
 

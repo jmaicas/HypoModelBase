@@ -200,7 +200,7 @@ public:
 	int neuroindex;
 	int cellcount;
 	SpikeDat *currcell;
-	SpikeDat *selected;
+	//SpikeDat *selected;
 	//NeuroDat *cells;
 	vector<NeuroDat>*cells;
 
@@ -210,9 +210,13 @@ public:
 	TextGrid *textgrid;
 
 	wxStaticBoxSizer *selectbox1, *selectbox2;
+	wxToggleButton *addbutton[5];
+	wxToggleButton *subbutton[5];
+	int selectmode[5];
+	int selectcount;
 	int currselect;
 	//BurstDat **selectdata;
-	BurstDat *selectdata[5];
+	//BurstDat *selectdata[5];
 	int *selectspikes[2];
 	
 
@@ -235,6 +239,9 @@ public:
 	void AnalyseSelection();
 	void SetSelect(double, double);
 	void OnClick(wxPoint);
+	void OnToggle(wxCommandEvent& event);
+	void SelectAdd();
+	void SelectSub();
 };
 
 

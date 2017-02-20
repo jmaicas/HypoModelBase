@@ -27,9 +27,10 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	paramindex = 0;
 	textgrid = NULL;
 
-	selected = new SpikeDat();
-	selectdata[0] = new BurstDat(true);
-    selectdata[1] = new BurstDat(true);
+	selectcount = 2;
+	//selected = new SpikeDat();
+	//selectdata[0] = new BurstDat(true);
+    //selectdata[1] = new BurstDat(true);
 
 	selectspikes[0] = new int[100000];
 	selectspikes[1] = new int[100000];
@@ -54,6 +55,33 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
 	//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
 	PanelParamLayout(histparambox);
+
+	
+
+	wxBoxSizer *colbox = new wxBoxSizer(wxHORIZONTAL); 
+	//colbox->AddStretchSpacer();
+	//colbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//colbox->AddSpacer(10);
+	colbox->Add(histparambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//colbox->AddStretchSpacer();
+
+	analysisbox->AddStretchSpacer();
+	analysisbox->Add(colbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	analysisbox->AddStretchSpacer();
+	analysispanel->Layout();
+
+
+	//
+
+	ToolPanel *selectpanel = new ToolPanel(mainwin, tabpanel);
+	selectpanel->SetFont(boxfont);
+	wxBoxSizer *selectbox = new wxBoxSizer(wxVERTICAL);
+	selectpanel->SetSizer(selectbox);
+	activepanel = selectpanel;
+	paramset->panel = selectpanel;
+
+
+	// Neuron selection
 
 	datwidth = 50;
 	labelwidth = 70;
@@ -93,27 +121,8 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	databox->AddSpacer(5);
 	databox->Add(datagrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 
-	wxBoxSizer *colbox = new wxBoxSizer(wxHORIZONTAL); 
-	//colbox->AddStretchSpacer();
-	colbox->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	colbox->AddSpacer(10);
-	colbox->Add(histparambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	//colbox->AddStretchSpacer();
 
-	analysisbox->AddStretchSpacer();
-	analysisbox->Add(colbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	analysisbox->AddStretchSpacer();
-	analysispanel->Layout();
-
-
-	//
-
-	ToolPanel *selectpanel = new ToolPanel(mainwin, tabpanel);
-	selectpanel->SetFont(boxfont);
-	wxBoxSizer *selectbox = new wxBoxSizer(wxVERTICAL);
-	selectpanel->SetSizer(selectbox);
-	activepanel = selectpanel;
-	paramset->panel = selectpanel;
+	// Spike selection
 
 	paramset->AddNum("from", "From", 0, 0, 30); 
 	paramset->AddNum("to", "To", 100, 0, 20); 
@@ -128,34 +137,49 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 
 	int buttspace = 20;
 
-	AddButton(100, "Add", 40, selectbox1);
+	//AddButton(100, "Add", 40, selectbox1);
+	addbutton[0] = ToggleButton(100, "Add", 40, selectbox1);	
 	selectbox1->AddSpacer(buttspace);
-	AddButton(200, "Sub", 40, selectbox1);
+	//AddButton(200, "Sub", 40, selectbox1);
+	subbutton[0] = ToggleButton(200, "Sub", 40, selectbox1);	
 	selectbox1->AddSpacer(buttspace);
 	AddButton(300, "Clear", 40, selectbox1);
 	selectbox1->AddSpacer(buttspace);
 	AddButton(400, "Invert", 40, selectbox1);
 	
-	AddButton(101, "Add", 40, selectbox2);
+	//AddButton(101, "Add", 40, selectbox2);
+	addbutton[1] = ToggleButton(101, "Add", 40, selectbox2);	
 	selectbox2->AddSpacer(buttspace);
-	AddButton(201, "Sub", 40, selectbox2);
+	//AddButton(201, "Sub", 40, selectbox2);
+	subbutton[1] = ToggleButton(201, "Sub", 40, selectbox2);	
 	selectbox2->AddSpacer(buttspace);
 	AddButton(301, "Clear", 40, selectbox2);
 	selectbox2->AddSpacer(buttspace);
 	AddButton(401, "Invert", 40, selectbox2);
 	
+	for(i=0; i<selectcount; i++) selectmode[i] = 1;
+	currselect = 0;
+	addbutton[currselect]->SetValue(true);
+
 	selectpanelbox->Add(fromtobox, 0, wxALIGN_CENTRE_HORIZONTAL);
 	selectpanelbox->AddSpacer(20);
 	selectpanelbox->Add(selectbox1, 0);
 	selectpanelbox->AddSpacer(10);
 	selectpanelbox->Add(selectbox2, 0);
 
+	wxBoxSizer *colbox2 = new wxBoxSizer(wxHORIZONTAL); 
+	colbox2->AddStretchSpacer();
+	colbox2->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	colbox2->AddSpacer(30);
+	//colbox2->AddStretchSpacer();
+	colbox2->Add(selectpanelbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
 	selectbox->AddStretchSpacer();
-	selectbox->Add(selectpanelbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	selectbox->Add(colbox2, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	selectbox->AddStretchSpacer();
 	selectpanel->Layout();
 
-	//
+	// Data Loading 
 
 	ToolPanel *loadpanel = new ToolPanel(mainwin, tabpanel);
 	loadpanel->SetFont(boxfont);
@@ -184,9 +208,10 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	loadpanel->Layout();
 
 	tabpanel->Freeze();
-	tabpanel->AddPage(analysispanel, "Analysis" , true);
-	tabpanel->AddPage(loadpanel, "Data Load" , false);
-	tabpanel->AddPage(selectpanel, "Select" , false);
+	tabpanel->AddPage(selectpanel, "Data Select" , true);
+	tabpanel->AddPage(analysispanel, "Analysis" , false);
+	tabpanel->AddPage(loadpanel, "Loading" , false);
+	
 	tabpanel->Thaw();
 
 	winman->AddPane(tabpanel, wxAuiPaneInfo().Name("tabpane").CentrePane().PaneBorder(false));
@@ -202,6 +227,31 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnClear));
 	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnInvert));
 }
+
+
+void CellBox::OnToggle(wxCommandEvent& event)
+{
+	int sel, type, i;
+	wxString text;
+	int id = event.GetId();
+
+	type = id / 100;
+	sel = id % 100;
+
+	for(i=0; i<selectcount; i++) {
+		addbutton[i]->SetValue(false);
+		subbutton[i]->SetValue(false);
+	}
+
+	if(type == 1) addbutton[sel]->SetValue(true);
+	if(type == 2) subbutton[sel]->SetValue(true);
+	
+	selectmode[sel] = type;	
+	currselect = sel;
+
+	//diagbox->Write(text.Format("\nSelect Button type %d  selection %d\n", type, sel));
+}
+
 
 
 void CellBox::OnClick(wxPoint pos)
@@ -230,6 +280,67 @@ void CellBox::SetSelect(double from, double to)
 	paramset->con[id]->SetValue(from);
 	id = paramset->ref["to"];
 	paramset->con[id]->SetValue(to);
+
+	if(selectmode[currselect] == 1) SelectAdd();
+	if(selectmode[currselect] == 2) SelectSub();
+}
+
+
+void CellBox::SelectAdd()
+{
+	int sfrom, sto;
+	wxString text;
+
+	diagbox->Write(text.Format("Add %d\n", currselect));
+
+	ParamStore *selectparams = GetParams();
+	sfrom = (*selectparams)["from"] * 1000;         // Convert from s to ms
+	sto = (*selectparams)["to"] * 1000;
+	
+	//selectdata[currselect]->times = currcell->times;
+	//selectdata[currselect]->maxtime = currcell->times[numspikes-1];
+
+	//diagbox->Write(text.Format("spike count %d\n", numspikes));
+
+	for(i=0; i<currcell->spikecount; i++) {
+		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {
+			//selectdata[currselect]->spikes[i] = currselect + 1;
+			selectspikes[currselect][i] = currselect + 1;		
+		}	
+	}
+
+	currcell->burstdata->spikes = selectspikes[currselect];
+
+	//diagbox->Write(text.Format("add%d from %.2f to %.2f\n", currselect, sfrom, sto));	
+	AnalyseSelection();	
+	mainwin->scalebox->BurstDisp(1);
+}
+
+
+void CellBox::SelectSub()
+{
+	int sfrom, sto;
+
+	ParamStore *selectparams = GetParams();
+	sfrom = (int)(*selectparams)["from"] * 1000;
+	sto = (int)(*selectparams)["to"] * 1000;
+
+	int numspikes = currcell->spikecount;
+	//selectdata[currselect]->times = currcell->times;
+	//selectdata[currselect]->maxtime = currcell->times[numspikes-1];
+
+	for(i=0; i<numspikes; i++) {
+		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {
+			//selectdata[currselect]->spikes[i] = 0;
+			selectspikes[currselect][i] = 0;
+		}
+	}
+
+	currcell->burstdata->spikes = selectspikes[currselect];
+	//diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", currselect, sfrom, sto));
+
+	mainwin->scalebox->BurstDisp(1);
+	AnalyseSelection();
 }
 
 
@@ -241,28 +352,8 @@ void CellBox::OnSub(wxCommandEvent& event)
 	id = event.GetId();
 	sel = event.GetId() - 200;
 	currselect = sel;
-	int sfrom, sto;
-
-	ParamStore *selectparams = GetParams();
-	sfrom = (int)(*selectparams)["from"] * 1000;
-	sto = (int)(*selectparams)["to"] * 1000;
-
-	int numspikes = currcell->spikecount;
-	selectdata[sel]->times = currcell->times;
-	selectdata[sel]->maxtime = currcell->times[numspikes-1];
-
-	for(i=0; i<numspikes; i++) {
-		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {
-			selectdata[sel]->spikes[i] = 0;
-			selectspikes[sel][i] = 0;
-		}
-	}
-
-	currcell->burstdata->spikes = selectspikes[sel];
-	diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", sel, sfrom, sto));
-
-	mainwin->scalebox->BurstDisp(1);
-	AnalyseSelection();
+	
+	SelectSub();
 }
 
 
@@ -270,11 +361,12 @@ void CellBox::OnInvert(wxCommandEvent& event)
 {
 	int i;
 	int sel = event.GetId() - 400;
-	int numspikes = currcell->spikecount;
 
 	//for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = (sel + 1) - selectdata[sel]->spikes[i];
 
-	for(i=0; i<numspikes; i++) selectspikes[sel][i] = (sel + 1) - selectspikes[sel][i];
+	//sel = event.GetId() - 00;
+	//currselect = sel;
+	for(i=0; i<currcell->spikecount; i++) selectspikes[sel][i] = (sel + 1) - selectspikes[sel][i];
 
 	mainwin->scalebox->BurstDisp(1);
 	AnalyseSelection();
@@ -285,11 +377,11 @@ void CellBox::OnClear(wxCommandEvent& event)
 {
 	int i;
 	int sel = event.GetId() - 300;
-	int numspikes = currcell->spikecount;
 
 	//for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = 0;
-
-	for(i=0; i<numspikes; i++) selectspikes[sel][i] = 0;
+	//sel = event.GetId() - 300;
+	//currselect = sel;
+	for(i=0; i<currcell->spikecount; i++) selectspikes[sel][i] = 0;
 
 	mainwin->scalebox->BurstDisp(1);
 	AnalyseSelection();
@@ -300,7 +392,6 @@ void CellBox::OnAdd(wxCommandEvent& event)
 {
 	int i, sel, selspike;
 	int numspikes, scount;
-	double sfrom, sto;
 	double isi, timepoint;
 	double intracount, intratime;
 	wxString text;
@@ -310,55 +401,7 @@ void CellBox::OnAdd(wxCommandEvent& event)
 	sel = event.GetId() - 100;
 	currselect = sel;
 
-	diagbox->Write(text.Format("Add %d\n", currselect));
-
-	ParamStore *selectparams = GetParams();
-	sfrom = (*selectparams)["from"] * 1000;         // Convert from s to ms
-	sto = (*selectparams)["to"] * 1000;
-	
-	numspikes = currcell->spikecount;
-	//burstdata = mod->spikedata->burstdata;
-	//burstdata->times = mod->spikedata->times;
-	//burstdata->maxtime = mod->spikedata->times[numspikes-1];
-	//isis = mod->spikedata->isis;
-	selectdata[sel]->times = currcell->times;
-	selectdata[sel]->maxtime = currcell->times[numspikes-1];
-
-	diagbox->Write(text.Format("spike count %d\n", numspikes));
-
-	
-	for(i=0; i<numspikes; i++) {
-		//mod->diagbox->Write(text.Format("spike time %.4f\n", mod->spikedata->times[i]));
-		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {
-			selectdata[sel]->spikes[i] = sel + 1;
-			selectspikes[sel][i] = sel + 1;
-			//mod->diagbox->Write(text.Format("select spike %d\n", i));
-		}
-		//else seldata[sel]->spikes[i] = 0;
-	}
-
-	currcell->burstdata->spikes = selectspikes[sel];
-
-	/*
-	for(i=sfrom; i<sto; i++) {
-		isi = mod->spikedata->isis[i];
-		timepoint = mod->spikedata->times[i];
-		select1.store[select1.count].isi = isi;
-		select1.store[select1.count].timepoint = timepoint;
-		select1.count++;
-	}
-
-	for(i=0; i<select1.count; i++) {
-		mod->selectdata->isis[i] = select1.store[i].isi;
-	}
-	mod->selectdata->spikecount = select1.count;
-
-	mod->selectdata->neurocalc();
-	*/
-	
-	diagbox->textbox->AppendText(text.Format("add%d from %.2f to %.2f\n", sel, sfrom, sto));	
-	AnalyseSelection();	
-	mainwin->scalebox->BurstDisp(1);
+	SelectAdd();
 }
 
 
@@ -441,6 +484,7 @@ void CellBox::NeuroData()
 	//currcell->neurocalc(&((*cells)[neuroindex]));
 	currcell->neurocalc(&(*cells)[neuroindex]);
 	currcell->id = neuroindex;
+	
 	//PanelData(&((*cells)[neuroindex]));
 	PanelData(&(*cells)[neuroindex]);
 	mainwin->scalebox->GraphUpdate();	
