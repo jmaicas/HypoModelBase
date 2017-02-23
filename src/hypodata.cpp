@@ -34,6 +34,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 
 	selectspikes[0] = new int[100000];
 	selectspikes[1] = new int[100000];
+	spikeselectLink = false;
 
 	for(i=0; i<100000; i++) {
 		selectspikes[0][i] = 0;
@@ -55,8 +56,6 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
 	//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
 	PanelParamLayout(histparambox);
-
-	
 
 	wxBoxSizer *colbox = new wxBoxSizer(wxHORIZONTAL); 
 	//colbox->AddStretchSpacer();
@@ -226,6 +225,15 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	Connect(200, 205, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnSub));
 	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnClear));
 	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnInvert));
+}
+
+
+CellBox::~CellBox()
+{
+	if(!spikeselectLink) {
+		delete[] selectspikes[0];
+		delete[] selectspikes[1];
+	}
 }
 
 
@@ -459,7 +467,6 @@ void CellBox::OnLoadData(wxCommandEvent& event)
 
 	//mod->filebase->newentry = false;
 }
-
 
 
 void CellBox::PanelData(NeuroDat *data)

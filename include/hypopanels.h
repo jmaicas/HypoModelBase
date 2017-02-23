@@ -218,9 +218,11 @@ public:
 	//BurstDat **selectdata;
 	//BurstDat *selectdata[5];
 	int *selectspikes[2];
+	bool spikeselectLink;
 	
 
 	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
+	~CellBox();
 	void NeuroData();
 	//void NeuroAnalysis();
 	void PanelData(NeuroDat *);
