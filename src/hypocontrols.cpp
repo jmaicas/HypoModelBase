@@ -974,7 +974,7 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
 	wxString filename, filepath;
-	wxString readline, tag;
+	wxString readline, tag, text;
 	TextFile opfile;
 	bool check;
 
@@ -986,7 +986,7 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 
 	if(panel->mainwin) diagbox = panel->mainwin->diagbox;
 
-	diagbox->Write("\nTagBox init\n");
+	diagbox->Write("\nTagBox init " + name + "\n");
 
 	// tag history load
 	if(name == "") {
@@ -1000,11 +1000,12 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 		return;
 	}
 
-	diagbox->Write("Reading tag history\n");
+	diagbox->Write("Reading tag history " + filename + "\n");
 
 	readline = opfile.ReadLine();
 
 	while(!readline.IsEmpty()) {
+		//diagbox->Write("Readline " + readline + "\n");
 		readline = readline.AfterFirst(' ');
 		readline.Trim();
 		tag = readline;
