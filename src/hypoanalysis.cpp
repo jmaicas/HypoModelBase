@@ -204,7 +204,7 @@ void BurstDat::IntraBurstAnalysis()
 
 	if(scandiag) outfile.New("intradat.txt");
 
-	spikedata->diagbox->Write("Intra Burst Analysis\n");
+	//spikedata->diagbox->Write("Intra Burst Analysis\n");
 
 	// Intraburst Re-Analysis  
 
