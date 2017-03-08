@@ -5,7 +5,7 @@
 #include <cmath>
 
 
-void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
+void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitConSet *conset)
 {
 	int i;
 	int histmax = 512;
@@ -18,9 +18,14 @@ void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	// FitSet class store fit measures and weights - allows parameterised set of fit measures
 
 	ParamStore *fitparams = new ParamStore();
-	(*fitparams)["RMSFirstNBins"] = 30;
-	(*fitparams)["RMSBinRangeStart"] = 30;
-	(*fitparams)["RMSBinRangeFinish"] = 125;
+	//(*fitparams)["RMSFirstNBins"] = 30;
+	//(*fitparams)["RMSBinRangeStart"] = 30;
+	//(*fitparams)["RMSBinRangeFinish"] = 125;
+
+	(*fitparams)["RMSHeadStart"] = conset->GetCon("RMSHeadStart").value;
+	(*fitparams)["RMSHeadStop"] = conset->GetCon("RMSHeadStop").value;
+	(*fitparams)["RMSBinRangeStart"] = conset->GetCon("RMSBinRangeStart").value;
+	(*fitparams)["RMSBinRangeFinish"] = conset->GetCon("RMSBinRangeFinish").value;
 
 	if(spikecount < 10) {
 		fitdat->scores["RMSFirstNBins"] = -1;
@@ -72,6 +77,7 @@ void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		hazremain -= histquadlin[i];
 	}
 
+	
 	// ISI Histogram First N Bins RMS
 	double RMSError;
 	double Error;
@@ -83,7 +89,8 @@ void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	else CutOff = testdata->histquadsm[testdata->histquadmode] * 0.1;
 
 	RMSError = 0;
-	for(i=0; i<(*fitparams)["RMSFirstNBins"]; i++) {
+	//for(i=0; i<(*fitparams)["RMSFirstNBins"]; i++) {
+	for(i=(*fitparams)["RMSHeadStart"]; i<(*fitparams)["RMSHeadStop"]; i++) {
 		//The RMS error must be flexible to take account of bins with very small values
 		//If a bin has a value of below 0.01 (1% of all events) then it is not normalised                 
 		if(testdata->histquadsm[i] > histquadsm[i]) {
@@ -101,11 +108,61 @@ void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 		RMSError += Error * Error;
 	}
 
-	RMSError /= (*fitparams)["RMSFirstNBins"];
+	//RMSError /= (*fitparams)["RMSFirstNBins"];
+	RMSError /= ((*fitparams)["RMSHeadStop"] - (*fitparams)["RMSHeadStart"]);
 	RMSError = sqrt(RMSError);
 
 	fitdat->RMSFirstNBins = RMSError;
 	fitdat->scores["RMSFirstNBins"] = RMSError;
+
+
+	/*
+	// ISI Histogram First N Bins RMS
+
+	double RMSError;
+	double Error;
+	double CutOff;
+	double Big, Small;
+
+	if(histquadsm[histquadmode] > testdata->histquadsm[testdata->histquadmode])
+		CutOff = histquadsm[histquadmode] * 0.1;
+	else CutOff = testdata->histquadsm[testdata->histquadmode] * 0.1;
+
+
+	//diagbox->Write(text.Format("\nRMSHead Start %.0f Stop %.0f\n", (*fitcon)["RMSHeadStart"], (*fitcon)["RMSHeadStop"]));
+
+	RMSError = 0;
+	//for(i=0; i<(*fitcon)["RMSFirstNBins"]; i++) {
+	for(i=(*fitcon)["RMSHeadStart"]; i<(*fitcon)["RMSHeadStop"]; i++) {
+		//The RMS error must be flexible to take account of bins with very small values
+		//If a bin has a value of below 0.01 (1% of all events) then it is not normalised                   // Tom Code, probably out of date description
+		if(testdata->histquadsm[i] > histquadsm[i]) {
+			Big = testdata->histquadsm[i];
+			Small = histquadsm[i];
+		}
+		else {
+			Big = histquadsm[i];
+			Small = testdata->histquadsm[i];
+		}
+
+		//If both are less than the cutoff then use alternate rules
+
+		if (Big < CutOff) Error = (Big - Small) * 100.0;                  
+		else Error = (Big - Small) / Big * 100.0;
+		RMSError += Error * Error;
+	}
+
+	//diagbox->Write(text.Format("\nRMSHead Error Sum %.4f\n", RMSError));
+
+	//RMSError /= (*fitcon)["RMSFirstNBins"];
+	RMSError /= ((*fitcon)["RMSHeadStop"] - (*fitcon)["RMSHeadStart"]);
+	RMSError = sqrt(RMSError);
+
+	//diagbox->Write(text.Format("\nRMSHead Error RMS %.4f\n", RMSError));
+
+	fitdat->RMSFirstNBins = RMSError;
+	fitdat->scores["RMSFirstNBins"] = RMSError;
+	*/
 	
 
 	// ISI Histogram Bin Range RMS
@@ -183,8 +240,8 @@ void SpikeDat::FitScoreOxy(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 	IoDdata[1] = dispcalc(1000);
 	IoDdata[2] = dispcalc(2000);
 	IoDdata[3] = dispcalc(4000);
-	IoDdata[4] = dispcalc(8000);
-	IoDdata[5] = dispcalc(6000);
+	IoDdata[4] = dispcalc(6000);
+	IoDdata[5] = dispcalc(8000);
 	IoDdata[6] = dispcalc(10000);
 
 	RMSError = 0;
@@ -694,7 +751,9 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 	(*fitcon)["HazMin"];
 	(*fitcon)["RMSFirstNBinsBurst"] = 20;
 
-	(*fitcon)["RMSFirstNBins"] = conset->GetCon("RMSFirstNBins").value;
+	//(*fitcon)["RMSFirstNBins"] = conset->GetCon("RMSFirstNBins").value;
+	(*fitcon)["RMSHeadStart"] = conset->GetCon("RMSHeadStart").value;
+	(*fitcon)["RMSHeadStop"] = conset->GetCon("RMSHeadStop").value;
 	(*fitcon)["RMSBinRangeStart"] = conset->GetCon("RMSBinRangeStart").value;
 	(*fitcon)["RMSBinRangeFinish"] = conset->GetCon("RMSBinRangeFinish").value;
 
@@ -813,8 +872,11 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 	else CutOff = testdata->histquadsm[testdata->histquadmode] * 0.1;
 
 
+	diagbox->Write(text.Format("\nRMSHead Start %.0f Stop %.0f\n", (*fitcon)["RMSHeadStart"], (*fitcon)["RMSHeadStop"]));
+
 	RMSError = 0;
-	for(i=0; i<(*fitcon)["RMSFirstNBins"]; i++) {
+	//for(i=0; i<(*fitcon)["RMSFirstNBins"]; i++) {
+	for(i=(*fitcon)["RMSHeadStart"]; i<(*fitcon)["RMSHeadStop"]; i++) {
 		//The RMS error must be flexible to take account of bins with very small values
 		//If a bin has a value of below 0.01 (1% of all events) then it is not normalised                   // Tom Code, probably out of date description
 		if(testdata->histquadsm[i] > histquadsm[i]) {
@@ -833,8 +895,13 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 		RMSError += Error * Error;
 	}
 
-	RMSError /= (*fitcon)["RMSFirstNBins"];
+	diagbox->Write(text.Format("\nRMSHead Error Sum %.4f\n", RMSError));
+
+	//RMSError /= (*fitcon)["RMSFirstNBins"];
+	RMSError /= ((*fitcon)["RMSHeadStop"] - (*fitcon)["RMSHeadStart"]);
 	RMSError = sqrt(RMSError);
+
+	diagbox->Write(text.Format("\nRMSHead Error RMS %.4f\n", RMSError));
 
 	fitdat->RMSFirstNBins = RMSError;
 	fitdat->scores["RMSFirstNBins"] = RMSError;
