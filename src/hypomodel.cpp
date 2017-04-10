@@ -834,7 +834,7 @@ void HypoMain::OnBurst(wxCommandEvent& WXUNUSED(event))
 void HypoMain::SpikeModule(Model *mod)
 {
 	GraphSet *graphset;
-	wxString tag = "exp";
+	wxString gtag, tag = "exp";
 
 	expdata->GraphSet(mod->graphbase, "Exp ", blue, 1, "exp");
 
@@ -857,6 +857,13 @@ void HypoMain::SpikeModule(Model *mod)
 	graphset->Add(tag + "haz1ms", 110);
 	graphset->Add(tag + "haz5ms", 111);
 	if(diagbox) diagbox->textbox->AppendText(graphset->Display());
+
+	gtag = tag + "iod";
+	mod->graphbase->Add(GraphDat(&expdata->IoDdata, 0, 70, 0, 2, "Exp IoD", 9, 1, lightgreen), gtag);
+	mod->graphbase->GetGraph(gtag)->gdatax = &expdata->IoDdataX;
+	mod->graphbase->GetGraph(gtag)->xcount = 7;  
+	mod->graphbase->GetGraph(gtag)->synchx = false; 
+	mod->graphbase->GetGraph(gtag)->barshift  = 20;
 }
 
 
