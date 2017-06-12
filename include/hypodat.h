@@ -326,6 +326,7 @@ public:
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
 	void neurocalcBasic(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
 	double dispcalc(int binsize);
+	void quadhist();
 	void ISIanalysis();
 	//void autocalc();
 	void netneurocalc(int);
