@@ -291,6 +291,8 @@ public:
 class ParamSet
 {
 public:
+	int labelwidth;   // not in use
+	int numwidth;     // not in use
 	int numparams;
 	int currlay;      // Current parameter for panel layout, starts at 0
 	int type;

@@ -70,6 +70,7 @@ public:
 	int version;
 	int parallel;
 	int labelwidth;
+	int numwidth;
 	int defbutt;
 	wxString redtag;
 	wxString storehist[10];

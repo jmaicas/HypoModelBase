@@ -203,8 +203,6 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		//graphwin[graph]->Refresh();
 	}
 
-
-
 	//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call\n");
 	scalebox = new ScaleBox(this, this, wxDefaultSize, numdraw, gpos, mod, graphwin, 0, scaletype);
 	scalebox->GraphSwitch(0);
