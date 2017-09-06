@@ -246,6 +246,7 @@ public:
 	void OnXZoomOut(wxCommandEvent& event);
 	void OnGStore(wxCommandEvent& event);
 	void OnGLoad(wxCommandEvent& event);
+	void OnXScale(wxCommandEvent& event);
 
 	void OnGraphButton(wxCommandEvent& event);   // New general button system
 

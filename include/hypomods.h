@@ -34,6 +34,7 @@ public:
 	short gsync;
 	int storesize;
 	double xmin;
+	int xscaletoggle;
 	bool oldhist;
 
 	wxString modname;
@@ -64,6 +65,7 @@ public:
 	virtual void RunModel();
 	virtual void Output();
 	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags);
+	virtual void ScaleSwitch(double xscale = 0);
 	virtual int ModeSum(ParamStore *gflags);
 	virtual int SoundLink(SpikeDat **, datdouble **);
 	virtual void ModStore();

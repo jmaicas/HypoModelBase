@@ -233,6 +233,7 @@ enum {
 	ID_recep,
 	ID_vasoinject,
 	ID_Sync,
+	ID_xscale,
 	ID_gload,
 	ID_gstore,
 	ID_DataBrowse,

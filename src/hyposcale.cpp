@@ -232,6 +232,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			}
 		}
 
+		if(boxtype == modAgent) {
+		}
+
 		if(boxtype == modHeat) {
 			if(i == 1) {
 				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -411,7 +414,16 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		}
 	}
 
+
 	//vbox->AddStretchSpacer(5);
+	
+	wxBoxSizer *modbuttonbox = new wxBoxSizer(wxHORIZONTAL);
+	if(boxtype == modAgent) {
+		ScaleButton(ID_xscale, "XScale", 50, modbuttonbox);
+	}
+	mod->diagbox->Write(text.Format("\nscale boxtype %d\n", boxtype));
+
+
 	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
 	if(ostype == Mac) {
 		ScaleButton(wxID_OK, "OK", 43, buttonbox);
@@ -424,6 +436,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		syncbutton = ToggleButton(ID_Sync, "Sync", 35, buttonbox);	
 		//ScaleButton(ID_Sync, "Sync", 35, buttonbox);	
 	}
+
+	vbox->Add(modbuttonbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	vbox->AddSpacer(3);
 	vbox->Add(buttonbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	vbox->AddSpacer(3);
@@ -461,6 +476,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(ID_dendmode, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnDendMode));
 	Connect(ID_overlay, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
 	Connect(ID_position, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
+	Connect(ID_xscale, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXScale));
 
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSpikes));
 	Connect(ID_rateres, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnRateRes));
@@ -486,6 +502,13 @@ ScaleBox::~ScaleBox()
 	delete gflagrefs;
 }
 
+
+void ScaleBox::OnXScale(wxCommandEvent& event)
+{
+	if(mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("\nOnXScale\n");
+	mod->xscaletoggle = 1 - mod->xscaletoggle;
+	mod->ScaleSwitch();
+}
 
 void ScaleBox::OnConFocus(wxFocusEvent& event)
 {

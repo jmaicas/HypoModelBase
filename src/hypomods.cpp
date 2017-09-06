@@ -31,6 +31,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	xmin = -100000;
 	path = "";
 	oldhist = true;
+	xscaletoggle = 0;
 }
 
 
@@ -97,6 +98,12 @@ void Model::ModClose()
 
 
 void Model::Output()
+{
+	int i;
+}
+
+
+void Model::ScaleSwitch(double newxscale)
 {
 	int i;
 }
