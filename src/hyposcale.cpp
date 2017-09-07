@@ -22,6 +22,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	gmod = model;
 	mod = model;
 
+	SetDoubleBuffered(true);
+
 	gflags = new ParamStore();
 	gflagrefs = new RefStore();
 

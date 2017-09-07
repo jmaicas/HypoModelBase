@@ -46,6 +46,9 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//mainwing = this;
 	//CreateStatusBar();
 
+	// Flicker Protection
+
+
 	// Check System
 	wxString oslabel = wxGetOsDescription();
 	SetStatusText(oslabel);
@@ -79,6 +82,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	startmod = 13;
 	pinmode = 0;
 	basic = 1;
+	user = 1;
 	diagnostic = 0;
 	xstretch = 50;
 	modpath = "";
@@ -155,6 +159,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
 
 	if(basic) BasicMenu();
+	else if(user) UserMenu();
 	else FullMenu();
 
 	//GraphOut();
@@ -450,6 +455,29 @@ void HypoMain::FullMenu()
 }
 
 
+void HypoMain::UserMenu()
+{
+	wxMenu *menuFile = new wxMenu;
+	wxMenu *menuAnalysis = new wxMenu;
+	wxMenu *menuSystem = new wxMenu;
+
+	menuFile->Append(ID_About, "&About...");
+	menuFile->AppendSeparator();
+	menuFile->Append(ID_Quit, "E&xit");
+
+	SetMenuFlag(ID_XYPos, "xypos", "XY Pos", 1, menuAnalysis); 
+
+	menuSystem->Append(ID_Options, "Options");
+
+	wxMenuBar *menuBar = new wxMenuBar;
+	menuBar->Append(menuFile, "&File");
+	menuBar->Append(menuAnalysis, "Analysis");
+	menuBar->Append(menuSystem, "System");
+
+	SetMenuBar(menuBar);
+}
+
+
 void HypoMain::BasicMenu()
 {
 	wxMenu *menuFile = new wxMenu;
@@ -692,6 +720,7 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 	wxString message;
 
 	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2013\n\nSystem: %s", wxGetOsDescription());
+	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2017\n\nSystem: %s", wxGetOsDescription());
 	else message.Printf("Hypothalamic Network Model\n\nDuncan MacGregor 2010-2015\n\nSystem: %s", wxGetOsDescription());
 
 	wxMessageBox(message, "About Hypo Model", wxOK | wxICON_INFORMATION, this);
@@ -1617,8 +1646,10 @@ bool HypoApp::OnInit()
 	//MainFrame *mainwin = new MainFrame("Hypo Net Model", wxPoint(50, 10), wxSize(700, y));   // 850   // 920
 	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y));   // 850   // 920
 	//HypoMain *mainwin = new HypoMain("HypoMod", wxDefaultPosition, wxSize(400, 500));
-	mainwin->Show(TRUE);
+	mainwin->SetTransparent(254);
+	mainwin->Show();
 	SetTopWindow(mainwin);
+	//mainwin->SetDoubleBuffered(true);
 	return TRUE;
 }
 

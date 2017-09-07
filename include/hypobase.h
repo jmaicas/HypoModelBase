@@ -364,6 +364,7 @@ public:
 	GraphWindow3 *graphwin[10];
     
 	int basic;
+	int user;
 	int diagnostic;
 	int ostype;
     

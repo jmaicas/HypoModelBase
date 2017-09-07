@@ -184,6 +184,7 @@ public:
 
 	void BasicMenu();
 	void FullMenu();
+	void UserMenu();
 	void ModInit();
 	void CleanUp();
 	void AddGraph();
