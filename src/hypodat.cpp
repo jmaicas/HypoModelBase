@@ -629,6 +629,7 @@ void GraphDat::Init()
 	highstart = 0;
 	highstop = 0;
 	highcolour = red;
+	oldset = false;
 }
 
 

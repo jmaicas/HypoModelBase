@@ -101,7 +101,7 @@ void ModGenBox::DefGen()
 	inpath = "src\\";
 	outpath = "Newcode\\";
 
-	check = infile.Open(inpath + plate[i]);
+	check = infile.Open(inpath + plate[i]);       // needs fixing
 		if(!check) {
 			status->SetLabel("Template files missing");
 			return;

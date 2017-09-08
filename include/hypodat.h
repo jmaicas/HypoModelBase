@@ -527,6 +527,8 @@ public:
 	double yto;
 	double xfrom;
 	double xto;
+	bool oldset;
+	double oldyfrom, oldyto, oldxfrom, oldxto;
 	double binsize;
 	wxString gname;
 	wxString xtag, ytag;

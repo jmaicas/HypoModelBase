@@ -201,6 +201,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	Connect(ID_GraphPrint, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphPrint));
 	Connect(ID_GraphEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphEPS));
 	Connect(ID_Scale, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnScale));
+	Connect(ID_UnZoom, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnUnZoom));
 }
 
 
@@ -208,6 +209,17 @@ GraphWindow3::~GraphWindow3()
 {
 	//delete overlay;
 	//delete menuPlot;
+}
+
+
+void GraphWindow3::OnUnZoom(wxCommandEvent& event)
+{
+	if(!graph->oldset) return;
+	graph->xfrom = graph->oldxfrom;	
+	graph->xto = graph->oldxto;	
+	graph->yfrom = graph->oldyfrom;	
+	graph->yto = graph->oldyto;	
+	mainwin->scalebox->ScaleUpdate();
 }
 
 
@@ -380,7 +392,13 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 		if(xgraphTo > graph->xto) xgraphTo = graph->xto;
 		if(ygraphFrom < graph->yfrom) ygraphFrom = graph->yfrom;
 		if(ygraphTo > graph->yto) ygraphTo = graph->yto;
-			
+		
+		graph->oldxfrom = graph->xfrom;
+		graph->oldxto = graph->xto;
+		graph->oldyfrom = graph->yfrom;
+		graph->oldyto = graph->yto;
+		graph->oldset = true;
+
 	    graph->xfrom = xgraphFrom;
 	    graph->xto = xgraphTo; 
 		graph->yfrom = ygraphFrom;
@@ -434,11 +452,12 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 	//mainwin->diagbox->textbox->AppendText(text.Format("graph menu set %d\n", gpos->GetFront()->sdex));
 
 	wxMenu *menuPlot = new wxMenu;
-	if(mainwin->diagnostic) {
-		menuPlot->Append(ID_GraphRemove, "Delete Graph");
+	if(!mainwin->basic) {
+		//menuPlot->Append(ID_GraphRemove, "Delete Graph");
 		//menuPlot->Append(ID_GraphPrint, "Print Graph");
 		menuPlot->Append(ID_GraphEPS, "Export EPS");
 		menuPlot->Append(ID_Scale, "Plot Panel");
+		menuPlot->Append(ID_UnZoom, "Zoom Undo");
 		menuPlot->AppendSeparator();
 	}
 	for(i=0; i<mod->graphbase->numsets; i++) {

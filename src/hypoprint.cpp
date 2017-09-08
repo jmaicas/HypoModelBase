@@ -54,11 +54,13 @@ void GraphWindow3::PrintEPS()
 	//yoffset = axisstroke / 2;
 	yoffset = 0;
 
+
 	// Set output file path
+	graph = dispset[0]->plot[0];
 	filepath = mainwin->outpath;
-	//filetag = paramstoretag->GetValue();
-	filetag = "test";
-	filename = filepath + "/" + filetag + "-" + gname + ".eps";
+	filetag = mod->modbox->paramstoretag->GetValue();
+	//filetag = "test";
+	filename = filepath + "/" + filetag + "-" + graph->gname + ".eps";
 
 	// Initialise postscript file and write header
 	//out.New("C:/Users/Duncan/Desktop/plot.eps");

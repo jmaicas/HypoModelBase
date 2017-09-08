@@ -101,6 +101,7 @@ public:
 	void OnGraphPrint(wxCommandEvent& event);
 	void OnGraphEPS(wxCommandEvent& event);
 	void OnScale(wxCommandEvent& event);
+	void OnUnZoom(wxCommandEvent& event);
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
 	void PrintEPS();
 	wxRealPoint GraphPos(wxPoint);

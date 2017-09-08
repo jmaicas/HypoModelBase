@@ -213,6 +213,7 @@ enum {
 	ID_Print,
 	ID_GraphEPS,
 	ID_Scale,
+	ID_UnZoom,
 	ID_Go,
 	ID_Stop, 
 	ID_Wave,
