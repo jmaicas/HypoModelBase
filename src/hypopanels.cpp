@@ -600,7 +600,7 @@ void ParamBox::Initialise()
 	paramstoretag = NULL;
 	if(boxtype == 0 || boxtype == 1) {
 		mainwin->diagbox->Write("Store Box initialise\n");
-		paramstoretag = TextInputCombo(100, 20, "", boxname, mod->GetPath());
+		paramstoretag = TextInputCombo(120, 20, "", boxname, mod->GetPath());
 		paramstoretag->Show(false);
 	}
 	
