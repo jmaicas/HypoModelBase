@@ -400,12 +400,12 @@ void BurstBox::BurstDataPanel(BurstPanel *datpanel)
 }
 
 
-BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag)
+BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode)
 	: ToolBox(model->mainwin, title, pos, size)
 {
 	int numwidth = 50;
 	int gridwidth = 65;
-	int numpan = 3;
+	int numpan = 2;
 
 	units = 1000;
 	boxname = "SpikeAnalysis";
@@ -428,6 +428,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	endspike = 0;
 
 	loaddata = NULL;
+	evoburst = NULL;
 
 	//wxFont textfont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//SetFont(textfont);
@@ -452,15 +453,20 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	datburst = new BurstPanel();
 	modburst = new BurstPanel();
-	evoburst = new BurstPanel();
-
+	
 	BurstDataPanel(datburst);
 	BurstDataPanel(modburst);
-	BurstDataPanel(evoburst);
-
+	
 	burstpanset[0] = datburst;
 	burstpanset[1] = modburst;
-	burstpanset[2] = evoburst;
+
+	if(evomode) { 
+		evoburst = new BurstPanel();
+		BurstDataPanel(evoburst);
+		burstpanset[2] = evoburst;
+		numpan++;
+	}
+	
 
 
 	/*
@@ -506,7 +512,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	datagrid->Add(GridLabel(gridwidth, "SD"), 0, wxALIGN_CENTRE);
 	datagrid->Add(allisisd);
 
-	wxFlexGridSizer *intragrid = new wxFlexGridSizer(4, 3, 3);
+	wxFlexGridSizer *intragrid = new wxFlexGridSizer(numpan+1, 3, 3);
 	intragrid->Add(GridLabel(gridwidth, "Spikes"), 0, wxALIGN_CENTRE);
 	for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraspikes);
 	//intragrid->Add(modburst->intraspikes);
@@ -539,7 +545,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	if(ostype == Windows) intrabox->AddSpacer(5);
 	intrabox->Add(intragrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
 
-	wxFlexGridSizer *burstgrid = new wxFlexGridSizer(4, 3, 5);
+	wxFlexGridSizer *burstgrid = new wxFlexGridSizer(numpan+1, 3, 5);
 	if(ostype == Mac) gridwidth = 80; else gridwidth = 65;
 	burstgrid->Add(GridLabel(45, "Bursts"), 0, wxALIGN_CENTRE);
 	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->numbursts);
@@ -667,7 +673,7 @@ BurstBox::~BurstBox()
 	delete paramset;
 	delete datburst;
 	delete modburst;
-	delete evoburst;
+	if(evoburst) delete evoburst;
 	delete blankevent;
 }
 

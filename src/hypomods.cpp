@@ -20,6 +20,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	graphbase = new GraphBase(10);
 	graphbase->mainwin = mainwin;
 	modeflags = new ParamStore();
+	toolflags = new ParamStore();
 	scalebox = mainwin->scalebox;
 	diagbox = mainwin->diagbox;
 

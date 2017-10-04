@@ -410,7 +410,7 @@ public:
 	wxComboBox *datfiletag;
 	wxStaticText *datstatus;
 
-	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst");
+	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst", bool evomode = false);
 	void BurstDataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void DataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void BurstDataPanel(BurstPanel *);

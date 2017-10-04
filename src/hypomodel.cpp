@@ -312,9 +312,9 @@ HypoMain::~HypoMain()
 }
 
 
-void HypoMain::ToolLoad(ParamStore *toolflags)
+void HypoMain::ToolLoad()
 {
-	if((*toolflags)["burstbox"]) SpikeBox(1); 
+	if((*mod->toolflags)["burstbox"] || (*mod->toolflags)["spikebox"]) SpikeBox(1); 
 }
 
 
@@ -863,7 +863,7 @@ void HypoMain::SpikeModule(Model *mod)
 	GraphSet *graphset;
 	wxString gtag, tag = "exp";
 
-	expdata->GraphSet(mod->graphbase, "Exp ", blue, 1, "exp");
+	expdata->GraphSet(mod->graphbase, "Exp ", green, 1, "exp");
 
 	graphset = mod->graphbase->NewSet("Exp Spikes", tag + "spikes");
 	graphset->AddFlag("timeres", 1);

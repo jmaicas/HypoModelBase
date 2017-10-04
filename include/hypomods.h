@@ -51,6 +51,7 @@ public:
 	GraphBase *graphbase;
 	ModThread *modthread;
 	ParamStore *modeflags;
+	ParamStore *toolflags;
 	ToolSet modtools;
 	wxString gcodes[10];
 	ScaleBox *scalebox;

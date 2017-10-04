@@ -386,6 +386,21 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				}		
 				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
+			if(i == 2) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				overpan1 = 1;
+				overpan2 = 2;
+			}
 
 			/*
 			if(i == 2) {		

@@ -178,7 +178,7 @@ public:
 	void OptionLoad();
 	void ViewLoad();
 	void ViewStore();
-	void ToolLoad(ParamStore *toolflags);
+	void ToolLoad();
 	void SpikeModule(Model *);
 	void SpikeBox(int modmode = 0);
 
