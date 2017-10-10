@@ -424,6 +424,7 @@ void HypoMain::FullMenu()
 	//menuAnalysis->Append(ID_Burst, "Burst");
 	//menuAnalysis->Append(ID_XYPos, "XY Pos");
 	SetMenuFlag(ID_XYPos, "xypos", "XY Pos", 1, menuAnalysis); 
+	SetMenuFlag(ID_Zoom, "zoom", "Graph Zoom", 1, menuAnalysis); 
 
 	//menuTools->Append(ID_Info, "Info");
 	menuTools->Append(ID_Burst, "Spike Analysis");
@@ -466,6 +467,7 @@ void HypoMain::UserMenu()
 	menuFile->Append(ID_Quit, "E&xit");
 
 	SetMenuFlag(ID_XYPos, "xypos", "XY Pos", 1, menuAnalysis); 
+	SetMenuFlag(ID_Zoom, "zoom", "Graph Zoom", 1, menuAnalysis); 
 
 	menuSystem->Append(ID_Options, "Options");
 

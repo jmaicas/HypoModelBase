@@ -385,26 +385,28 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 		//ygraphTo = (pos.y - ybase) * yscale + graph->yfrom;
 		
 		// Zoom Select
-		if(xgraphFrom > xgraphTo) std::swap(xgraphFrom, xgraphTo);
-		if(ygraphFrom > ygraphTo) std::swap(ygraphFrom, ygraphTo);
+		if((*mainwin->hypoflags)["zoom"]) {
+			if(xgraphFrom > xgraphTo) std::swap(xgraphFrom, xgraphTo);
+			if(ygraphFrom > ygraphTo) std::swap(ygraphFrom, ygraphTo);
 		
-		if(xgraphFrom < graph->xfrom) xgraphFrom = graph->xfrom;
-		if(xgraphTo > graph->xto) xgraphTo = graph->xto;
-		if(ygraphFrom < graph->yfrom) ygraphFrom = graph->yfrom;
-		if(ygraphTo > graph->yto) ygraphTo = graph->yto;
+			if(xgraphFrom < graph->xfrom) xgraphFrom = graph->xfrom;
+			if(xgraphTo > graph->xto) xgraphTo = graph->xto;
+			if(ygraphFrom < graph->yfrom) ygraphFrom = graph->yfrom;
+			if(ygraphTo > graph->yto) ygraphTo = graph->yto;
 		
-		graph->oldxfrom = graph->xfrom;
-		graph->oldxto = graph->xto;
-		graph->oldyfrom = graph->yfrom;
-		graph->oldyto = graph->yto;
-		graph->oldset = true;
+			graph->oldxfrom = graph->xfrom;
+			graph->oldxto = graph->xto;
+			graph->oldyfrom = graph->yfrom;
+			graph->oldyto = graph->yto;
+			graph->oldset = true;
 
-	    graph->xfrom = xgraphFrom;
-	    graph->xto = xgraphTo; 
-		graph->yfrom = ygraphFrom;
-		graph->yto = ygraphTo;
+			graph->xfrom = xgraphFrom;
+			graph->xto = xgraphTo; 
+			graph->yfrom = ygraphFrom;
+			graph->yto = ygraphTo;
 		
-		scalebox->ScaleUpdate();
+			scalebox->ScaleUpdate();
+		}
 
 		// Data Select
 		mod->DataSelect(xgraphFrom, xgraphTo);

@@ -274,6 +274,7 @@ enum {
 	ID_FileIO,
 	ID_MultiRun,
 	ID_XYPos,
+	ID_Zoom,
 	ID_AddPlot,
 	ID_quad,
 	ID_Add1,
