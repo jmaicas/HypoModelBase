@@ -155,7 +155,7 @@ public:
 	void SetStatus(wxString);
 	void WriteVDU(wxString);
 	void InitMenu();
-  void DataMenu();
+	void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
@@ -165,6 +165,7 @@ public:
 	void ParamLayout(int columns=1);
 	void PanelParamLayout(wxBoxSizer *box, int columns=1);
 	void OnClose(wxCloseEvent& event);
+	ParamCon *GetCon(wxString);
 	wxBoxSizer *RunBox();
 };
 

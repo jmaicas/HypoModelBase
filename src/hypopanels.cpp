@@ -925,6 +925,12 @@ void ParamBox::OnRun(wxCommandEvent& WXUNUSED(event))
 }
 
 
+ParamCon *ParamBox::GetCon(wxString tag)
+{
+	return paramset->GetCon(tag);
+}
+
+
 wxBoxSizer *ParamBox::RunBox()
 {
 	wxBoxSizer *runbox = new wxBoxSizer(wxHORIZONTAL);

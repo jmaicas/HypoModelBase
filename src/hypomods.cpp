@@ -40,6 +40,7 @@ Model::~Model()
 {
 	delete graphbase;
 	delete modeflags;
+	delete toolflags;
 }
 
 
