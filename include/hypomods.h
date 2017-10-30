@@ -58,7 +58,7 @@ public:
 
 	DatStore *recdata;
 
-	Model(short, wxString, HypoMain *);
+	Model(int, wxString, HypoMain *);
 	virtual ~Model();
 
 	long ReadNextData(wxString *);
@@ -77,6 +77,20 @@ public:
 	virtual void GHistStore();
 	virtual void GHistLoad(wxComboBox *);
 	virtual void ModClose();
+	virtual void EvoRun();
+};
+
+
+class NeuroMod : public Model
+{
+public:
+	// Data
+	SpikeDat *evodata;
+
+	NeuroMod(int, wxString, HypoMain *);
+	virtual ~NeuroMod();
+
+	void EvoGraphs();
 };
 
 

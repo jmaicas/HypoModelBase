@@ -178,9 +178,11 @@ public:
 	void OptionLoad();
 	void ViewLoad();
 	void ViewStore();
+
 	void ToolLoad();
 	void SpikeModule(Model *);
 	void SpikeBox(int modmode = 0);
+	void EvoSpikeModule(Model *);
 
 	void BasicMenu();
 	void FullMenu();

@@ -8,7 +8,47 @@ DEFINE_EVENT_TYPE(wxEVT_SYNCH)
 
 
 
-Model::Model(short type, wxString name, HypoMain *main)
+NeuroMod::NeuroMod(int type, wxString name, HypoMain *main)
+	: Model(type, name, main)
+{
+	evodata = NULL;
+}
+
+
+NeuroMod::~NeuroMod()
+{
+	if(evodata) delete evodata;
+}
+
+
+void NeuroMod::EvoGraphs()
+{
+	evodata->GraphSet(graphbase, "Evo ", purple, 1, "evo");
+
+	GraphSet *graphset = graphbase->NewSet("Evo Intervals", "evointervals");
+	graphset->AddFlag("hazmode1", 10);
+	graphset->AddFlag("binrestog1", 1);
+	graphset->AddFlag("burstmode", 100);
+	graphset->AddFlag("normtog", 1000);
+	graphset->AddFlag("quadtog", 10000);
+	graphset->Add("evohist1ms", 0);
+	graphset->Add("evohaz1ms", 10);
+	graphset->Add("evohist5ms", 1);
+	graphset->Add("evohaz5ms", 11);
+	graphset->Add("evobursthist1ms", 100);
+	graphset->Add("evobursthaz1ms", 110);
+	graphset->Add("evobursthist5ms", 101);
+	graphset->Add("evobursthaz5ms", 111);
+	graphset->Add("evonormhist1ms", 1000);
+	graphset->Add("evonormhist5ms", 1001);
+	graphset->Add("evohistquadsmooth", 10001);
+	graphset->Add("evohistquadsmooth", 11001);
+	if(diagbox) diagbox->textbox->AppendText(graphset->Display());
+}
+
+
+
+Model::Model(int type, wxString name, HypoMain *main)
 {
 	mainwin = main;
 	modtype = type;
@@ -114,6 +154,11 @@ void Model::ScaleSwitch(double newxscale)
 void Model::DataSelect(double x, double y)
 {
 	int i;
+}
+
+
+void Model::EvoRun()
+{
 }
 
 
@@ -398,3 +443,6 @@ int Model::ModeSum(ParamStore *gflags)
 {
 	return 0;
 }
+
+
+

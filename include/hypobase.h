@@ -582,6 +582,7 @@ public:
 		long idx = store.size();
 		ParamData param;
 		param.indexName = indexName;
+		param.data = 0;                  // New 26/10/17 to fix undefined return value
 		store.push_back(param);  
 		return store[idx].data;             
 	} 

@@ -1169,6 +1169,8 @@ void ScaleBox::SetMod(Model *model)
 
 ParamStore *ScaleBox::GetFlags()
 {
+
+	// Old manually defined gflags
 	(*gflags)["cortflag"] = cortflag;
 	(*gflags)["rateres"] = rateres;
 	(*gflags)["timeres"] = timeres;
