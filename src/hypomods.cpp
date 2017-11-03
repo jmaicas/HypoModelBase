@@ -44,6 +44,12 @@ void NeuroMod::EvoGraphs()
 	graphset->Add("evohistquadsmooth", 10001);
 	graphset->Add("evohistquadsmooth", 11001);
 	if(diagbox) diagbox->textbox->AppendText(graphset->Display());
+
+	graphbase->Add(GraphDat(&evodata->IoDdata, 0, 70, 0, 2, "Evo IoD", 9, 1, lightred), "iodevo");
+	graphbase->GetGraph("iodevo")->gdatax = &evodata->IoDdataX;
+	graphbase->GetGraph("iodevo")->xcount = 7;  
+	graphbase->GetGraph("iodevo")->synchx = false; 
+	graphbase->GetGraph("iodevo")->barshift  = 20;
 }
 
 
