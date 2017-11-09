@@ -4,6 +4,40 @@
 #include <hypotools.h>
 
 
+NeuroDat::NeuroDat()
+	//: times(std::make_shared<double>(maxspikes)), 
+	//srate(std::make_shared<int>(maxtime)),
+	//srate10(std::make_shared<int>(maxtime))
+{
+	//times = new double[maxspikes];
+	//srate = new int[maxtime];
+	//srate10 = new int[maxtime];
+	times.resize(maxspikes);
+	srate.resize(maxtime);
+	srate10.resize(maxtime);
+}
+
+
+NeuroDat::~NeuroDat()
+{
+	//delete[] times;
+	//delete[] srate;
+	//delete[] srate10;
+}
+
+
+void NeuroDat::ratereset()
+{
+	int i;
+
+	for(i=0; i<maxtime; i++) {
+		srate[i] = 0;
+		srate10[i] = 0;
+	}
+	for(i=0; i<10000; i++) srate100[i] = 0;
+}
+
+
 void NeuroDat::ratecalc()
 {
 	short spikestep;
@@ -123,7 +157,9 @@ SpikeDat::SpikeDat()
 
 	srate.setsize(100000);
 	srate1.setsize(1000000);
+	srate10.setsize(100000);
 	srate100.setsize(100000);
+
 	spikerate05.setsize(100000);// For Indexes of Dispersion calcs
 	spikerate1.setsize(100000);
 	spikerate2.setsize(100000);
@@ -135,18 +171,28 @@ SpikeDat::SpikeDat()
 	dispersions.setsize(300);
 	dispersionsre.setsize(300);
 
+	srate10s.setsize(100000);
+	srate100s.setsize(100000);
+
 	synsim.data.resize(1000100);
 	synsim.max = 1000000;
 
-	times.data.resize(100000);
+	maxspikes = 100000;
+
+	times.data.resize(maxspikes);
 	times.max = 100000;
-	isis.data.resize(100000);
+	isis.data.resize(maxspikes);
 	isis.max = 100000;
 	winfreq.data.resize(11000);
 	winfreq.max = 10000;
 
 	raterec.setsize(1000);
 	netinputrec.setsize(1000);
+
+	IoDdata.setsize(100);
+	IoDdataX.setsize(100);
+
+	meanV.setsize(5000);
 
 	burstdata = NULL;
 	vasomean.data.resize(250);
@@ -156,7 +202,6 @@ SpikeDat::SpikeDat()
 	spikecount = 0;
 	start = 0;
 	freqwindow = 100;
-	maxspikes = 100000;
 	normscale = 10000;
 	mainwin = NULL;
 	graphs = false;
@@ -237,8 +282,8 @@ BurstDat::BurstDat(bool select)
 	hist5norm.data.resize(10000);
 	haz1.data.resize(10000);
 	haz5.data.resize(10000);
-	spikes.data.resize(100000);
-	spikes.max = 100000;
+	//spikes.data.resize(100000);
+	//spikes.max = 100000;
 	profile.data.resize(1000);
 	profile.max = 500;
 	tailprofile.data.resize(1000);
@@ -259,16 +304,21 @@ BurstDat::BurstDat(bool select)
 
 	profilesm.setsize(500);
 	tailprofilesm.setsize(500);
+	IoDdata.setsize(100);
+	IoDdataX.setsize(100);
 
 	maxbursts = 1000;
 	//bustore = new burst[maxbursts];
 	bustore.resize(maxbursts);
+	burstspikes = new int[100000];
+	spikes = burstspikes;
 }
 
 
 BurstDat::~BurstDat()
 {
 	//delete[] bustore;
+	delete [] burstspikes;
 }
 
 
@@ -331,12 +381,13 @@ int TypeSet::GetType(int ref)
 }
 
 
-GraphDat::GraphDat()
+GraphDat::GraphDat()             // See more specific versions below
 {
 	scrollpos = 0;
 	gparam = 0;
 	xscale = 1;
 	xdis = 0;
+	xstop = 0;
 	negscale = 0;
 	//burstdata = NULL;
 	spikedata = NULL;
@@ -355,9 +406,9 @@ wxString GraphDat::StoreDat(wxString tag)
 	storeytag = ytag;
 	storeytag.Replace(" ", "_");
 
-	return gtext.Format("v5 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f", 
+	return gtext.Format("v7 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %d bg %d yu %.4f", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
-		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample);
+		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
 }
 
 
@@ -472,6 +523,15 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		xunitdscale = ParseDouble(&readline, 'd');
 		xsample = ParseDouble(&readline, 'm');
 	}
+
+	if(version > 5) {
+		barwidth = ParseLong(&readline, 'w');
+		bargap = ParseLong(&readline, 'g');
+	}
+
+	if(version > 6) {
+		yunitscale = ParseDouble(&readline, 'u');
+	}
 }
 
 
@@ -563,8 +623,10 @@ void GraphDat::Init()
 	xplot = 500;
 	yplot = 200;
 	xshift = 0;
+	yshift  = 0;
 	xsample = 1;
 	xunitscale = 1;
+	yunitscale = 1;
 	xunitdscale = 1;
 	strokecolour.Set(0, 0, 0);
 	xtag = "X";
@@ -575,10 +637,18 @@ void GraphDat::Init()
 	tickfontsize = 10;
 	clipmode = 0;
 	synchx = true;
+	barshift = 0;
+	barwidth = 10;
+	bargap = 10;
+	xstop = 0;
+	highstart = 0;
+	highstop = 0;
+	highcolour = red;
+	oldset = false;
 }
 
 
-graphdisp::graphdisp()
+GraphDisp::GraphDisp()
 {
 	numplots = 0;
 	currentplot = 0;
@@ -586,7 +656,7 @@ graphdisp::graphdisp()
 }
 
 
-void graphdisp::Add(GraphDat *newplot)
+void GraphDisp::Add(GraphDat *newplot)
 {
 	if(numplots < 5) {
 		plot[numplots] = newplot;
@@ -595,14 +665,39 @@ void graphdisp::Add(GraphDat *newplot)
 }
 
 
-void graphdisp::Front(GraphDat *newplot)
+void GraphDisp::Set(int index, GraphDat *newplot)
+{
+	if(numplots <= index) Add(newplot);
+	else plot[index] = newplot;
+}
+
+
+void GraphDisp::XYSynch(GraphDat *graph0)      // Synchronise X and Y axes for all plots
+{
+	int i;
+	GraphDat *graph;
+
+	//graph0 = plot[0];
+	if(!graph0) graph0 = plot[0];
+	
+	for(i=1; i<numplots; i++) {
+		graph = plot[i];
+		graph->yfrom = graph0->yfrom; 
+		graph->yto = graph0->yto; 
+		graph->xfrom = graph0->xfrom; 
+		graph->xto = graph0->xto; 
+	}
+}
+
+
+void GraphDisp::Front(GraphDat *newplot)
 {
 	plot[0] = newplot;
 	if(numplots == 0) numplots = 1;
 }
 
 
-GraphDat *graphdisp::GetFront()
+GraphDat *GraphDisp::GetFront()
 {
 	return plot[0];
 }
@@ -704,7 +799,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	nameindex[newgraph.gname] = numgraphs;
 	indextag[numgraphs] = tag;
 
-	if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
+	//if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
 	
 	numgraphs++;
 	return numgraphs-1; 
@@ -727,7 +822,7 @@ GraphSet *GraphBase::NewSet(wxString name, wxString tag)
 	setindextag[numsets] = tag;
 	numsets++;
 
-	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("new set name %s tag %s numsets %d\n", name, tag, numsets));
+	//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("new set name %s tag %s numsets %d\n", name, tag, numsets));
 
 	return &setstore[numsets-1];
 }
@@ -874,3 +969,95 @@ void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 	*/
 }
 
+
+FitConSet::FitConSet(int size)
+{
+	count = 0;
+	max = size;
+	tags = new wxString[size];
+	cons = new FitCon[size];
+}
+
+
+FitConSet::~FitConSet()
+{
+	delete[] cons;
+	delete[] tags;
+}
+
+
+void FitConSet::AddCon(wxString tag, wxString label, double value)
+{
+	ref[tag] = count;
+	tags[count] = tag;
+	cons[count] = FitCon(tag, label, value);
+	count++;
+}
+
+
+FitCon FitConSet::GetCon(wxString tag)
+{
+	return cons[(int)ref[tag]];
+}
+
+
+FitSet::FitSet(int size)
+{
+	measureCount = 0;
+	measureMax = size;
+	measures = new FitMeasure[size];
+	tags = new wxString[size];
+}
+
+
+FitSet::~FitSet()
+{
+	delete[] measures;
+	delete[] tags;
+}
+
+
+void FitSet::AddMeasure(wxString tag, wxString label, double weight)
+{
+	ref[tag] = measureCount;
+	tags[measureCount] = tag;
+	measures[measureCount] = FitMeasure(tag, label, weight);
+	measureCount++;
+}
+
+
+FitMeasure FitSet::GetMeasure(wxString tag)
+{
+	return measures[(int)ref[tag]];
+}
+
+
+
+double IoDcalc(int binsize, int spikecount, datdouble *times)
+{
+	int i;
+	int maxbin = 10000;
+	int spikerate[10000];
+	int laststep;
+	double mean, variance, dispersion = 0;
+	double timeshift = 0;
+
+	if((*times)[0] > 1000) timeshift = (*times)[0] - 1000;        // for data where recording starts at non-zero time point
+
+	// calculate spike rate for binsize
+	for(i=0; i<maxbin; i++) spikerate[i] = 0;
+	for(i=0; i<spikecount; i++) if(((*times)[i] - timeshift) / binsize < maxbin) spikerate[(int)(((*times)[i] - timeshift) + 0.5) / binsize]++;
+	laststep = ((int)((*times)[spikecount - 1] - timeshift)/ binsize) - 4;
+	if(laststep > maxbin) laststep = maxbin;
+
+	// calculate index of dispersion
+	mean = 0;
+	variance = 0;
+	for(i=0; i<laststep; i++) mean = mean +  spikerate[i];	//mean
+	mean = mean / laststep;
+	for(i=0; i<laststep; i++) variance += (mean - spikerate[i]) * (mean - spikerate[i]);	// variance
+	variance = variance / laststep;
+	dispersion = variance / mean;		// dispersion
+
+	return dispersion;
+}

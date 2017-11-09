@@ -40,6 +40,7 @@ public:
 	short gsync;
 	int storesize;
 	double xmin;
+	int xscaletoggle;
 	bool oldhist;
 
 	wxString modname;
@@ -56,18 +57,22 @@ public:
 	GraphBase *graphbase;
 	ModThread *modthread;
 	ParamStore *modeflags;
+	ParamStore *toolflags;
 	ToolSet modtools;
 	wxString gcodes[10];
 	ScaleBox *scalebox;
 
-	Model(short, wxString, HypoMain *);
+	DatStore *recdata;
+
+	Model(int, wxString, HypoMain *);
 	virtual ~Model();
 
 	long ReadNextData(wxString *);
 	wxString GetPath();
 	virtual void RunModel();
 	virtual void Output();
-	virtual void GSwitch(graphdisp *gpos, ParamStore *gflags);
+	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags);
+	virtual void ScaleSwitch(double xscale = 0);
 	virtual int ModeSum(ParamStore *gflags);
 	virtual int SoundLink(SpikeDat **, datdouble **);
 	virtual void ModStore();
@@ -78,6 +83,20 @@ public:
 	virtual void GHistStore();
 	virtual void GHistLoad(wxComboBox *);
 	virtual void ModClose();
+	virtual void EvoRun();
+};
+
+
+class NeuroMod : public Model
+{
+public:
+	// Data
+	SpikeDat *evodata;
+
+	NeuroMod(int, wxString, HypoMain *);
+	virtual ~NeuroMod();
+
+	void EvoGraphs();
 };
 
 

@@ -101,7 +101,7 @@ void ModGenBox::DefGen()
 	inpath = "src\\";
 	outpath = "Newcode\\";
 
-	check = infile.Open(inpath + plate[i]);
+	check = infile.Open(inpath + plate[i]);       // needs fixing
 		if(!check) {
 			status->SetLabel("Template files missing");
 			return;
@@ -245,7 +245,7 @@ void ModGenBox::GenModCode()
 	page[pageindex]->AppendText(text);
 	text.Printf("\n\nclass %sModel : public Model\n{\npublic:\n\t%sModel(int, wxString, HypoMain *);\n", modname, modname);
 	page[pageindex]->AppendText(text);
-	text.Printf("\n\tvoid RunModel();\n\tvoid GraphData();\n\tvoid GSwitch(graphdisp *gpos, ParamStore *gflags);\n};\n");
+	text.Printf("\n\tvoid RunModel();\n\tvoid GraphData();\n\tvoid GSwitch(GraphDisp *gpos, ParamStore *gflags);\n};\n");
 	page[pageindex]->AppendText(text);
 
 
@@ -400,12 +400,12 @@ void BurstBox::BurstDataPanel(BurstPanel *datpanel)
 }
 
 
-BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag)
+BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode)
 	: ToolBox(model->mainwin, title, pos, size)
 {
 	int numwidth = 50;
 	int gridwidth = 65;
-	int numpan = 3;
+	int numpan = 2;
 
 	units = 1000;
 	boxname = "SpikeAnalysis";
@@ -428,6 +428,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	endspike = 0;
 
 	loaddata = NULL;
+	evoburst = NULL;
 
 	//wxFont textfont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//SetFont(textfont);
@@ -452,15 +453,20 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	datburst = new BurstPanel();
 	modburst = new BurstPanel();
-	evoburst = new BurstPanel();
-
+	
 	BurstDataPanel(datburst);
 	BurstDataPanel(modburst);
-	BurstDataPanel(evoburst);
-
+	
 	burstpanset[0] = datburst;
 	burstpanset[1] = modburst;
-	burstpanset[2] = evoburst;
+
+	if(evomode) { 
+		evoburst = new BurstPanel();
+		BurstDataPanel(evoburst);
+		burstpanset[2] = evoburst;
+		numpan++;
+	}
+	
 
 
 	/*
@@ -506,7 +512,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	datagrid->Add(GridLabel(gridwidth, "SD"), 0, wxALIGN_CENTRE);
 	datagrid->Add(allisisd);
 
-	wxFlexGridSizer *intragrid = new wxFlexGridSizer(4, 3, 3);
+	wxFlexGridSizer *intragrid = new wxFlexGridSizer(numpan+1, 3, 3);
 	intragrid->Add(GridLabel(gridwidth, "Spikes"), 0, wxALIGN_CENTRE);
 	for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraspikes);
 	//intragrid->Add(modburst->intraspikes);
@@ -539,7 +545,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	if(ostype == Windows) intrabox->AddSpacer(5);
 	intrabox->Add(intragrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
 
-	wxFlexGridSizer *burstgrid = new wxFlexGridSizer(4, 3, 5);
+	wxFlexGridSizer *burstgrid = new wxFlexGridSizer(numpan+1, 3, 5);
 	if(ostype == Mac) gridwidth = 80; else gridwidth = 65;
 	burstgrid->Add(GridLabel(45, "Bursts"), 0, wxALIGN_CENTRE);
 	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->numbursts);
@@ -587,6 +593,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	}
 	else {
 		AddButton(ID_datload, "Load", 40, datbuttons, 2);
+		AddButton(ID_datload2, "Load2", 40, datbuttons, 2);
 		AddButton(ID_datoutput, "Output Data", 80, datcon, 2);
 		AddButton(ID_scan, "Burst Scan", 65, parambox, 5);
 	}
@@ -598,15 +605,19 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	rightbox->Add(burstgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	//rightbox->AddStretchSpacer(10);
 
-	hbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	//hbox->Add(parambox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	hbox->Add(parambox, 0, wxALL, 0);
 	hbox->AddSpacer(10);
-	hbox->Add(rightbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	//hbox->Add(rightbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 0);
+	hbox->Add(rightbox, 0, wxALL, 0);
 
 	wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
-	hbox2->Add(databox, 1, wxALIGN_CENTRE_VERTICAL| wxALIGN_CENTRE_HORIZONTAL);
+	//hbox2->Add(databox, 1, wxALIGN_CENTRE_VERTICAL| wxALIGN_CENTRE_HORIZONTAL);
+	hbox2->Add(databox, 1, wxALIGN_CENTRE_VERTICAL);
 	hbox2->AddSpacer(20);
 	//hbox2->AddStretchSpacer(20);
-	hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL| wxALIGN_CENTRE_HORIZONTAL);
+	//hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL);
+	hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL);
 
 	//wxButton *datoutputbutton = new wxButton(panel, ID_datoutput, "Output Data", wxDefaultPosition, wxSize(80, buttonheight));	
 	datstatus = NumPanel(100, wxALIGN_RIGHT, "");
@@ -649,6 +660,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	Connect(ID_scan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnScan));
 	Connect(ID_datload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatLoad));
+	Connect(ID_datload2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatLoad));
 	Connect(ID_datoutput, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatOutput));
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(BurstBox::OnDatRadio));
 	//Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(BurstBox::OnClose));
@@ -661,7 +673,7 @@ BurstBox::~BurstBox()
 	delete paramset;
 	delete datburst;
 	delete modburst;
-	delete evoburst;
+	if(evoburst) delete evoburst;
 	delete blankevent;
 }
 
@@ -751,7 +763,9 @@ void BurstBox::BurstDataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
 	if(dispdata == NULL) dispdata = spikedata; 
 	if(datpanel == NULL) datpanel = modburst;
 
-	// Display scan data
+	if(!dispdata->burstdata) return;
+
+	// Display burstscan data
 	snum.Printf("%d", dispdata->burstdata->numbursts);
 	datpanel->numbursts->SetLabel(snum);
 	snum.Printf("%.2f", dispdata->burstdata->meancount);
@@ -780,8 +794,27 @@ void BurstBox::BurstDataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
 	datpanel->intraisisd->SetLabel(snum);
 }
 
+
+void BurstBox::DataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
+{
+	if(dispdata == NULL) dispdata = spikedata; 
+	if(datpanel == NULL) datpanel = modburst;
+
+	// Display spike data
+	
+	snum.Printf("%d", dispdata->spikecount);
+	datpanel->intraspikes->SetLabel(snum);
+	snum.Printf("%.2f", dispdata->spikefreq);
+	datpanel->intrafreq->SetLabel(snum);
+	snum.Printf("%.2f", dispdata->meanisi);
+	datpanel->intraisimean->SetLabel(snum);
+	snum.Printf("%.2f", dispdata->isisd);
+	datpanel->intraisisd->SetLabel(snum);
+}
+
+
 // Getting and processing data from files. 
-void BurstBox::OnDatLoad(wxCommandEvent& event)  
+void BurstBox::OnDatLoad(wxCommandEvent& event)
 {
 	int s, count, maxdata, stretchdata;
 	double datval, spikeint;
@@ -793,6 +826,10 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	maxdata = 100000;
 	stretchdata = maxdata;
 	rawdata.setsize(maxdata);
+
+	// Load data store
+	loaddata = mainwin->expdata;
+	if(event.GetId() == ID_datload2) loaddata = mainwin->expdata2;
 
 	// Spike data file
 	filetag = datfiletag->GetValue();
@@ -894,6 +931,7 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	mainwin->scalebox->GraphSwitch();
 
 	datfile->Close();
+	delete datfile;
 }
 
 

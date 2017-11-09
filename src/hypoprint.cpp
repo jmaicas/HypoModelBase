@@ -21,7 +21,7 @@ void GraphWindow3::PrintEPS()
 	double xfrom, xto, yfrom, yto;
 	double xfromAxis, xtoAxis;
 	double srangex, srangey;
-	double binsize, bargap;
+	double binsize, histbargap;
 	int gtype, sample, gpar;
 	int xplot, yplot, xstretch, xsample;
 	double xbase, ybase;
@@ -36,7 +36,8 @@ void GraphWindow3::PrintEPS()
 	double yoffset;
 	double oldx, oldy, mpoint, preval;
 	double axisstroke, plotstroke;
-	int gplot, colour;
+	int gplot, gdisp, colour;
+	double barwidth, bargap;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -48,16 +49,18 @@ void GraphWindow3::PrintEPS()
 	xstretch = mainwin->xstretch;
 	xlabels = 10;
 	ylabels = mainwin->ylabels;
-	xoffset = 1;
+	xoffset = 0;
 	axisstroke = 0.75;
 	//yoffset = axisstroke / 2;
 	yoffset = 0;
 
+
 	// Set output file path
+	graph = dispset[0]->plot[0];
 	filepath = mainwin->outpath;
-	//filetag = paramstoretag->GetValue();
-	filetag = "test";
-	filename = filepath + "/" + filetag + "-" + gname + ".eps";
+	filetag = mod->modbox->paramstoretag->GetValue();
+	//filetag = "test";
+	filename = filepath + "/" + filetag + "-" + graph->gname + ".eps";
 
 	// Initialise postscript file and write header
 	//out.New("C:/Users/Duncan/Desktop/plot.eps");
@@ -71,8 +74,11 @@ void GraphWindow3::PrintEPS()
 	out.WriteLine("");
 
 
-	for(gplot=0; gplot<numgraphs; gplot++) {
-		graph = graphset[gplot]->plot[0];
+	//for(gplot=0; gplot<numdisps; gplot++) {
+	for(gdisp=0; gdisp<numdisps; gdisp++)
+	for(gplot=0; gplot<dispset[gdisp]->numplots; gplot++) {
+
+		graph = dispset[gdisp]->plot[gplot];
 
 		// Get Graph parameters
 		//graph = graphset[0]->plot[0];
@@ -97,6 +103,8 @@ void GraphWindow3::PrintEPS()
 		yplot = graph->yplot; 
 		xlabels = graph->xlabels;
 		ylabels = graph->ylabels;
+		barwidth = graph->barwidth;
+		bargap = graph->bargap;
 
 		//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
 		//xto = xto - xstart;
@@ -161,9 +169,9 @@ void GraphWindow3::PrintEPS()
 
 		if(gtype == 1) {                             // scaled width bars, Histogram    
 			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 0, histogram\n"));
-			bargap = 1.5;
-			if(xrange < 3) bargap = 0;
-			if(xrange < 5) bargap = 1;
+			histbargap = 1.5;
+			if(xrange < 3) histbargap = 0;
+			if(xrange < 5) histbargap = 1;
 			//out.WriteLine("0.5 setlinewidth");
 
 			for(i=0; i<(xto - xfrom); i++) {
@@ -178,8 +186,8 @@ void GraphWindow3::PrintEPS()
 				out.WriteLine("newpath");
 				out.MoveTo(xpos, ybase);
 				out.LineTo(xpos, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase);
+				out.LineTo(xpos + xrange - histbargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - histbargap, ybase);
 				out.WriteLine("closepath");
 				out.WriteLine("gsave");
 				out.WriteLine("fill");
@@ -200,9 +208,9 @@ void GraphWindow3::PrintEPS()
 			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 3, spike rate\n"));
 			int spikestep = 0;
 			int burstcolour = 0;
-			bargap = 1.5;
-			if(xrange < 3) bargap = 0;
-			if(xrange < 5) bargap = 1;
+			histbargap = 1.5;
+			if(xrange < 3) histbargap = 0;
+			if(xrange < 5) histbargap = 1;
 			//out.WriteLine("0.5 setlinewidth");
 
 			for(i=0; i<(xto - xfrom); i++) {
@@ -246,8 +254,8 @@ void GraphWindow3::PrintEPS()
 				out.WriteLine("newpath");
 				out.MoveTo(xpos, ybase);
 				out.LineTo(xpos, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase + yrange * (y - yfrom));
-				out.LineTo(xpos + xrange - bargap, ybase);
+				out.LineTo(xpos + xrange - histbargap, ybase + yrange * (y - yfrom));
+				out.LineTo(xpos + xrange - histbargap, ybase);
 				out.WriteLine("closepath");
 				out.WriteLine("gsave");
 				out.WriteLine("fill");
@@ -339,13 +347,13 @@ void GraphWindow3::PrintEPS()
 			oldx = xbase;
 			oldy = ybase; // - yrange * (yfrom);
 			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
-			for(i=0; i<graph->xcount; i++) {
+			for(i=0; i<graph->xcount; i+=xsample) {
 				xval = (*graph->gdatax)[i];
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (xval - xfrom) * xrange;
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
-					out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
+					if(i > 0) out.DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));        // First point sets start position
 					//dc.SetPen(colourpen[black]);
 					//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
 					oldx = xpos + xbase + xoffset;
@@ -359,7 +367,7 @@ void GraphWindow3::PrintEPS()
 				for(i=0; i<graph->xcount; i++) {
 					xval = (*graph->gdatax)[i];
 					if(xval >= xfrom && xval <= xto) {
-						xpos = (int)(xval - xfrom) * xrange;
+						xpos = (xval - xfrom) * xrange;
 						y = (*gdatadv)[i];		
 						out.WriteLine("newpath");
 						out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
@@ -369,6 +377,52 @@ void GraphWindow3::PrintEPS()
 						out.WriteLine("grestore");
 						out.WriteLine("stroke");
 					}
+				}
+			}
+		}
+
+		if(gtype == 10 && graph->gdatax) {				                            // scatter graph with X data
+			out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
+			//out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+			for(i=0; i<graph->xcount; i+=xsample) {
+				xval = (*graph->gdatax)[i];
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (xval - xfrom) * xrange;
+					y = (*gdatadv)[i];		
+					//mainwin->diagbox->Write(text.Format("EPS Scatter y %.5f ypos %.5f\n", y, ybase + yrange * (y - yfrom)));
+					out.WriteLine("newpath");
+					out.WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
+					out.WriteLine("gsave");
+					out.WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
+					out.WriteLine("fill");
+					out.WriteLine("grestore");
+					out.WriteLine("stroke");
+				}
+			}
+		}
+
+		double barshift = graph->barshift;
+		double barpos;
+
+		if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data
+			for(i=0; i<graph->xcount; i++) {
+				xval = (*graph->gdatax)[i];
+				if(xval >= xfrom && xval <= xto) {
+					xpos = (xval - xfrom) * xrange;
+					barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
+					barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
+					y = (*gdatadv)[i];
+
+					out.WriteLine("newpath");
+					out.MoveTo(barpos, ybase);
+					out.LineTo(barpos, ybase + yrange * (y - yfrom));
+					out.LineTo(barpos + barwidth, ybase + yrange * (y - yfrom));
+					out.LineTo(barpos + barwidth, ybase);
+					out.WriteLine("closepath");
+					out.WriteLine("gsave");
+					out.WriteLine("fill");
+					out.WriteLine("grestore");
+					out.WriteLine("stroke");
 				}
 			}
 		}
@@ -432,7 +486,7 @@ void GraphWindow3::PrintEPS()
 		if(graph->xtickmode) xcoord = xplotstep * i;
 		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale / graph->xunitdscale - xshift;
 		if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - xshift;
-		srangex = (xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale;
+		srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
 		snum.Printf("%.0f", xval + xdis);	
 		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
 		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
@@ -448,11 +502,12 @@ void GraphWindow3::PrintEPS()
 	for(i=0; i<=ylabels; i+=1) {
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
-		yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale;
-		if(graph->ytickmode) yval = yfrom + graph->ystep * i;
-		if(yto - yfrom < 0.1) snum.Printf("%.3f", yval);
-		else if(yto - yfrom < 1) snum.Printf("%.2f", yval);
-		else if(yto - yfrom < 10) snum.Printf("%.1f", yval);
+		yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;
+		if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+		srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
+		if(srangey < 0.1) snum.Printf("%.3f", yval);
+		else if(srangey < 1) snum.Printf("%.2f", yval);
+		else if(srangey < 10) snum.Printf("%.1f", yval);
 		else snum.Printf("%.0f", yval);
 		out.MoveTo(xbase - xylab, ybase + ycoord - 2.75);
 		out.WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));
