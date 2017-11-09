@@ -362,7 +362,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			}
 		}
 
-		if(boxtype == modOxy || boxtype == modOxySec) {
+		if(boxtype == modOxyHH || boxtype == modOxySec) {
 			if(i == 0) {
 				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
 			}

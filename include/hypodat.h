@@ -16,7 +16,7 @@
 //	12. GraphDat	Collect data before drawing the graph
 //	13. GraphSet	Offer the possibility of having a set of graphs ?
 //	14. GraphBase	Basic Set of Graphs? Allow to Save and Load saved configurations of graphs?
-//	15. graphdisp	Display a single graph?
+//	15. GraphDisp	Display a single graph?
 //
 // *************************************************************************************************
 
@@ -634,7 +634,7 @@ public:
 	wxString tag;
 	wxString name;
 	GraphBase *graphbase;
-	//graphdisp *gpos;
+	//GraphDisp *gpos;
 	int numgraphs;
 	int numflags;
 	int gindex[20];

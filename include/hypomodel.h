@@ -2,7 +2,7 @@
 // *********************************      hypomodel.h               *********************************
 //
 //  HypoMain Class. Use the other important created classes for showing data in a Window
-//	a. For Display: ScaleBox, ToolBox, GraphWindow3, graphdisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
+//	a. For Display: ScaleBox, ToolBox, GraphWindow3, GraphDisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
 //	b. For Analysis: InfoBox,	BurstBox, BurstDat, SpikeDat, AnaDat,	SpikeDat, ProtocolBox.
 //
 //  *************************************************************************************************
@@ -80,7 +80,7 @@ public:
 
 
 //  HypoMain Class. Use the other important created classes for showing data in a Window
-//	a. For Display: ScaleBox, ToolBox, GraphWindow3, graphdisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
+//	a. For Display: ScaleBox, ToolBox, GraphWindow3, GraphDisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
 //	b. For Analysis: InfoBox,	BurstBox, BurstDat, SpikeDat, AnaDat,	SpikeDat, ProtocolBox.
 class HypoMain: public MainFrame
 {
@@ -134,7 +134,7 @@ public:
 	GraphWindow3 *graphwin2[10];
 	SpikeDat *focusdata;
 	FileBase *filebase;
-	//graphdisp *gpos2;
+	//GraphDisp *gpos2;
 
 	// Tools and Analysis 
 	InfoBox *infobox;
