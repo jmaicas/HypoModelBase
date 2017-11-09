@@ -4,6 +4,9 @@
 #include <hypodat.h>
 #include <hypopanels.h>
 
+//#include <iostream>
+//#include <algorithm>
+//#include <vector>
 
 
 void SpikeDat::BurstProfile()
@@ -943,6 +946,17 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	}	
 }
 
+//struct isiscomp {
+//		double nextisi;
+//		double previsi;
+//	};
+//
+//
+//// Sort an array of struct of isis
+//bool sortbyprevisi(const isiscomp &lhs, const isiscomp &rhs) 
+//{ 
+//	return lhs.previsi < rhs.previsi; 
+//}
 
 // Makes Calculation for histograms and hazard
 
@@ -983,15 +997,31 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		hazquad[i] = 0;
 		hist1norm.data[i] = 0;
 		hist5norm.data[i] = 0;
+		histprev.data[i] = 0;
+		histnext.data[i] = 0;
+		spikerate6.data[i] = 0;
+		spikerate8.data[i] = 0;
+		spikerate10.data[i] = 0;
+		spikerate16.data[i] = 0;
 		//haz1norm.data[i] = 0;
 		//haz5norm.data[i] = 0;
 	}
 
+	for(i=0; i<100000; i++) {
+		spikerate05.data[i] = 0;
+		spikerate1.data[i] = 0;
+		spikerate2.data[i] = 0;
+		spikerate4.data[i] = 0;
+	}
+	
 	for(i=0; i<maxtime; i++) srate.data[i] = 0;
 	for(i=0; i<max1; i++) srate1.data[i] = 0;
 	for(i=0; i<max100; i++) srate100.data[i] = 0;
-
+	for(i=0; i<300; i++) dispersions.data[i] = dispersionsre.data[i] = 0;
+	
 	hist1.max = 0;
+	histprev.max = 0;
+	histnext.max = 0;
 	hist5.max = 0;
 	hist1norm.max = 0;
 	hist5norm.max = 0;
@@ -1030,11 +1060,36 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		isis[i] = times[i+1] - times[i];
 		if(hist1.max < (int)isis[i]) hist1.max = (int)isis[i];
 		if(hist1.data.size() < hist1.max + 1) hist1.data.resize(hist1.max + 1);
-		hist1[(int)isis[i]]++;	
+		hist1[(int)isis[i]]++;
+		/*if (i>0) {
+			histprev[(int)isis[i]]=histprev[(int)isis[i]] + isis[i-1];
+			histnext[(int)isis[i]]=histnext[(int)isis[i]] + isis[i];
+		}*/
 		mean = mean + (double)(isis[i] / isicount);
 		variance = isis[i] * isis[i] / isicount + variance;
 		if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
 	}
+
+	/*for(i=0; i<hist1.max; i++) {                                      
+		histprev[(int)isis[i]]=histprev[(int)isis[i]]/hist1[(int)isis[i]];		
+	}*/
+
+
+	// isis[i] is interspike interval. Here we want to make a double sorted ISI. 
+	// isis1[i] would  equal to isis[i] and isis0[i] would get the same but moved one position. 
+	// isis1 will be sorted by lenght of the isis0. 
+	//vector<isiscomp> isiv(isicount); // std::vector initialize values to 0 automatically
+	//for (i=0; i<isicount-1; i++) {
+	//	isiv[i+1].nextisi = isis[i];
+	//	isiv[i].previsi = isis[i];
+	//}
+	//std::sort(isiv.begin(), isiv.end(), sortbyprevisi); // sorting from 1 -not 0- to end +1 
+	//for(i=0; i<10000; i++) isisNext[i] = isisPrev[i] = 0;
+	//for(i=0; i<isicount; i++) {
+	//	isisNext[i] = isiv[i].nextisi;
+	//	isisPrev[i] = isiv[i].previsi;;
+	//}
+
 
 	/*
 	for(i=1; i<spikecount; i++) {
@@ -1195,8 +1250,9 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		spikerate6[(int)(times[i])/6000]++;  
 		spikerate8[(int)(times[i])/8000]++;  
 		spikerate10[(int)(times[i])/10000]++; // 10 seconds BIN		
+		spikerate16[(int)(times[i])/16000]++;
 	}
-	double laststep05, laststep1, laststep2, laststep4, laststep6, laststep8, laststep10;
+	double laststep05, laststep1, laststep2, laststep4, laststep6, laststep8, laststep10, laststep16;
 	laststep05 =  ((int)(times[spikecount-1])/500)-4;
 	laststep1 =  ((int)(times[spikecount-1])/1000)-4;
 	laststep2 =  ((int)(times[spikecount-1])/2000)-4;
@@ -1204,6 +1260,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	laststep6 =  ((int)(times[spikecount-1])/6000)-4;
 	laststep8 =  ((int)(times[spikecount-1])/8000)-4;
 	laststep10 =  ((int)(times[spikecount-1])/10000)-4;
+	laststep16 =  ((int)(times[spikecount-1])/16000)-4;
 	// **************** 0.5 sec **************************
 	double mean05, variance05, temp05, dispersion05; 
 	mean05 = variance05 = temp05 = dispersion05 = 0.0;
@@ -1262,13 +1319,43 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	for(double a=0; a<laststep10;a++) temp10 += (mean10 - spikerate10[a])*(mean10 - spikerate10[a]); // variance
 	variance10 = temp10/(laststep10);
 	dispersion10 = variance10/mean10; // dispersion
+	// **************** 16 sec **************************
+	double mean16, variance16, temp16, dispersion16; 
+	mean16 = variance16 = temp16 = dispersion16 = 0.0;
+	for (int a=0; a<laststep16;  a++) mean16 = mean16 +  spikerate16[a]; //mean
+	mean16 = mean16/(laststep16);
+	for(double a=0; a<laststep16;a++) temp16 += (mean16 - spikerate16[a])*(mean16 - spikerate16[a]); // variance
+	variance16 = temp16/(laststep16);
+	dispersion16 = variance16/mean16; // dispersion
+
+	// To know what the variance, the SD and the media is we use a clean part or our vector. 
+	dispersions[250] = variance05;
+	dispersions[251] = variance1;
+	dispersions[252] = variance2;
+	dispersions[253] = variance4;
+	dispersions[254] = variance6;
+	dispersions[255] = variance8;
+	dispersions[256] = variance10;
+	dispersions[257] = variance16;
+
 	// Array of dispersions for altogether plotting 
-	for (int i=10; i<20; i++) dispersions[i] = dispersion05;
-	for (int i=30; i<40; i++) dispersions[i] = dispersion1;
-	for (int i=50; i<60; i++) dispersions[i] = dispersion2;
-	for (int i=70; i<80; i++) dispersions[i] = dispersion4;
-	for (int i=90; i<100; i++) dispersions[i] = dispersion6;
-	for (int i=110; i<120; i++) dispersions[i] = dispersion10;
+	for (int i=6; i<12; i++) dispersionsre[i] = dispersion05;
+	for (int i=31; i<37; i++) dispersionsre[i] = dispersion1;
+	for (int i=56; i<62; i++) dispersionsre[i] = dispersion2;
+	for (int i=81; i<87; i++) dispersionsre[i] = dispersion4;
+	for (int i=106; i<112; i++) dispersionsre[i] = dispersion6;
+	for (int i=131; i<137; i++) dispersionsre[i] = dispersion8;
+	for (int i=156; i<162; i++) dispersionsre[i] = dispersion10;
+	for (int i=181; i<187; i++) dispersionsre[i] = dispersion16;
+	// Array of Real dispersions for altogether plotting 
+	for (int i=13; i<19; i++) dispersions[i] = dispersion05;
+	for (int i=38; i<44; i++) dispersions[i] = dispersion1;
+	for (int i=63; i<69; i++) dispersions[i] = dispersion2;
+	for (int i=88; i<94; i++) dispersions[i] = dispersion4;
+	for (int i=113; i<119; i++) dispersions[i] = dispersion6;
+	for (int i=138; i<144; i++) dispersions[i] = dispersion8;
+	for (int i=163; i<169; i++) dispersions[i] = dispersion10;
+	for (int i=188; i<194; i++) dispersions[i] = dispersion16;
 			
 
 	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d \n", i, times[i], (int)(times[i]+0.5)));
@@ -1389,7 +1476,8 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
 	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spike Rate 100ms", this, 0.1, red + shift), reftag + "rate100ms", reftag);
 	graphbase->Add(GraphDat(&srate1, 0, 0.5, 0, 3, tag + "Spikes 1ms", this, 0.001, red + shift), reftag + "spikes1ms", reftag);
-	graphbase->Add(GraphDat(&dispersions, 0, 130, 0, 20, tag + "Indexes of Dispersions", 1, 1, colour + shift), reftag + "dispersions", reftag);
+	graphbase->Add(GraphDat(&dispersions, 0, 100, 0, 20, tag + "Indexes of Dispersions Model", 1, 1, colour + shift), reftag + "dispersions-model", reftag);
+	graphbase->Add(GraphDat(&dispersionsre, 0, 100, 0, 20, tag + "Indexes of Dispersions Real", 1, 1, colour + shift), reftag + "dispersions-real", reftag);
 	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "ISI Histogram 1ms", 1, 1, colour + shift), reftag + "hist1ms", reftag);
 	graphbase->Add(GraphDat(&hist5, 0, 500, 0, 500, tag + "ISI Histogram 5ms", 1, 5, colour + shift), reftag + "hist5ms", reftag);
 	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Hazard 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);

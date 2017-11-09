@@ -68,6 +68,7 @@ void SpikeDat::Clear()
 
 	for(i=0; i<10000; i++) {
 		hist1[i] = 0;
+		histprev[i] = 0;
 		hist5[i] = 0;
 		haz1[i] = 0;
 		haz5[i] = 0;
@@ -104,6 +105,8 @@ SpikeDat::SpikeDat()
 	diagbox = NULL;
 
 	hist1.setsize(10000);
+	histprev.setsize(10000);
+	histnext.setsize(10000);
 	hist5.setsize(10000);
 	haz1.setsize(10000);
 	haz5.setsize(10000);
@@ -128,7 +131,9 @@ SpikeDat::SpikeDat()
 	spikerate6.setsize(10000);
 	spikerate8.setsize(10000);
 	spikerate10.setsize(10000);
-	dispersions.setsize(1000);
+	spikerate16.setsize(10000);
+	dispersions.setsize(300);
+	dispersionsre.setsize(300);
 
 	synsim.data.resize(1000100);
 	synsim.max = 1000000;

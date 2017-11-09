@@ -280,7 +280,21 @@ enum {
 	ID_Store,
 	ID_Wheel,
 	ID_Neuron,
-	ID_FileIO
+	ID_FileIO,
+	ID_ConstFreqRate,
+	ID_IncrConstFreqRate,
+	ID_IreAnalysis,
+	ID_AHPAnalysis,
+	ID_DAPAnalysis,
+	ID_FreqAnalysis,
+	ID_BrdngAnalysis,
+	ID_CthAnalysis,
+	ID_EthAnalysis,
+	ID_CckAnalysis,
+	ID_runningexpdata,
+	ID_runningSecExpData, 
+	ID_runningDiffIre,
+	ID_EPSPtrain
 };
 
 
@@ -442,7 +456,7 @@ string ReadFile(const char *filename)
 class datdouble{
 public:
 	datdouble(wxTextCtrl *text = NULL);
-	datdouble(int size);  //// OJO AQUI, ESTABA EN INTEGER. 
+	datdouble(int size); 
 	std::vector <double> data;
 	double count;
 	int max, maxindex;

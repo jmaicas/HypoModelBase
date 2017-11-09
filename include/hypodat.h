@@ -182,12 +182,16 @@ public:
 
 	datdouble times;
 	datdouble isis;
+	/*datdouble isisNext;
+	datdouble isisPrev;*/
 	BurstDat *burstdata;
-	
+
 	datdouble haz1; // hazard 1ms
 	datdouble haz5;	// hazard 5ms
 	datdouble hazquad; // 
 	datdouble hist1;	// histogram
+	datdouble histprev;	// histogram of previous isis
+	datdouble histnext;	// histogram of current isis
 	datdouble hist5;	
 	datdouble histquad;		//ISI Histogram Quadratic
 	datdouble histquadx;
@@ -202,7 +206,9 @@ public:
 	datdouble spikerate6;
 	datdouble spikerate8;
 	datdouble spikerate10;
-	datdouble dispersions;
+	datdouble spikerate16;
+	datdouble dispersions; // modelled dispersions
+	datdouble dispersionsre; // real dispersions -shifted in the graphs for comparison 
 	//datdouble haz1norm;
 	//datdouble haz5norm;
 	datint srate;
