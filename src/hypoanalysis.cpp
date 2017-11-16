@@ -223,6 +223,7 @@ void BurstDat::IntraBurstAnalysis()
 		hist5norm[i] = 0;
 		haz1[i] = 0;
 		haz5[i] = 0;
+		//haz5norm[i] = 0;
 	}
 
 	//if(diagbox) diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
@@ -828,17 +829,17 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	if(datneuron != NULL) neurodat = 1;
 
 	for(i=0; i<10000; i++) {
-		hist1.data[i] = 0;
-		hist5.data[i] = 0;
-		haz1.data[i] = 0;	
-		haz5.data[i] = 0;	
-		hist1norm.data[i] = 0;
-		hist5norm.data[i] = 0;
+		hist1[i] = 0;
+		hist5[i] = 0;
+		haz1[i] = 0;	
+		haz5[i] = 0;	
+		hist1norm[i] = 0;
+		hist5norm[i] = 0;
 	}
 
-	for(i=0; i<maxtime; i++) srate.data[i] = 0;
-	for(i=0; i<max1; i++) srate1.data[i] = 0;
-	for(i=0; i<max100; i++) srate100.data[i] = 0;
+	for(i=0; i<maxtime; i++) srate[i] = 0;
+	for(i=0; i<max1; i++) srate1[i] = 0;
+	for(i=0; i<max100; i++) srate100[i] = 0;
 
 	hist1.max = 0;
 	hist5.max = 0;
@@ -848,7 +849,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	haz1.max = 0;
 	haz5.max = 0;
 	//haz1norm.max = 0;
-	//haz5norm.max = 0;
+	haz5norm.max = 0;
 	hazquad.max = 0;
 	srate.max = 0;
 	srate1.max = 0;
@@ -958,33 +959,34 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	// Hazard
 
 	hazcount = 0;
-	haznorm = 10/freq;
+	haznorm = 5/freq;  // 10/freq
 	haz1.max = hist1.max;
 	if(haz1.data.size() < haz1.max + 1) haz1.data.resize(haz1.max + 1);
 
 	for(i=0; i<=hist1.max; i++) {        // 1ms Hazard
-		haz1.data[i] = hist1.data[i] / (spikecount - hazcount); //   / freq;		
-		hazcount = hazcount + hist1.data[i];
+		haz1[i] = hist1[i] / (spikecount - hazcount); //   / freq;		
+		hazcount = hazcount + hist1[i];
 	}
 
 	for(i=0; i<hist1.max; i++) {      // 5ms Hazard                                               
 		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
 		if(i/binsize > haz5.max) haz5.max = i/binsize;
 		if(haz5.data.size() < haz5.max + 1)	haz5.data.resize(haz5.max + 1);
-		haz5.data[i/binsize] = haz5.data[i/binsize] + haz1.data[i]; // * haznorm;	
+		haz5[i/binsize] = haz5[i/binsize] + haz1[i]; // * haznorm;	
 	}
 
 	for(i=0; i<=hist1.max; i++) {         // 5ms ISI Histogram
 		if(i/binsize > hist5.max) hist5.max = i/binsize;
 		if(hist5.data.size() < hist5.max + 1)	hist5.data.resize(hist5.max + 1);
-		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
+		hist5[i/binsize] = hist5[i/binsize] + hist1[i];		
 	}
 
 
-	// Normalise
+	// Normalise Histograms
 	for(i=0; i<=hist1.max; i++) {
 		hist1norm[i] = normscale * hist1[i] / isicount;
 		hist5norm[i] = normscale * hist5[i] / isicount;
+		haz5norm[i] = haz5[i] * haznorm;
 	}	
 }
 
@@ -1017,26 +1019,26 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	if(datneuron != NULL) neurodat = 1;
 
 	for(i=0; i<10000; i++) {
-		hist1.data[i] = 0;
-		hist5.data[i] = 0;
+		hist1[i] = 0;
+		hist5[i] = 0;
 		histquad[i] = 0;
-		haz1.data[i] = 0;	
-		haz5.data[i] = 0;	
+		haz1[i] = 0;	
+		haz5[i] = 0;	
 		hazquad[i] = 0;
-		hist1norm.data[i] = 0;
-		hist5norm.data[i] = 0;
+		hist1norm[i] = 0;
+		hist5norm[i] = 0;
 		//haz1norm.data[i] = 0;
-		//haz5norm.data[i] = 0;
+		haz5norm[i] = 0;
 	}
 
-	for(i=0; i<maxtime; i++) srate.data[i] = 0;
-	for(i=0; i<max1; i++) srate1.data[i] = 0;
+	for(i=0; i<maxtime; i++) srate[i] = 0;
+	for(i=0; i<max1; i++) srate1[i] = 0;
 	for(i=0; i<max100; i++) {
-		srate10.data[i] = 0;
-		srate100.data[i] = 0;
-		srate10s.data[i] = 0;
+		srate10[i] = 0;
+		srate100[i] = 0;
+		srate10s[i] = 0;
 	}
-	for(i=0; i<10000; i++) srate100s.data[i] = 0;
+	for(i=0; i<10000; i++) srate100s[i] = 0;
 
 	hist1.max = 0;
 	hist5.max = 0;
@@ -1321,6 +1323,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	for(i=0; i<=hist1.max; i++) {
 		hist1norm[i] = normscale * hist1[i] / isicount;
 		hist5norm[i] = normscale * hist5[i] / isicount;
+		haz5norm[i] = haz5[i] * haznorm;
 	}
 
 
@@ -1597,6 +1600,8 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->hist1norm, 0, 500, 0, 100, btag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "burstnormhist1ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->hist5norm, 0, 500, 0, 500, btag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "burstnormhist5ms", reftag);
+
+	graphbase->Add(GraphDat(&haz5norm, 0, 500, 0, 0.2, tag + "Norm Haz 5ms", 1, 5, colour + shift), reftag + "normhaz5ms", reftag);
 
 	(*graphbase)[reftag + "rate1s"]->synchx = false;
 	(*graphbase)[reftag + "spikes1ms"]->synchx = false;

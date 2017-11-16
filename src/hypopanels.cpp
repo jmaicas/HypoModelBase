@@ -156,14 +156,23 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	// plot type selection
 	typeset = TypeSet();
 	typeset.Add("Line", 5);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Line with X data", 2);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Line with Sampling", 6);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Scatter with Sampling", 8);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Bar", 7);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Histogram", 1);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Spike Rate", 3);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Bar with X data", 9);
+	diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Scatter with X data", 10);
+	diagbox->Write(typeset.List());
 
 	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), typeset.numtypes, typeset.names);
 	typechoice->SetSelection(typeset.GetIndex(graph->type));
@@ -356,6 +365,10 @@ void GraphBox::OnChoice(wxCommandEvent& event)
 	graph->type = typeset.GetType(selection);
 	//status->SetLabel(text.Format("Type %d", typeset.GetType(selection)));
 	graphwin->UpdateScroll();
+
+	diagbox->Write(typeset.List());
+
+	diagbox->Write(text.Format("Choice Select %d Type %d", selection, typeset.GetType(selection)));
 }
 
 

@@ -271,7 +271,7 @@ public:
 	datdouble hist1norm;
 	datdouble hist5norm;
 	//datdouble haz1norm;
-	//datdouble haz5norm;
+	datdouble haz5norm;
 
 	datint srate;
 	datint srate1;
@@ -488,9 +488,9 @@ class TypeSet
 {
 public:
 	int numtypes;
-	int refindex[10];
-	int typeindex[10];
-	wxString names[10];
+	int refindex[20];
+	int typeindex[20];
+	wxString names[20];
 
 	TypeSet() {
 		numtypes = 0; 
@@ -499,6 +499,7 @@ public:
 	void Add(wxString, int);
 	int GetIndex(int);
 	int GetType(int);
+	wxString List();
 };
 
 

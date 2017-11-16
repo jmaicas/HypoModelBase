@@ -150,7 +150,7 @@ SpikeDat::SpikeDat()
 	hist1norm.setsize(10000);
 	hist5norm.setsize(10000);
 	//haz1norm.setsize(10000);
-	//haz5norm.setsize(10000);
+	haz5norm.setsize(10000);
 
 	srate.setsize(100000);
 	srate1.setsize(1000000);
@@ -363,6 +363,18 @@ int TypeSet::GetIndex(int type)
 int TypeSet::GetType(int ref)
 {
 	return typeindex[ref];
+}
+
+
+wxString TypeSet::List()
+{
+	wxString list, text;
+	int i;
+
+	list = "";
+	for(i=0; i<numtypes; i++) 
+		list = list + text.Format("Index %d Type %d Name %s\n", i, typeindex[i], names[i]); 
+	return list;
 }
 
 

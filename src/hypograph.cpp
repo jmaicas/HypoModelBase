@@ -898,6 +898,9 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		*/
 
+		mainwin->diagbox->Write(text.Format("Graph %d %s type %d\n", gdisp, gname, gtype)); 
+
+
 		if(gtype == 1) {                             // scaled width bars, Histogram    
 			for(i=0; i<(xto - xfrom); i++) {
 				if(gpar == -1) y = (double)gdata[i + (int)xfrom];
