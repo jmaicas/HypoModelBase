@@ -130,6 +130,11 @@ void GraphWindow3::PrintEPS()
 		out.WriteLine(text.Format("gsave"));
 
 
+		// Diagnostics
+		//
+		//mainwin->diagbox->Write(text.Format("EPS xfrom %.2f xto %.2f xplot %d xrange %.4f xbase %.2f\n", xfrom, xto, xplot, xrange, xbase));
+
+
 		if(graph->clipmode) {
 			out.WriteLine("newpath");
 			out.MoveTo(xbase, ybase);
@@ -170,8 +175,8 @@ void GraphWindow3::PrintEPS()
 		if(gtype == 1) {                             // scaled width bars, Histogram    
 			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 0, histogram\n"));
 			histbargap = 1.5;
-			if(xrange < 3) histbargap = 0;
 			if(xrange < 5) histbargap = 1;
+			if(xrange < 3) histbargap = 0;
 			//out.WriteLine("0.5 setlinewidth");
 
 			for(i=0; i<(xto - xfrom); i++) {
@@ -209,8 +214,8 @@ void GraphWindow3::PrintEPS()
 			int spikestep = 0;
 			int burstcolour = 0;
 			histbargap = 1.5;
-			if(xrange < 3) histbargap = 0;
 			if(xrange < 5) histbargap = 1;
+			if(xrange < 3) histbargap = 0;
 			//out.WriteLine("0.5 setlinewidth");
 
 			for(i=0; i<(xto - xfrom); i++) {
@@ -250,7 +255,7 @@ void GraphWindow3::PrintEPS()
 						out.SetColour(ColourString(colourpen[green]));
 				}
 
-				xpos = i * xrange + xbase;
+				xpos = (double)i * xrange + xbase;
 				out.WriteLine("newpath");
 				out.MoveTo(xpos, ybase);
 				out.LineTo(xpos, ybase + yrange * (y - yfrom));
@@ -430,7 +435,8 @@ void GraphWindow3::PrintEPS()
 		out.WriteLine(text.Format("grestore"));
 	}
 
-	out.WriteLine(text.Format("/Helvetica findfont %.2f scalefont setfont", graph->labelfontsize));
+	//out.WriteLine(text.Format("/Helvetica findfont %.2f scalefont setfont", graph->labelfontsize));
+	out.WriteLine(text.Format("/Arial findfont %.2f scalefont setfont", graph->labelfontsize));
 
 	// Draw Axes
 
