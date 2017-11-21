@@ -1086,7 +1086,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (int)(xval - xfrom) * xrange;
 					barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
-					barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
+					barpos = xbase + xpos - barshift + gdisp * (barwidth + bargap);
 					y = (*gdatadv)[i];
 					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
 					dc.SetPen(colourpen[colour]);

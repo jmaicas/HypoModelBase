@@ -415,7 +415,7 @@ void GraphWindow3::PrintEPS()
 				if(xval >= xfrom && xval <= xto) {
 					xpos = (xval - xfrom) * xrange;
 					barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
-					barpos = xbase + xpos - barshift + gplot * (barwidth + bargap);
+					barpos = xbase + xpos - barshift + gdisp * (barwidth + bargap);
 					y = (*gdatadv)[i];
 
 					out.WriteLine("newpath");
