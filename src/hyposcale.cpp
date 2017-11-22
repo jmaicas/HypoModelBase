@@ -40,6 +40,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	binrestog1 = 0;
 	binrestog2 = 0;
 	overtog = 0;
+	overtog2 = 0;
 	vmhflag = 0;
 	nettog = 0;
 	timeres = 0;
@@ -137,8 +138,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 		gsync[i] = NULL;
 		if(boxtype == modVMN) {
-			gsync[i] = new wxCheckBox(panel, i, "Sync");
-			psetbox->Add(gsync[i], 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 2);
+			//gsync[i] = new wxCheckBox(panel, i, "Sync");
+			//psetbox->Add(gsync[i], 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 2);
 		}
 
 		vbox->Add(psetbox, 1, wxALIGN_CENTRE_HORIZONTAL, 0);
@@ -398,8 +399,23 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 					ScaleButton(ID_position, "Pos", 35, hbox);
 				}
 				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				overpan1 = 1;
-				overpan2 = 2;
+				overpan1 = 2;
+				overpan2 = 3;
+			}
+			if(i == 4) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay2, "Ovl", 43, hbox);
+					ScaleButton(ID_position2, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay2, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position2, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				overpan3 = 4;
+				overpan4 = 5;
 			}
 
 			/*
@@ -492,7 +508,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(ID_secretion, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSecMode));
 	Connect(ID_dendmode, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnDendMode));
 	Connect(ID_overlay, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
+	Connect(ID_overlay2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
 	Connect(ID_position, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
+	Connect(ID_position2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
 	Connect(ID_xscale, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXScale));
 
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSpikes));
@@ -875,6 +893,21 @@ void ScaleBox::OnGraphButton(wxCommandEvent& event)
 	else (*gflags)[tag] = 0;
 
 	mainwin->diagbox->Write(text.Format("graphbutton %s %.0f", tag, (*gflags)[tag]));
+
+	GraphSwitch();
+}
+
+
+void ScaleBox::GraphCommand(int commid)
+{
+	wxString text;
+	int id = commid;
+	wxString tag = gflagrefs->GetRef(id);
+
+	if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
+	else (*gflags)[tag] = 0;
+
+	mainwin->diagbox->Write(text.Format("graphcommand %s %.0f", tag, (*gflags)[tag]));
 
 	GraphSwitch();
 }
@@ -1387,14 +1420,25 @@ void ScaleBox::PanelUpdate()
 }
 
 
-void ScaleBox::OnOverlay(wxCommandEvent& WXUNUSED(event))
+void ScaleBox::OnOverlay(wxCommandEvent& event)
 {
-	short pan1 = overpan1;  // 1
-	short pan2 = overpan2;  // 2
-	//if(boxtype = modHeat) {pan1 = 0; pan2 = 1;}
-	//if(boxtype = modOxy) {pan1 = 2; pan2 = 3;}
+	int pan1, pan2;
+	int toggle;
 
-	if(!overtog) {	
+	if(event.GetId() == ID_overlay) {
+		pan1 = overpan1;  
+		pan2 = overpan2;
+		toggle = overtog;
+		overtog = 1 - overtog;
+	}
+	else {
+		pan1 = overpan3;
+		pan2 = overpan4;
+		toggle = overtog2;
+		overtog2 = 1 - overtog2;
+	}
+	
+	if(!toggle) {	
 		GraphDisp *pos = graphwin[pan1]->dispset[0];
 		graph = pos->plot[0];
 		graphwin[pan2]->AddGraph(pos);
@@ -1408,14 +1452,14 @@ void ScaleBox::OnOverlay(wxCommandEvent& WXUNUSED(event))
 		graphwin[pan2]->numdisps--;
 		graphwin[pan1]->AddGraph(graphwin[pan2]->dispset[graphwin[pan2]->numdisps]);	
 	}	
-	overtog = 1 - overtog;
-	snum.Printf("overlay = %d", overtog);
-	mainwin->SetStatusText(snum);
+	//overtog = 1 - overtog;
+	//snum.Printf("overlay = %d", overtog);
+	//mainwin->SetStatusText(snum);
 	ScaleUpdate();
 }
 
 
-void ScaleBox::OnPosition(wxCommandEvent& WXUNUSED(event))
+void ScaleBox::OnPosition(wxCommandEvent& event)
 {
 	if(graphwin[overpan1]->numdisps > 1) {
 		GraphDisp *pos = graphwin[overpan1]->dispset[0];

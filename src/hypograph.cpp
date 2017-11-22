@@ -200,6 +200,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	Connect(ID_GraphRemove, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphRemove));
 	Connect(ID_GraphPrint, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphPrint));
 	Connect(ID_GraphEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphEPS));
+	Connect(ID_MultiEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnMultiEPS));
 	Connect(ID_Scale, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnScale));
 	Connect(ID_UnZoom, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnUnZoom));
 }
@@ -234,6 +235,12 @@ void GraphWindow3::OnGraphRemove(wxCommandEvent& event)
 void GraphWindow3::OnGraphEPS(wxCommandEvent& event)
 {
 	PrintEPS();
+}
+
+
+void GraphWindow3::OnMultiEPS(wxCommandEvent& event)
+{
+	MultiEPS();
 }
 
 void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
@@ -458,6 +465,7 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 		//menuPlot->Append(ID_GraphRemove, "Delete Graph");
 		//menuPlot->Append(ID_GraphPrint, "Print Graph");
 		menuPlot->Append(ID_GraphEPS, "Export EPS");
+		menuPlot->Append(ID_MultiEPS, "Multi EPS");
 		menuPlot->Append(ID_Scale, "Plot Panel");
 		menuPlot->Append(ID_UnZoom, "Zoom Undo");
 		menuPlot->AppendSeparator();
@@ -898,7 +906,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		*/
 
-		mainwin->diagbox->Write(text.Format("Graph %d %s type %d\n", gdisp, gname, gtype)); 
+		//mainwin->diagbox->Write(text.Format("Graph %d %s type %d\n", gdisp, gname, gtype)); 
 
 
 		if(gtype == 1) {                             // scaled width bars, Histogram    

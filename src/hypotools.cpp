@@ -72,6 +72,18 @@ TextGrid::~TextGrid()
 }
 
 
+double TextGrid::ReadDouble(int row, int col)
+{
+	double celldata;
+
+	wxString celltext = GetCell(row, col);
+	celltext.Trim();
+	if(!celltext.IsEmpty()) celltext.ToDouble(&celldata);
+	else return 0;
+	return celldata;
+}
+
+
 wxString TextGrid::GetCell(int row, int col)
 {
 	int numrows = GetNumberRows();

@@ -100,10 +100,12 @@ public:
 	void OnGraphRemove(wxCommandEvent& event);
 	void OnGraphPrint(wxCommandEvent& event);
 	void OnGraphEPS(wxCommandEvent& event);
+	void OnMultiEPS(wxCommandEvent& event);
 	void OnScale(wxCommandEvent& event);
 	void OnUnZoom(wxCommandEvent& event);
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
-	void PrintEPS();
+	void PrintEPS(double xbase = -1, double ybase = -1, TextFile *ofp = NULL);
+	void MultiEPS();
 	wxRealPoint GraphPos(wxPoint);
 };
 
@@ -171,7 +173,7 @@ public:
 	int buttonheight;
 	int i, g, numgraphs, startgraph, modesum;
 	int hazmode1, hazmode2, binrestog1, binrestog2;
-	int overtog;
+	int overtog, overtog2;
 	int timeres;
 	int rateres;
 	int vmhflag, nettog;
@@ -194,7 +196,7 @@ public:
 	int synchcon;
 
 	int xmin, xmax, ymin, ymax;
-	int overpan1, overpan2;
+	int overpan1, overpan2, overpan3, overpan4;
 
 	wxString snum, redtag, text;
 	wxFont boxfont, confont;
@@ -250,6 +252,7 @@ public:
 	void OnXScale(wxCommandEvent& event);
 
 	void OnGraphButton(wxCommandEvent& event);   // New general button system
+	void GraphCommand(int id);
 
 	//void OnClose(wxCloseEvent& event);
 	//void GSwitch(int mod = 0);

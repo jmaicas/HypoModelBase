@@ -57,6 +57,8 @@ public:
 	ScaleBox *scalebox;
 
 	DatStore *recdata;
+	OutBox *outbox;
+	CellBox *cellbox;
 
 	Model(int, wxString, HypoMain *);
 	virtual ~Model();
