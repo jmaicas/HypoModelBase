@@ -558,7 +558,10 @@ public:
 	int burstdisp;
 	int xlabels, ylabels; 
 	double xstep, ystep;
-	int xtickmode, ytickmode;
+	int xtickmode, ytickmode;         
+	int xlabelplaces, ylabelplaces;        // -1 for automatic
+	int xlabelmode, ylabelmode;            // New November 2017  0 - none | 1 - normal | 2 - only end labels
+	double xticklength, yticklength;
 	double plotstroke;
 	wxColour strokecolour, fillcolour;
 	int xplot, yplot;

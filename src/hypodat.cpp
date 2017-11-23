@@ -642,6 +642,13 @@ void GraphDat::Init()
 	highstop = 0;
 	highcolour = red;
 	oldset = false;
+
+	xlabelmode = 1;
+	ylabelmode = 1;
+	xticklength = 5;
+	yticklength = 5;
+	xlabelplaces = -1;
+	ylabelplaces = -1;
 }
 
 

@@ -122,6 +122,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	int gplot, gdisp, colour;
 	double barwidth, bargap;
 	int gtitle;
+	int xlabelmode, ylabelmode;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -195,6 +196,8 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		barwidth = graph->barwidth;
 		bargap = graph->bargap;
 		gtitle = 0;
+		xlabelmode = 2;
+		ylabelmode = 2;
 
 		//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
 		//xto = xto - xstart;
@@ -577,6 +580,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	// Draw Tick Labels
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
+		if(xlabelmode == 2 && i > 0 && i < xlabels) break;
 		out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
@@ -596,15 +600,19 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 
 	out->WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
+		if(ylabelmode == 2 && i > 0 && i < ylabels) break;
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
 		yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;
 		if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
 		srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
-		if(srangey < 0.1) snum.Printf("%.3f", yval);
-		else if(srangey < 1) snum.Printf("%.2f", yval);
-		else if(srangey < 10) snum.Printf("%.1f", yval);
-		else snum.Printf("%.0f", yval);
+		if(graph->ylabelplaces == -1) {
+			if(srangey < 0.1) snum.Printf("%.3f", yval);
+			else if(srangey < 1) snum.Printf("%.2f", yval);
+			else if(srangey < 10) snum.Printf("%.1f", yval);
+			else snum.Printf("%.0f", yval);
+		}
+		else snum = numstring(yval, graph->ylabelplaces);
 		out->MoveTo(xbase - xylab, ybase + ycoord - 2.75);
 		out->WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));
 	}
