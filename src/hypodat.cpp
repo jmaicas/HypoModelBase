@@ -628,8 +628,8 @@ void GraphDat::Init()
 	strokecolour.Set(0, 0, 0);
 	xtag = "X";
 	ytag = "Y";
-	xlabelgap = 40;
-	ylabelgap = 30;
+	xlabelgap = 30; //40;
+	ylabelgap = 20; //30;
 	labelfontsize = 10;
 	tickfontsize = 10;
 	clipmode = 0;

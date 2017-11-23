@@ -580,7 +580,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	// Draw Tick Labels
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
-		if(xlabelmode == 2 && i > 0 && i < xlabels) break;
+		if(xlabelmode == 2 && i > 0 && i < xlabels) continue;
 		out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
@@ -602,7 +602,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	for(i=0; i<=ylabels; i+=1) {
 		mod->diagbox->Write(text.Format("ylabels %d %d\n", ylabels, i));
 		if(ylabelmode == 2 && i > 0 && i < ylabels) {
-			mod->diagbox->Write("break\n");
+			//mod->diagbox->Write("break\n");
 			continue;
 		}
 		ycoord = i * yplot / ylabels;
