@@ -600,7 +600,11 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 
 	out->WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
-		if(ylabelmode == 2 && i > 0 && i < ylabels) break;
+		mod->diagbox->Write(text.Format("ylabels %d %d\n", ylabels, i));
+		if(ylabelmode == 2 && i > 0 && i < ylabels) {
+			mod->diagbox->Write("break\n");
+			continue;
+		}
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
 		yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;

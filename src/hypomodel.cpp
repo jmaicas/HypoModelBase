@@ -893,6 +893,7 @@ void HypoMain::SpikeModule(Model *mod)
 	mod->graphbase->GetGraph(gtag)->xcount = 7;  
 	mod->graphbase->GetGraph(gtag)->synchx = false; 
 	mod->graphbase->GetGraph(gtag)->barshift  = 20;
+	mod->graphbase->GetGraph(gtag)->ylabelplaces  = 0;
 }
 
 
