@@ -1004,7 +1004,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 //}
 
 // Makes Calculation for histograms and hazard
-
+// after recieving data of number of spikes and spiketimes
 void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams) 
 {
 	int i;

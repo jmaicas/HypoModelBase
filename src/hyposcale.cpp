@@ -479,6 +479,59 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				overpan1 = 1;
 				overpan2 = 2;
 			}
+		}
+
+		if(boxtype == modOxyNet) {
+			if(i == 0) {
+				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+				wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
+
+				if(ostype == Mac) {
+					ScaleButton(ID_spikes, "Sp", 40, resbox);   
+					ScaleButton(ID_rateres, "Ra", 40, resbox); 
+					GraphButton("nettog", 0, ID_net, "Net", 43, modebox);
+				}
+				else {
+					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
+					resbox->AddSpacer(2);
+					ScaleButton(ID_rateres, "Rate", 37, resbox); 
+					
+					GraphButton("nettog", 0, ID_net, "Net", 37, modebox);
+				}
+				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				vbox->Add(modebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+
+			}
+			if(i == 1) {
+				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+				if(ostype == Mac) {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+				}
+				else {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+				}		
+				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+			if(i == 2) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				overpan1 = 1;
+				overpan2 = 2;
+			}
+		}
 
 			/*
 			if(i == 2) {		
@@ -506,7 +559,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			vbox->Add(secbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}*/
-		}
+		
 	}
 
 
