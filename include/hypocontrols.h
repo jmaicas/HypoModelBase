@@ -49,6 +49,22 @@ public:
 };
 
 
+class ToolText: public wxStaticText
+{
+public:
+	DiagBox *diagbox;
+	ToolBox *toolbox;
+	wxString text;
+
+	virtual void OnLeftClick(wxMouseEvent & event);
+	void OnLeftDClick(wxMouseEvent & event);
+	void OnRightDClick(wxMouseEvent & event);
+	void OnMouseMove(wxMouseEvent & event);
+
+	ToolText(ToolBox *tbox, wxString label, const wxPoint& pos, const wxSize& size, long style);
+};
+
+
 class ToolButton: public wxButton
 {
 public:
@@ -79,7 +95,7 @@ public:
 	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxNotebook *notebook, const wxPoint& pos, const wxSize& size);
-  ToolPanel(MainFrame *main, wxWindow *parent);
+	ToolPanel(MainFrame *main, wxWindow *parent);
 };
 
 
@@ -90,6 +106,7 @@ public:
 	//Model *mod;
 	ToolSet *toolset;
 	//ParamBox **mainlink;
+	DiagBox *diagbox;
 	
 	int i;
 	int buttonheight;
@@ -235,7 +252,7 @@ public:
 	wxTextCtrl *numbox;
 	wxSpinButton *spin;
 	wxBoxSizer *sizer;
-	wxStaticText *label;
+	ToolText *label;
 	wxString snum;
 	wxString name;
 	wxString plabel;

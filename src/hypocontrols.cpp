@@ -163,7 +163,7 @@ ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxStrin
 	max = 1000;                    // Text version needs min and max set for use with GetParams()
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
-	label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+	label = new ToolText(panel->toolbox, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
 	numbox = new wxTextCtrl(this, wxID_ANY, initval, wxDefaultPosition, wxSize(numwidth, -1), wxTE_PROCESS_ENTER);
 
 	label->SetFont(textfont);
@@ -226,7 +226,7 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 		labelwidth = 0;
 	}
 	else {
-		label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+		label = new ToolText(panel->toolbox, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
 		label->SetFont(textfont);
 		if(ostype == Mac && labelwidth < 40) label->SetFont(smalltextfont);
 		sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
@@ -431,7 +431,7 @@ ParamCon *ParamSet::AddNum(wxString name, wxString labelname, double initval, in
 
 ParamCon *ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
 {
-	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);																// text
+	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);								   // text
 	ref[name] = numparams;
 	//numparams++;
 
@@ -507,6 +507,52 @@ TextBox::TextBox(wxWindow *parent, wxWindowID id, wxString value, wxPoint pos, w
 	: wxTextCtrl(parent, id, value, pos, size, style)
 {
 	//int i;
+}
+
+
+ToolText::ToolText(ToolBox *tbox, wxString label, const wxPoint& pos, const wxSize& size, long style)
+	: wxStaticText(tbox->activepanel, wxID_ANY, label, pos, size, style)
+{
+	toolbox = tbox;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolText::OnLeftClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolText::OnLeftDClick));
+	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolText::OnRightDClick));
+}
+
+
+void ToolText::OnLeftDClick(wxMouseEvent& event)
+{
+	if(toolbox) {
+		toolbox->pinmode = 1 - toolbox->pinmode;
+		toolbox->diagbox->Write(text.Format("LDClick pin %d\n", toolbox->pinmode));	
+	}
+}
+
+
+void ToolText::OnRightDClick(wxMouseEvent& event)
+{
+	if(toolbox) {
+		toolbox->pinmode = 1 - toolbox->pinmode;
+		toolbox->diagbox->Write(text.Format("RDClick pin %d\n", toolbox->pinmode));
+	}
+}
+
+
+void ToolText::OnLeftClick(wxMouseEvent& event)
+{
+	
+	if(toolbox) toolbox->diagbox->Write("text click\n");
+
+	if(toolbox) toolbox->OnClick(event.GetPosition());
+}
+
+
+void ToolText::OnMouseMove(wxMouseEvent &event)
+{
+	wxPoint pos = event.GetPosition();
+	//snum.Printf("ToolMove X %d Y %d", pos.x, pos.y);
+	//if(mainwin) toolbox->mainwin->SetStatusText(snum);
 }
 
 
@@ -633,7 +679,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 
 	//main->diagbox->Write("ToolBox init\n");
 
-  Init();
+	Init();
 }
 
 
@@ -713,6 +759,7 @@ void ToolBox::Init()
 	SetPosition();
 	pinmode = 1;	
 	ostype = GetSystem();
+	diagbox = mainwin->diagbox;
 	
 	visible = true;
 	status = NULL;
