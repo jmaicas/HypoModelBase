@@ -17,6 +17,7 @@ public:
 	PlotModel *mod;
 	wxCheckBox *synccheck;
 	TextGrid *textgrid;
+	wxString text;
 
 	TagBox *datatag, *datapath;
 	GraphDat *graph;
@@ -25,6 +26,7 @@ public:
 
 	int plotcount;
 	int plotlayer;
+	int graphindex;
 	wxString coltag;
 
 	PlotBox(PlotModel *mod, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size);
