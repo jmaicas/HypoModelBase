@@ -139,10 +139,11 @@ wxString ParamNum::GetValue()
 }
 
 
-ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxString initval, int labelwid, int numwid)               // Stripped down string only version for text entry
+ParamCon::ParamCon(ToolPanel *pan, wxString pname, wxString labelname, wxString initval, int labelwid, int numwid)               // Stripped down string only version for text entry
 {
 	ostype = GetSystem();
-	wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	wxControl::Create(pan, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	panel = pan;
 	name = pname;
 	plabel = labelname;
 	type = textcon;
@@ -150,6 +151,7 @@ ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxStrin
 	numwidth = numwid;
 	pad = panel->controlborder;
 	if(ostype == Mac) pad = 0;
+	
 	mainwin = panel->mainwin;
 	
 	textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
@@ -163,7 +165,7 @@ ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxStrin
 	max = 1000;                    // Text version needs min and max set for use with GetParams()
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
-	label = new ToolText(panel->toolbox, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+	label = new ToolText(this, panel->toolbox, name, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
 	numbox = new wxTextCtrl(this, wxID_ANY, initval, wxDefaultPosition, wxSize(numwidth, -1), wxTE_PROCESS_ENTER);
 
 	label->SetFont(textfont);
@@ -181,12 +183,12 @@ ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxStrin
 }
 
 
-ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname, double initval, double step, int places, int labelwid, int numwid)
+ParamCon::ParamCon(ToolPanel *pan, int tp, wxString pname, wxString labelname, double initval, double step, int places, int labelwid, int numwid)
 {
 	//mainwin = main;
 	//wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxSize(250, 30), wxBORDER_NONE, wxDefaultValidator, name);
 	ostype = GetSystem();
-	wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+	wxControl::Create(pan, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	numstep = step;
 	name = pname;
 	plabel = labelname;
@@ -194,6 +196,7 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	type = tp;
 	labelwidth = labelwid;
 	numwidth = numwid;
+	panel = pan;
 	pad = panel->controlborder;
 	//pad = 0;
 	if(ostype == Mac) pad = 0;
@@ -226,7 +229,7 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 		labelwidth = 0;
 	}
 	else {
-		label = new ToolText(panel->toolbox, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
+		label = new ToolText(this, panel->toolbox, name, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
 		label->SetFont(textfont);
 		if(ostype == Mac && labelwidth < 40) label->SetFont(smalltextfont);
 		sizer->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, pad);
@@ -251,6 +254,12 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	Connect(wxEVT_SPIN_UP, wxSpinEventHandler(ParamCon::OnSpinUp));
 	Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(ParamCon::OnSpinDown));
 	Connect(wxEVT_SPIN, wxSpinEventHandler(ParamCon::OnSpin));
+}
+
+
+void ParamCon::Select()
+{
+	panel->toolbox->TextClick(name);
 }
 
 
@@ -510,10 +519,11 @@ TextBox::TextBox(wxWindow *parent, wxWindowID id, wxString value, wxPoint pos, w
 }
 
 
-ToolText::ToolText(ToolBox *tbox, wxString label, const wxPoint& pos, const wxSize& size, long style)
-	: wxStaticText(tbox->activepanel, wxID_ANY, label, pos, size, style)
+ToolText::ToolText(wxWindow *parent, ToolBox *tbox, wxString ptag, wxString label, const wxPoint& pos, const wxSize& size, long style)
+	: wxStaticText(parent, wxID_ANY, label, pos, size, style)
 {
 	toolbox = tbox;
+	tag = ptag;
 
 	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolText::OnLeftClick));
 	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolText::OnLeftDClick));
@@ -541,10 +551,11 @@ void ToolText::OnRightDClick(wxMouseEvent& event)
 
 void ToolText::OnLeftClick(wxMouseEvent& event)
 {
-	
-	if(toolbox) toolbox->diagbox->Write("text click\n");
-
-	if(toolbox) toolbox->OnClick(event.GetPosition());
+	if(toolbox) {
+		toolbox->diagbox->Write("text click\n");
+		toolbox->OnClick(event.GetPosition());
+		toolbox->TextClick(tag);
+	}
 }
 
 
@@ -556,11 +567,11 @@ void ToolText::OnMouseMove(wxMouseEvent &event)
 }
 
 
-ToolPanel::ToolPanel(MainFrame *main, wxWindow *parent)
+ToolPanel::ToolPanel(ToolBox *tbox, wxWindow *parent)
 	: wxPanel(parent, wxID_ANY)
 {
-	mainwin = main;
-	toolbox = NULL;
+	toolbox = tbox;
+	mainwin = toolbox->mainwin;
 	controlborder = 2;
 }
 
@@ -877,6 +888,12 @@ wxToggleButton *ToolBox::ToggleButton(int id, wxString label, int width, wxBoxSi
 
 void ToolBox::OnToggle(wxCommandEvent& event)
 {}
+
+
+void ToolBox::TextClick(wxString tag)
+{
+	diagbox->Write("toolbox textclick\n");
+}
 
 
 void ToolSet::AddBox(ToolBox *newbox, bool serve, bool child) {

@@ -15,12 +15,12 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
 	wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
 
-	ToolPanel *antipanel = new ToolPanel(mainwin, tabpanel);
+	ToolPanel *antipanel = new ToolPanel(this, tabpanel);
 	antipanel->SetFont(boxfont);
 	wxBoxSizer *antibox = new wxBoxSizer(wxVERTICAL);
 	antipanel->SetSizer(antibox);
 
-	ToolPanel *inputpanel = new ToolPanel(mainwin, tabpanel);
+	ToolPanel *inputpanel = new ToolPanel(this, tabpanel);
 	inputpanel->SetFont(boxfont);
 	wxBoxSizer *inputsizer = new wxBoxSizer(wxVERTICAL);
 	inputpanel->SetSizer(inputsizer);
@@ -73,7 +73,7 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 
 	// Synaptic Panel
 
-	ToolPanel *synpanel = new ToolPanel(mainwin, tabpanel);
+	ToolPanel *synpanel = new ToolPanel(this, tabpanel);
 	synpanel->SetFont(boxfont);
 	wxBoxSizer *synbox = new wxBoxSizer(wxVERTICAL);
 	synpanel->SetSizer(synbox);
@@ -133,7 +133,7 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 
 	// Injection Panel
 
-	ToolPanel *osmopanel = new ToolPanel(mainwin, tabpanel);
+	ToolPanel *osmopanel = new ToolPanel(this, tabpanel);
 	osmopanel->SetFont(boxfont);
 	wxBoxSizer *osmopansizer = new wxBoxSizer(wxVERTICAL);
 	osmopanel->SetSizer(osmopansizer);

@@ -25,6 +25,7 @@ public:
 
 	int plotcount;
 	int plotlayer;
+	wxString coltag;
 
 	PlotBox(PlotModel *mod, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//~PlotBox();
@@ -37,6 +38,8 @@ public:
 	void LoadData(FileDat *);
 	void LoadTxt(FileDat *);
 	void SetGraph(GraphWindow3 *);
+	void TextClick(wxString tag);
+	void SetColumn(int col);
 };
 
 

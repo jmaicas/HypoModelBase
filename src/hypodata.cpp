@@ -44,7 +44,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
 	wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
 
-	ToolPanel *analysispanel = new ToolPanel(mainwin, tabpanel);
+	ToolPanel *analysispanel = new ToolPanel(this, tabpanel);
 	analysispanel->SetFont(boxfont);
 	wxBoxSizer *analysisbox = new wxBoxSizer(wxVERTICAL);
 	analysispanel->SetSizer(analysisbox);
@@ -72,7 +72,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 
 	//
 
-	ToolPanel *selectpanel = new ToolPanel(mainwin, tabpanel);
+	ToolPanel *selectpanel = new ToolPanel(this, tabpanel);
 	selectpanel->SetFont(boxfont);
 	wxBoxSizer *selectbox = new wxBoxSizer(wxVERTICAL);
 	selectpanel->SetSizer(selectbox);
@@ -180,7 +180,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 
 	// Data Loading 
 
-	ToolPanel *loadpanel = new ToolPanel(mainwin, tabpanel);
+	ToolPanel *loadpanel = new ToolPanel(this, tabpanel);
 	loadpanel->SetFont(boxfont);
 	wxBoxSizer *loadbox = new wxBoxSizer(wxVERTICAL);
 	loadpanel->SetSizer(loadbox);

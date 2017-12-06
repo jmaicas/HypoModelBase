@@ -55,13 +55,15 @@ public:
 	DiagBox *diagbox;
 	ToolBox *toolbox;
 	wxString text;
+	wxString tag;
+	//int conID;
 
 	virtual void OnLeftClick(wxMouseEvent & event);
 	void OnLeftDClick(wxMouseEvent & event);
 	void OnRightDClick(wxMouseEvent & event);
 	void OnMouseMove(wxMouseEvent & event);
 
-	ToolText(ToolBox *tbox, wxString label, const wxPoint& pos, const wxSize& size, long style);
+	ToolText(wxWindow *parent, ToolBox *tbox, wxString tag, wxString label, const wxPoint& pos, const wxSize& size, long style);
 };
 
 
@@ -95,7 +97,7 @@ public:
 	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxNotebook *notebook, const wxPoint& pos, const wxSize& size);
-	ToolPanel(MainFrame *main, wxWindow *parent);
+	ToolPanel(ToolBox *tbox, wxWindow *parent);
 };
 
 
@@ -166,6 +168,7 @@ public:
 	} 
 
 	virtual void OnToggle(wxCommandEvent& event);
+	virtual void TextClick(wxString tag);
 };
 
 
@@ -258,6 +261,7 @@ public:
 	wxString plabel;
 	double value, oldvalue;
 	MainFrame *mainwin;
+	ToolPanel *panel;
 	
 	double numstep;
 	int decimals;
@@ -274,6 +278,7 @@ public:
 	void SetPen(wxColour);
 	void SetValue(wxString);
 	void SetMinMax(double min, double max);
+	void Select();
 	
 protected:
 	virtual wxSize DoGetBestSize() const;
