@@ -657,6 +657,7 @@ GraphDisp::GraphDisp()
 	numplots = 0;
 	currentplot = 0;
 	spikedisp = 0;
+	plotset = NULL;
 }
 
 
@@ -781,6 +782,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 
 	newgraph.diagbox = mainwin->diagbox;
 	newgraph.strokecolour = mainwin->colourpen[newgraph.colour];
+	newgraph.gtag = tag;
 
 	// If single graph, create new single graph set, otherwise add to set 'settag'
 	if(set) {

@@ -503,6 +503,35 @@ public:
 };
 
 
+class PlotDat: public ModDat
+{
+public:
+	wxString gtag;
+	int ycol;
+	int xcol;
+	int gtype;
+
+	PlotDat(wxString, int, int, int);
+	wxString StoreDat(int);
+};
+
+
+class PlotSet
+{
+public:
+	int plotcount;
+	vector<PlotDat>plotdata;
+	int dispindex;
+
+	PlotSet() {
+		plotcount = 0;
+	};
+
+	void AddPlot(PlotDat);
+	int SetPlot(int, PlotDat);
+};
+
+
 class GraphDat{                               // Basic single graph class
 public:
 	GraphDat();
@@ -532,6 +561,7 @@ public:
 	double oldyfrom, oldyto, oldxfrom, oldxto;
 	double binsize;
 	wxString gname;
+	wxString gtag;
 	wxString xtag, ytag;
 	int samprate;    // 0 for no limit
 	int xstop;
@@ -735,6 +765,7 @@ public:
 	int sdex;
 	int maxplots;
 	//BurstDat *burstdata;
+	PlotSet *plotset;
 	
 	GraphDisp();
 	void Add(GraphDat *);
