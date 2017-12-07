@@ -804,6 +804,8 @@ void ScaleBox::OnYZoomIn(wxCommandEvent& event)
 		graph->yfrom = graph->yfrom + diff / 4;
 	}
 	else graph->yto = graph->yto - diff / 2;
+
+	graphwin[pos]->XYSynch();
 	synchcon = startgraph + pos;
 	mainwin->SetStatusText("");
 	ScaleUpdate();
@@ -821,6 +823,8 @@ void ScaleBox::OnYZoomOut(wxCommandEvent& event)
 		graph->yfrom = graph->yfrom - diff / 2;
 	}
 	else graph->yto = graph->yto + diff;
+
+	graphwin[pos]->XYSynch();
 	synchcon = startgraph + pos;
 	mainwin->SetStatusText("");
 	ScaleUpdate();
@@ -834,6 +838,8 @@ void ScaleBox::OnXZoomIn(wxCommandEvent& event)
 	graph = graphwin[pos]->dispset[0]->plot[0];
 	double diff = graph->xto - graph->xfrom;
 	graph->xto = graph->xto - diff / 2;
+
+	graphwin[pos]->XYSynch();
 	synchcon = startgraph + pos;
 	mainwin->SetStatusText("");
 	ScaleUpdate();
@@ -843,6 +849,7 @@ void ScaleBox::OnXZoomIn(wxCommandEvent& event)
 void ScaleBox::OnXZoomOut(wxCommandEvent& event)
 {
 	double oldxto; 
+
 	int pos = event.GetId() - 1110;
 	snum.Printf("zoom ID %d", pos);
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
@@ -856,6 +863,8 @@ void ScaleBox::OnXZoomOut(wxCommandEvent& event)
 		graph->xto = oldxto;
 		return;
 	}
+
+	graphwin[pos]->XYSynch();
 	mainwin->SetStatusText("");
 	synchcon = startgraph + pos;
 	ScaleUpdate();
@@ -1374,7 +1383,6 @@ void ScaleBox::PanelUpdate()
 			graph = graphwin[i]->dispset[0]->plot[0];
 			plot0 = graphwin[i]->dispset[0]->plot[0];
 
-
 			if(abs(graph->yto - graph->yfrom) < 10) {
 				snum.Printf("%.2f", graph->yfrom);
 				graphwin[i]->yf->SetValue(snum);
@@ -1387,11 +1395,6 @@ void ScaleBox::PanelUpdate()
 				snum.Printf("%.1f", graph->yto);
 				graphwin[i]->yt->SetValue(snum);
 			}
-
-			/*snum.Printf("%.1f", graph->yfrom);
-			graphwin[i]->yf->SetValue(snum);
-			snum.Printf("%.1f", graph->yto);
-			graphwin[i]->yt->SetValue(snum);*/
 
 			if(abs(graph->xto - graph->xfrom) < 1) {
 				graphwin[i]->xf->SetValue(text.Format("%.3f", graph->xfrom));

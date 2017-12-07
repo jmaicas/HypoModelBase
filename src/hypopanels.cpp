@@ -248,7 +248,6 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 }
 
 
-
 void GraphBox::SetControls()
 {
 	paramset->GetCon("gname")->SetValue(graph->gname);
@@ -281,6 +280,8 @@ void GraphBox::SetControls()
 
 	strokepicker->SetColour(graph->strokecolour);
 	fillpicker->SetColour(graph->fillcolour);
+
+	typechoice->SetSelection(typeset.GetIndex(graph->type));
 }
 
 
@@ -755,6 +756,18 @@ void ParamBox::HistLoad()
 	}
 
 	opfile.Close();	
+}
+
+
+wxBoxSizer *ParamBox::StoreBoxSync(wxString label, wxPanel *storepanel)
+{
+	synccheck = new wxCheckBox(panel, wxID_ANY, "Sync");
+	synccheck->SetValue(true);
+
+	wxBoxSizer *storebox = StoreBox(label, storepanel);
+	storebox->Add(synccheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
+
+	return storebox;
 }
 
 

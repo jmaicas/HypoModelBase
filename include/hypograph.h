@@ -106,6 +106,7 @@ public:
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
 	void PrintEPS(double xbase = -1, double ybase = -1, TextFile *ofp = NULL);
 	void MultiEPS();
+	void XYSynch();
 	wxRealPoint GraphPos(wxPoint);
 };
 

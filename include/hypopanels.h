@@ -118,6 +118,7 @@ public:
 	//wxTextCtrl *paramstoretag;
 	TagBox *paramstoretag;
 	wxTextCtrl *datastoretag;
+	wxCheckBox *synccheck;
 
 	//wxBoxSizer *vbox1;
 	//wxBoxSizer *vbox2;
@@ -160,6 +161,7 @@ public:
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
 	wxBoxSizer *StoreBox(wxString label="", wxPanel *storepanel=NULL);
+	wxBoxSizer *StoreBoxSync(wxString label="", wxPanel *storepanel=NULL);
 	ParamStore *GetParams(ParamStore *pstore=NULL);
 	ParamStore *GetNumParams();
 	void ParamLayout(int columns=1);

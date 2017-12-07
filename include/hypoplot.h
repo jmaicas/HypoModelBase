@@ -15,7 +15,6 @@ class PlotBox: public ParamBox
 {
 public:
 	PlotModel *mod;
-	wxCheckBox *synccheck;
 	TextGrid *textgrid;
 	wxString text;
 
@@ -42,6 +41,8 @@ public:
 	void SetGraph(GraphWindow3 *);
 	void TextClick(wxString tag);
 	void SetColumn(int col);
+	void OnParamStore(wxCommandEvent& event);
+	void OnParamLoad(wxCommandEvent& event);
 };
 
 

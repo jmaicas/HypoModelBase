@@ -623,6 +623,14 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 }
 
 
+void GraphWindow3::XYSynch()
+{
+	int i;
+
+	for(i=0; i<numdisps; i++) dispset[i]->XYSynch();
+}
+
+
 void GraphWindow3::ReSize(int newxplot, int newyplot)
 {
 	yplot = newyplot;

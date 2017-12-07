@@ -524,6 +524,7 @@ public:
 	int dispindex;
 
 	PlotSet() {
+		dispindex = 0;
 		plotcount = 0;
 	};
 
