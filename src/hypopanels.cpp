@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 720),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 785),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -75,6 +75,25 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	wxBoxSizer *radbox = new wxBoxSizer(wxHORIZONTAL);
 	radbox->Add(xradbox, 1, wxALL, 5);
 	radbox->Add(yradbox, 1, wxALL, 5);
+
+	// Scale mode controls  December 2017
+	wxStaticBoxSizer *xsmodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Scale Mode");
+	xsrad[0] = new wxRadioButton(panel, 10, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	xsrad[1] = new wxRadioButton(panel, 11, "Log");
+	xsmodebox->Add(xsrad[0], 1, wxTOP | wxBOTTOM, 3);
+	xsmodebox->Add(xsrad[1], 1, wxTOP | wxBOTTOM, 3);
+	xsrad[graph->xscalemode]->SetValue(true);
+
+	wxStaticBoxSizer *ysmodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Scale Mode");
+	ysrad[0] = new wxRadioButton(panel, 12, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	ysrad[1] = new wxRadioButton(panel, 13, "Log");
+	ysmodebox->Add(ysrad[0], 1, wxTOP | wxBOTTOM, 3);
+	ysmodebox->Add(ysrad[1], 1, wxTOP | wxBOTTOM, 3);
+	ysrad[graph->yscalemode]->SetValue(true);
+
+	wxBoxSizer *scalemoderadbox = new wxBoxSizer(wxHORIZONTAL);
+	scalemoderadbox->Add(xsmodebox, 1, wxALL, 5);
+	scalemoderadbox->Add(ysmodebox, 1, wxALL, 5);
 
 	numwidth = 50;
 
@@ -156,22 +175,24 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	// plot type selection
 	typeset = TypeSet();
 	typeset.Add("Line", 5);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Line with X data", 2);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Line with Sampling", 6);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Scatter with Sampling", 8);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Bar", 7);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Histogram", 1);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Spike Rate", 3);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Bar with X data", 9);
-	diagbox->Write(typeset.List() + "\n");
+	//diagbox->Write(typeset.List() + "\n");
 	typeset.Add("Scatter with X data", 10);
+	//diagbox->Write(typeset.List());
+	typeset.Add("Mean field plot", 11);
 	diagbox->Write(typeset.List());
 
 	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), typeset.numtypes, typeset.names);
@@ -208,6 +229,8 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(tickparams, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(radbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(scalemoderadbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(plotparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddStretchSpacer();
@@ -364,6 +387,7 @@ void GraphBox::OnChoice(wxCommandEvent& event)
 	//graph = graphwin->dispset[0]->plot[0];
 	int selection = typechoice->GetSelection();
 	graph->type = typeset.GetType(selection);
+	if(graph->plotdata) (*graph->plotdata).gtype = graph->type;
 	//status->SetLabel(text.Format("Type %d", typeset.GetType(selection)));
 	graphwin->UpdateScroll();
 
@@ -375,12 +399,17 @@ void GraphBox::OnChoice(wxCommandEvent& event)
 
 void GraphBox::OnRadio(wxCommandEvent& event)
 {
-	//graph = graphwin->dispset[0]->plot[0];
-
 	if(event.GetId() == 0) graph->xtickmode = 0;
 	if(event.GetId() == 1) graph->xtickmode = 1;
 	if(event.GetId() == 2) graph->ytickmode = 0;
 	if(event.GetId() == 3) graph->ytickmode = 1;
+
+	if(event.GetId() == 10) graph->xscalemode = 0;
+	if(event.GetId() == 11) graph->xscalemode = 1;
+	if(event.GetId() == 12) graph->yscalemode = 0;
+	if(event.GetId() == 13) graph->yscalemode = 1;
+
+	OnOK(event);
 }
 
 
@@ -460,6 +489,9 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	
 	setgraph->xtickmode = graph->xtickmode;
 	setgraph->ytickmode = graph->ytickmode;	
+
+	setgraph->xscalemode = graph->xscalemode;
+	setgraph->yscalemode = graph->yscalemode;	
 }
 
 
@@ -613,7 +645,7 @@ void ParamBox::Initialise()
 
 	paramstoretag = NULL;
 	if(boxtype == 0 || boxtype == 1) {
-		mainwin->diagbox->Write("Store Box initialise\n");
+		mainwin->diagbox->Write(boxname + " Store Box initialise\n");
 		paramstoretag = TextInputCombo(120, 20, "", boxname, mod->GetPath());
 		paramstoretag->Show(false);
 	}
@@ -1111,10 +1143,11 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 	}
 
 	// Param file history
-	if(tag != "default") {
+	if(filetag != "default") {
 		short tagpos = paramstoretag->FindString(filetag);
 		if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
 		paramstoretag->Insert(filetag, 0);
+		diagbox->Write("Insert " + filetag + "\n");
 
 		redtag = "";
 		paramstoretag->SetForegroundColour(blackpen);
@@ -1221,11 +1254,13 @@ void ParamBox::StoreParam(wxString tag)
 	filename = filepath + "/" + filetag + "-" + boxname + "param.dat";
 
 	// Param file history
-	short tagpos = paramstoretag->FindString(filetag);
-	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
-	paramstoretag->Insert(filetag, 0);
+	if(filetag != "default") {
+		short tagpos = paramstoretag->FindString(filetag);
+		if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
+		paramstoretag->Insert(filetag, 0);
+	}
 
-  wxTextFile paramfile(filename);
+	wxTextFile paramfile(filename);
 	//check = paramfile.Open(filename);
 	if(!paramfile.Exists()) paramfile.Create();
 	else if(tag == "" && redtag != filetag) {

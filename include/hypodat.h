@@ -549,6 +549,8 @@ public:
 	datdouble *gdatadv;
 	datint *gdatav;
 	datdouble *gdatax;
+	PlotDat *plotdata;
+
 	int xcount, ycount;
 	int scattermode;
 	int linemode;
@@ -603,6 +605,7 @@ public:
 	int clipmode;
 	bool synchx;
 	int barwidth, barshift, bargap;
+	int xscalemode, yscalemode;
 
 	int highstart, highstop, highcolour;
 

@@ -608,6 +608,8 @@ GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, w
 void GraphDat::Init()
 {
 	diagbox = NULL;
+	plotdata = NULL;
+
 	scrollpos = 0;
 	negscale = 0;
 	xlabels = 0;
@@ -649,6 +651,8 @@ void GraphDat::Init()
 	yticklength = 5;
 	xlabelplaces = -1;
 	ylabelplaces = -1;
+	xscalemode = 0;
+	yscalemode = 0;
 }
 
 

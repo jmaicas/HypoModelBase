@@ -912,6 +912,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		10 - scatter plot with x data
 
+		11 - mean field plot
+
 		*/
 
 		//mainwin->diagbox->Write(text.Format("Graph %d %s type %d\n", gdisp, gname, gtype)); 
@@ -1077,19 +1079,79 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			}
 		}
 
-		if(gtype == 10 && graph->gdatax) {				                            // scatter graph with X data
+		double xlogmax, ylogmax;
+		double xmin, xmax, ymin, ymax, xmid, ymid;
+		int scatterfield = 1;
+		int width, height;
+
+
+		if(gtype == 10 && graph->gdatax) {	           // scatter graph with X data
 			mainwin->diagbox->Write(text.Format("Graph Type 10  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+
+			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom);
 			for(i=0; i<graph->xcount; i++) {
 				xval = (*graph->gdatax)[i];
 				if(xval >= xfrom && xval <= xto) {
-					xpos = (int)((xval - xfrom) * xrange);
-					y = (*gdatadv)[i];
+					if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * log(xval / xfrom) / xlogmax);  // log scaled x-axis  December 2017
+					else xpos = (xval - xfrom) * xrange;
+					yval = (*gdatadv)[i];
+					ypos = (yval - yfrom) * yrange;
+					if(i == 0) {
+						xmin = xpos;
+						xmax = xpos;
+						ymin = ypos;
+						ymax = ypos;
+					}
+					else {
+						if(xpos < xmin) xmin = xpos;
+						if(xpos > xmax) xmax = xpos;
+						if(ypos < ymin) ymin = ypos;
+						if(ypos > ymax) ymax = ypos;
+					}
 					dc.SetPen(colourpen[colour]);
-					dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);			
+					//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (yval - yfrom)), graph->scattersize);	
+					dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - ypos), graph->scattersize);	
 				}
 			}
+
+			if(scatterfield) {
+				xmid = (xmin + xmax) / 2;
+				ymid = (ymin + ymax) / 2;
+				width = (double)(xmax - xmin) * 1.5;
+				height = (double)(ymax - ymin) * 1.5;
+				dc.SetBrush(*wxTRANSPARENT_BRUSH);
+				dc.DrawEllipse((int)(xmid + xbase + xoffset - width/2), (int)(yplot + ybase - ymid - height/2), width, height);
+			}
 		}
+
+		double xfield, yfield;
+
+		if(gtype == 11 && graph->gdatax && graph->xcount > 1) {         // mean field plot - oval with centre at xy mean and xy StdDev dimensions      December 2017
+			mainwin->diagbox->Write(text.Format("Graph Type 11  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
+			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+
+			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom);
+			xval = (*graph->gdatax)[0];
+			yval = (*gdatadv)[0];
+			xfield = (*graph->gdatax)[1];
+			yfield = (*gdatadv)[1];
+			width = xfield * xrange * 2;
+			height = yfield * yrange * 2;
+
+			if(graph->xscalemode == 1 && xfrom > 0) {
+				xpos = (int)((double)xplot * log(xval / xfrom) / xlogmax);  
+				//xfield = 
+			}
+			else xpos = (int)((xval - xfrom) * xrange);
+			dc.SetPen(colourpen[colour]);
+			dc.SetBrush(*wxTRANSPARENT_BRUSH);
+			dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (yval - yfrom)), 10);
+			dc.DrawEllipse((int)(xpos + xbase + xoffset - width), (int)(yplot + ybase - yrange * (yval - yfrom) - height), width*2, height*2);	
+		}
+
+
+		// xrange = (double)xplot / (xto - xfrom);  code copy comment for reference
 
 		int barshift = graph->barshift;
 		int barpos;
@@ -1410,6 +1472,10 @@ void GraphWindow3::OnPaintGC(wxPaintEvent &WXUNUSED(event))
 		if(gpar == -3) gdatav = graph->gdatav;
 		if(gpar == -4) gdatadv = graph->gdatadv;
 		xscale = graph->xscale;
+		if(xscale < 0) {                // use of xscale to switch on log scaling
+			xscale = 1;
+			graph->xscalemode = 1;}
+		else graph->xscalemode = 0;
 		yfrom = graph->yfrom;
 		yto = graph->yto;
 		xfrom = graph->xfrom * xscale;

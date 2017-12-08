@@ -46,6 +46,7 @@ public:
 
 	void HistLoad();
 	void HistStore();
+	void SetLabel(wxString);
 };
 
 

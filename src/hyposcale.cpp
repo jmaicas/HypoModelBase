@@ -982,8 +982,8 @@ void ScaleBox::OnOK(wxCommandEvent& WXUNUSED(event))
 	mainwin->SetStatusText("");
 	for(i=startgraph; i<startgraph+numgraphs; i++) {
 		graph = graphwin[i]->dispset[0]->plot[0];
-		oldxfrom = graph->xfrom;
-		oldxto = graph->xto;
+		//oldxfrom = graph->xfrom;
+		//oldxto = graph->xto;
 		oldxfrom = graphwin[i]->dispset[0]->plot[0]->xfrom;
 		oldxto = graphwin[i]->dispset[0]->plot[0]->xto;
 
@@ -1002,6 +1002,7 @@ void ScaleBox::OnOK(wxCommandEvent& WXUNUSED(event))
 			mainwin->SetStatusText("X To, value out of range, max 100000");
 			graphwin[i]->dispset[0]->plot[0]->xto = oldxto;
 		}
+		graphwin[i]->XYSynch();
 	}
 	snum.Printf("start %d num %d", startgraph, numgraphs);
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);

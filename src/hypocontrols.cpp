@@ -1074,6 +1074,7 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 		readline.Trim();
 		tag = readline;
 		Insert(tag, 0);
+		//diagbox->Write("Insert " + tag + "\n");
 		readline = opfile.ReadLine();
 	}
 
@@ -1106,6 +1107,12 @@ TagBox::~TagBox()
 	opfile.Close();
 }
 
+
+void TagBox::SetLabel(wxString label)
+{
+	wxComboBox::SetLabel(label);
+	diagbox->Write("TagBox SetLabel " + label + "\n");
+}
 
 /*
 void ToolBox::OnLeftDClick(wxMouseEvent& event)
