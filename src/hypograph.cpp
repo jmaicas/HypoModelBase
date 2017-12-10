@@ -1092,7 +1092,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		double xmin, xmax, ymin, ymax, xmid, ymid;
 		int scatterfield = 1;
+		int scattermean = 1;
 		int width, height;
+		double xmean, ymean, xvar, yvar, xsd, ysd;
+		double xsdneg, xsdpos, ysdneg, ysdpos;
 
 
 		if(gtype == 10 && graph->gdatax) {	           // scatter graph with X data and optional range fields
@@ -1100,12 +1103,16 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 
 			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
+			xmean = 0;
+			ymean = 0;
 			for(i=0; i<graph->xcount; i++) {
 				xval = (*graph->gdatax)[i];
+				xmean += xval / graph->xcount;
+				yval = (*gdatadv)[i];
+				ymean += yval / graph->xcount;
 				if(xval >= xfrom && xval <= xto) {
 					if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(logbase)) / xlogmax);  // log scaled x-axis  December 2017
 					else xpos = (xval - xfrom) * xrange;
-					yval = (*gdatadv)[i];
 					ypos = (yval - yfrom) * yrange;
 					if(i == 0) {
 						xmin = xpos;
@@ -1125,12 +1132,43 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				}
 			}
 
+			if(graph->xcount > 0 && scattermean) {
+				xvar = 0;
+				yvar = 0;
+				for(i=0; i<graph->xcount; i++) {
+					xvar += ((*graph->gdatax)[i] - xmean) * ((*graph->gdatax)[i] - xmean);
+					yvar += ((*graph->gdatadv)[i] - ymean) * ((*graph->gdatadv)[i] - ymean);
+				}
+				xsd = sqrt(xvar / graph->xcount);
+				ysd = sqrt(yvar / graph->xcount);
+				if(graph->xscalemode == 1 && xfrom > 0) {
+					xpos = (int)((double)xplot * (log(xmean / xfrom) / log(logbase)) / xlogmax);  
+					xsdneg = (int)((double)xplot * (log((xmean - xsd) / xfrom) / log(logbase)) / xlogmax);
+					xsdpos = (int)((double)xplot * (log((xmean + xsd) / xfrom) / log(logbase)) / xlogmax);  
+				}
+				else {
+					xpos = (xmean - xfrom) * xrange;
+					xsdneg = (xmean - xsd - xfrom) * xrange;
+					xsdpos = (xmean + xsd - xfrom) * xrange;
+				}
+				ypos = (ymean - yfrom) * yrange;
+				ysdneg = (ymean - ysd - yfrom) * yrange;
+				ysdpos = (ymean + ysd - yfrom) * yrange;
+
+				dc.SetPen(colourpen[black]);
+				dc.SetBrush(*wxBLACK_BRUSH);
+				dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - ypos), 3);	
+				dc.DrawLine((int)(xsdneg + xbase + xoffset), (int)(yplot + ybase - ypos), (int)(xsdpos + xbase + xoffset), (int)(yplot + ybase - ypos));
+				dc.DrawLine((int)(xpos + xbase + xoffset), (int)(yplot + ybase - ysdneg), (int)(xpos + xbase + xoffset), (int)(yplot + ybase - ysdpos));
+			}
+
 			if(graph->xcount > 0 && scatterfield) {
 				xmid = (xmin + xmax) / 2;
 				ymid = (ymin + ymax) / 2;
 				width = (double)(xmax - xmin) * 1.5;
 				height = (double)(ymax - ymin) * 1.5;
 				dc.SetBrush(*wxTRANSPARENT_BRUSH);
+				dc.SetPen(colourpen[colour]);
 				dc.DrawEllipse((int)(xmid + xbase + xoffset - width/2), (int)(yplot + ybase - ymid - height/2), width, height);
 			}
 		}
