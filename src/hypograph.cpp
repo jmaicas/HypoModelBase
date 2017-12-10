@@ -5,6 +5,7 @@
 #include "wx/graphics.h"
 #include <hypoprint.h>
 #include <hypomodel.h>
+#include <math.h>
 
 
 DispWin::DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size, int start, int numgraphs)
@@ -737,6 +738,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	bool drawdiag;
 	int highon;    // 9/2/17  Prototype highlighting code
 	int xylab;
+	double xlogmax, ylogmax;    // 8/12/17  Log axis scaling
+	double logbase = 2.71828182845904523536028747135266250;   // 3;
 
 	wxString snum, gname, text;
 	wxSize textsize;
@@ -829,12 +832,20 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
 		}
 
+		if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
+		//V = Vmin * b ** (logmax * X / Xmax)
+		//xval = xfrom * exp(xlogmax * 
+
+		//if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * log(xval / xfrom) / xlogmax);  // log scaled x-axis  December 2017
+		//else xpos = (xval - xfrom) * xrange;
+
 		for(i=0; i<=xlabels && xlabels > 0; i++) {
 			xcoord = i * xplot / xlabels;
 			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
 			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale / graph->xunitdscale - graph->xshift;
 			if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - graph->xshift;
+			if(graph->xscalemode == 1) xval = xfrom * pow(logbase, xlogmax * xval / xto);
 			srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
 			snum.Printf("%.0f", xval + xdis);	
 			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
@@ -1079,21 +1090,20 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			}
 		}
 
-		double xlogmax, ylogmax;
 		double xmin, xmax, ymin, ymax, xmid, ymid;
 		int scatterfield = 1;
 		int width, height;
 
 
-		if(gtype == 10 && graph->gdatax) {	           // scatter graph with X data
+		if(gtype == 10 && graph->gdatax) {	           // scatter graph with X data and optional range fields
 			mainwin->diagbox->Write(text.Format("Graph Type 10  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 
-			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom);
+			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
 			for(i=0; i<graph->xcount; i++) {
 				xval = (*graph->gdatax)[i];
 				if(xval >= xfrom && xval <= xto) {
-					if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * log(xval / xfrom) / xlogmax);  // log scaled x-axis  December 2017
+					if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(logbase)) / xlogmax);  // log scaled x-axis  December 2017
 					else xpos = (xval - xfrom) * xrange;
 					yval = (*gdatadv)[i];
 					ypos = (yval - yfrom) * yrange;
@@ -1115,7 +1125,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				}
 			}
 
-			if(scatterfield) {
+			if(graph->xcount > 0 && scatterfield) {
 				xmid = (xmin + xmax) / 2;
 				ymid = (ymin + ymax) / 2;
 				width = (double)(xmax - xmin) * 1.5;

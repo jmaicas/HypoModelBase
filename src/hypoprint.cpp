@@ -123,6 +123,8 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	double barwidth, bargap;
 	int gtitle;
 	int xlabelmode, ylabelmode;
+	double xlogmax, ylogmax;    
+	double logbase = 2.71828182845904523536028747135266250;   // 3;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -196,8 +198,10 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		barwidth = graph->barwidth;
 		bargap = graph->bargap;
 		gtitle = 0;
-		xlabelmode = 2;
-		ylabelmode = 2;
+		xlabelmode = 1;
+		ylabelmode = 1;
+
+		if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
 
 		//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
 		//xto = xto - xstart;
@@ -479,23 +483,61 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 			}
 		}
 
+		double xmin, xmax, ymin, ymax, xmid, ymid;
+		int scatterfield = 1;
+		int width, height;
+
+
 		if(gtype == 10 && graph->gdatax) {				                            // scatter graph with X data
 			out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
+			graph->fillcolour = graph->strokecolour;
 			//out.WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
 			for(i=0; i<graph->xcount; i+=xsample) {
 				xval = (*graph->gdatax)[i];
 				if(xval >= xfrom && xval <= xto) {
-					xpos = (xval - xfrom) * xrange;
-					y = (*gdatadv)[i];		
+					//xpos = (xval - xfrom) * xrange;
+					//y = (*gdatadv)[i];		
+					if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(logbase)) / xlogmax);  // log scaled x-axis  December 2017
+					else xpos = (xval - xfrom) * xrange;
+					yval = (*gdatadv)[i];
+					ypos = (yval - yfrom) * yrange;
+
+					// Detect min and max for x and y
+					if(i == 0) {
+						xmin = xpos;
+						xmax = xpos;
+						ymin = ypos;
+						ymax = ypos;
+					}
+					else {
+						if(xpos < xmin) xmin = xpos;
+						if(xpos > xmax) xmax = xpos;
+						if(ypos < ymin) ymin = ypos;
+						if(ypos > ymax) ymax = ypos;
+					}
+
 					//mainwin->diagbox->Write(text.Format("EPS Scatter y %.5f ypos %.5f\n", y, ybase + yrange * (y - yfrom)));
 					out->WriteLine("newpath");
-					out->WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
+					out->WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + ypos, graph->scattersize));
 					out->WriteLine("gsave");
 					out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
 					out->WriteLine("fill");
 					out->WriteLine("grestore");
 					out->WriteLine("stroke");
 				}
+			}
+			if(scatterfield) {
+				xmid = (xmin + xmax) / 2;
+				ymid = (ymin + ymax) / 2;
+				width = (double)(xmax - xmin) * 1.5;
+				height = (double)(ymax - ymin) * 1.5;
+				out->WriteLine("newpath");
+				out->MoveTo(xmid + xbase + xoffset, ybase + ymid);
+				out->DrawEllipse(xmid + xbase + xoffset, ybase + ymid, width/2, height/2);
+				//out->WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
+				out->WriteLine("stroke");
+				//dc.SetBrush(*wxTRANSPARENT_BRUSH);
+				//dc.DrawEllipse((int)(xmid + xbase + xoffset - width/2), (int)(yplot + ybase - ymid - height/2), width, height);
 			}
 		}
 
@@ -586,6 +628,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		if(graph->xtickmode) xcoord = xplotstep * i;
 		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale / graph->xunitdscale - xshift;
 		if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - xshift;
+		if(graph->xscalemode == 1) xval = xfrom * pow(logbase, xlogmax * xval / xto);
 		srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
 		snum.Printf("%.0f", xval + xdis);	
 		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	

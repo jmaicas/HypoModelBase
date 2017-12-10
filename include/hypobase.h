@@ -411,6 +411,7 @@ public:
 	void LineTo(double x, double y);
 	void DrawLine(double xf, double yf, double xt, double yt);
 	void DrawText(wxString, double x, double y);
+	void DrawEllipse(double x, double y, double width, double height);
 	void SetColour(wxString);
 
 	void Flush();

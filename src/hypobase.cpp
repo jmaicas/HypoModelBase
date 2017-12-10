@@ -329,6 +329,33 @@ void TextFile::DrawLine(double xf, double yf, double xt, double yt)
 }
 
 
+void TextFile::DrawEllipse(double x, double y, double w, double h)
+{
+	double kappa = 0.551784;
+	double wk = w * kappa;
+	double hk = h * kappa;
+
+	WriteLine(txt.Format("%.2f pu %.2f pu moveto", (double)x, h+y));
+	WriteLine(txt.Format("%.4f %.4f %.4f %.4f %.4f %.4f curveto", wk+x, h+y, w+x, hk+y, w+x, y));
+	WriteLine(txt.Format("%.4f %.4f %.4f %.4f %.4f %.4f curveto", w+x, -hk+y, wk+x, -h+y, (double)x, -h+y));
+	WriteLine(txt.Format("%.4f %.4f %.4f %.4f %.4f %.4f curveto", -wk+x, -h+y, -w+x, -hk+y, -w+x, (double)y));
+	WriteLine(txt.Format("%.4f %.4f %.4f %.4f %.4f %.4f curveto", -w+x, hk+y, -wk+x, h+y, (double)x, h+y));
+}
+
+/*
+/ellipse { /ys exch def /xs exch def 
+/kappa 0.551784 def
+newpath
+0 ys moveto 
+kappa xs mul ys xs kappa ys mul xs 0 curveto    
+xs kappa ys mul neg kappa xs mul ys neg 0 ys neg curveto
+kappa xs mul neg ys neg xs neg kappa ys mul neg xs neg 0 curveto
+xs neg kappa ys mul kappa xs mul neg ys 0 ys curveto
+} def 
+*/
+
+
+
 void TextFile::DrawText(wxString text, double x, double y)
 {
 	WriteLine(txt.Format("%.2f pu %.2f pu moveto", x, y));
