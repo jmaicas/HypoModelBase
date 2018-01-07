@@ -1011,6 +1011,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	//maxspikes = 100000;
 
+	//diagbox->Write("\nneurocalc\n");
+
 	calcdiag = false;
 	calcdiag2 = false;
 

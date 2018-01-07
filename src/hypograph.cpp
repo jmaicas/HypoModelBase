@@ -1059,10 +1059,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		int xposnext;
 
 		if(gtype == 2 && graph->gdatax) {				                            // line graph with X data
-			mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
+			//mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 			oldx = xbase + xoffset;
 			oldy = (int)(yplot + ybase - yrange * (yfrom));
-			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 			for(i=0; i<graph->xcount; i++) {
 				xval = (*graph->gdatax)[i];
 				//if(xval <= prevx) break;
@@ -1099,8 +1099,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 
 		if(gtype == 10 && graph->gdatax) {	           // scatter graph with X data and optional range fields
-			mainwin->diagbox->Write(text.Format("Graph Type 10  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
-			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			//mainwin->diagbox->Write(text.Format("Graph Type 10  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
+			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 
 			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
 			xmean = 0;
@@ -1176,8 +1176,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		double xfield, yfield;
 
 		if(gtype == 11 && graph->gdatax && graph->xcount > 1) {         // mean field plot - oval with centre at xy mean and xy StdDev dimensions      December 2017
-			mainwin->diagbox->Write(text.Format("Graph Type 11  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
-			mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+			//mainwin->diagbox->Write(text.Format("Graph Type 11  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
+			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 
 			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom);
 			xval = (*graph->gdatax)[0];
