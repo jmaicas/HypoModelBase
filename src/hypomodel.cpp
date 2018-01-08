@@ -460,6 +460,7 @@ void HypoMain::UserMenu()
 {
 	wxMenu *menuFile = new wxMenu;
 	wxMenu *menuAnalysis = new wxMenu;
+	wxMenu *menuTools = new wxMenu;
 	wxMenu *menuSystem = new wxMenu;
 
 	menuFile->Append(ID_About, "&About...");
@@ -469,11 +470,14 @@ void HypoMain::UserMenu()
 	SetMenuFlag(ID_XYPos, "xypos", "XY Pos", 1, menuAnalysis); 
 	SetMenuFlag(ID_Zoom, "zoom", "Graph Zoom", 1, menuAnalysis); 
 
+	menuTools->Append(ID_Diag, "Diagnostic Box");
+
 	menuSystem->Append(ID_Options, "Options");
 
 	wxMenuBar *menuBar = new wxMenuBar;
 	menuBar->Append(menuFile, "&File");
 	menuBar->Append(menuAnalysis, "Analysis");
+	menuBar->Append(menuTools, "Tools");
 	menuBar->Append(menuSystem, "System");
 
 	SetMenuBar(menuBar);
