@@ -646,11 +646,12 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 }
 
 
-OutBox::OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols, bool bmode)
-	: ParamBox(mod, title, pos, size, "outbox")
+OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols, bool bmode)
+	: ParamBox(model, title, pos, size, "outbox")
 {
 	int gridrows, gridcols;
 	wxBoxSizer *vdubox;
+	mod = model;
 
 	redtag = "";
 	gridrows = rows;
@@ -891,13 +892,28 @@ void OutBox::GridStore()
 {
 	TextFile ofp;
 	int row, col;
-	wxString celltext, text, filename, filetag;
+	wxString celltext, text, filename, filetag, filepath;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, sfilename;
 	Index columnindex;
 
+	/*
+	filetag = gstag->GetValue();
+	filename = "graph-" + filetag + ".dat";
+
+	// Tag history
+	short tagpos = gstag->FindString(filetag);
+	if(tagpos != wxNOT_FOUND) gstag->Delete(tagpos);
+	gstag->Insert(filetag, 0);
+
+	// Check and warn existing file
+	wxTextFile checkfile(filepath + "/" + filename);*/
+
+	filepath = mod->GetPath() + "/Grids";
+	if(!wxDirExists(filepath)) wxMkdir(filepath);
+
 	filetag = paramstoretag->GetValue();
-	filename = filetag + "-grid.txt";
+	filename = filepath + "/" + filetag + "-grid.txt";
 
 	short tagpos = paramstoretag->FindString(filetag);
 	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
@@ -917,7 +933,7 @@ void OutBox::GridStore()
 	paramstoretag->SetValue(filetag);
 
 	//ofp.New(filename);
-	sfilename = filetag.ToStdString() + "-grid.txt";
+	sfilename = filename.ToStdString();
 	ofstream outfile(sfilename.c_str());
 
 	if(!outfile.is_open()) {
@@ -954,18 +970,21 @@ void OutBox::GridStore()
 }
 
 
-void OutBox::GridLoad()
+void OutBox::GridLoad()            // Replaced by GridLoadFast()
 {
 	TextFile ifp;
 	int row, col;
 	long numdat;
-	wxString text, filetag, cell;
+	wxString text, filetag, filename, filepath, cell;
 	wxString datstring;
 	wxColour redpen("#dd0000"), blackpen("#000000");
-	string line, filename;
+	string line, sfilename;
 	int numlines, linecount, cellcount;
 
+	filepath = mod->GetPath() + "/Grids";
 	filetag = paramstoretag->GetValue();
+	filename = filepath + "/" + filetag + "-grid.txt";
+
 	/*
 	filename = filetag + "-grid.txt";
 	if(!ifp.Open(filename)) {
@@ -973,8 +992,8 @@ void OutBox::GridLoad()
 	return;
 	}*/
 
-	filename = filetag.ToStdString() + "-grid.txt";
-	ifstream infile(filename.c_str());
+	sfilename = filename.ToStdString();
+	ifstream infile(sfilename.c_str());
 	if(!infile.is_open()) {
 		paramstoretag->SetValue("Not found");
 		return;
@@ -1033,36 +1052,31 @@ void OutBox::GridLoad()
 }
 
 
-
 void OutBox::GridLoadFast()
 {
 	TextFile ifp;
 	int row, col, width;
 	long numdat;
-	wxString text, filetag, cell;
+	wxString text, filetag, filepath, filename, cell;
 	wxString datstring, readline;
 	wxColour redpen("#dd0000"), blackpen("#000000");
-	string line, filename;
+	string line, sfilename;
 	int numlines, linecount, cellcount;
 
+
+	filepath = mod->GetPath() + "/Grids";
 	filetag = paramstoretag->GetValue();
+	filename = filepath + "/" + filetag + "-grid.txt";
 
-
-	filename = filetag.ToStdString() + "-grid.txt";
-	ifstream readfile(filename.c_str());
-	if(!readfile.is_open()) {
-		paramstoretag->SetValue("Not found");
-		return;
+	if(!ifp.Exists(filename)) {
+		filename = filetag + "-grid.txt";            // Backwards compatibility, try old grid file location
+		if(!ifp.Exists(filename)) {
+			paramstoretag->SetValue("Not found");
+			return;
+		}
 	}
-
-	/*
-	char c;
-	diagbox->Write("File start:\n");
-	while (readfile.get(c)) {
-	diagbox->Write(text.Format("%d ", c));
-	if(c == '\n') diagbox->Write("\n");
-	}
-	diagbox->Write("EOF\n");*/
+	sfilename = filename.ToStdString();
+	ifstream readfile(sfilename.c_str());
 
 	// Param file history
 	short tagpos = paramstoretag->FindString(filetag);
@@ -1080,7 +1094,7 @@ void OutBox::GridLoadFast()
 
 	numlines = count(istreambuf_iterator<char>(readfile), istreambuf_iterator<char>(), '\n');
 	if(!numlines) {
-		WriteVDU("File empty");
+		WriteVDU("File empty\n");
 		return;
 	}
 	readfile.clear();

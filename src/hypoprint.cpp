@@ -198,8 +198,8 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		barwidth = graph->barwidth;
 		bargap = graph->bargap;
 		gtitle = 0;
-		xlabelmode = 1;
-		ylabelmode = 1;
+		xlabelmode = 2;
+		ylabelmode = 2;         // 1 = label every tick, 2 = only label first and last tick
 
 		if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
 
