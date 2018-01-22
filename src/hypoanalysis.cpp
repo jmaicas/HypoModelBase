@@ -1243,7 +1243,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	srate100s.max = (int)(times[spikecount-1]/100000 + 0.5);
 
 	for(i=0; i<spikecount; i++) {
-		if(times[i] < 1000000) srate1[(int)(times[i] + 0.5)]++;            // spike rate count (1ms)
+		if(start < 100000 && times[i] < 1000000) srate1[(int)(times[i] + 0.5)]++;            // spike rate count (1ms)
+		if(start >= 100000 && times[i] < (start + 1000000)) srate1[(int)(times[i] + 0.5 - start)]++;            // spike rate count (1ms) with deferred start point
 		if(times[i]/10 < 100000) srate10[(int)(times[i]/10 + 0.5)]++;
 		if(times[i]/100 < 100000) srate100[(int)(times[i]/100 + 0.5)]++;
 		if(times[i]/10000 < 100000) srate10s[(int)(times[i] + 0.5)/10000]++;

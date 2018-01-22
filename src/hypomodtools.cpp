@@ -882,7 +882,7 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	}
 	datfiletag->SetValue(datname);
 
-	if(readline.ToDouble(&datval)) rawdata[count++] = datval * 1000;
+	if(readline.ToDouble(&datval)) rawdata[count++] = datval * 1000;        // rawdata in ms
 	readline = datfile->GetNextLine();
 
 	while(readline.IsEmpty() || readline.GetChar(0) == '\"' || readline.GetChar(0) == ':') 
