@@ -80,6 +80,7 @@ public:
 	virtual void GHistLoad(wxComboBox *);
 	virtual void ModClose();
 	virtual void EvoRun();
+	virtual void ScaleCon(ScaleBox *scalebox, int condex);
 };
 
 

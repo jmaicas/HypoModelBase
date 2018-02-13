@@ -194,7 +194,7 @@ public:
 	int ratedata;
 	int internflag;
 	int normtog;
-	unsigned int boxtype;
+	int boxtype;
 	int synchcon;
 
 	int xmin, xmax, ymin, ymax;
@@ -219,7 +219,7 @@ public:
 	wxCheckBox *gsync[10];
 	wxBoxSizer *vbox;
 
-	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, short boxtype=0);
+	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, int boxtype=0);
 	~ScaleBox();
 
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);
