@@ -1118,7 +1118,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 
 	ParamStore *oldparams = GetParams();
 
-	//mod->diagbox->Write(text.Format("param load %s\n", boxname));
+	mod->diagbox->Write(text.Format("param load %s\n", boxname));
 
 	//if(mod->path == "") filepath = mod->mainwin->parampath;
 	//else filepath = mod->path + "/Params";
@@ -1133,6 +1133,8 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 	else filetag = tag;
 
 	filename = filepath + "/" + filetag + "-" + boxname + "param.dat";
+
+	diagbox->Write("paramload " + filename + "\n");
 
 	wxTextFile paramfile(filename);
 

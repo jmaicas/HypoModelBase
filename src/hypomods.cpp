@@ -168,6 +168,11 @@ void Model::EvoRun()
 }
 
 
+void Model::ScaleCon(ScaleBox *scalebox, int condex)
+{
+}
+
+
 long Model::ReadNextData(wxString *readline)
 {
 	long numdat;
@@ -374,7 +379,7 @@ void Model::ModLoad()
 
 	TextFile infile, opfile;
 	wxPoint pos;
-  wxSize size;
+	wxSize size;
 
 	diagbox->Write("ModLoad....\n");
 
@@ -386,14 +391,12 @@ void Model::ModLoad()
 			filename = modname + "prefs.ini";
 			check = opfile.Open(filepath + "/" + filename);
 			if(!check) return;
-
 			readline = opfile.ReadLine();
 			while(!readline.IsEmpty()) {
 				readline = readline.AfterFirst(' ');
 				readline.Trim();
 				initparams = readline;
 				modbox->paramstoretag->Insert(initparams, 0);
-	
 				readline = opfile.ReadLine();
 			}
 			opfile.Close();	
@@ -415,7 +418,6 @@ void Model::ModLoad()
 		numstring.ToLong(&numdat);
 		boxindex = numdat;
 		if(boxindex >= modtools.numtools) break;
-
 		pos.x = ReadNextData(&readline);
 		//if(pos.x < 0) pos.x = 0;
 		pos.y = ReadNextData(&readline);
