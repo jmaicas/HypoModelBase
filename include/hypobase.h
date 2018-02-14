@@ -300,6 +300,7 @@ enum {
 	ID_runningexpdata,
 	ID_runningSecExpData, 
 	ID_runningDiffIre,
+	ID_runningLognormIre,
 	ID_EPSPtrain,
 	ID_MultiRun,
 	ID_XYPos,
