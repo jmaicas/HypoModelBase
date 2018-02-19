@@ -762,12 +762,12 @@ public:
 	wxBitmapButton *xzoomin;
 	int ypos;
 	int xpos;*/
-	GraphDat *plot[5];
+	GraphDat *plot[10];
+	static const int maxplots = 10;
 	int numplots;
 	int currentplot;
 	int spikedisp;
 	int sdex;
-	int maxplots;
 	//BurstDat *burstdata;
 	PlotSet *plotset;
 	

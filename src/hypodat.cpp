@@ -667,7 +667,7 @@ GraphDisp::GraphDisp()
 
 void GraphDisp::Add(GraphDat *newplot)
 {
-	if(numplots < 5) {
+	if(numplots < maxplots) {
 		plot[numplots] = newplot;
 		numplots++;
 	}
