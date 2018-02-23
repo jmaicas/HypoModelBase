@@ -67,6 +67,7 @@ Model::Model(int type, wxString name, HypoMain *main)
 	graphbase->mainwin = mainwin;
 	modeflags = new ParamStore();
 	toolflags = new ParamStore();
+	//prefstore = new ParamStore();
 	scalebox = mainwin->scalebox;
 	diagbox = mainwin->diagbox;
 
@@ -77,8 +78,10 @@ Model::Model(int type, wxString name, HypoMain *main)
 	storesize = 100000;
 	xmin = -100000;
 	path = "";
-	oldhist = true;
+	oldhist = false;
 	xscaletoggle = 0;
+
+	prefstore["numdraw"] = 2;
 }
 
 
@@ -323,7 +326,8 @@ void Model::GLoad(wxComboBox *gstag)
 
 void Model::ModStore()
 {
-	short i;
+	int i;
+	int prefcount;
 	wxString filename, filepath;
 	wxString outline, text;
 
@@ -337,8 +341,18 @@ void Model::ModStore()
 		
   //modbox->StoreParam("default");
 
-	// Parameter history
 
+	// Prefs                                  February 2018
+	filename = modname + "prefs.ini";
+	outfile.New(filepath + "/" + filename);
+
+	prefcount = prefstore.size();
+	for(i=0; i<prefcount; i++) {
+		outfile.WriteLine(text.Format("%s %.0f", prefstore.gettag(i), prefstore[i]));
+	}
+	outfile.Close();
+
+	// Parameter history                   - no longer in use, replaced by box specific file tag history 
 	if(oldhist) {
 		filename = modname + "prefs.ini";
 		initparams = modbox->paramstoretag->GetValue();
@@ -376,6 +390,7 @@ void Model::ModLoad()
 
 	wxString filename, filepath;
 	wxString readline, numstring;
+	wxString tag;
 
 	TextFile infile, opfile;
 	wxPoint pos;
@@ -402,6 +417,22 @@ void Model::ModLoad()
 			opfile.Close();	
 			modbox->paramstoretag->SetLabel(initparams);
 		}
+	}
+
+	// Prefs load
+	filename = modname + "prefs.ini";
+	check = infile.Open(filepath + "/" + filename);
+	if(check) {
+		readline = infile.ReadLine();
+		while(!readline.IsEmpty()) {
+				tag = readline.BeforeFirst(' ');
+				readline = readline.AfterFirst(' ');
+				readline.Trim();
+				readline.ToLong(&numdat);
+				prefstore[tag] = numdat;
+				readline = infile.ReadLine();
+		}
+		infile.Close();
 	}
 
 	diagbox->Write("ModLoad history ok, reading boxes...\n");

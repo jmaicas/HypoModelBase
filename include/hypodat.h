@@ -273,7 +273,7 @@ public:
 	//datdouble haz1norm;
 	datdouble haz5norm;
 
-	datint srate;
+	datint srate;      // change to srate1s
 	datint srate1;
 	datint srate100;
 	datint srate10;

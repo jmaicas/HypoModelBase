@@ -180,6 +180,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	mod = NULL;
 
 	ModInit();
+	if(mod->prefstore.check("numdraw")) numdraw = mod->prefstore["numdraw"];
+	else diagbox->Write("mod numdraw not found\n");
 
 	diagbox->Write("HypoMain graph start\n\n");
 
