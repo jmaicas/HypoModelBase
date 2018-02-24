@@ -170,6 +170,8 @@ public:
 
 	virtual void OnToggle(wxCommandEvent& event);
 	virtual void TextClick(wxString tag);
+	virtual void SpinClick(wxString tag);
+	virtual void BoxEnter(wxString tag);
 };
 
 
@@ -273,6 +275,7 @@ public:
 	void OnSpinUp(wxSpinEvent& event);
 	void OnSpinDown(wxSpinEvent& event);
 	void OnSpin(wxSpinEvent& event);
+	void OnEnter(wxCommandEvent& event);
 	double GetValue();
 	wxString GetString();
 	void SetValue(double val);

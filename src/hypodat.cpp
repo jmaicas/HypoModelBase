@@ -674,6 +674,17 @@ void GraphDisp::Add(GraphDat *newplot)
 }
 
 
+void GraphDisp::Remove(int index)       // Remove plot layer from GraphDisp set
+{
+	int i;
+
+	if(index >= numplots) return;
+	for(i=index; i<numplots-1; i++) plot[i] = plot[i+1];   // re-index
+	numplots--;	
+}
+
+
+
 void GraphDisp::Set(int index, GraphDat *newplot)
 {
 	if(numplots <= index) Add(newplot);

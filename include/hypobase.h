@@ -279,6 +279,7 @@ enum {
 	ID_XYPos,
 	ID_Zoom,
 	ID_AddPlot,
+	ID_RemovePlot,
 	ID_quad,
 	ID_Add1,
 	ID_Add2,

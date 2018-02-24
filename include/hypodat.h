@@ -529,6 +529,7 @@ public:
 	};
 
 	void AddPlot(PlotDat);
+	int RemovePlot(int);
 	int SetPlot(int, PlotDat);
 };
 
@@ -773,6 +774,7 @@ public:
 	
 	GraphDisp();
 	void Add(GraphDat *);
+	void Remove(int index);
 	void Front(GraphDat *);
 	GraphDat *GetFront();
 	void Set(int index, GraphDat *newplot);   // Set(0, newplot) equivalent to Front(newplot)
