@@ -746,6 +746,7 @@ OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wx
 	Connect(ID_Undo, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnUndo));
 	Connect(ID_Copy, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnCopy));
 	Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(OutBox::OnRightClick));
+	Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(OutBox::OnCellChange));
 };
 
 
@@ -767,6 +768,15 @@ void OutBox::OnCopy(wxCommandEvent& event)
 {
 	textgrid->Copy();
 }
+
+
+void OutBox::OnCellChange(wxGridEvent& event)
+{
+	int col = event.GetCol();
+
+	mainwin->diagbox->Write(text.Format("grid cell change col %d\n", col));
+}
+
 
 
 void OutBox::OnRightClick(wxMouseEvent& event)

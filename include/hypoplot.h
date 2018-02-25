@@ -41,8 +41,11 @@ public:
 	void LoadTxt(FileDat *);
 	void SetGraph(GraphWindow3 *);
 	void TextClick(wxString tag);
+	void SpinClick(wxString tag);
+	void BoxEnter(wxString tag);
 	void SetColumn(int col);
-	void SetLayer(int layer);
+	void SetLayer();
+	void DataEdit(int col);
 	void OnParamStore(wxCommandEvent& event);
 	void OnParamLoad(wxCommandEvent& event);
 };

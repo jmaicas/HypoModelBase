@@ -733,7 +733,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	int pdir, sample, xtime;
 	int xlabelgap;
 	int barwidth, bargap;
-	//SpikeDat *spikedata;
+
 	int diag;
 	bool drawdiag;
 	int highon;    // 9/2/17  Prototype highlighting code

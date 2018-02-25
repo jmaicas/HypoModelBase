@@ -5,6 +5,7 @@
 
 #include "wx/wx.h"
 #include <wx/richtext/richtextctrl.h>
+#include <wx/grid.h>
 #include "hypocontrols.h"
 #include "hypotools.h"
 #include "hypodat.h"
@@ -278,6 +279,7 @@ public:
 	void OnCopy(wxCommandEvent& event);
 	void OnButton(wxCommandEvent& event);
 	int ColumnData(int, datdouble *);
+	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);
 };
 
