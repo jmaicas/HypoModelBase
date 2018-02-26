@@ -78,7 +78,7 @@ Model::Model(int type, wxString name, HypoMain *main)
 	storesize = 100000;
 	xmin = -100000;
 	path = "";
-	oldhist = false;
+	oldhist = true;
 	xscaletoggle = 0;
 
 	prefstore["numdraw"] = 2;

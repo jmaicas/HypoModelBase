@@ -44,8 +44,8 @@ public:
 	TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
 	~TagBox();
 
-	void HistLoad();
-	void HistStore();
+	//void HistLoad();
+	//void HistStore();
 	void SetLabel(wxString);
 };
 
