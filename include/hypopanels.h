@@ -88,7 +88,9 @@ public:
 	ParamSet *paramset;
 	ParamStore *modparams;
 	ParamStore *modflags;
+	ParamStore *conflags;
 	RefStore *flagrefs;
+	RefStore *conflagrefs;
 	RefStore *checkrefs;
 	RefStore *panelrefs;
 	wxNotebook *notebook;
@@ -159,6 +161,7 @@ public:
 	void InitMenu();
 	void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
+	void SetConFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
 	wxBoxSizer *StoreBox(wxString label="", wxPanel *storepanel=NULL);

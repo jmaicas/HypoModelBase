@@ -637,9 +637,11 @@ void ParamBox::Initialise()
 {	
 	modparams = new ParamStore;
 	modflags = new ParamStore;
+	conflags = new ParamStore;
 	activepanel = panel;
 	paramset = new ParamSet(activepanel);
 	flagrefs = new RefStore();
+	conflagrefs = new RefStore();
 	checkrefs = new RefStore();
 	panelrefs = new RefStore();
 
@@ -857,6 +859,17 @@ void ParamBox::SetModFlag(int id, wxString flagname, wxString flagtext, int stat
 	if(menu == NULL) menu = menuModel;
 	(*modflags)[flagname] = state;
 	flagrefs->AddRef(id, flagname);
+	menu->Append(id, flagtext, "Toggle " + flagtext, wxITEM_CHECK);
+	menu->Check(id, state);
+	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnFlag));
+}
+
+
+void ParamBox::SetConFlag(int id, wxString flagname, wxString flagtext, int state, wxMenu *menu)
+{
+	if(menu == NULL) menu = menuControls;
+	(*conflags)[flagname] = state;
+	conflagrefs->AddRef(id, flagname);
 	menu->Append(id, flagtext, "Toggle " + flagtext, wxITEM_CHECK);
 	menu->Check(id, state);
 	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnFlag));
