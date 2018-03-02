@@ -675,6 +675,9 @@ OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wx
 	}
 	else textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
 
+	currgrid = textgrid;
+	textgrid->diagbox = diagbox;
+
 	//for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
 	//for(i=0; i<gridcols; i++) textgrid->SetColSize(i, 60);
 	textgrid->SetDefaultRowSize(20, true);

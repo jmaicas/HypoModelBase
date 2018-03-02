@@ -260,7 +260,8 @@ class OutBox: public ParamBox
 public:
 	Model *mod;
 	wxTextCtrl *textbox;
-	TextGrid *textgrid;
+	TextGrid *textgrid;   // base grid
+	TextGrid *currgrid;   // pointer to selected grid, textgrid by default
 	DiagBox *diagbox;
 	wxNotebook *notebook;
 	//PlotBox *plotbox;

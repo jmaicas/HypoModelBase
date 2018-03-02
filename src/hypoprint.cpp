@@ -25,7 +25,7 @@ void GraphWindow3::MultiEPS()
 
 
 	// Read panel data from OutBox
-	textgrid = mod->outbox->textgrid;
+	textgrid = mod->outbox->currgrid;
 
 	//celltext = textgrid->GetCell(0, 0);
 	//celltext.Trim(); 
@@ -81,7 +81,8 @@ void GraphWindow3::MultiEPS()
 			gwin = mainwin->graphwin[paneldex[i]];
 			gwin->PrintEPS(xb[i], yb[i], &out);
 		}
-		else if(panelcomm[i] == "hh") mainwin->scalebox->GraphCommand(ID_histhaz1);
+	  if(panelcomm[i] == "hh") mainwin->scalebox->GraphCommand(ID_histhaz1);
+		if(panelcomm[i] == "norm") mainwin->scalebox->GraphCommand(ID_norm);
 	}
 
 	// Close file

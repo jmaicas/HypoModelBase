@@ -919,7 +919,7 @@ void ScaleBox::GraphCommand(int commid)
 	if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
 	else (*gflags)[tag] = 0;
 
-	mainwin->diagbox->Write(text.Format("graphcommand %s %.0f", tag, (*gflags)[tag]));
+	mainwin->diagbox->Write(text.Format("graphcommand %s %.0f\n", tag, (*gflags)[tag]));
 
 	GraphSwitch();
 }
