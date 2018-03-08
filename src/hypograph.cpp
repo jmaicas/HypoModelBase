@@ -739,7 +739,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	int highon;    // 9/2/17  Prototype highlighting code
 	int xylab;
 	double xlogmax, ylogmax;    // 8/12/17  Log axis scaling
-	double logbase = 2.71828182845904523536028747135266250;   // 3;
+	double xlogbase = 2.71828182845904523536028747135266250;   // 3;
+	double ylogbase = 2.71828182845904523536028747135266250;   // 10;         // default values replaced by graph specific below
 
 	wxString snum, gname, text;
 	wxSize textsize;
@@ -802,6 +803,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		bargap = graph->bargap;
 		//burstdata = graph->burstdata;
 		//spikedata = graph->spikedata;
+		xlogbase = graph->xlogbase;
+		ylogbase = graph->ylogbase;
 
 		//if(gtype == 3) ofp = fopen("graph.txt", "w");
 		if(drawdiag && burstdata != NULL && burstdata->burstdisp == 1) ofp = fopen("graph.txt", "w");  
@@ -832,7 +835,12 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
 		}
 
-		if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
+		if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(xlogbase);
+		else xlogmax = 0;
+
+		if(graph->yscalemode == 1 && yfrom > 0) ylogmax = log(yto / yfrom) / log(ylogbase);
+		else ylogmax = 0;
+
 		//V = Vmin * b ** (logmax * X / Xmax)
 		//xval = xfrom * exp(xlogmax * 
 
@@ -845,7 +853,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
 			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale / graph->xunitdscale - graph->xshift;
 			if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - graph->xshift;
-			if(graph->xscalemode == 1) xval = xfrom * pow(logbase, xlogmax * xval / xto);
+
+			// log scale mode
+			if(graph->xscalemode == 1 && xfrom > 0) xval = xfrom * pow(xlogbase, xlogmax * xval / xto);
+
 			srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
 			snum.Printf("%.0f", xval + xdis);	
 			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
@@ -872,6 +883,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
 			yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale - graph->yshift;
 			if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+
+			// log scale mode
+			if(graph->yscalemode == 1 && yfrom > 0) yval = yfrom * pow(ylogbase, ylogmax * yval / yto);
+
 			srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
 			if(srangey < 0.1) snum.Printf("%.3f", yval);
 			else if(srangey < 1) snum.Printf("%.2f", yval);
@@ -976,11 +991,23 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			}
 		}
 
-		if(gtype == 4) {                         // normal line graph
-			dir = 1;
+		if(gtype == 4) {                         // normal line graph   - no longer in use, see type 5 below
+			dir = 1;   // 1 for ascending, 0 for descending
 			preval = (*gdatadv)[0];
 			oldx = xbase;
 			oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
+
+			mod->diagbox->Write(text.Format("line plot xrange %.4f yscalemode %d\n", xrange, graph->yscalemode));
+
+			// subpixel scale drawing mode - drawing data in limited x-axis resolution, xrange gives ratio of plot pixels to data points, use this mode if xrange < 1
+			//
+			// attempt to preserve maxima and minima
+			// 'dir' gives current direction of plot progression
+			// 'xnum' gives number of data points for current pixel position, reciprocal of xrange
+			// choose lowest or highest data point for plot value depending on direction
+
+			//if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(xlogbase)) / xlogmax);  // log scaled x-axis  December 2017
+		    //else xpos = (xval - xfrom) * xrange;
 
 			for(i=0; i<xplot; i++) {
 				if(xrange < 1) {
@@ -995,17 +1022,22 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 						}
 					}
 					if(preval < mpoint) dir = 1; else dir = 0;
-					y = mpoint;
+					yval = mpoint;
 					preval = mpoint;
-					DrawLine(dc, gc, oldx, oldy, i + xbase, (int)(yplot + ybase - yrange * (y - yfrom)));	
+
+					if(graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					else ypos = (yval - yfrom) * yrange;
+					DrawLine(dc, gc, oldx, oldy, i + xbase, (int)(yplot + ybase - ypos));	
 					oldx = i + xbase;
-					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+					oldy = (int)(yplot + ybase - ypos);
 				} 
 				else {
-					y = (*gdatadv)[(int)(i + xfrom)];
-					DrawLine(dc, gc, oldx, oldy, (int)(i*xrange + xbase), (int)(yplot + ybase - yrange * (y - yfrom)));
-					oldx = i*xrange + xbase;
-					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+					yval = (*gdatadv)[(int)(i + xfrom)];
+					if(graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					else ypos = (yval - yfrom) * yrange;
+					DrawLine(dc, gc, oldx, oldy, (int)(i * xrange + xbase), (int)(yplot + ybase - ypos));
+					oldx = i * xrange + xbase;
+					oldy = (int)(yplot + ybase - ypos);
 				}
 				//fprintf(pofp, "xindex %d  y %.2f\n  dir %d", xindex, y, dir);
 			}
@@ -1015,6 +1047,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		if(gtype == 5) {                         // line graph with scaling fix
 			if(drawdiag) ofp = fopen("graph.txt", "w");
+			mod->diagbox->Write(text.Format("line plot xrange %.4f  yscalemode %d  ylogbase %.4f  ylogmax %.4f\n", xrange, graph->yscalemode, ylogbase, ylogmax));
+
 			dir = 1;
 			pdir = 0;
 			xindex = (int)xfrom;
@@ -1037,18 +1071,32 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 						}
 					}
 					if(preval <= mpoint || preval < 0.000001) dir = 1; else dir = 0;
-					y = mpoint;
+					yval = mpoint;
 					preval = mpoint;
 					if(drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  mpoint %.4f  point %.4f\n", i, preval, mpoint, y);
-					DrawLine(dc, gc, oldx, oldy, i + xbase + xoffset, (int)(yplot + ybase - yrange * (y - yfrom)));	
+
+					if(graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					else ypos = (yval - yfrom) * yrange;
+					DrawLine(dc, gc, oldx, oldy, i + xbase + xoffset, (int)(yplot + ybase - ypos));	
 					oldx = i + xbase + xoffset;
-					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+					oldy = (int)(yplot + ybase - ypos);
+
+					//DrawLine(dc, gc, oldx, oldy, i + xbase + xoffset, (int)(yplot + ybase - yrange * (y - yfrom)));	
+					//oldx = i + xbase + xoffset;
+					//oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				} 
 				else {
-					y = (*gdatadv)[(int)(i + xfrom)];
-					DrawLine(dc, gc, oldx, oldy, (int)(i*xrange + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-					oldx = i*xrange + xbase + xoffset;
-					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+					yval = (*gdatadv)[(int)(i + xfrom)];
+
+					//DrawLine(dc, gc, oldx, oldy, (int)(i*xrange + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+					//oldx = i*xrange + xbase + xoffset;
+					//oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+
+					if(graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					else ypos = yrange * (yval - yfrom);
+					DrawLine(dc, gc, oldx, oldy, (int)(i * xrange + xbase + xoffset), (int)(yplot + ybase - ypos));
+					oldx = i * xrange + xbase + xoffset;
+					oldy = (int)(yplot + ybase - ypos);
 				}
 				//fprintf(pofp, "xindex %d  y %.2f\n  dir %d", xindex, y, dir);
 			}
@@ -1102,7 +1150,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			//mainwin->diagbox->Write(text.Format("Graph Type 10  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 
-			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
+			//if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
 			xmean = 0;
 			ymean = 0;
 			for(i=0; i<graph->xcount; i++) {
@@ -1111,7 +1159,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				yval = (*gdatadv)[i];
 				ymean += yval / graph->xcount;
 				if(xval >= xfrom && xval <= xto) {
-					if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(logbase)) / xlogmax);  // log scaled x-axis  December 2017
+					if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(xlogbase)) / xlogmax);  // log scaled x-axis  December 2017
 					else xpos = (xval - xfrom) * xrange;
 					ypos = (yval - yfrom) * yrange;
 					if(i == 0) {
@@ -1142,9 +1190,9 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				xsd = sqrt(xvar / graph->xcount);
 				ysd = sqrt(yvar / graph->xcount);
 				if(graph->xscalemode == 1 && xfrom > 0) {
-					xpos = (int)((double)xplot * (log(xmean / xfrom) / log(logbase)) / xlogmax);  
-					xsdneg = (int)((double)xplot * (log((xmean - xsd) / xfrom) / log(logbase)) / xlogmax);
-					xsdpos = (int)((double)xplot * (log((xmean + xsd) / xfrom) / log(logbase)) / xlogmax);  
+					xpos = (int)((double)xplot * (log(xmean / xfrom) / log(xlogbase)) / xlogmax);  
+					xsdneg = (int)((double)xplot * (log((xmean - xsd) / xfrom) / log(xlogbase)) / xlogmax);
+					xsdpos = (int)((double)xplot * (log((xmean + xsd) / xfrom) / log(xlogbase)) / xlogmax);  
 				}
 				else {
 					xpos = (xmean - xfrom) * xrange;

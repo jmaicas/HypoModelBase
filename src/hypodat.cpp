@@ -653,6 +653,8 @@ void GraphDat::Init()
 	ylabelplaces = -1;
 	xscalemode = 0;
 	yscalemode = 0;
+	xlogbase = 2.7183;
+	ylogbase = 2.7183;
 }
 
 

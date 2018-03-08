@@ -607,6 +607,7 @@ public:
 	bool synchx;
 	int barwidth, barshift, bargap;
 	int xscalemode, yscalemode;
+	double xlogbase, ylogbase;
 
 	int highstart, highstop, highcolour;
 

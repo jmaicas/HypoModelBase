@@ -101,12 +101,14 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset->AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
 	paramset->AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
 	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
+	paramset->AddNum("xlogbase", "XLogB", graph->xlogbase, 4, labelwidth, numwidth);
 	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
 	paramset->AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
 	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
 	paramset->AddNum("yscale", "YScale", graph->yunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
+	paramset->AddNum("ylogbase", "YLogB", graph->ylogbase, 4, labelwidth, numwidth);
 	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
 	paramset->AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
@@ -455,6 +457,9 @@ void GraphBox::SetParams(GraphDat *setgraph)
 	graph->gname = paramset->GetCon("gname")->GetString();
 	graph->xtag = paramset->GetCon("xtag")->GetString();
 	graph->ytag = paramset->GetCon("ytag")->GetString();
+
+	graph->xlogbase = (*params)["xlogbase"];
+	graph->ylogbase = (*params)["ylogbase"];
 }
 
 
@@ -491,7 +496,10 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	setgraph->ytickmode = graph->ytickmode;	
 
 	setgraph->xscalemode = graph->xscalemode;
-	setgraph->yscalemode = graph->yscalemode;	
+	setgraph->yscalemode = graph->yscalemode;
+
+	setgraph->xlogbase = graph->xlogbase;
+	setgraph->ylogbase = graph->ylogbase;
 }
 
 
@@ -509,7 +517,7 @@ void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 	SetParams();
 	
 	graphwin->UpdateScroll();
-	diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
+	//diagbox->Write(text.Format("colourstring %s\n", ColourString(graph->strokecolour)));
 }
 
 
@@ -597,8 +605,10 @@ ParamBox::~ParamBox()
 {
 	delete modparams;
 	delete modflags;
+	delete conflags;
 	delete paramset;
 	delete flagrefs;
+	delete conflagrefs;
 	delete checkrefs;
 	delete panelrefs;
 
