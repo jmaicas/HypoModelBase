@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 785),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 815),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;

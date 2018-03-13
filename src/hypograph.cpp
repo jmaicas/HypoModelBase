@@ -746,6 +746,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	wxSize textsize;
 	int roundcount;
 	double ymax, ycalc;
+	double xlogrange, ylogrange;
 
 	FILE *ofp;
 	TextFile opfile;
@@ -872,21 +873,31 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
 		xylab = 5;
 
-		if(graph->ytickmode && graph->ystep > 0) {
+		if(graph->ytickmode && graph->ystep > 0) {                     // tick count and spacing for defined linear step size
 			ylabels = (int)((yto - yfrom) / (yscale * graph->ystep));
 			yplotstep = (yplot * graph->ystep) / (yto - yfrom);  
+		}
+
+		if(graph->ytickmode == 1 && graph->yscalemode == 1) {          // tick count and spacing for log scale, step size specifies exponent step
+			ylogrange = log(yto - yfrom) / log(ylogbase);
+			ylabels = (int)(ylogrange / graph->ystep);
+			yplotstep = (yplot * graph->ystep) / ylogrange;
+			mod->diagbox->Write(text.Format("ylog tick step %.2f ylabels %d stepsize %.2f ylogrange %.4f\n", graph->ystep, ylabels, yplotstep, ylogrange)); 
 		}
 
 		for(i=0; i<=ylabels && ylabels > 0; i+=1) {
 			ycoord = i * yplot / ylabels;
 			if(graph->ytickmode) ycoord = (int)(yplotstep * i);
 			dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
-			yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale - graph->yshift;
-			if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+			if(graph->ytickmode == 0) yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale - graph->yshift;
+			if(graph->ytickmode == 1) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
 
 			// log scale mode
-			if(graph->yscalemode == 1 && yfrom > 0) yval = yfrom * pow(ylogbase, ylogmax * yval / yto);
-
+			if(graph->yscalemode == 1 && yfrom > 0) {
+				if(graph->ytickmode == 1) yval = pow(ylogbase, graph->ystep * i);
+				if(graph->ytickmode == 0) yval = yfrom * pow(ylogbase, ylogmax * yval / yto);
+			}
+				
 			srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
 			if(srangey < 0.1) snum.Printf("%.3f", yval);
 			else if(srangey < 1) snum.Printf("%.2f", yval);
@@ -1075,7 +1086,13 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					preval = mpoint;
 					if(drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  mpoint %.4f  point %.4f\n", i, preval, mpoint, y);
 
-					if(graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					if(graph->yscalemode == 1 && yfrom > 0) {
+						ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+						if(yval < yfrom) {
+							ypos = -yfrom * yrange;
+							//mod->diagbox->Write(text.Format("line draw log low value yval %.4f ypos %d\n", yval, ypos));
+						}
+					}
 					else ypos = (yval - yfrom) * yrange;
 					DrawLine(dc, gc, oldx, oldy, i + xbase + xoffset, (int)(yplot + ybase - ypos));	
 					oldx = i + xbase + xoffset;
@@ -1087,12 +1104,10 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				} 
 				else {
 					yval = (*gdatadv)[(int)(i + xfrom)];
-
-					//DrawLine(dc, gc, oldx, oldy, (int)(i*xrange + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-					//oldx = i*xrange + xbase + xoffset;
-					//oldy = (int)(yplot + ybase - yrange * (y - yfrom));
-
-					if(graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					if(graph->yscalemode == 1 && yfrom > 0) {
+						ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+						if(yval < yfrom) ypos = -yfrom * yrange;
+					}
 					else ypos = yrange * (yval - yfrom);
 					DrawLine(dc, gc, oldx, oldy, (int)(i * xrange + xbase + xoffset), (int)(yplot + ybase - ypos));
 					oldx = i * xrange + xbase + xoffset;
