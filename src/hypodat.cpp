@@ -183,6 +183,8 @@ SpikeDat::SpikeDat()
 	vasomean.data.resize(250);
 	vasomean.max = 200;
 
+	mag.setsize(maxspikes);
+
 	count = 0;
 	spikecount = 0;
 	start = 0;

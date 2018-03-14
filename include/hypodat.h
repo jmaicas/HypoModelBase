@@ -255,6 +255,7 @@ public:
 	DiagBox *diagbox;
 
 	datdouble times;
+	datdouble mag;
 	datdouble isis;
 	BurstDat *burstdata;
 	
