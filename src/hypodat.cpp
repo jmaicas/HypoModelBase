@@ -657,6 +657,9 @@ void GraphDat::Init()
 	yscalemode = 0;
 	xlogbase = 2.7183;
 	ylogbase = 10;
+
+	scatterfield = 0;
+	scattermean = 0;
 }
 
 

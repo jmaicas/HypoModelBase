@@ -199,8 +199,8 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		barwidth = graph->barwidth;
 		bargap = graph->bargap;
 		gtitle = 0;
-		xlabelmode = 2;
-		ylabelmode = 2;         // 1 = label every tick, 2 = only label first and last tick
+		//xlabelmode = 2;
+		//ylabelmode = 2;         // 1 = label every tick, 2 = only label first and last tick
 
 		//if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
 
@@ -498,9 +498,9 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		}
 
 		double xmin, xmax, ymin, ymax, xmid, ymid;
-		int scatterfield = 1;
+		int scatterfield = graph->scatterfield;
 		int width, height;
-		int scattermean = 1;
+		int scattermean = graph->scattermean;
 		double xmean, ymean, xvar, yvar, xsd, ysd;
 		double xsdneg, xsdpos, ysdneg, ysdpos;
 
@@ -693,7 +693,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	// Draw Tick Labels
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
-		if(xlabelmode == 2 && i > 0 && i < xlabels) continue;
+		if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
 		out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
@@ -715,10 +715,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	out->WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
 		mod->diagbox->Write(text.Format("ylabels %d %d\n", ylabels, i));
-		if(ylabelmode == 2 && i > 0 && i < ylabels) {
-			//mod->diagbox->Write("break\n");
-			continue;
-		}
+		if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
 		yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;

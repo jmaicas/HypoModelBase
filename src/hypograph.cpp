@@ -852,6 +852,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			xcoord = i * xplot / xlabels;
 			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
+			if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
 			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale / graph->xunitdscale - graph->xshift;
 			if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - graph->xshift;
 
@@ -889,6 +890,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			ycoord = i * yplot / ylabels;
 			if(graph->ytickmode) ycoord = (int)(yplotstep * i);
 			dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
+			if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
 			if(graph->ytickmode == 0) yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale - graph->yshift;
 			if(graph->ytickmode == 1) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
 
@@ -897,12 +899,15 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				if(graph->ytickmode == 1) yval = pow(ylogbase, graph->ystep * i);
 				if(graph->ytickmode == 0) yval = yfrom * pow(ylogbase, ylogmax * yval / yto);
 			}
-				
+
 			srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
-			if(srangey < 0.1) snum.Printf("%.3f", yval);
-			else if(srangey < 1) snum.Printf("%.2f", yval);
-			else if(srangey < 10) snum.Printf("%.1f", yval);
-			else snum.Printf("%.0f", yval);
+			if(graph->ylabelplaces == -1) {
+				if(srangey < 0.1) snum.Printf("%.3f", yval);
+				else if(srangey < 1) snum.Printf("%.2f", yval);
+				else if(srangey < 10) snum.Printf("%.1f", yval);
+				else snum.Printf("%.0f", yval);
+			}
+			else snum = numstring(yval, graph->ylabelplaces);
 			textsize = dc.GetTextExtent(snum);
 			if(ostype == Mac)
 				dc.DrawText(snum, xbase - xylab - textsize.GetWidth(), ybase + yplot - ycoord - textsize.GetHeight()/2);
@@ -1154,8 +1159,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		}
 
 		double xmin, xmax, ymin, ymax, xmid, ymid;
-		int scatterfield = 1;
-		int scattermean = 1;
+		int scatterfield = graph->scatterfield;
+		int scattermean = graph->scattermean;;
 		int width, height;
 		double xmean, ymean, xvar, yvar, xsd, ysd;
 		double xsdneg, xsdpos, ysdneg, ysdpos;

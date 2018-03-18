@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 815),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 850),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -65,6 +65,13 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	xradbox->Add(xrad[1], 1, wxTOP | wxBOTTOM, 3);
 	xrad[graph->xtickmode]->SetValue(true);
 
+	wxStaticBoxSizer *xlabradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Labels");
+	xlabrad[0] = new wxRadioButton(panel, 100, "All", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	xlabrad[1] = new wxRadioButton(panel, 101, "Ends");
+	xlabradbox->Add(xlabrad[0], 1, wxTOP | wxBOTTOM, 3);
+	xlabradbox->Add(xlabrad[1], 1, wxTOP | wxBOTTOM, 3);
+	xlabrad[graph->xlabelmode-1]->SetValue(true);
+
 	wxStaticBoxSizer *yradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Tick Mode");
 	yrad[0] = new wxRadioButton(panel, 2, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	yrad[1] = new wxRadioButton(panel, 3, "Step");
@@ -72,9 +79,18 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	yradbox->Add(yrad[1], 1, wxTOP | wxBOTTOM, 3);
 	yrad[graph->ytickmode]->SetValue(true);
 
+	wxStaticBoxSizer *ylabradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Labels");
+	ylabrad[0] = new wxRadioButton(panel, 102, "All", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	ylabrad[1] = new wxRadioButton(panel, 103, "Ends");
+	ylabradbox->Add(ylabrad[0], 1, wxTOP | wxBOTTOM, 3);
+	ylabradbox->Add(ylabrad[1], 1, wxTOP | wxBOTTOM, 3);
+	ylabrad[graph->ylabelmode-1]->SetValue(true);
+
 	wxBoxSizer *radbox = new wxBoxSizer(wxHORIZONTAL);
 	radbox->Add(xradbox, 1, wxALL, 5);
+	radbox->Add(xlabradbox, 1, wxALL, 5);
 	radbox->Add(yradbox, 1, wxALL, 5);
+	radbox->Add(ylabradbox, 1, wxALL, 5);
 
 	// Scale mode controls  December 2017
 	wxStaticBoxSizer *xsmodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Scale Mode");
@@ -103,6 +119,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
 	paramset->AddNum("xlogbase", "XLogB", graph->xlogbase, 4, labelwidth, numwidth);
 	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
+	paramset->AddNum("xlabelplaces", "X Places", graph->xlabelplaces, 0, labelwidth, numwidth);
 	paramset->AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
 	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
@@ -110,6 +127,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
 	paramset->AddNum("ylogbase", "YLogB", graph->ylogbase, 4, labelwidth, numwidth);
 	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
+	paramset->AddNum("ylabelplaces", "Y Places", graph->ylabelplaces, 0, labelwidth, numwidth);
 	paramset->AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
 
@@ -292,6 +310,8 @@ void GraphBox::SetControls()
 	paramset->GetCon("xdscale")->SetValue(graph->xunitdscale);
 	paramset->GetCon("xlabelgap")->SetValue(graph->xlabelgap);
 	paramset->GetCon("ylabelgap")->SetValue(graph->ylabelgap);
+	paramset->GetCon("xlabelplaces")->SetValue(graph->xlabelgap);
+	paramset->GetCon("ylabelplaces")->SetValue(graph->ylabelgap);
 	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
 	paramset->GetCon("labelfontsize")->SetValue(graph->labelfontsize);
 	paramset->GetCon("scattersize")->SetValue(graph->scattersize);
@@ -302,6 +322,8 @@ void GraphBox::SetControls()
 	scattercheck->SetValue(graph->scattermode);
 	xrad[graph->xtickmode]->SetValue(true);
 	yrad[graph->ytickmode]->SetValue(true);
+	xlabrad[graph->xlabelmode-1]->SetValue(true);
+	ylabrad[graph->ylabelmode-1]->SetValue(true);
 
 	strokepicker->SetColour(graph->strokecolour);
 	fillpicker->SetColour(graph->fillcolour);
@@ -411,6 +433,11 @@ void GraphBox::OnRadio(wxCommandEvent& event)
 	if(event.GetId() == 12) graph->yscalemode = 0;
 	if(event.GetId() == 13) graph->yscalemode = 1;
 
+	if(event.GetId() == 100) graph->xlabelmode = 1;
+	if(event.GetId() == 101) graph->xlabelmode = 2;
+	if(event.GetId() == 102) graph->ylabelmode = 1;
+	if(event.GetId() == 103) graph->ylabelmode = 2;
+
 	OnOK(event);
 }
 
@@ -440,6 +467,8 @@ void GraphBox::SetParams(GraphDat *setgraph)
 	graph->plotstroke = (*params)["plotstroke"];
 	graph->xlabelgap = (*params)["xlabelgap"];
 	graph->ylabelgap = (*params)["ylabelgap"];
+	graph->xlabelplaces = (*params)["xlabelplaces"];
+	graph->ylabelplaces = (*params)["ylabelplaces"];
 	graph->labelfontsize = (*params)["labelfontsize"];
 	graph->scattersize = (*params)["scattersize"];
 	graph->yunitscale = (*params)["yscale"];
@@ -482,6 +511,8 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	setgraph->plotstroke = (*params)["plotstroke"];
 	setgraph->xlabelgap = (*params)["xlabelgap"];
 	setgraph->ylabelgap = (*params)["ylabelgap"];
+	setgraph->xlabelplaces = (*params)["xlabelplaces"];
+	setgraph->ylabelplaces = (*params)["ylabelplaces"];
 	setgraph->labelfontsize = (*params)["labelfontsize"];
 	setgraph->scattersize = (*params)["scattersize"];
 	setgraph->barwidth = (*params)["barwidth"];

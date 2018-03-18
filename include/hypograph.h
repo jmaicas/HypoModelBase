@@ -135,6 +135,7 @@ public:
 	wxChoice *typechoice;
 	TypeSet typeset;
 	wxRadioButton *xrad[2], *yrad[2];
+	wxRadioButton *xlabrad[2], *ylabrad[2];
 	wxRadioButton *xsrad[2], *ysrad[2];
 	wxCheckBox *clipcheck, *scattercheck, *linecheck;
 

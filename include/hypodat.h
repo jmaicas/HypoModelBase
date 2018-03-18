@@ -609,6 +609,7 @@ public:
 	int barwidth, barshift, bargap;
 	int xscalemode, yscalemode;
 	double xlogbase, ylogbase;
+	int scatterfield, scattermean;      // used for drawing scatter cloud oval and mean
 
 	int highstart, highstop, highcolour;
 
