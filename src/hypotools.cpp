@@ -174,8 +174,15 @@ void TextGrid::ParseLabel(int row, int col, wxString readline)
 	int i;
 	wxString text, label;
 
-	label = readline.AfterFirst('\'');
-	label = label.BeforeFirst('\'');
+	if(readline.GetChar(0) == '\'') {
+		label = readline.AfterFirst('\'');
+		label = label.BeforeFirst('\'');
+	}
+	if(readline.GetChar(0) == '\"') {
+		label = readline.AfterFirst('\"');
+		label = label.BeforeFirst('\"');
+	}
+	if(!label.BeforeFirst('.').IsEmpty()) label = label.BeforeFirst('.');
 	label.Trim();
 	SetCell(row, col++, label);
 }

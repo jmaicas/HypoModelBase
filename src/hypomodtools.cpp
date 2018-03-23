@@ -400,6 +400,8 @@ void BurstBox::BurstDataPanel(BurstPanel *datpanel)
 }
 
 
+// BurstBox - now used as general spike time data loading and analysis box
+
 BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode)
 	: ToolBox(model->mainwin, title, pos, size)
 {

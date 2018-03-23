@@ -1013,7 +1013,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			oldx = xbase;
 			oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
 
-			mod->diagbox->Write(text.Format("line plot xrange %.4f yscalemode %d\n", xrange, graph->yscalemode));
+			//mod->diagbox->Write(text.Format("line plot xrange %.4f yscalemode %d\n", xrange, graph->yscalemode));
 
 			// subpixel scale drawing mode - drawing data in limited x-axis resolution, xrange gives ratio of plot pixels to data points, use this mode if xrange < 1
 			//
