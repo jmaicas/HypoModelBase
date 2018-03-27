@@ -8,7 +8,53 @@ DEFINE_EVENT_TYPE(wxEVT_SYNCH)
 
 
 
-Model::Model(short type, wxString name, HypoMain *main)
+NeuroMod::NeuroMod(int type, wxString name, HypoMain *main)
+	: Model(type, name, main)
+{
+	evodata = NULL;
+}
+
+
+NeuroMod::~NeuroMod()
+{
+	if(evodata) delete evodata;
+}
+
+
+void NeuroMod::EvoGraphs()
+{
+	evodata->GraphSet(graphbase, "Evo ", purple, 1, "evo");
+
+	GraphSet *graphset = graphbase->NewSet("Evo Intervals", "evointervals");
+	graphset->AddFlag("hazmode1", 10);
+	graphset->AddFlag("binrestog1", 1);
+	graphset->AddFlag("burstmode", 100);
+	graphset->AddFlag("normtog", 1000);
+	graphset->AddFlag("quadtog", 10000);
+	graphset->Add("evohist1ms", 0);
+	graphset->Add("evohaz1ms", 10);
+	graphset->Add("evohist5ms", 1);
+	graphset->Add("evohaz5ms", 11);
+	graphset->Add("evobursthist1ms", 100);
+	graphset->Add("evobursthaz1ms", 110);
+	graphset->Add("evobursthist5ms", 101);
+	graphset->Add("evobursthaz5ms", 111);
+	graphset->Add("evonormhist1ms", 1000);
+	graphset->Add("evonormhist5ms", 1001);
+	graphset->Add("evohistquadsmooth", 10001);
+	graphset->Add("evohistquadsmooth", 11001);
+	if(diagbox) diagbox->textbox->AppendText(graphset->Display());
+
+	graphbase->Add(GraphDat(&evodata->IoDdata, 0, 70, 0, 2, "Evo IoD", 9, 1, lightred), "iodevo");
+	graphbase->GetGraph("iodevo")->gdatax = &evodata->IoDdataX;
+	graphbase->GetGraph("iodevo")->xcount = 7;  
+	graphbase->GetGraph("iodevo")->synchx = false; 
+	graphbase->GetGraph("iodevo")->barshift  = 20;
+}
+
+
+
+Model::Model(int type, wxString name, HypoMain *main)
 {
 	mainwin = main;
 	modtype = type;
@@ -20,6 +66,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	graphbase = new GraphBase(10);
 	graphbase->mainwin = mainwin;
 	modeflags = new ParamStore();
+	toolflags = new ParamStore();
 	scalebox = mainwin->scalebox;
 	diagbox = mainwin->diagbox;
 
@@ -31,6 +78,7 @@ Model::Model(short type, wxString name, HypoMain *main)
 	xmin = -100000;
 	path = "";
 	oldhist = true;
+	xscaletoggle = 0;
 }
 
 
@@ -38,10 +86,11 @@ Model::~Model()
 {
 	delete graphbase;
 	delete modeflags;
+	delete toolflags;
 }
 
 
-void Model::GSwitch(graphdisp *gpos, ParamStore *gflags)
+void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
 {
 	int i, gdex;
 	GraphSet *graphset;
@@ -102,9 +151,20 @@ void Model::Output()
 }
 
 
+void Model::ScaleSwitch(double newxscale)
+{
+	int i;
+}
+
+
 void Model::DataSelect(double x, double y)
 {
 	int i;
+}
+
+
+void Model::EvoRun()
+{
 }
 
 
@@ -154,22 +214,24 @@ void Model::GHistLoad(wxComboBox *gstag)
 	//else filepath = path;
 	filepath = GetPath();
 
-	if(mainwin->diagnostic) tofp.New("histdiag.txt");
+	bool diagflag = false;
+
+	if(diagflag) tofp.New("histdiag.txt");
 
 	filename = modname + "gshist.ini";
 	
 	check = infile.Open(filepath + "/" + filename);
 	if(!check) return;
 	readline = infile.ReadLine();
-	if(mainwin->diagnostic) tofp.WriteLine(readline);
+	if(mainwin->diagnostic && diagflag) tofp.WriteLine(readline);
 	while(!readline.IsEmpty()) {
 		readline = readline.AfterFirst(' ');
 		//readline.Trim();
 		initgraph = readline;
 		gstag->Insert(initgraph, 0);
-		if(mainwin->diagnostic) tofp.WriteLine(text.Format("insert %s", initgraph));
+		if(diagflag) tofp.WriteLine(text.Format("insert %s", initgraph));
 		readline = infile.ReadLine();
-		if(mainwin->diagnostic) tofp.WriteLine(readline);
+		if(diagflag) tofp.WriteLine(readline);
 	}
 	infile.Close();	
 
@@ -190,7 +252,7 @@ void Model::GHistLoad(wxComboBox *gstag)
 
 	gstag->SetLabel(initgraph);
 
-	if(mainwin->diagnostic) tofp.Close();
+	if(diagflag) tofp.Close();
 }
 
 /*
@@ -387,3 +449,6 @@ int Model::ModeSum(ParamStore *gflags)
 {
 	return 0;
 }
+
+
+

@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 600),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(250, 720),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -27,6 +27,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	wxString text;
 
 	ostype = GetSystem();
+	autosynch = true;
 
 	buttonheight = 23;
 	boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
@@ -50,11 +51,11 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	labelwidth = 40;
 	numwidth = 50;
 	if(ostype == Mac) labelwidth = 50;
-	graph = graphwin->graphset[0]->plot[0];
+	graph = graphwin->dispset[0]->plot[0];
 	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth, numwidth);
-	paramset->AddNum("xstep", "X Step", graph->xstep, 1, labelwidth, numwidth);
+	paramset->AddNum("xstep", "X Step", graph->xstep, 2, labelwidth, numwidth);
 	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth, numwidth);
-	paramset->AddNum("ystep", "Y Step", graph->ystep, 1, labelwidth, numwidth);
+	paramset->AddNum("ystep", "Y Step", graph->ystep, 2, labelwidth, numwidth);
 	wxBoxSizer *tickparams = ParamLayout(2);
 
 	wxStaticBoxSizer *xradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
@@ -78,14 +79,21 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	numwidth = 50;
 
 	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth, numwidth);
-	paramset->AddNum("xsample", "Sample", graph->xsample, 0, labelwidth, numwidth);
+	paramset->AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
+	paramset->AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
 	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
 	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
+	paramset->AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
 	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
+	paramset->AddNum("yscale", "YScale", graph->yunitscale, 3, labelwidth, numwidth);
 	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
 	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
+	paramset->AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
+
+	paramset->GetCon("xshift")->SetMinMax(-100000, 100000);
+	paramset->GetCon("yshift")->SetMinMax(-100000, 100000);
 
 	paramset->AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
 	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
@@ -137,6 +145,15 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	fillbox->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	fillbox->Add(fillpicker);
 
+	// plot layer selection and synch
+	paramset->AddCon("plotlayer", "Layer", 0, 1, 0, labelwidth);
+	wxBoxSizer *layerbox = new wxBoxSizer(wxHORIZONTAL);
+	layerbox->Add(paramset->GetCon("plotlayer"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	paramset->currlay++;
+	wxButton *syncButton = new wxButton(panel, ID_Sync, "Synch", wxDefaultPosition, wxSize(50, buttonheight));
+	layerbox->Add(syncButton, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	
+	// plot type selection
 	typeset = TypeSet();
 	typeset.Add("Line", 5);
 	typeset.Add("Line with X data", 2);
@@ -145,18 +162,11 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	typeset.Add("Bar", 7);
 	typeset.Add("Histogram", 1);
 	typeset.Add("Spike Rate", 3);
-
-	/*
-	typestrings[0] = "Line";
-	typestrings[1] = "Line with Sampling";
-	typestrings[2] = "Scatter with Sampling";
-	typestrings[3] = "Bar";
-	typestrings[4] = "Histogram";
-	typestrings[5] = "Spike Rate";*/
+	typeset.Add("Bar with X data", 9);
+	typeset.Add("Scatter with X data", 10);
 
 	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), typeset.numtypes, typeset.names);
 	typechoice->SetSelection(typeset.GetIndex(graph->type));
-	//typechoice->SetSelection(0);
 	wxBoxSizer *typebox = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Plot Type");
 	label->SetFont(confont);
@@ -164,7 +174,6 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	typebox->AddSpacer(5);
 	typebox->Add(typechoice);
 	
-
 	paramset->AddText("gname", "Name", graph->gname, labelwidth);
 	paramset->AddText("xtag", "X Label", graph->xtag, labelwidth);
 	paramset->AddText("ytag", "Y Label", graph->ytag, labelwidth);
@@ -200,6 +209,8 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(strokebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->Add(fillbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
+	mainbox->Add(layerbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	mainbox->AddStretchSpacer();
 	mainbox->Add(typebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(labelparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
@@ -212,12 +223,15 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 
 	Connect(wxEVT_CHOICE, wxCommandEventHandler(GraphBox::OnChoice));
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(GraphBox::OnRadio));
+	Connect(ID_Sync, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnSynch));
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnOK));
 	Connect(wxID_CANCEL, wxEVT_COMMAND_BUTTON_CLICKED, wxCloseEventHandler(GraphBox::OnClose));
 	Connect(ID_Print, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnPrint));
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(GraphBox::OnOK));
 	Connect(wxEVT_SIZE, wxSizeEventHandler(GraphBox::OnSize));
 	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(GraphBox::OnClose));
+	Connect(wxEVT_SPIN, wxSpinEventHandler(GraphBox::OnSpin));
+
 
 	//ShowModal();
 	//Destroy(); 
@@ -225,17 +239,9 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 }
 
 
-void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
+
+void GraphBox::SetControls()
 {
-	int i, type;
-	wxString tag;
-	double pval;
-
-	SetParams();
-
-	if(newgraphwin) graphwin = newgraphwin;            // default newgraphwin=NULL for updating panel without changing graph window
-	graph = graphwin->graphset[0]->plot[0];
-
 	paramset->GetCon("gname")->SetValue(graph->gname);
 	//paramset->GetCon("gname")->SetLabel("test label");
 	paramset->GetCon("xtag")->SetValue(graph->xtag);
@@ -256,6 +262,8 @@ void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
 	paramset->GetCon("labelfontsize")->SetValue(graph->labelfontsize);
 	paramset->GetCon("scattersize")->SetValue(graph->scattersize);
+	paramset->GetCon("yscale")->SetValue(graph->yunitscale);
+	paramset->GetCon("yshift")->SetValue(graph->yshift);
 
 	clipcheck->SetValue(graph->clipmode);
 	scattercheck->SetValue(graph->scattermode);
@@ -267,11 +275,62 @@ void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
 }
 
 
+void GraphBox::SetGraph(GraphWindow3 *newgraphwin)
+{
+	int i, type;
+	wxString tag;
+	double pval;
+
+	SetParams();	// read and store params for previous plot
+
+	if(newgraphwin) graphwin = newgraphwin;            // default newgraphwin=NULL for updating panel without changing graph window
+	graph = graphwin->dispset[0]->plot[0];
+
+	SetControls();
+}
+
+
 void GraphBox::OnClose(wxCloseEvent& event)
 {
 	diagbox->Write("Axis box close\n");
 	graphwin->mainwin->graphbox = NULL;
 	wxDialog::Destroy();
+}
+
+
+void GraphBox::OnSpin(wxSpinEvent& event)
+{
+	wxString text;
+
+	int layer = paramset->GetValue("plotlayer");
+
+	GraphDisp *graphdisp = graphwin->dispset[0];
+	if(layer > graphdisp->numplots-1) paramset->GetCon("plotlayer")->SetValue(graphdisp->numplots-1);
+	else {
+		SetParams();   // read and store params for previous plot
+		graph = graphdisp->plot[layer];
+		diagbox->Write(text.Format("Layer %d plot %s\n", layer, graph->gname));
+		SetControls();  // update params for new plot
+	}
+}
+
+
+void GraphBox::SynchLayers() {
+
+	int i;
+
+	GraphDisp *graphdisp = graphwin->dispset[0];
+	for(i=0; i<graphdisp->numplots; i++) SetParamsCopy(graphdisp->plot[i]);
+
+	graphdisp->XYSynch(graph);
+
+	graphwin->UpdateScroll();
+}
+
+
+void GraphBox::OnSynch(wxCommandEvent& WXUNUSED(event))
+{
+	SynchLayers();
 }
 
 
@@ -292,7 +351,7 @@ void GraphBox::OnChoice(wxCommandEvent& event)
 {
 	wxString text;
 
-	graph = graphwin->graphset[0]->plot[0];
+	//graph = graphwin->dispset[0]->plot[0];
 	int selection = typechoice->GetSelection();
 	graph->type = typeset.GetType(selection);
 	//status->SetLabel(text.Format("Type %d", typeset.GetType(selection)));
@@ -302,7 +361,7 @@ void GraphBox::OnChoice(wxCommandEvent& event)
 
 void GraphBox::OnRadio(wxCommandEvent& event)
 {
-	graph = graphwin->graphset[0]->plot[0];
+	//graph = graphwin->dispset[0]->plot[0];
 
 	if(event.GetId() == 0) graph->xtickmode = 0;
 	if(event.GetId() == 1) graph->xtickmode = 1;
@@ -318,9 +377,10 @@ void GraphBox::OnPrint(wxCommandEvent& event)
 }
 
 
-void GraphBox::SetParams()
+void GraphBox::SetParams(GraphDat *setgraph)
 {
 	ParamStore *params = paramset->GetParamsNew(boxout);
+	if(setgraph) graph = setgraph;
 
 	graph->xlabels = (*params)["xlabels"];
 	graph->ylabels = (*params)["ylabels"];
@@ -337,6 +397,11 @@ void GraphBox::SetParams()
 	graph->ylabelgap = (*params)["ylabelgap"];
 	graph->labelfontsize = (*params)["labelfontsize"];
 	graph->scattersize = (*params)["scattersize"];
+	graph->yunitscale = (*params)["yscale"];
+	graph->yshift = (*params)["yshift"];
+
+	graph->barwidth = (*params)["barwidth"];
+	graph->bargap = (*params)["bargap"];
 
 	graph->clipmode = clipcheck->GetValue();
 	graph->scattermode = scattercheck->GetValue();
@@ -350,13 +415,51 @@ void GraphBox::SetParams()
 }
 
 
+void GraphBox::SetParamsCopy(GraphDat *setgraph)
+{
+	ParamStore *params = paramset->GetParamsNew(boxout);
+
+	setgraph->xlabels = (*params)["xlabels"];
+	setgraph->ylabels = (*params)["ylabels"];
+	setgraph->xstep = (*params)["xstep"];
+	setgraph->ystep = (*params)["ystep"];
+	setgraph->xplot = (*params)["xplot"];
+	setgraph->yplot = (*params)["yplot"];
+	setgraph->xshift = (*params)["xshift"];
+	setgraph->yshift = (*params)["yshift"];
+	setgraph->xsample = (*params)["xsample"];
+	setgraph->xunitscale = (*params)["xscale"];
+	setgraph->xunitdscale = (*params)["xdscale"];
+	setgraph->yunitscale = (*params)["yscale"];
+	setgraph->plotstroke = (*params)["plotstroke"];
+	setgraph->xlabelgap = (*params)["xlabelgap"];
+	setgraph->ylabelgap = (*params)["ylabelgap"];
+	setgraph->labelfontsize = (*params)["labelfontsize"];
+	setgraph->scattersize = (*params)["scattersize"];
+	setgraph->barwidth = (*params)["barwidth"];
+	setgraph->bargap = (*params)["bargap"];
+	setgraph->clipmode = clipcheck->GetValue();
+	setgraph->scattermode = scattercheck->GetValue();
+	
+	setgraph->xtag = paramset->GetCon("xtag")->GetString();
+	setgraph->ytag = paramset->GetCon("ytag")->GetString();
+	
+	setgraph->xtickmode = graph->xtickmode;
+	setgraph->ytickmode = graph->ytickmode;	
+}
+
+
 void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 {
+	int g;
 	long stringnum;
 	wxString snum, text;
 
-	graph = graphwin->graphset[0]->plot[0];
+	if(autosynch) SynchLayers();
 
+	for(g=0; g<graphwin->numdisps; g++) SetParamsCopy(graphwin->dispset[g]->plot[0]);
+
+	//graph = graphwin->dispset[0]->plot[0];      // not sure if this is needed 7/3/16
 	SetParams();
 	
 	graphwin->UpdateScroll();
@@ -420,6 +523,7 @@ ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	//status = NULL;
 	defbutt = 0;
 	defstore = false;
+	diagmode = 0;
 	mainwin = mod->mainwin;
 
 	model->mainwin->diagbox->Write("ParamBox init\n");
@@ -479,7 +583,7 @@ void ParamBox::SetStatus(wxString text)
 
 void ParamBox::WriteVDU(wxString text)
 {
-	vdu->AppendText(text);
+	if(vdu) vdu->AppendText(text);
 }
 
 
@@ -496,7 +600,7 @@ void ParamBox::Initialise()
 	paramstoretag = NULL;
 	if(boxtype == 0 || boxtype == 1) {
 		mainwin->diagbox->Write("Store Box initialise\n");
-		paramstoretag = TextInputCombo(100, 20, "", boxname, mod->GetPath());
+		paramstoretag = TextInputCombo(120, 20, "", boxname, mod->GetPath());
 		paramstoretag->Show(false);
 	}
 	
@@ -576,6 +680,15 @@ void ParamBox::ParamLayout(int columns)                   // Currently for one o
 		}
 		parambox->Add(vbox[1], 0);
 	}
+}
+
+
+void ParamBox::PanelParamLayout(wxBoxSizer *box, int columns)
+{
+	for(i=paramindex; i<paramset->numparams; i++) {
+		box->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	}
+	paramindex = paramset->numparams;
 }
 
 
@@ -671,7 +784,7 @@ wxCheckBox *ParamBox::SetModCheck(int id, wxString checktag, wxString checktext,
 {
 	wxCheckBox *newcheck;
 	(*modflags)[checktag] = state;
-	newcheck = new wxCheckBox(panel, id, checktext);
+	newcheck = new wxCheckBox(activepanel, id, checktext);
 	newcheck->SetFont(confont);
 	newcheck->SetValue(state);
 	checkrefs->AddRef(id, checktag, newcheck);
@@ -812,6 +925,12 @@ void ParamBox::OnRun(wxCommandEvent& WXUNUSED(event))
 }
 
 
+ParamCon *ParamBox::GetCon(wxString tag)
+{
+	return paramset->GetCon(tag);
+}
+
+
 wxBoxSizer *ParamBox::RunBox()
 {
 	wxBoxSizer *runbox = new wxBoxSizer(wxHORIZONTAL);
@@ -937,7 +1056,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 	//TextFile ofp;
 	wxString text;
 
-	diagnostic = 0;
+	diagnostic = false;
 
 	ParamStore *oldparams = GetParams();
 
@@ -1006,7 +1125,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 			}
 			else paramset->con[id]->SetValue(readline);
 		}
-		//if(diagnostic) ofp.WriteLine(text.Format("Model Param ID %d, Value %.4f\n", id, datval)); 
+		if(diagnostic) mainwin->diagbox->Write(text.Format("Model Param ID %d, Name %s, Value %.4f\n", id, datname, datval)); 
 		if(paramfile.Eof()) return;
 		readline = paramfile.GetNextLine();	
 	}
@@ -1021,7 +1140,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 		(*modflags)[datname] = flagval;
 		id = flagrefs->GetID(datname);
 		if(id) menuModel->Check(id, flagval);
-		//if(diagnostic) ofp.WriteLine(text.Format("Model flag ID %d, Set %d\n", id, flagval)); 
+		if(diagnostic) mainwin->diagbox->Write(text.Format("Model flag ID %d, Name %s, Set %d\n", id, datname, flagval)); 
 		readline = paramfile.GetNextLine();	
 	}
 
@@ -1037,8 +1156,8 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 		(*modflags)[datname] = flagval;
 		id = checkrefs->GetID(datname);
 		//menuModel->Check(id, flagval);
-		((wxCheckBox *)checkrefs->GetBox(id))->SetValue(flagval);
-		//if(diagnostic) ofp.WriteLine(text.Format("Model flag ID %d, Set %d\n", id, flagval)); 
+		if(id) ((wxCheckBox *)checkrefs->GetBox(id))->SetValue(flagval);
+		if(diagnostic) mainwin->diagbox->Write(text.Format("Model check ID %d, Name %s, Set %d\n", id, datname, flagval)); 
 		readline = paramfile.GetNextLine();	
 	}
 	paramfile.Close();
@@ -1124,3 +1243,35 @@ void ParamBox::StoreParam(wxString tag)
 }
 
 
+
+DatPanel::DatPanel(ToolBox *tbox, int size)
+{
+	box = tbox;
+	numdats = 0;
+	numwidth = 60;
+	maxdats = size;
+	datset = new wxStaticText*[size];
+	tags = new wxString[size];
+}
+
+
+DatPanel::~DatPanel()
+{
+	delete[] datset;
+	delete[] tags;
+}
+
+
+void DatPanel::AddDat(wxString tag, wxString value)
+{
+	ref[tag] = numdats;
+	tags[numdats] = tag;
+	datset[numdats] = box->NumPanel(numwidth);
+	numdats++;
+}
+
+
+wxStaticText *DatPanel::GetDat(wxString tag)
+{
+	return datset[(int)ref[tag]];
+}

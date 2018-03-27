@@ -2,7 +2,7 @@
 // *********************************      hypomodel.h               *********************************
 //
 //  HypoMain Class. Use the other important created classes for showing data in a Window
-//	a. For Display: ScaleBox, ToolBox, GraphWindow3, graphdisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
+//	a. For Display: ScaleBox, ToolBox, GraphWindow3, GraphDisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
 //	b. For Analysis: InfoBox,	BurstBox, BurstDat, SpikeDat, AnaDat,	SpikeDat, ProtocolBox.
 //
 //  *************************************************************************************************
@@ -18,6 +18,7 @@
 
 #include <wx/wx.h>
 #include "hypograph.h"
+#include "hypoplot.h"
 #include "hypopanels.h"
 #include "hypomods.h"
 #include "hypodat.h"
@@ -79,7 +80,7 @@ public:
 
 
 //  HypoMain Class. Use the other important created classes for showing data in a Window
-//	a. For Display: ScaleBox, ToolBox, GraphWindow3, graphdisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
+//	a. For Display: ScaleBox, ToolBox, GraphWindow3, GraphDisp, GraphDat, GraphBase, DispWin, GraphWindow3, SpikeDat
 //	b. For Analysis: InfoBox,	BurstBox, BurstDat, SpikeDat, AnaDat,	SpikeDat, ProtocolBox.
 class HypoMain: public MainFrame
 {
@@ -126,13 +127,14 @@ public:
 	//GraphBox *graphbox;
 	//ToolBox *toolset[10];
 	//GraphWindow3 *graphwin[10];
-	graphdisp *gpos;
+	GraphDisp *gpos;
 	GraphDat *greg;
 	GraphBase *graphbase;
 	DispWin *dispwin;
 	GraphWindow3 *graphwin2[10];
 	SpikeDat *focusdata;
-	//graphdisp *gpos2;
+	FileBase *filebase;
+	//GraphDisp *gpos2;
 
 	// Tools and Analysis 
 	InfoBox *infobox;
@@ -140,7 +142,10 @@ public:
 	BurstDat *burstdata;
 	SpikeDat *currentdata;
 	AnaDat *analysisdata;
-	SpikeDat *expdata, *selectdata;
+	SpikeDat *expdata, *expdata2, *selectdata;
+
+	ParamStore *hypoflags;
+	RefStore *flagrefs;
 
 	ProtocolBox *protocolbox;
 #ifdef HYPOSOUND
@@ -166,6 +171,7 @@ public:
 	Model *mod;
 
 	HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size);
+	~HypoMain();
 
 	void OnPaint2(wxPaintEvent& event);
 	void SetStatus(wxString);
@@ -182,16 +188,22 @@ public:
 	void OptionLoad();
 	void ViewLoad();
 	void ViewStore();
-	void ToolLoad(ParamStore *toolflags);
+
+	void ToolLoad();
 	void SpikeModule(Model *);
 	void SpikeBox(int modmode = 0);
+	void EvoSpikeModule(Model *);
 
 	void BasicMenu();
 	void FullMenu();
+	void UserMenu();
 	void ModInit();
 	void CleanUp();
 	void AddGraph();
 	void RemoveGraph(int);
+
+	void OnFlag(wxCommandEvent& event);
+	void SetMenuFlag(int, wxString, wxString, int state, wxMenu *menu); 
 
 	void OnMove(wxMoveEvent& event);
 	void OnSize(wxSizeEvent& event);

@@ -43,8 +43,8 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 	nummods = mainwin->moddex - 1;
 	nummods = mainwin->modset.modcount;
 
-	modrad[0] = new wxRadioButton(panel, 0, "Blank", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	startbox->Add(modrad[0], 1, wxTOP | wxBOTTOM, 3);
+	//modrad[0] = new wxRadioButton(panel, 0, "Blank", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	//startbox->Add(modrad[0], 1, wxTOP | wxBOTTOM, 3);
 	
 	for(i=0; i<nummods; i++) {
 		modrad[i+1] = new wxRadioButton(panel, mainwin->modset.modeldat[i].index, mainwin->modset.modeldat[i].title);

@@ -148,7 +148,7 @@ ParamCon::ParamCon(ToolPanel *panel, wxString pname, wxString labelname, wxStrin
 	type = textcon;
 	labelwidth = labelwid;
 	numwidth = numwid;
-	pad = 2;
+	pad = panel->controlborder;
 	if(ostype == Mac) pad = 0;
 	mainwin = panel->mainwin;
 	
@@ -194,7 +194,8 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	type = tp;
 	labelwidth = labelwid;
 	numwidth = numwid;
-	pad = 2;
+	pad = panel->controlborder;
+	//pad = 0;
 	if(ostype == Mac) pad = 0;
 	mainwin = panel->mainwin;
 	//wxFont textfont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
@@ -214,7 +215,7 @@ ParamCon::ParamCon(ToolPanel *panel, int tp, wxString pname, wxString labelname,
 	if(initval < 0) min = -1000000;
 	if(initval < min) min = initval * 10;
 	if(initval > max) max = initval * 100;
-
+	oldvalue = initval;
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	snum.Printf("%.1f", initval);
@@ -311,7 +312,7 @@ wxSize ParamCon::DoGetBestSize() const
 	//if(type == spincon) return wxSize(numwidth + labelwidth + 20, 25);
 	if(type == spincon) return wxSize(numwidth + labelwidth + 17, 25);
 	else //return wxSize(110, 25);                 // 109
-		return wxSize(numwidth + labelwidth + pad*2, 25);
+		return wxSize(numwidth + labelwidth + pad*2, 21 + pad*2);
 }
 
 
@@ -333,7 +334,7 @@ void ParamCon::OnSpin(wxSpinEvent& event)
 	wxString text;
 
 	int spindir = event.GetPosition();
-	if(mainwin->diagnostic) mainwin->diagbox->textbox->AppendText(text.Format("\nspin click %d\n", spindir));
+	if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText(text.Format("\nspin click %d\n", spindir));
 
 	event.Skip();
 }
@@ -356,7 +357,7 @@ void ParamCon::OnSpinDown(wxSpinEvent& WXUNUSED(event))
 {
 	double value, newvalue;
 
-	if(mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("spin down\n");
+	if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("spin down\n");
 
 	numbox->GetValue().ToDouble(&value);
 	newvalue = value - numstep;
@@ -395,7 +396,10 @@ void ParamSet::SetMinMax(wxString tag, double min, double max)
 
 int ParamSet::GetID(wxString tag)
 {
-	return ref[tag];
+	wxString text;
+	int index = ref[tag];
+	if(index < 0) panel->mainwin->diagbox->Write(text.Format("ParamSet bad tag index %d, tag %s\n", index, tag));
+	return index;
 }
 
 
@@ -405,27 +409,33 @@ ParamCon *ParamSet::GetCon(wxString tag)
 }
 
 
-void ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth) 
+ParamCon *ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth) 
 {
 	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);           // number + spin
 	ref[name] = numparams;
-	numparams++;
+	//numparams++;
+
+	return con[numparams++];
 }
 
 
-void ParamSet::AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth, int numwidth)
+ParamCon *ParamSet::AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth, int numwidth)
 {
 	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);              // number
 	ref[name] = numparams;
-	numparams++;
+	//numparams++;
+
+	return con[numparams++];
 }
 
 
-void ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
+ParamCon *ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
 {
 	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);																// text
 	ref[name] = numparams;
-	numparams++;
+	//numparams++;
+
+	return con[numparams++];
 }
 
 
@@ -435,6 +445,7 @@ double ParamSet::GetValue(wxString tag)
 	double value;
 
 	id = GetID(tag);
+	if(id < 0) return 0;
 	con[id]->numbox->GetValue().ToDouble(&value);
 	return value;	
 }
@@ -504,6 +515,20 @@ ToolPanel::ToolPanel(MainFrame *main, wxWindow *parent)
 {
 	mainwin = main;
 	toolbox = NULL;
+	controlborder = 2;
+}
+
+
+ToolPanel::ToolPanel(wxNotebook *book, const wxPoint& pos, const wxSize& size)
+	: wxPanel(book, wxID_ANY, pos, size)
+{
+	toolbox = NULL;
+	mainwin = NULL;
+	controlborder = 2;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
+	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
 }
 
 
@@ -512,6 +537,7 @@ ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
 {
 	toolbox = NULL;
 	mainwin = NULL;
+	controlborder = 2;
 
 	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
 	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
@@ -525,6 +551,7 @@ ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)
 {
 	toolbox = tbox;
 	mainwin = toolbox->mainwin;
+	controlborder = 2;
 
 	//if(mainwin->diagbox) mainwin->diagbox->Write("ToolPanel init\n");
 
@@ -540,10 +567,9 @@ ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)
 ToolPanel::ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size)
 	: wxPanel(main, wxID_ANY, pos, size)
 {
-	//toolbox = tbox;
-	//pinmode = 0;
 	toolbox = NULL;
 	mainwin = main;
+	controlborder = 2;
 
 	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
 	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
@@ -603,6 +629,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	child = chi;
 	boxname = title;
 	canclose = true;
+	vdu = NULL;
 
 	//main->diagbox->Write("ToolBox init\n");
 
@@ -620,6 +647,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	boxtype = 0;
 	boxname = title;
 	canclose = close;
+	vdu = NULL;
 	
 	Init();
 }
@@ -946,7 +974,7 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
 	wxString filename, filepath;
-	wxString readline, tag;
+	wxString readline, tag, text;
 	TextFile opfile;
 	bool check;
 
@@ -958,7 +986,7 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 
 	if(panel->mainwin) diagbox = panel->mainwin->diagbox;
 
-	diagbox->Write("\nTagBox init\n");
+	diagbox->Write("\nTagBox init " + name + "\n");
 
 	// tag history load
 	if(name == "") {
@@ -972,11 +1000,12 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 		return;
 	}
 
-	diagbox->Write("Reading tag history\n");
+	diagbox->Write("Reading tag history " + filename + "\n");
 
 	readline = opfile.ReadLine();
 
 	while(!readline.IsEmpty()) {
+		//diagbox->Write("Readline " + readline + "\n");
 		readline = readline.AfterFirst(' ');
 		readline.Trim();
 		tag = readline;

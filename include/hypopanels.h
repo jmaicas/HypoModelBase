@@ -30,6 +30,9 @@ using namespace std;
 class Model;
 class HypoMain;
 
+class TextGrid;
+
+
 //	1. OptionPanel. Use a Hypomain class to show Option Menu ?
 class OptionPanel : public wxDialog
 {
@@ -77,6 +80,7 @@ class ParamBox: public ToolBox
 {
 public:
 	int numparams;	
+	int paramindex;
 	double countmark;
 	int column;
 	int redflag;
@@ -84,6 +88,7 @@ public:
 	int version;
 	int parallel;
 	int labelwidth;
+	int numwidth;
 	int defbutt;
 	wxString redtag;
 	wxString storehist[10];
@@ -91,6 +96,7 @@ public:
 	wxString name;
 	short histmode;
 	bool defstore;
+	int diagmode;
 
 	HypoMain *mainwin;
 	Model *mod;
@@ -102,6 +108,7 @@ public:
 	RefStore *flagrefs;
 	RefStore *checkrefs;
 	RefStore *panelrefs;
+	wxNotebook *notebook;
 	//FlagSet *flagset;
 
 	int autorun;
@@ -115,6 +122,7 @@ public:
 	wxStaticText *freq;
 	wxStaticText *sd;
 	wxStaticText *runcount;
+	wxStaticText *label;
 
 	wxMenu *menuControls;
 	wxMenu *menuModel;
@@ -165,7 +173,7 @@ public:
 	void SetStatus(wxString);
 	void WriteVDU(wxString);
 	void InitMenu();
-    void DataMenu();
+	void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
@@ -173,7 +181,9 @@ public:
 	ParamStore *GetParams(ParamStore *pstore=NULL);
 	ParamStore *GetNumParams();
 	void ParamLayout(int columns=1);
+	void PanelParamLayout(wxBoxSizer *box, int columns=1);
 	void OnClose(wxCloseEvent& event);
+	ParamCon *GetCon(wxString);
 	wxBoxSizer *RunBox();
 };
 
@@ -213,19 +223,50 @@ public:
 	int neuroindex;
 	int cellcount;
 	SpikeDat *currcell;
+	//SpikeDat *selected;
 	//NeuroDat *cells;
-	vector<NeuroDat> *cells;
+	vector<NeuroDat>*cells;
 
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
+	TagBox *neurodatatag;
+	TextGrid *textgrid;
+
+	wxStaticBoxSizer *selectbox1, *selectbox2;
+	wxToggleButton *addbutton[5];
+	wxToggleButton *subbutton[5];
+	int selectmode[5];
+	int selectcount;
+	int currselect;
+	//BurstDat **selectdata;
+	//BurstDat *selectdata[5];
+	int *selectspikes[2];
+	bool spikeselectLink;
+	
 
 	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
+	~CellBox();
 	void NeuroData();
 	//void NeuroAnalysis();
 	void PanelData(NeuroDat *);
 	void OnNext(wxSpinEvent& event);
 	void OnPrev(wxSpinEvent& event);
 	void OnEnter(wxCommandEvent& event);
+	void OnLoadData(wxCommandEvent& event);
+	void OnBrowse(wxCommandEvent& event);
+	void LoadDataList(FileDat *);
+	void LoadNeuroData(FileDat file, int col);
+
+	void OnAdd(wxCommandEvent& event);
+	void OnSub(wxCommandEvent& event);
+	void OnClear(wxCommandEvent& event);
+	void OnInvert(wxCommandEvent& event);
+	void AnalyseSelection();
+	void SetSelect(double, double);
+	void OnClick(wxPoint);
+	void OnToggle(wxCommandEvent& event);
+	void SelectAdd();
+	void SelectSub();
 };
 
 
@@ -237,8 +278,10 @@ public:
 	TextGrid *textgrid;
 	DiagBox *diagbox;
 	wxNotebook *notebook;
+	//PlotBox *plotbox;
+	bool bookmode, vdumode;
 
-	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20);
+	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true);
 
 	virtual void GridDefault();
 	virtual void TestGrid();
@@ -254,6 +297,7 @@ public:
 	void OnCopy(wxCommandEvent& event);
 	void OnButton(wxCommandEvent& event);
 	int ColumnData(int, datdouble *);
+	virtual void ColumnSelect(int);
 };
 
 //	6. InfoBox. Derived from ToolBox, has a Hypomain window to manage, storing and loading, different parameters.
@@ -388,8 +432,9 @@ public:
 	wxComboBox *datfiletag;
 	wxStaticText *datstatus;
 
-	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst");
+	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst", bool evomode = false);
 	void BurstDataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
+	void DataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void BurstDataPanel(BurstPanel *);
 	void SpikeDataDisp(SpikeDat *dispdata=NULL);
 	void Scan(SpikeDat *);
@@ -404,6 +449,26 @@ public:
 	~BurstBox();
 };
 
+
+class DatPanel
+{
+public:
+	wxPanel *panel;
+	ToolBox *box;
+
+	wxStaticText **datset;
+	ParamStore ref;
+	wxString *tags;
+
+	int numdats, maxdats;
+	int numwidth;
+	wxString text;
+
+	DatPanel(ToolBox *box, int size = 10);
+	~DatPanel();
+	void AddDat(wxString tag, wxString value = "");
+	wxStaticText *GetDat(wxString tag);
+};
 
 
 

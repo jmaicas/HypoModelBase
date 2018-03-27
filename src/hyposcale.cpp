@@ -5,7 +5,7 @@
 
 
 
-ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, graphdisp *gdisp, Model *model, GraphWindow3 **gwin, int start, short btype)
+ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, GraphDisp *gdisp, Model *model, GraphWindow3 **gwin, int start, short btype)
 	: wxPanel(draw, wxID_ANY, wxPoint(0, 0), size, wxBORDER_SIMPLE | wxFULL_REPAINT_ON_RESIZE)
 {
 	mainwin = main;
@@ -23,6 +23,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	mod = model;
 
 	int buttonsize;
+
+	SetDoubleBuffered(true);
 
 	gflags = new ParamStore();
 	gflagrefs = new RefStore();
@@ -169,6 +171,20 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			//vbox->AddSpacer(2);
 			
 			if(i == 1) {
+				/*
+				if(ostype == Mac) {
+				ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
+				ScaleButton(ID_binres1, "Bin Res", 60, vbox);
+				ScaleButton(ID_allburst, "All / Burst", 74, vbox);
+				}
+				else {
+				ScaleButton(ID_histhaz1, "Hist / Haz", 54, vbox);
+				ScaleButton(ID_binres1, "Bin Res", 43, vbox);
+				ScaleButton(ID_allburst, "All / Burst", 55, vbox);
+				}	*/	
+
+				// GraphButton replaces ScaleButton, gradual phase out    16/6/16
+
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
 					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
@@ -188,7 +204,10 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			//vbox->AddSpacer(2);
 			if(i == 2) {		
 				wxBoxSizer *secbox = new wxBoxSizer(wxHORIZONTAL); 
-				ScaleButton(ID_expdat, "Exp", 45, vbox);
+				wxBoxSizer *quadbox = new wxBoxSizer(wxHORIZONTAL); 
+				GraphButton("quadtog", 0, ID_quad, "Quad", 35, quadbox);
+				ScaleButton(ID_expdat, "Exp", 35, quadbox);
+				vbox->Add(quadbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 				ScaleButton(ID_profile, "Profile", 55, vbox);
 				//wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
 				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -215,6 +234,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				vbox->Add(secbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
+		}
+
+		if(boxtype == modAgent) {
 		}
 
 		if(boxtype == modHeat) {
@@ -330,12 +352,19 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 					ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
 				else {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 60, vbox);
+					GraphButton("allselect", 0, ID_allselect, "All / Select", 60, vbox);
 					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
 					ScaleButton(ID_allburst, "All / Burst", 55, vbox);
 				}		
 				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+		}
+
+		if(boxtype == modOxyHH || boxtype == modOxySec) {
+			if(i == 0) {
+				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
 			}
 
 			if(i == 2) {
@@ -435,10 +464,114 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				}		
 				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
+			if(i == 2) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				overpan1 = 1;
+				overpan2 = 2;
+			}
 		}
+
+		if(boxtype == modOxyNet) {
+			if(i == 0) {
+				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+				wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
+
+				if(ostype == Mac) {
+					ScaleButton(ID_spikes, "Sp", 40, resbox);   
+					ScaleButton(ID_rateres, "Ra", 40, resbox); 
+					GraphButton("nettog", 0, ID_net, "Net", 43, modebox);
+				}
+				else {
+					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
+					resbox->AddSpacer(2);
+					ScaleButton(ID_rateres, "Rate", 37, resbox); 
+					
+					GraphButton("nettog", 0, ID_net, "Net", 37, modebox);
+				}
+				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				vbox->Add(modebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+
+			}
+			if(i == 1) {
+				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+				if(ostype == Mac) {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+				}
+				else {
+					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+				}		
+				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}
+			if(i == 2) {
+				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+				if(ostype == Mac) {
+					ScaleButton(ID_overlay, "Ovl", 43, hbox);
+					ScaleButton(ID_position, "Pos", 43, hbox);
+				}
+				else {
+					ScaleButton(ID_overlay, "Over", 35, hbox);
+					hbox->AddSpacer(2);
+					ScaleButton(ID_position, "Pos", 35, hbox);
+				}
+				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				overpan1 = 1;
+				overpan2 = 2;
+			}
+		}
+
+			/*
+			if(i == 2) {		
+			wxBoxSizer *secbox = new wxBoxSizer(wxHORIZONTAL); 
+			ScaleButton(ID_expdat, "Exp", 45, vbox);
+			ScaleButton(ID_profile, "Profile", 55, vbox);
+
+			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+			if(ostype == Mac) {
+
+			ScaleButton(ID_secretion, "Sec", 43, secbox);
+
+			ScaleButton(ID_dendmode, "Den", 45, secbox);
+			ScaleButton(ID_overlay, "Ovl", 43, hbox);
+			ScaleButton(ID_position, "Pos", 43, hbox);
+			}
+			else {
+			ScaleButton(ID_secretion, "Sec", 37, secbox);
+			secbox->AddSpacer(2);
+			ScaleButton(ID_dendmode, "Dend", 37, secbox);
+			ScaleButton(ID_overlay, "Over", 35, hbox);
+			hbox->AddSpacer(2);
+			ScaleButton(ID_position, "Pos", 35, hbox);
+			}
+			vbox->Add(secbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			}*/
+		
 	}
 
+
 	//vbox->AddStretchSpacer(5);
+	
+	wxBoxSizer *modbuttonbox = new wxBoxSizer(wxHORIZONTAL);
+	if(boxtype == modAgent) {
+		ScaleButton(ID_xscale, "XScale", 50, modbuttonbox);
+	}
+	mod->diagbox->Write(text.Format("\nscale boxtype %d\n", boxtype));
+
+
 	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
 	if(ostype == Mac) {
 		ScaleButton(wxID_OK, "OK", 43, buttonbox);
@@ -451,6 +584,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		syncbutton = ToggleButton(ID_Sync, "Sync", 35, buttonbox);	
 		//ScaleButton(ID_Sync, "Sync", 35, buttonbox);	
 	}
+
+	vbox->Add(modbuttonbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	vbox->AddSpacer(3);
 	vbox->Add(buttonbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	vbox->AddSpacer(3);
@@ -488,6 +624,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(ID_dendmode, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnDendMode));
 	Connect(ID_overlay, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
 	Connect(ID_position, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
+	Connect(ID_xscale, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXScale));
 
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSpikes));
 	Connect(ID_rateres, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnRateRes));
@@ -513,6 +650,13 @@ ScaleBox::~ScaleBox()
 	delete gflagrefs;
 }
 
+
+void ScaleBox::OnXScale(wxCommandEvent& event)
+{
+	if(mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("\nOnXScale\n");
+	mod->xscaletoggle = 1 - mod->xscaletoggle;
+	mod->ScaleSwitch();
+}
 
 void ScaleBox::OnConFocus(wxFocusEvent& event)
 {
@@ -765,8 +909,8 @@ GraphUpdate();
 void ScaleBox::OnYZoomIn(wxCommandEvent& event)
 {
 	int pos = event.GetId() - 1000;
-	if(graphwin[pos]->numgraphs == 0) return;
-	graph = graphwin[pos]->graphset[0]->plot[0];
+	if(graphwin[pos]->numdisps == 0) return;
+	graph = graphwin[pos]->dispset[0]->plot[0];
 	double diff = graph->yto - graph->yfrom;
 	if(graph->negscale || graph->yfrom < 0) {
 		graph->yto = graph->yto - diff / 4;
@@ -782,8 +926,8 @@ void ScaleBox::OnYZoomIn(wxCommandEvent& event)
 void ScaleBox::OnYZoomOut(wxCommandEvent& event)
 {
 	int pos = event.GetId() - 1010;
-	if(graphwin[pos]->numgraphs == 0) return;
-	graph = graphwin[pos]->graphset[0]->plot[0];
+	if(graphwin[pos]->numdisps == 0) return;
+	graph = graphwin[pos]->dispset[0]->plot[0];
 	double diff = graph->yto - graph->yfrom;
 	if(graph->negscale || graph->yfrom < 0) {
 		graph->yto = graph->yto + diff / 2;
@@ -799,8 +943,8 @@ void ScaleBox::OnYZoomOut(wxCommandEvent& event)
 void ScaleBox::OnXZoomIn(wxCommandEvent& event)
 {
 	int pos = event.GetId() - 1100;
-	if(graphwin[pos]->numgraphs == 0) return;
-	graph = graphwin[pos]->graphset[0]->plot[0];
+	if(graphwin[pos]->numdisps == 0) return;
+	graph = graphwin[pos]->dispset[0]->plot[0];
 	double diff = graph->xto - graph->xfrom;
 	graph->xto = graph->xto - diff / 2;
 	synchcon = startgraph + pos;
@@ -815,8 +959,8 @@ void ScaleBox::OnXZoomOut(wxCommandEvent& event)
 	int pos = event.GetId() - 1110;
 	snum.Printf("zoom ID %d", pos);
 	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
-	if(graphwin[pos]->numgraphs == 0) return;
-	graph = graphwin[pos]->graphset[0]->plot[0];
+	if(graphwin[pos]->numdisps == 0) return;
+	graph = graphwin[pos]->dispset[0]->plot[0];
 	oldxto = graph->xto;
 	double diff = graph->xto - graph->xfrom;
 	graph->xto = graph->xto + diff;
@@ -926,26 +1070,26 @@ void ScaleBox::OnOK(wxCommandEvent& WXUNUSED(event))
 	//mainwin->SetStatus("Scale OK");
 	mainwin->SetStatusText("");
 	for(i=startgraph; i<startgraph+numgraphs; i++) {
-		graph = graphwin[i]->graphset[0]->plot[0];
+		graph = graphwin[i]->dispset[0]->plot[0];
 		oldxfrom = graph->xfrom;
 		oldxto = graph->xto;
-		oldxfrom = graphwin[i]->graphset[0]->plot[0]->xfrom;
-		oldxto = graphwin[i]->graphset[0]->plot[0]->xto;
+		oldxfrom = graphwin[i]->dispset[0]->plot[0]->xfrom;
+		oldxto = graphwin[i]->dispset[0]->plot[0]->xto;
 
-		graphwin[i]->yf->GetValue().ToDouble(&(graphwin[i]->graphset[0]->plot[0]->yfrom));
-		graphwin[i]->yt->GetValue().ToDouble(&(graphwin[i]->graphset[0]->plot[0]->yto));
-		graphwin[i]->xf->GetValue().ToDouble(&(graphwin[i]->graphset[0]->plot[0]->xfrom));
-		graphwin[i]->xt->GetValue().ToDouble(&(graphwin[i]->graphset[0]->plot[0]->xto));
-		if(graphwin[i]->graphset[0]->plot[0]->xfrom < xmin || graphwin[i]->graphset[0]->plot[0]->xfrom > xmax) {
+		graphwin[i]->yf->GetValue().ToDouble(&(graphwin[i]->dispset[0]->plot[0]->yfrom));
+		graphwin[i]->yt->GetValue().ToDouble(&(graphwin[i]->dispset[0]->plot[0]->yto));
+		graphwin[i]->xf->GetValue().ToDouble(&(graphwin[i]->dispset[0]->plot[0]->xfrom));
+		graphwin[i]->xt->GetValue().ToDouble(&(graphwin[i]->dispset[0]->plot[0]->xto));
+		if(graphwin[i]->dispset[0]->plot[0]->xfrom < xmin || graphwin[i]->dispset[0]->plot[0]->xfrom > xmax) {
 			mainwin->SetStatusText("X From, value out of range, max 100000");
-			graphwin[i]->graphset[0]->plot[0]->xfrom = oldxfrom;
+			graphwin[i]->dispset[0]->plot[0]->xfrom = oldxfrom;
 			//graphwin[i]->xf->SetValue(
 			if(graph->xto < 1) graphwin[i]->xf->SetValue(text.Format("%.2f", oldxfrom));
 			else graphwin[i]->xf->SetValue(text.Format("%.1f", oldxfrom));
 		}
-		if(graphwin[i]->graphset[0]->plot[0]->xto < xmin || graphwin[i]->graphset[0]->plot[0]->xto > xmax) {
+		if(graphwin[i]->dispset[0]->plot[0]->xto < xmin || graphwin[i]->dispset[0]->plot[0]->xto > xmax) {
 			mainwin->SetStatusText("X To, value out of range, max 100000");
-			graphwin[i]->graphset[0]->plot[0]->xto = oldxto;
+			graphwin[i]->dispset[0]->plot[0]->xto = oldxto;
 		}
 	}
 	snum.Printf("start %d num %d", startgraph, numgraphs);
@@ -1156,6 +1300,8 @@ void ScaleBox::SetMod(Model *model)
 
 ParamStore *ScaleBox::GetFlags()
 {
+
+	// Old manually defined gflags
 	(*gflags)["cortflag"] = cortflag;
 	(*gflags)["rateres"] = rateres;
 	(*gflags)["timeres"] = timeres;
@@ -1260,7 +1406,7 @@ void ScaleBox::GraphUpdate(int pos)
 void ScaleBox::XSynch(int pos)
 {
 	if(gsynch) {
-		GraphDat *graph0 = graphwin[synchcon]->graphset[0]->plot[0];
+		GraphDat *graph0 = graphwin[synchcon]->dispset[0]->plot[0];
 		if(!graph0->synchx) return;
 		for(i=startgraph; i<startgraph+numgraphs; i++) {
 			if(gsync[i] && !gsync[i]->GetValue()) {
@@ -1268,7 +1414,7 @@ void ScaleBox::XSynch(int pos)
 				continue;
 			}
 			//mainwin->diagbox->Write(text.Format("Sync go pos %d\n", i));
-			graph = graphwin[i]->graphset[0]->plot[0];
+			graph = graphwin[i]->dispset[0]->plot[0];
 			if(!graph->synchx) continue;
 			if(pos >= 0) graph->scrollpos = pos;
 			graph->xfrom = graph0->xfrom;
@@ -1283,9 +1429,9 @@ void ScaleBox::SynchScale()
 	GraphDat *plot0, *plot;
 
 	for(i=startgraph; i<startgraph+numgraphs; i++) {
-		plot0 = graphwin[i]->graphset[0]->plot[0];
-		for(g=1; g<graphwin[i]->numgraphs; g++) {
-			plot = graphwin[i]->graphset[g]->plot[0];
+		plot0 = graphwin[i]->dispset[0]->plot[0];
+		for(g=1; g<graphwin[i]->numdisps; g++) {
+			plot = graphwin[i]->dispset[g]->plot[0];
 			plot->yfrom = plot0->yfrom; 
 			plot->yto = plot0->yto; 
 			plot->xfrom = plot0->xfrom; 
@@ -1322,12 +1468,12 @@ void ScaleBox::PanelUpdate()
 	wxString text;
 
 	for(i=startgraph; i<startgraph+numgraphs; i++) {
-		if(graphwin[i]->numgraphs > 0) {
-			graph = graphwin[i]->graphset[0]->plot[0];
-			plot0 = graphwin[i]->graphset[0]->plot[0];
+		if(graphwin[i]->numdisps > 0) {
+			graph = graphwin[i]->dispset[0]->plot[0];
+			plot0 = graphwin[i]->dispset[0]->plot[0];
 
 
-			if(graph->yto < 1) {
+			if(abs(graph->yto - graph->yfrom) < 10) {
 				snum.Printf("%.2f", graph->yfrom);
 				graphwin[i]->yf->SetValue(snum);
 				snum.Printf("%.2f", graph->yto);
@@ -1345,7 +1491,11 @@ void ScaleBox::PanelUpdate()
 			snum.Printf("%.1f", graph->yto);
 			graphwin[i]->yt->SetValue(snum);*/
 
-			if(graph->xto < 1) {
+			if(abs(graph->xto - graph->xfrom) < 1) {
+				graphwin[i]->xf->SetValue(text.Format("%.3f", graph->xfrom));
+				graphwin[i]->xt->SetValue(text.Format("%.3f", graph->xto));
+			}
+			else if(abs(graph->xto - graph->xfrom) < 10) {
 				graphwin[i]->xf->SetValue(text.Format("%.2f", graph->xfrom));
 				graphwin[i]->xt->SetValue(text.Format("%.2f", graph->xto));
 			}
@@ -1354,8 +1504,8 @@ void ScaleBox::PanelUpdate()
 				graphwin[i]->xt->SetValue(text.Format("%.1f", graph->xto));	
 			}
 
-			for(g=1; g<graphwin[i]->numgraphs; g++) {
-				plot = graphwin[i]->graphset[g]->plot[0];
+			for(g=1; g<graphwin[i]->numdisps; g++) {
+				plot = graphwin[i]->dispset[g]->plot[0];
 				plot->yfrom = plot0->yfrom; 
 				plot->yto = plot0->yto; 
 				plot->xfrom = plot0->xfrom; 
@@ -1376,18 +1526,18 @@ void ScaleBox::OnOverlay(wxCommandEvent& WXUNUSED(event))
 	//if(boxtype = modOxy) {pan1 = 2; pan2 = 3;}
 
 	if(!overtog) {	
-		graphdisp *pos = graphwin[pan1]->graphset[0];
+		GraphDisp *pos = graphwin[pan1]->dispset[0];
 		graph = pos->plot[0];
 		graphwin[pan2]->AddGraph(pos);
-		graphwin[pan1]->numgraphs--;
-		graph->yto = graphwin[pan2]->graphset[0]->plot[0]->yto;
-		graph->yfrom = graphwin[pan2]->graphset[0]->plot[0]->yfrom;
-		graph->xto = graphwin[pan2]->graphset[0]->plot[0]->xto;
-		graph->xfrom = graphwin[pan2]->graphset[0]->plot[0]->xfrom;
+		graphwin[pan1]->numdisps--;
+		graph->yto = graphwin[pan2]->dispset[0]->plot[0]->yto;
+		graph->yfrom = graphwin[pan2]->dispset[0]->plot[0]->yfrom;
+		graph->xto = graphwin[pan2]->dispset[0]->plot[0]->xto;
+		graph->xfrom = graphwin[pan2]->dispset[0]->plot[0]->xfrom;
 	}
 	else {
-		graphwin[pan2]->numgraphs--;
-		graphwin[pan1]->AddGraph(graphwin[pan2]->graphset[graphwin[pan2]->numgraphs]);	
+		graphwin[pan2]->numdisps--;
+		graphwin[pan1]->AddGraph(graphwin[pan2]->dispset[graphwin[pan2]->numdisps]);	
 	}	
 	overtog = 1 - overtog;
 	snum.Printf("overlay = %d", overtog);
@@ -1398,15 +1548,15 @@ void ScaleBox::OnOverlay(wxCommandEvent& WXUNUSED(event))
 
 void ScaleBox::OnPosition(wxCommandEvent& WXUNUSED(event))
 {
-	if(graphwin[overpan1]->numgraphs > 1) {
-		graphdisp *pos = graphwin[overpan1]->graphset[0];
-		graphwin[overpan1]->graphset[0] = graphwin[overpan1]->graphset[1];
-		graphwin[1]->graphset[1] = pos;
+	if(graphwin[overpan1]->numdisps > 1) {
+		GraphDisp *pos = graphwin[overpan1]->dispset[0];
+		graphwin[overpan1]->dispset[0] = graphwin[overpan1]->dispset[1];
+		graphwin[1]->dispset[1] = pos;
 	}
-	if(graphwin[overpan2]->numgraphs > 1) {
-		graphdisp *pos = graphwin[overpan2]->graphset[0];
-		graphwin[overpan2]->graphset[0] = graphwin[overpan2]->graphset[1];
-		graphwin[overpan2]->graphset[1] = pos;
+	if(graphwin[overpan2]->numdisps > 1) {
+		GraphDisp *pos = graphwin[overpan2]->dispset[0];
+		graphwin[overpan2]->dispset[0] = graphwin[overpan2]->dispset[1];
+		graphwin[overpan2]->dispset[1] = pos;
 	}
 	if(gpos[3].numplots > 1) {
 		graph = gpos[3].plot[0];

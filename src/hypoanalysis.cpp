@@ -110,10 +110,10 @@ void SpikeDat::BurstProfile()
 	}
 	burstdata->pmodetime = pmode;
 	burstdata->pmoderate = burstdata->profilesm[pmode];
-		
 
 
-	
+
+
 	// Burst tail analysis  (Nancy, 2006 paper)
 
 	double tailsum, varsum;
@@ -166,37 +166,37 @@ void SpikeDat::BurstProfile()
 
 /*
 spikestep = 0;
-	srate.max = (int)(times[spikecount-1] + 0.5); 
-	for(i=0; i<=times[spikecount-1]; i++) {	     // spike rate count (1s)
-		fprintf(ofp, "%ds. ", i);
-		if(spikestep > spikecount) {
-			fprintf(ofp, "break spikestep %d  spikecount %d\n", spikestep, spikecount);
-			break;
-		}
-		while(times[spikestep] < i+1) {
-			fprintf(ofp, "spike %d  ", spikestep);
-			srate.data[i]++;
-			spikestep++;
-			if(spikestep >= spikecount) break;
-		}
-    fprintf(ofp, "srate %d\n", srate.data[i]);
-	}*/
+srate.max = (int)(times[spikecount-1] + 0.5); 
+for(i=0; i<=times[spikecount-1]; i++) {	     // spike rate count (1s)
+fprintf(ofp, "%ds. ", i);
+if(spikestep > spikecount) {
+fprintf(ofp, "break spikestep %d  spikecount %d\n", spikestep, spikecount);
+break;
+}
+while(times[spikestep] < i+1) {
+fprintf(ofp, "spike %d  ", spikestep);
+srate.data[i]++;
+spikestep++;
+if(spikestep >= spikecount) break;
+}
+fprintf(ofp, "srate %d\n", srate.data[i]);
+}*/
 
 
 /*
 void SpikeDat::Clear()
 {
-	int i;
+int i;
 
 
 }
 */
 
-void SpikeDat::IntraBurstAnalysis()
+void BurstDat::IntraBurstAnalysis()
 {
 	int i;
 	//int numspikes, 
-  int intracount;
+	int intracount;
 	int bindex;
 	bool scandiag;
 
@@ -207,12 +207,12 @@ void SpikeDat::IntraBurstAnalysis()
 
 	if(scandiag) outfile.New("intradat.txt");
 
-	if(diagbox) diagbox->Write("Intra Burst Analysis\n");
+	//spikedata->diagbox->Write("Intra Burst Analysis\n");
 
-	 // Intraburst Re-Analysis  
+	// Intraburst Re-Analysis  
 
 	int hazdex = 0;
-  int binsize = 5;
+	int binsize = 5;
 	int intcount = 0;
 	double mean = 0;
 	double variance = 0;
@@ -220,95 +220,112 @@ void SpikeDat::IntraBurstAnalysis()
 	bindex = 1;
 
 	for(i=0; i<10000; i++) {
-		burstdata->hist1[i] = 0;
-		burstdata->hist5[i] = 0;
-		burstdata->haz1[i] = 0;
-		burstdata->haz5[i] = 0;
+		hist1[i] = 0;
+		hist5[i] = 0;
+		hist1norm[i] = 0;
+		hist5norm[i] = 0;
+		haz1[i] = 0;
+		haz5[i] = 0;
 	}
 
-	if(diagbox) diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
+	//if(diagbox) diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
 
-	for(i=0; i<spikecount-1; i++) {
-		if(burstdata->spikes[i] > 0 && isis[i] < maxspikes) {
-			if(!burstdata->selectmode && i == burstdata->bustore[bindex].end) {
+	for(i=0; i<spikedata->spikecount-1; i++) {
+		if(spikes[i] > 0 && spikedata->isis[i] < spikedata->maxspikes) {
+			if(!selectmode && i == bustore[bindex].end) {
 				//fprintf(ofp, "New burst %d, time total %.2f\n", bindex, inttime);
 				bindex++;
 				if(scandiag) outfile.WriteLine(text.Format("i %d burstend", i));
 			}
 			else {
 				intcount++;
-				if(burstdata->hist1.max < (int)isis[i]) burstdata->hist1.max = (int)isis[i];
-				if(burstdata->hist1.data.size() < burstdata->hist1.max + 1) burstdata->hist1.data.resize(burstdata->hist1.max + 1);
-				burstdata->hist1[(int)isis[i]]++;	
-				inttime = inttime + isis[i];
+				if(hist1.max < (int)spikedata->isis[i]) hist1.max = (int)spikedata->isis[i];
+				if(hist1.data.size() < hist1.max + 1) hist1.data.resize(hist1.max + 1);
+				hist1[(int)spikedata->isis[i]]++;	
+				inttime = inttime + spikedata->isis[i];
 				//if(spikedata->isis[i] > maxint) fprintf(ofp, "burst %d index %d isi %.2f total %.2f\n", 
 				//	bindex-1, i, spikedata->isis[i], inttime);  
-				mean = mean + isis[i];
-				if(scandiag) outfile.WriteLine(text.Format("i %d isi %.4f", i, isis[i]));
-				variance = variance + isis[i] * isis[i];
+				mean = mean + spikedata->isis[i];
+				if(scandiag) outfile.WriteLine(text.Format("i %d isi %.4f", i, spikedata->isis[i]));
+				variance = variance + spikedata->isis[i] * spikedata->isis[i];
 			}
 		}
 	}
-	
+
 	//mean = mean / (scount - burstdata->numbursts);
 	//variance = variance / (scount - burstdata->numbursts);
 	mean = mean / intcount;
 	variance = variance / intcount;
 
-	burstdata->intraspikes = intcount + burstdata->numbursts;
+	intraspikes = intcount + numbursts;
 	if(intcount > 0) {
-		burstdata->isisd = sqrt(variance - mean * mean);
-		burstdata->freq = 1000/mean;
-		burstdata->meanisi = mean;
+		isisd = sqrt(variance - mean * mean);
+		freq = 1000/mean;
+		meanisi = mean;
 	}
 	else {
-		burstdata->isisd = 0;
-		burstdata->freq = 0;
-		burstdata->meanisi = 0;
+		isisd = 0;
+		freq = 0;
+		meanisi = 0;
 	}
 
-	if(diagbox) diagbox->Write(text.Format("intcount %d\n", intcount));
-	
-	//burstdata->intraspikes = intracount;
-	//burstdata->intraspikes = scount;
-	//burstdata->isisd = sqrt(variance - mean * mean);
-	//burstdata->freq = 1000/mean;
-	//burstdata->meanisi = mean;
-	//fprintf(ofp, "\nIntra burst time total = %.2f\n", inttime);
-	burstdata->burstdisp = 1;
-	burstdata->times = times;
-	burstdata->maxtime = times[spikecount-1];
-	//burstbox->BurstDataDisp();
-	//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
-	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
-	//fprintf(ofp, "maxtime %.2f\n", burstdata->maxtime);
-	//for(i=0; i<spikecount; i++) burstdata->times[i] = times[i];
+	burstdisp = 1;
+	times = spikedata->times;
+	maxtime = times[spikedata->spikecount-1];
+
+	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, times[i]));
+
 
 	// Hazard
 
 	double hazcount = 0;
 	//double haznorm = 10/freq;
-	burstdata->haz1.max = burstdata->hist1.max;
-	if(burstdata->haz1.data.size() < burstdata->haz1.max + 1) burstdata->haz1.data.resize(burstdata->haz1.max + 1);
+	haz1.max = hist1.max;
+	if(haz1.data.size() < haz1.max + 1) haz1.data.resize(haz1.max + 1);
 
-  for(i=0; i<=burstdata->hist1.max; i++) {
-    burstdata->haz1.data[i] = burstdata->hist1.data[i] / (burstdata->intraspikes - hazcount); 	
-    hazcount = hazcount + burstdata->hist1.data[i];
+	for(i=0; i<=hist1.max; i++) {
+		haz1.data[i] = hist1.data[i] / (intraspikes - hazcount); 	
+		hazcount = hazcount + hist1.data[i];
 	}
 
-  for(i=0; i<=burstdata->hist1.max; i++) {
+	for(i=0; i<=hist1.max; i++) {
 		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
-		if(i/binsize > burstdata->haz5.max) burstdata->haz5.max = i/binsize;
-		if(burstdata->haz5.data.size() < burstdata->haz5.max + 1)	burstdata->haz5.data.resize(burstdata->haz5.max + 1);
-		burstdata->haz5.data[i/binsize] = burstdata->haz5.data[i/binsize] + burstdata->haz1.data[i]; // * haznorm;	
+		if(i/binsize > haz5.max) haz5.max = i/binsize;
+		if(haz5.data.size() < haz5.max + 1)	haz5.data.resize(haz5.max + 1);
+		haz5.data[i/binsize] = haz5.data[i/binsize] + haz1.data[i]; // * haznorm;	
 	}
 
-	for(i=0; i<=burstdata->hist1.max; i++) {
-    //hist[i] = hist[i] / norm;
-		if(i/binsize > burstdata->hist5.max) burstdata->hist5.max = i/binsize;
-		if(burstdata->hist5.data.size() < burstdata->hist5.max + 1)	burstdata->hist5.data.resize(burstdata->hist5.max + 1);
-		burstdata->hist5.data[i/binsize] = burstdata->hist5.data[i/binsize] + burstdata->hist1.data[i];		
+	for(i=0; i<=hist1.max; i++) {
+		//hist[i] = hist[i] / norm;
+		if(i/binsize > hist5.max) hist5.max = i/binsize;
+		if(hist5.data.size() < hist5.max + 1) hist5.data.resize(hist5.max + 1);
+		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
 	}
+
+	// Normalised histograms
+	for(i=0; i<=hist1.max; i++) {
+		hist1norm[i] = spikedata->normscale * hist1[i] / intcount;
+		hist5norm[i] = spikedata->normscale * hist5[i] / intcount;
+	}
+
+
+	// Index of Dispersion
+
+	IoDdata[0] = IoDcalc(500, intraspikes, &times);
+	IoDdata[1] = IoDcalc(1000, intraspikes, &times);
+	IoDdata[2] = IoDcalc(2000, intraspikes, &times);
+	IoDdata[3] = IoDcalc(4000, intraspikes, &times);
+	IoDdata[4] = IoDcalc(6000, intraspikes, &times);
+	IoDdata[5] = IoDcalc(8000, intraspikes, &times);
+	IoDdata[6] = IoDcalc(10000, intraspikes, &times);
+
+	IoDdataX[0] = 5;            // x positions for displaying IoD range as bar chart
+	IoDdataX[1] = 15;
+	IoDdataX[2] = 25;
+	IoDdataX[3] = 35;
+	IoDdataX[4] = 45;
+	IoDdataX[5] = 55;
+	IoDdataX[6] = 65;
 
 	if(scandiag) outfile.Close();
 }
@@ -318,7 +335,7 @@ void SpikeDat::IntraSelectAnalysis()
 {
 	int i;
 	//int numspikes, 
-  int intracount;
+	int intracount;
 	int bindex;
 	bool scandiag;
 
@@ -329,10 +346,10 @@ void SpikeDat::IntraSelectAnalysis()
 
 	if(scandiag) outfile.New("intradat.txt");
 
-	 // Intraburst Re-Analysis  
+	// Intraburst Re-Analysis  
 
 	int hazdex = 0;
-  int binsize = 5;
+	int binsize = 5;
 	int intcount = 0;
 	double mean = 0;
 	double variance = 0;
@@ -407,12 +424,12 @@ void SpikeDat::IntraSelectAnalysis()
 	burstdata->haz1.max = burstdata->hist1.max;
 	if(burstdata->haz1.data.size() < burstdata->haz1.max + 1) burstdata->haz1.data.resize(burstdata->haz1.max + 1);
 
-  for(i=0; i<=burstdata->hist1.max; i++) {
-    burstdata->haz1.data[i] = burstdata->hist1.data[i] / (burstdata->intraspikes - hazcount); 	
-    hazcount = hazcount + burstdata->hist1.data[i];
+	for(i=0; i<=burstdata->hist1.max; i++) {
+		burstdata->haz1.data[i] = burstdata->hist1.data[i] / (burstdata->intraspikes - hazcount); 	
+		hazcount = hazcount + burstdata->hist1.data[i];
 	}
 
-  for(i=0; i<=burstdata->hist1.max; i++) {
+	for(i=0; i<=burstdata->hist1.max; i++) {
 		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
 		if(i/binsize > burstdata->haz5.max) burstdata->haz5.max = i/binsize;
 		if(burstdata->haz5.data.size() < burstdata->haz5.max + 1)	burstdata->haz5.data.resize(burstdata->haz5.max + 1);
@@ -420,12 +437,12 @@ void SpikeDat::IntraSelectAnalysis()
 	}
 
 	for(i=0; i<=burstdata->hist1.max; i++) {
-    //hist[i] = hist[i] / norm;
+		//hist[i] = hist[i] / norm;
 		if(i/binsize > burstdata->hist5.max) burstdata->hist5.max = i/binsize;
 		if(burstdata->hist5.data.size() < burstdata->hist5.max + 1)	burstdata->hist5.data.resize(burstdata->hist5.max + 1);
 		burstdata->hist5.data[i/binsize] = burstdata->hist5.data[i/binsize] + burstdata->hist1.data[i];		
 	}
-	
+
 	if(scandiag) outfile.Close();
 }
 
@@ -449,7 +466,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 
 	scandiag = false;
 
-  FILE *ofp = NULL;
+	FILE *ofp = NULL;
 
 	// Parameter transfer
 	ParamStore *burstparams = burstbox->GetParams();
@@ -459,17 +476,17 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	startspike = (int)(*burstparams)["startspike"];
 	endspike = (int)(*burstparams)["endspike"];
 
-  // Initialise scan
-  burston = 0;
-  silenceon = 0;
-  bcheck = 0;
-  bindex = 0;
-  bcount = 0;
-  tpoint = 0;
-  btime = 0;
+	// Initialise scan
+	burston = 0;
+	silenceon = 0;
+	bcheck = 0;
+	bindex = 0;
+	bcount = 0;
+	tpoint = 0;
+	btime = 0;
 	bstart = 0;
 
-  numspikes = spikecount;
+	numspikes = spikecount;
 
 	if(numspikes == 0) scandiag = false;
 
@@ -479,31 +496,31 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		fprintf(ofp, "maxint %d  minspikes %d   maxspikes %d  startspike %d   endspike %d\n\n",
 			maxint, minspikes, maxspikes, startspike, endspike);
 	}
-	
-	
-	// Burst Scan (Based on Nancy's algorithm)
-  for(i=0; i<numspikes-1; i++) {
 
-    isi = isis[i];        
+
+	// Burst Scan (Based on Nancy's algorithm)
+	for(i=0; i<numspikes-1; i++) {
+
+		isi = isis[i];        
 		tpoint = times[i];
-	
+
 		if(tpoint < startspike) continue;
 
 		if(endspike && tpoint > endspike) continue;
 
-    if(!burston) {
+		if(!burston) {
 			if(isi < maxint)
 				bstart = i;
-				btime = 0;
-				bcount = 1;
-				burston = 1;
-				bcheck = 0;
-    }
-		
-    if(burston) {
-      if(isi > maxint) {
-        burston = 0;
-        if(bcheck) {
+			btime = 0;
+			bcount = 1;
+			burston = 1;
+			bcheck = 0;
+		}
+
+		if(burston) {
+			if(isi > maxint) {
+				burston = 0;
+				if(bcheck) {
 					if(!maxspikes || bcount <= maxspikes) { 
 						bindex++;		
 						burstdata->bustore[bindex].start = bstart;
@@ -519,28 +536,28 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 								bindex, bstart, i, bcount); 
 						}
 					}
-          bcheck = 0;
-          silenceon = 1;
-          stime = isi;
-          scheck = 0;			                                 
-        }
-      }
-      if(isi <= maxint) {
-        btime = btime + isi;
-        bcount++;
-        if(!bcheck && bcount >= minspikes) bcheck = 1;
-      }
-    }
-    
+					bcheck = 0;
+					silenceon = 1;
+					stime = isi;
+					scheck = 0;			                                 
+				}
+			}
+			if(isi <= maxint) {
+				btime = btime + isi;
+				bcount++;
+				if(!bcheck && bcount >= minspikes) bcheck = 1;
+			}
+		}
+
 		//fprintf(ofp, "%d %.2f %.2f B %d  S %d  BC %d  Btime %.2f Bcount %d   ", i, tpoint, isi, burston, silenceon, bcheck, btime, bcount);
-    //if(isi > 1000) fprintf(ofp, "ISI");
-    //fprintf(ofp, "\n");
-  }
+		//if(isi > 1000) fprintf(ofp, "ISI");
+		//fprintf(ofp, "\n");
+	}
 	burstdata->numbursts = bindex;
-  
-	
-	
-  // Burst Analysis
+
+
+
+	// Burst Analysis
 
 	if(burstdata->numbursts == 0) {
 		burstdata->intraspikes = 0;
@@ -556,21 +573,21 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		return;
 	}
 
-  bindex = 1;
-  int silence = 0;
+	bindex = 1;
+	int silence = 0;
 
-  for(i=0; i<numspikes; i++) burstdata->spikes[i] = 0;
+	for(i=0; i<numspikes; i++) burstdata->spikes[i] = 0;
 
-  for(i=0; i<numspikes; i++) {
-    if(i == burstdata->bustore[bindex].start) silence = 1;
+	for(i=0; i<numspikes; i++) {
+		if(i == burstdata->bustore[bindex].start) silence = 1;
 		burstdata->spikes[i] = silence * bindex;
-    if(i == burstdata->bustore[bindex].end) {
-      silence = 0;
-      bindex++;
-    }
+		if(i == burstdata->bustore[bindex].end) {
+			silence = 0;
+			bindex++;
+		}
 		if(bindex > burstdata->numbursts) break;   
-    if(scandiag) fprintf(ofp, "Spike %d  Burst ID  %.0f\n", i, burstdata->spikes[i]);
-  }
+		if(scandiag) fprintf(ofp, "Spike %d  Burst ID  %.0f\n", i, burstdata->spikes[i]);
+	}
 
 	// Mean burst spikes and time
 	intracount = 0;
@@ -579,26 +596,26 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	intravar = 0;
 	silencevar = 0;
 	for(i=1; i<=burstdata->numbursts; i++) {
-    intracount = intracount + burstdata->bustore[i].count;
-    intratime = intratime + burstdata->bustore[i].time;
+		intracount = intracount + burstdata->bustore[i].count;
+		intratime = intratime + burstdata->bustore[i].time;
 		//intravar += pow((burstdata->bustore[i].time - burstdata->meantime) / 1000, 2);          // OMG Idiot!
 		if(i < burstdata->numbursts) {
 			silencetime += (times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end]) / 1000;
 			//silencevar += pow(silencetime - burstdata->meansilence, 2);                                       // Ditto!
 		}
 		if(scandiag) fprintf(ofp, "Burst %d Silence %.2f\n", i, times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end]);
-  }
-  burstdata->meancount = (double)intracount / burstdata->numbursts;
-  burstdata->meantime = (double)intratime / burstdata->numbursts;
+	}
+	burstdata->meancount = (double)intracount / burstdata->numbursts;
+	burstdata->meantime = (double)intratime / burstdata->numbursts;
 	burstdata->meanlength = burstdata->meantime / 1000;
 	burstdata->meansilence = (double)silencetime / burstdata->numbursts-1;
-  burstfreq = intracount / (intratime / 1000);
+	burstfreq = intracount / (intratime / 1000);
 	burstdata->actQ = intratime / times[spikecount-1];  
 	if(burstdata->numbursts == 0) burstdata->actQ = 1;
 
 	if(scandiag) fprintf(ofp, "\ntotal time %.2f  burst time %.2f\n\n", intratime, times[spikecount-1]);
 
-	
+
 	for(i=1; i<burstdata->numbursts; i++) {
 		intravar += pow((burstdata->bustore[i].time - burstdata->meantime) / 1000, 2);
 		if(i < burstdata->numbursts) {
@@ -624,9 +641,37 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		fprintf(ofp, "Intra burst rate : %.2f\n\n", burstfreq);
 	}
 
-	IntraBurstAnalysis();
-	
+	burstdata->IntraBurstAnalysis();
+
 	if(ofp) fclose(ofp);
+}
+
+
+void SpikeDat::MeanSpikeForm(datdouble V, int filter, int substeps)
+{
+	int i, j, numspikes;
+	int timerange = 100;        // max 200
+	wxString text;
+
+	for(i=0; i<5000; i++) meanV[i] = 0;
+	numspikes = 0;
+
+	diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d\n", spikecount));
+
+	for(i=0; i<spikecount; i++) {
+		if(times[i] < timerange) continue;
+		if(filter) {
+			if(i > 0 && (times[i] - times[i-1] < timerange/2)) continue;
+			if(i < spikecount-1  && (times[i+1] - times[i] < timerange/2)) continue;
+		}
+		if(times[i] > 1000000) break;
+		for(j=0; j<timerange*substeps; j++) meanV[j] += V[(times[i] - timerange/2) * substeps + j];
+		numspikes++;
+	}
+
+	diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d  filter %d\n", spikecount, numspikes));
+
+	for(i=0; i<5000; i++) meanV[i] = meanV[i] / numspikes;
 }
 
 
@@ -689,8 +734,8 @@ void SpikeDat::output(wxString filetag, wxString path)
 	outfile.New(filename.Format(path + "%s-hist5allnorm.txt", filetag));
 	for(i=0; i<=2000; i++)
 		outfile.WriteLine(text.Format("%d  %.2f  %.2f  %.2f", i*5, hist5.data[i], 
-			hist5.data[i] * 10000 / (times[spikecount-1] - times[0]),
-			hist5.data[i] * 10000 / spikecount));
+		hist5.data[i] * 10000 / (times[spikecount-1] - times[0]),
+		hist5.data[i] * 10000 / spikecount));
 	outfile.Close();
 
 	outfile.New(filename.Format(path + "%s-srate1.txt", filetag));
@@ -738,7 +783,7 @@ void AnaDat::autocalc(SpikeDat *data)
 	ofp = fopen("autocalc.txt", "w");
 
 	for(i=0; i<10000; i++) autocorr[i] = 0;
-	
+
 	fprintf(ofp, "Spike Count %d\n", spikedata->spikecount);
 
 	for(i=0; i<spikedata->spikecount; i++) {
@@ -784,7 +829,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
 
 	if(datneuron != NULL) neurodat = 1;
-	
+
 	for(i=0; i<10000; i++) {
 		hist1.data[i] = 0;
 		hist5.data[i] = 0;
@@ -824,7 +869,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	stime = start;
 
 	if(calcdiag) fprintf(ofp, "Neuron %d  Spike Count %d\n", neurodat, spikecount);
-		
+
 	// ISIs, Histogram, Freq, Variance
 
 	isicount = spikecount - 1;
@@ -849,7 +894,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	isivar = variance;
 
 	if(calcdiag) fprintf(ofp, "Freq %.2fHz  Hist1 max %d  Hist1 500 %.2f\n\n", freq, hist1.max, hist1.data[500]);
-  
+
 	if(neurodat) {
 		datneuron->freq = freq;
 		datneuron->meanisi = mean;
@@ -861,7 +906,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	// Rate Count (1s)
 
 	//if(calcdiag) fprintf(ofp, "Rate count  last spike at %.2fs.\n", times[spikecount-1]/1000);
-	
+
 	spikestep = 0;
 	srate.max = (int)(times[spikecount-1]/1000 + 0.5); 
 	for(i=0; i<times[spikecount-1]/1000; i++) {	     // spike rate count (1s)
@@ -876,7 +921,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 			spikestep++;
 			if(spikestep >= spikecount) break;
 		}
-    //if(calcdiag) fprintf(ofp, "srate %d\n", srate.data[i]);
+		//if(calcdiag) fprintf(ofp, "srate %d\n", srate.data[i]);
 	}
 
 	//if(calcdiag) fprintf(ofp, "Rate count end  spikestep %d  spikecount %d\n", spikestep, spikecount);
@@ -914,18 +959,18 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	}
 
 	// Hazard
-	
+
 	hazcount = 0;
 	haznorm = 10/freq;
 	haz1.max = hist1.max;
 	if(haz1.data.size() < haz1.max + 1) haz1.data.resize(haz1.max + 1);
 
-  for(i=0; i<=hist1.max; i++) {        // 1ms Hazard
-    haz1.data[i] = hist1.data[i] / (spikecount - hazcount); //   / freq;		
-    hazcount = hazcount + hist1.data[i];
+	for(i=0; i<=hist1.max; i++) {        // 1ms Hazard
+		haz1.data[i] = hist1.data[i] / (spikecount - hazcount); //   / freq;		
+		hazcount = hazcount + hist1.data[i];
 	}
 
-  for(i=0; i<hist1.max; i++) {      // 5ms Hazard                                               
+	for(i=0; i<hist1.max; i++) {      // 5ms Hazard                                               
 		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
 		if(i/binsize > haz5.max) haz5.max = i/binsize;
 		if(haz5.data.size() < haz5.max + 1)	haz5.data.resize(haz5.max + 1);
@@ -938,7 +983,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
 	}
 
-	
+
 	// Normalise
 	for(i=0; i<=hist1.max; i++) {
 		hist1norm[i] = normscale * hist1[i] / isicount;
@@ -959,7 +1004,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 //}
 
 // Makes Calculation for histograms and hazard
-
+// after recieving data of number of spikes and spiketimes
 void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams) 
 {
 	int i;
@@ -987,7 +1032,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
 
 	if(datneuron != NULL) neurodat = 1;
-	
+
 	for(i=0; i<10000; i++) {
 		hist1.data[i] = 0;
 		hist5.data[i] = 0;
@@ -1016,9 +1061,16 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	
 	for(i=0; i<maxtime; i++) srate.data[i] = 0;
 	for(i=0; i<max1; i++) srate1.data[i] = 0;
-	for(i=0; i<max100; i++) srate100.data[i] = 0;
+
 	for(i=0; i<300; i++) dispersions.data[i] = dispersionsre.data[i] = 0;
 	
+	for(i=0; i<max100; i++) {
+		srate10.data[i] = 0;
+		srate100.data[i] = 0;
+		srate10s.data[i] = 0;
+	}
+	for(i=0; i<10000; i++) srate100s.data[i] = 0;
+
 	hist1.max = 0;
 	histprev.max = 0;
 	histnext.max = 0;
@@ -1047,7 +1099,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	stime = start;
 
 	if(calcdiag) fprintf(ofp, "Neuron %d  Spike Count %d\n", neurodat, spikecount);
-		
+
 	// ISIs, Histogram, Freq, Variance
 
 	//times[0] = stime/1000;
@@ -1067,7 +1119,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		}*/
 		mean = mean + (double)(isis[i] / isicount);
 		variance = isis[i] * isis[i] / isicount + variance;
-		if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
+		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
+		if(spikediag && diagbox) if(i<10) diagbox->Write(text.Format("i=%d time %.4f isi %.4f\n", i, times[i], isis[i]));
 	}
 
 	/*for(i=0; i<hist1.max; i++) {                                      
@@ -1093,24 +1146,26 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	/*
 	for(i=1; i<spikecount; i++) {
-		//isis[i] = (currentset->times[i+1] - currentset->times[i]) * 1000;   // real
-		if(i > maxspikes-1) break;
-		if(neurodat) isis[i] = datneuron->isis[i];
-    stime = stime + isis[i];
-		times[i] = stime/1000;
-		//index[i] = i;
-		if(hist1.max < (int)isis[i]) hist1.max = (int)isis[i];
-		if(hist1.data.size() < hist1.max + 1) hist1.data.resize(hist1.max + 1);
-		hist1[(int)isis[i]]++;	
-		mean = mean + (double)(isis[i] / spikecount);
-		variance = isis[i] * isis[i] / spikecount + variance;
+	//isis[i] = (currentset->times[i+1] - currentset->times[i]) * 1000;   // real
+	if(i > maxspikes-1) break;
+	if(neurodat) isis[i] = datneuron->isis[i];
+	stime = stime + isis[i];
+	times[i] = stime/1000;
+	//index[i] = i;
+	if(hist1.max < (int)isis[i]) hist1.max = (int)isis[i];
+	if(hist1.data.size() < hist1.max + 1) hist1.data.resize(hist1.max + 1);
+	hist1[(int)isis[i]]++;	
+	mean = mean + (double)(isis[i] / spikecount);
+	variance = isis[i] * isis[i] / spikecount + variance;
 	}*/
 
 	isisd = sqrt(variance - mean * mean);
-	freq = 1000/mean;
 	if(mean == 0) freq = 0;
+	else freq = 1000/mean;
 	meanisi = mean;
 	isivar = variance;
+
+	if(diagbox) diagbox->Write(text.Format("spikecount %d freq %.2f\n", spikecount, freq)); 
 
 
 	// Quad Binned Histogram                      24th November 2012
@@ -1123,6 +1178,10 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	double BSquared = b*b;
 	double FourA = 2*bininc;
 	double TwoA = bininc;
+
+	//This equation defines an ever increasing bin width                        Comment from Tom's code, SimulateIGF2.cs
+	//Even though it is quantised, it will increase by BinSpacing               BinSpacing likely equals bininc
+	//every bin.
 
 	for(i=1; i<spikecount; i++) {
 		float fBinNo = (-b + sqrt(BSquared + FourA * isis[i]))/TwoA;
@@ -1162,17 +1221,18 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	// Mode for fitness
 	maxcount = 0;
-	for(i=0; i<histmax; i++) 
+	for(i=0; i<histmax; i++) {
 		if(histquadsm[i] > maxcount) {
 			maxcount = histquadsm[i];
 			histquadmode = i;
 		}
+	}
 
 
 	// quad bin x
 	for (i=0; i<histmax; i++) histquadx[i] = i * initbinwidth + (i * (i - 1) / 2) * bininc;
 
-	
+
 	// linearise
 	histsum = 0;
 	for(i=0; i<histmax-1; i++) {
@@ -1198,7 +1258,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 
 	if(calcdiag) fprintf(ofp, "Freq %.2fHz  Hist1 max %d  Hist1 500 %.2f\n\n", freq, hist1.max, hist1.data[500]);
-  
+
 	if(neurodat) {
 		datneuron->freq = freq;
 		datneuron->meanisi = mean;
@@ -1207,12 +1267,12 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	}
 
 	//if(normal)
-  //  norm = (double)spikecount / 5000;	
+	//  norm = (double)spikecount / 5000;	
 
 	// Rate Count (1s)
 
 	if(calcdiag) fprintf(ofp, "Rate count  last spike at %.2fs.\n", times[spikecount-1]/1000);
-	
+
 	spikestep = 0;
 	srate.max = (int)(times[spikecount-1]/1000 + 0.5); 
 	for(i=0; i<times[spikecount-1]/1000; i++) {	     // spike rate count (1s)
@@ -1227,18 +1287,30 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 			spikestep++;
 			if(spikestep >= spikecount) break;
 		}
-    if(calcdiag) fprintf(ofp, "srate %d\n", srate.data[i]);
+		if(calcdiag) fprintf(ofp, "srate %d\n", srate.data[i]);
 	}
 
 	if(calcdiag) fprintf(ofp, "Rate count end  spikestep %d  spikecount %d\n", spikestep, spikecount);
 
 	srate1.max = (int)(times[spikecount-1] + 0.5);
+	srate10.max = (int)(times[spikecount-1]/10 + 0.5);
 	srate100.max = (int)(times[spikecount-1]/100 + 0.5);
+	srate10s.max = (int)(times[spikecount-1]/10000 + 0.5);
+	srate100s.max = (int)(times[spikecount-1]/100000 + 0.5);
 
 	for(i=0; i<spikecount; i++) {
 		if(times[i] < 1000000) srate1[(int)(times[i] + 0.5)]++;            // spike rate count (1ms)
+		if(times[i]/10 < 100000) srate10[(int)(times[i]/10 + 0.5)]++;
 		if(times[i]/100 < 100000) srate100[(int)(times[i]/100 + 0.5)]++;
-		if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
+		if(times[i]/10000 < 100000) srate10s[(int)(times[i] + 0.5)/10000]++;
+		if(times[i]/100000 < 100000) srate100s[(int)(times[i] + 0.5)/100000]++;
+		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
+		//if(mainwin) mainwin->diagbox->Write(text.Format("srate10s i=%d time %.2f bin %d\n", i, times[i], (int)(times[i]+0.5)/10000));
+	}
+
+	if(neurodat) {
+		//for(i=0; i<100000; i++)	srate10s[i] = datneuron->srate10[i];
+		//for(i=0; i<10000; i++)	srate100s[i] = datneuron->srate100[i];            // What is this for? 20/2/17   Vaso net maybe?
 	}
 	
 	// Index of Dispersion Code
@@ -1397,18 +1469,18 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	}
 
 	// Hazard
-	
+
 	hazcount = 0;
 	haznorm = 10/freq;
 	haz1.max = hist1.max;
 	if(haz1.data.size() < haz1.max + 1) haz1.data.resize(haz1.max + 1);
 
-  for(i=0; i<=hist1.max; i++) {        // 1ms Hazard
-    haz1.data[i] = hist1.data[i] / (spikecount - hazcount); //   / freq;		
-    hazcount = hazcount + hist1.data[i];
+	for(i=0; i<=hist1.max; i++) {        // 1ms Hazard
+		haz1.data[i] = hist1.data[i] / (spikecount - hazcount); //   / freq;		
+		hazcount = hazcount + hist1.data[i];
 	}
 
-  for(i=0; i<hist1.max; i++) {      // 5ms Hazard                                               
+	for(i=0; i<hist1.max; i++) {      // 5ms Hazard                                               
 		//haz5[i/binsize] = haz5[i/binsize] + haz[i] * 100;	          // Nancy sheet
 		if(i/binsize > haz5.max) haz5.max = i/binsize;
 		if(haz5.data.size() < haz5.max + 1)	haz5.data.resize(haz5.max + 1);
@@ -1416,7 +1488,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	}
 
 	for(i=0; i<=hist1.max; i++) {         // 5ms ISI Histogram
-    //hist[i] = hist[i] / norm;
+		//hist[i] = hist[i] / norm;
 		if(i/binsize > hist5.max) hist5.max = i/binsize;
 		if(hist5.data.size() < hist5.max + 1)	hist5.data.resize(hist5.max + 1);
 		hist5.data[i/binsize] = hist5.data[i/binsize] + hist1.data[i];		
@@ -1427,6 +1499,228 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		hist1norm[i] = normscale * hist1[i] / isicount;
 		hist5norm[i] = normscale * hist5[i] / isicount;
 	}
+
+
+	// Index of Dispersion Code
+
+	IoDdata[0] = dispcalc(500);
+	IoDdata[1] = dispcalc(1000);
+	IoDdata[2] = dispcalc(2000);
+	IoDdata[3] = dispcalc(4000);
+	IoDdata[4] = dispcalc(6000);
+	IoDdata[5] = dispcalc(8000);
+	IoDdata[6] = dispcalc(10000);              // order rearranged to match Trystan figure  March 2016   // restored Feb 2017
+
+	IoDdataX[0] = 5;
+	IoDdataX[1] = 15;
+	IoDdataX[2] = 25;
+	IoDdataX[3] = 35;
+	IoDdataX[4] = 45;
+	IoDdataX[5] = 55;
+	IoDdataX[6] = 65;
+
+	/*   Jorge IoD code
+
+	for(i=0; i<100000; i++) {
+	spikerate05.data[i] = 0;
+	spikerate1.data[i] = 0;
+	spikerate2.data[i] = 0;
+	spikerate4.data[i] = 0;
+	}
+
+	for(i=0; i<spikecount; i++) {
+	spikerate05[(int)(times[i])/500]++;  // 0.5 second BIN
+	spikerate1[(int)(times[i])/1000]++;  
+	spikerate2[(int)(times[i])/2000]++;  
+	spikerate4[(int)(times[i])/4000]++;  
+	spikerate6[(int)(times[i])/6000]++;  
+	spikerate8[(int)(times[i])/8000]++;  
+	spikerate10[(int)(times[i])/10000]++; // 10 seconds BIN		
+	}
+	double laststep05, laststep1, laststep2, laststep4, laststep6, laststep8, laststep10;
+	laststep05 =  ((int)(times[spikecount-1])/500)-4;
+	laststep1 =  ((int)(times[spikecount-1])/1000)-4;
+	laststep2 =  ((int)(times[spikecount-1])/2000)-4;
+	laststep4 =  ((int)(times[spikecount-1])/4000)-4;
+	laststep6 =  ((int)(times[spikecount-1])/6000)-4;
+	laststep8 =  ((int)(times[spikecount-1])/8000)-4;
+	laststep10 =  ((int)(times[spikecount-1])/10000)-4;
+	// **************** 0.5 sec **************************
+	double mean05, variance05, temp05, dispersion05; 
+	mean05 = variance05 = temp05 = dispersion05 = 0.0;
+	for (int a=0; a<laststep05;  a++) mean05 = mean05 +  spikerate05[a]; //mean
+	mean05 = mean05/laststep05;
+	//mainwin->diagbox->Write(text.Format("En Hypoanalysis -> %.4f Number of elements-> %d \n", mean05, (int)(times[spikecount])/500-4));
+	for(double a=0; a<laststep05;a++) temp05 += (mean05-spikerate05[a])*(mean05-spikerate05[a]); // variance
+	variance05 = temp05/laststep05;
+	//mainwin->diagbox->Write(text.Format("En Hypoanalysis Variance05-> %.4f Number of elements-> %d \n", variance05, (int)(times[spikecount])/500-4));
+	dispersion05 = variance05/mean05; // dispersion
+	// **************** 1 sec **************************
+	double mean1, variance1, temp1, dispersion1; 
+	mean1 = variance1 = temp1 = dispersion1 = 0.0;
+	for (int a=0; a<laststep1;  a++) mean1 = mean1 +  spikerate1[a]; //mean
+	mean1 = mean1/(laststep1);
+	for(double a=0; a<laststep1;a++) temp1 += (mean1-spikerate1[a])*(mean1-spikerate1[a]); // variance
+	variance1 = temp1/(laststep1);
+	dispersion1 = variance1/mean1; // dispersion
+	// **************** 2 sec **************************
+	double mean2, variance2, temp2, dispersion2; 
+	mean2 = variance2 = temp2 = dispersion2 = 0.0;
+	for (int a=0; a<laststep2;  a++) mean2 = mean2 +  spikerate2[a]; //mean
+	mean2 = mean2/(laststep2);
+	for(double a=0; a<laststep2;a++) temp2 += (mean2-spikerate2[a])*(mean2-spikerate2[a]); // variance
+	variance2 = temp2/(laststep2);
+	dispersion2 = variance2/mean2; // dispersion
+	// **************** 4 sec **************************
+	double mean4, variance4, temp4, dispersion4; 
+	mean4 = variance4 = temp4 = dispersion4 = 0.0;
+	for (int a=0; a<laststep4;  a++) mean4 = mean4 +  spikerate4[a]; //mean
+	mean4 = mean4/(laststep4);
+	for(double a=0; a<laststep4;a++) temp4 += (mean4-spikerate4[a])*(mean4-spikerate4[a]); // variance
+	variance4 = temp4/(laststep4);
+	dispersion4 = variance4/mean4; // dispersion
+	// **************** 6 sec **************************
+	double mean6, variance6, temp6, dispersion6; 
+	mean6 = variance6 = temp6 = dispersion6 = 0.0;
+	for (int a=0; a<laststep6;  a++) mean6 = mean6 +  spikerate6[a]; //mean
+	mean6 = mean6/(laststep6);
+	for(double a=0; a<laststep6;a++) temp6 += (mean6-spikerate6[a])*(mean6-spikerate6[a]); // variance
+	variance6 = temp6/(laststep6);
+	dispersion6 = variance6/mean6; // dispersion
+	// **************** 8 sec **************************
+	double mean8, variance8, temp8, dispersion8 ; 
+	mean8 = variance8 = temp8 = dispersion8 = 0.0;
+	for (int a=0; a<laststep8;  a++) mean8 = mean8 +  spikerate8[a]; //mean
+	mean8 = mean8/(laststep8);
+	for(double a=0; a<laststep8;a++) temp8 += (mean8 - spikerate8[a])*(mean8 - spikerate8[a]); // variance
+	variance8 = temp8/(laststep8);
+	dispersion8 = variance8/mean8; // dispersion
+	// **************** 10 sec **************************
+	double mean10, variance10, temp10, dispersion10; 
+	mean10 = variance10 = temp10 = dispersion10 = 0.0;
+	for (int a=0; a<laststep10;  a++) mean10 = mean10 +  spikerate10[a]; //mean
+	mean10 = mean10/(laststep10);
+	for(double a=0; a<laststep10;a++) temp10 += (mean10 - spikerate10[a])*(mean10 - spikerate10[a]); // variance
+	variance10 = temp10/(laststep10);
+	dispersion10 = variance10/mean10; // dispersion
+	*/
+
+	/*
+	// Array of dispersions for altogether plotting 
+	for (int i=6; i<12; i++) dispersionsre[i] = dispersion05;
+	for (int i=31; i<37; i++) dispersionsre[i] = dispersion1;
+	for (int i=56; i<62; i++) dispersionsre[i] = dispersion2;
+	for (int i=81; i<87; i++) dispersionsre[i] = dispersion4;
+	for (int i=106; i<112; i++) dispersionsre[i] = dispersion6;
+	for (int i=131; i<137; i++) dispersionsre[i] = dispersion8;
+	for (int i=156; i<162; i++) dispersionsre[i] = dispersion10;
+	// Array of Real dispersions for altogether plotting 
+	for (int i=13; i<19; i++) dispersions[i] = dispersion05;
+	for (int i=38; i<44; i++) dispersions[i] = dispersion1;
+	for (int i=63; i<69; i++) dispersions[i] = dispersion2;
+	for (int i=88; i<94; i++) dispersions[i] = dispersion4;
+	for (int i=113; i<119; i++) dispersions[i] = dispersion6;
+	for (int i=138; i<144; i++) dispersions[i] = dispersion8;
+	for (int i=163; i<169; i++) dispersions[i] = dispersion10;
+	*/
+}
+
+/*
+double SpikeDat::dispcalc(int binsize)
+{
+int i;
+int maxbin = 10000;
+int spikerate[10000];
+int laststep;
+double mean, variance, dispersion = 0;
+double timeshift = 0;
+
+if(times[0] > 1000) timeshift = times[0] - 1000;        // for data where recording starts at non-zero time point
+
+// calculate spike rate for binsize
+for(i=0; i<maxbin; i++) spikerate[i] = 0;
+for(i=0; i<spikecount; i++) if((times[i] - timeshift) / binsize < maxbin) spikerate[(int)((times[i] - timeshift) + 0.5) / binsize]++;
+laststep = ((int)(times[spikecount - 1] - timeshift)/ binsize) - 4;
+if(laststep > maxbin) laststep = maxbin;
+
+// calculate index of dispersion
+mean = 0;
+variance = 0;
+for(i=0; i<laststep; i++) mean = mean +  spikerate[i];	//mean
+mean = mean / laststep;
+for(i=0; i<laststep; i++) variance += (mean - spikerate[i]) * (mean - spikerate[i]);	// variance
+variance = variance / laststep;
+dispersion = variance / mean;		// dispersion
+
+return dispersion;
+}*/
+
+
+double SpikeDat::dispcalc(int binsize)
+{
+	int i;
+	int maxbin = 10000;
+	int spikerate[10000];
+	int laststep;
+	double mean, variance, dispersion = 0;
+	double timeshift = 0;
+
+	if(times[0] > 1000) timeshift = times[0] - 1000;        // for data where recording starts at non-zero time point
+
+	// calculate spike rate for binsize
+	for(i=0; i<maxbin; i++) spikerate[i] = 0;
+	for(i=0; i<spikecount; i++) if((times[i] - timeshift) / binsize < maxbin) spikerate[(int)((times[i] - timeshift) + 0.5) / binsize]++;
+	laststep = ((int)(times[spikecount - 1] - timeshift)/ binsize) - 4;
+	if(laststep > maxbin) laststep = maxbin;
+
+	// calculate index of dispersion
+	mean = 0;
+	variance = 0;
+	for(i=0; i<laststep; i++) mean = mean +  spikerate[i];	//mean
+	mean = mean / laststep;
+	for(i=0; i<laststep; i++) variance += (mean - spikerate[i]) * (mean - spikerate[i]);	// variance
+	variance = variance / laststep;
+	dispersion = variance / mean;		// dispersion
+
+	return dispersion;
+}
+
+
+IoDDat::IoDDat(int bsize, SpikeDat *sdata)
+{
+	binsize = bsize;
+	spikedata = sdata;
+	srate = new int(100000);
+}
+
+
+void IoDDat::ratecalc()
+{
+	int i;
+
+	for(i=0; i<spikedata->spikecount; i++) {
+		if(spikedata->times[i] / binsize < 100000) srate[(int)(spikedata->times[i] + 0.5) / binsize]++;
+	}
+	laststep = ((int)(spikedata->times[spikedata->spikecount - 1])/ binsize) - 4;
+}
+
+
+double IoDDat::dispcalc()
+{
+	int i;
+
+	mean = 0;
+	variance = 0;
+
+	ratecalc();
+
+	for(i=0; i<laststep; i++) mean = mean +  srate[i];	//mean
+	mean = mean / laststep;
+	for(i=0; i<laststep; i++) variance += (mean - srate[i]) * (mean - srate[i]);	// variance
+	variance = variance / laststep;
+	dispersion = variance / mean;		// dispersion
+
+	return dispersion;
 }
 
 
@@ -1447,7 +1741,7 @@ void SpikeDat::inputsim(double halflife)
 	double ve = 38;
 
 	halflife = 7.5;
-  memtau = 1 / (log((double)2) / halflife);
+	memtau = 1 / (log((double)2) / halflife);
 
 	v = vrest;
 	//memtau = 3.6067;
@@ -1455,9 +1749,9 @@ void SpikeDat::inputsim(double halflife)
 	for(i=0; i<1000000; i++) {
 		epsph = ae * (ve - v);
 		nepsp = srate1.data[i];
-	  syninput = epsph * nepsp;
+		syninput = epsph * nepsp;
 		//v = v - (v - vrest) * 0.1 + syninput;
-	  v = v - (v - vrest) / memtau + syninput;
+		v = v - (v - vrest) / memtau + syninput;
 		synsim.data[i] = v;
 	}
 }
@@ -1467,21 +1761,28 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 {
 	int setindex;
 	int shift;
+	wxString text;
 
 	if(light) shift = 5;
 	else shift = 0;
 
 	//graphbase->NewSet(tag, reftag);
+	//diagbox->Write(text.Format("\nGraphSet tag %s test %d\n", btag, burstdata->test));
 
 	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
+	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", reftag);
+	graphbase->Add(GraphDat(&srate10s, 0, 500, 0, 200, tag + "Spike Rate 10s", this, 10, red + shift), reftag + "rate10s", reftag);
 	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spike Rate 100ms", this, 0.1, red + shift), reftag + "rate100ms", reftag);
+	graphbase->Add(GraphDat(&srate10, 0, 5, 0, 20, tag + "Spike Rate 10ms", this, 0.1, red + shift), reftag + "rate10ms", reftag);
 	graphbase->Add(GraphDat(&srate1, 0, 0.5, 0, 3, tag + "Spikes 1ms", this, 0.001, red + shift), reftag + "spikes1ms", reftag);
+
 	graphbase->Add(GraphDat(&dispersions, 0, 100, 0, 20, tag + "Indexes of Dispersions Model", 1, 1, colour + shift), reftag + "dispersions-model", reftag);
 	graphbase->Add(GraphDat(&dispersionsre, 0, 100, 0, 20, tag + "Indexes of Dispersions Real", 1, 1, colour + shift), reftag + "dispersions-real", reftag);
 	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "ISI Histogram 1ms", 1, 1, colour + shift), reftag + "hist1ms", reftag);
 	graphbase->Add(GraphDat(&hist5, 0, 500, 0, 500, tag + "ISI Histogram 5ms", 1, 5, colour + shift), reftag + "hist5ms", reftag);
 	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Hazard 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);
 	graphbase->Add(GraphDat(&haz5, 0, 500, 0, 0.2, tag + "Hazard 5ms", 1, 5, colour + shift), reftag + "haz5ms", reftag);
+
 	graphbase->Add(GraphDat(&winfreq, 0, 500, 0, 20, tag + "Win Freq", 4, 1, green + shift), reftag + "winfreq", reftag);
 	graphbase->Add(GraphDat(&burstdata->hist1, 0, 500, 0, 100, btag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "bursthist1ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->hist5, 0, 500, 0, 500, btag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "bursthist5ms", reftag);
@@ -1492,15 +1793,22 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&burstdata->profilesm, 0, 250, 0, 20, tag + "Burst Profile Smooth", 4, 1, colour + shift), reftag + "-burst-headprofilesm", reftag);
 	graphbase->Add(GraphDat(&burstdata->bursthaz, 0, 250, 0, 200, tag + "Burst Haz", 1, 1, colour + shift), reftag + "-bursthaz", reftag);
 
-	graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, green + shift), reftag + "histquad", reftag);
-	graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, blue + shift), reftag + "histquadsmooth", reftag);
-	graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, red + shift), reftag + "histquadlinear", reftag);
-	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, green + shift), reftag + "hazquad", reftag);
+	//graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, green + shift), reftag + "histquad", reftag);                // old colours 9/2/17
+	//graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, blue + shift), reftag + "histquadsmooth", reftag);
+	//graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, red + shift), reftag + "histquadlinear", reftag);
+	//graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, green + shift), reftag + "hazquad", reftag);
 
-	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "ISI Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
-	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "ISI Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
+	graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, colour + shift), reftag + "histquad", reftag);
+	graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, colour + shift), reftag + "histquadsmooth", reftag);
+	graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, colour + shift), reftag + "histquadlinear", reftag);
+	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, colour + shift), reftag + "hazquad", reftag);
 
-	//(*graphbase)[reftag + "rate1s"]->synchx = false;
+	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
+	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
+	graphbase->Add(GraphDat(&burstdata->hist1norm, 0, 500, 0, 100, btag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "burstnormhist1ms", reftag);
+	graphbase->Add(GraphDat(&burstdata->hist5norm, 0, 500, 0, 500, btag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "burstnormhist5ms", reftag);
+
+	(*graphbase)[reftag + "rate1s"]->synchx = false;
 	(*graphbase)[reftag + "spikes1ms"]->synchx = false;
 	(*graphbase)[reftag + "hist1ms"]->synchx = false;
 	(*graphbase)[reftag + "hist5ms"]->synchx = false;

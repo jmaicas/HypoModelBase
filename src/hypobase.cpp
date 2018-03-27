@@ -30,6 +30,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	diagbox->Write("Diagnostic Box OK\n\n");
 
 	graphbox = NULL;
+	plotbox = NULL;
 
 	colourpen[0].Set("#000000");       // 0 black
 	colourpen[1].Set("#F50000");       // 1 red
@@ -223,7 +224,7 @@ long ParseLong(wxString *readline, wxUniChar tag)
 	wxString numstring;
 	long numdat;
 
-	*readline = readline->AfterFirst(tag);
+	if(tag) *readline = readline->AfterFirst(tag);           // NULL tag just reads next long
 	readline->Trim(false);
 	numstring = readline->BeforeFirst(' ');
 	numstring.ToLong(&numdat);

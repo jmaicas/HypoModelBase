@@ -90,7 +90,8 @@ enum {
 	vProto = 1,
 	vTom = 2,
 	vABC = 3,
-	vIGF = 4
+	vIGF = 4,
+	vBasic = 5
 };
 
 
@@ -118,7 +119,7 @@ enum {
 	ID_VMNMod,
 	ID_VasoMod,
 	ID_CortMod,
-  ID_GHMod,
+	ID_GHMod,
 	ID_LysisMod,
 	ID_AgentMod,
 	ID_Run,
@@ -129,6 +130,7 @@ enum {
 	ID_Sec,
 	ID_autorun,
 	ID_revpots,
+	ID_noise,
 	ID_histhaz1,
 	ID_histhaz2, 
 	ID_binres1,
@@ -185,6 +187,7 @@ enum {
 	ID_loaddata,
 	ID_datstore,
 	ID_datload,
+	ID_datload2,
 	ID_datoutput,
 	ID_Icap,
 	ID_Idrift,
@@ -225,6 +228,7 @@ enum {
 	ID_Print,
 	ID_GraphEPS,
 	ID_Scale,
+	ID_UnZoom,
 	ID_Go,
 	ID_Stop, 
 	ID_Wave,
@@ -245,8 +249,9 @@ enum {
 	ID_recep,
 	ID_vasoinject,
 	ID_Sync,
-  ID_gload,
-  ID_gstore,
+	ID_xscale,
+	ID_gload,
+	ID_gstore,
 	ID_DataBrowse,
 	ID_OutputBrowse,
 	ID_ParamBrowse,
@@ -268,6 +273,7 @@ enum {
 	ID_ms,
 	ID_net, 
 	ID_norm,
+	ID_allselect,
 	ID_clipmode,
 	ID_scatter,
 	ID_line,
@@ -294,7 +300,17 @@ enum {
 	ID_runningexpdata,
 	ID_runningSecExpData, 
 	ID_runningDiffIre,
-	ID_EPSPtrain
+	ID_runningLognormIre,
+	ID_EPSPtrain,
+	ID_MultiRun,
+	ID_XYPos,
+	ID_Zoom,
+	ID_AddPlot,
+	ID_quad,
+	ID_Add1,
+	ID_Add2,
+	ID_Sub1,
+	ID_Sub2
 };
 
 
@@ -338,6 +354,7 @@ class GraphBase;
 class ModGenBox;
 class DiagBox;
 class ToolSet;
+class PlotBox;
 
 
 //DiagBox *gdiag;
@@ -369,15 +386,17 @@ public:
 	wxStatusBar *statusbar;
 	//ToolSet toolset;
 	ToolSet *toolset;
-  DiagBox *diagbox;
+	DiagBox *diagbox;
 	wxColour colourpen[10];
 
 	// Display
 	ScaleBox *scalebox;
 	GraphBox *graphbox;
+	PlotBox *plotbox;
 	GraphWindow3 *graphwin[10];
     
 	int basic;
+	int user;
 	int diagnostic;
 	int ostype;
     
@@ -541,7 +560,7 @@ public:
 	unsigned long size() {
 		return store.size();
 	}
-	void add(wxString tag, int xscale, int size) {
+	void Add(wxString tag, int xscale, int size) {
 		for(unsigned long i=0; i<store.size(); i++) 
 			if(store[i].tag == tag) return;                 
 		DatData dat;
@@ -599,6 +618,7 @@ public:
 		long idx = store.size();
 		ParamData param;
 		param.indexName = indexName;
+		param.data = 0;                  // New 26/10/17 to fix undefined return value
 		store.push_back(param);  
 		return store[idx].data;             
 	} 
@@ -607,6 +627,24 @@ public:
 			if(store[i].indexName == indexName) return 1;
 		return 0;
 	}
+};
+
+
+class Index{
+	int i;
+public:
+	int count;
+	int list[1000];
+
+	Index() {
+		count = 0;
+	};
+
+	void Add(int entry) {
+		for(i=0; i<count; i++)
+			if(entry == list[i]) return;
+		list[count++] = entry;		
+	};
 };
 
 
@@ -687,6 +725,14 @@ public:
 	};
 };
 
+
+class NetCon{
+public:
+	int con;
+	int type;
+
+	NetCon() { type = 1; };
+};
 
 
 // Interface

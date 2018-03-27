@@ -3,6 +3,7 @@
 
 #include "wx/wx.h"
 #include <hypotools.h>
+
 #include "hypodef.h"
 
 
@@ -40,6 +41,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 
 	undogrid = new wxGridStringTable(size.x, size.y);
 	vdu = NULL;
+	outbox = NULL;
 
 	rightmenu = new wxMenu;
 	rightmenu->Append(ID_SelectAll, "Select All", "Grid Select", wxITEM_NORMAL);
@@ -52,6 +54,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	//Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(TextGrid::OnRightClick));
 	Connect(wxEVT_GRID_CELL_RIGHT_CLICK, wxGridEventHandler(TextGrid::OnRightClick));
 	Connect(wxEVT_GRID_CELL_LEFT_CLICK, wxGridEventHandler(TextGrid::OnLeftClick));
+	Connect(wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler(TextGrid::OnLabelClick));
 	Connect(ID_SelectAll, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnSelectAll));
 	Connect(ID_Copy, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnCopy));
 	Connect(ID_Paste, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnPaste));
@@ -85,10 +88,10 @@ void TextGrid::SetCell(int row, int col, wxString data)
 	int numcols = GetNumberCols();
 
 	if(row >= numrows) {
-		AppendRows(row - numrows + 1);
+		AppendRows(row - numrows + 10);
 	}
 	if(col >= numcols) {
-		AppendCols(col - numcols + 1);
+		AppendCols(col - numcols + 10);
 	}
 	SetCellValue(row, col, data);
 }
@@ -144,9 +147,21 @@ void TextGrid::ParseLine(int row, int col, wxString readline)
 	while(!readline.IsEmpty()) {
 		text = readline.BeforeFirst(' ');
 		text.Trim();
-		SetCellValue(row, col++, text);
+		SetCell(row, col++, text);
 		readline = readline.AfterFirst(' ');
 	}
+}
+
+
+void TextGrid::ParseLabel(int row, int col, wxString readline)
+{
+	int i;
+	wxString text, label;
+
+	label = readline.AfterFirst('\'');
+	label = label.BeforeFirst('\'');
+	label.Trim();
+	SetCell(row, col++, label);
 }
  
 
@@ -234,7 +249,6 @@ void TextGrid::Copy()
 			}
 		}
 	}
-
 
 	if(ostype == Mac) {
 		if (wxTheClipboard->Open()) {
@@ -325,6 +339,19 @@ void TextGrid::Paste()
 void TextGrid::OnUndo(wxCommandEvent& event)
 {
 	Undo();
+}
+
+
+void TextGrid::OnLabelClick(wxGridEvent& event)
+{
+	int r, c;
+
+	//if(vdu) vdu->AppendText("Label Click\n");
+	c = event.GetCol();
+
+	if(outbox && c >= 0) outbox->ColumnSelect(event.GetCol());
+
+	event.Skip();
 }
 
 

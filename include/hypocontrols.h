@@ -85,6 +85,7 @@ public:
 	wxString snum;
 	ToolBox *toolbox;
 	MainFrame *mainwin;
+	int controlborder;
 	
 	virtual void OnLeftClick(wxMouseEvent & event);
 	void OnLeftDClick(wxMouseEvent & event);
@@ -94,6 +95,7 @@ public:
 	ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
+	ToolPanel(wxNotebook *notebook, const wxPoint& pos, const wxSize& size);
   ToolPanel(MainFrame *main, wxWindow *parent);
 };
 
@@ -151,7 +153,7 @@ public:
 	wxStaticText *TextLabel(wxString);
 	wxStaticText *StatusBar();
 	wxTextCtrl *TextInput(int width = 80, int height = -1, wxString label = "---");
-  TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
+	TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
 	
 	ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool serve=false, bool child=false);
 	ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);
@@ -243,7 +245,7 @@ public:
 	int ostype;
 	int type;
 	int numwidth, labelwidth;
-  int pad;
+	int pad;
 	wxFont textfont, smalltextfont;
 	wxTextCtrl *numbox;
 	wxSpinButton *spin;
@@ -263,7 +265,7 @@ public:
 	ParamCon(ToolPanel *panel, wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth);
 	void OnSpinUp(wxSpinEvent& event);
 	void OnSpinDown(wxSpinEvent& event);
-    void OnSpin(wxSpinEvent& event);
+	void OnSpin(wxSpinEvent& event);
 	double GetValue();
 	wxString GetString();
 	void SetValue(double val);
@@ -304,6 +306,8 @@ public:
 class ParamSet
 {
 public:
+	int labelwidth;   // not in use
+	int numwidth;     // not in use
 	int numparams;
 	int currlay;      // Current parameter for panel layout, starts at 0
 	int type;
@@ -316,9 +320,9 @@ public:
 	ParamSet(ToolPanel *);
 	~ParamSet();
 
-	void AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=65, int numwidth=40);
-	void AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
-	void AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
+	ParamCon *AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=65, int numwidth=40);
+	ParamCon *AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
+	ParamCon *AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
 	ParamCon *GetCon(wxString);
 	ParamStore *GetParams();
 	ParamStore *GetParamsNew(BoxOut *boxout);
