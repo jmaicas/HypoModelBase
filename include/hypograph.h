@@ -224,6 +224,7 @@ public:
 	wxComboBox *gstag;
 	wxToggleButton *syncbutton;
 	wxCheckBox *gsync[10];
+	wxBoxSizer *vbox;
 
 	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, short boxtype=0);
 	~ScaleBox();
