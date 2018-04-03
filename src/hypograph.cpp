@@ -1063,7 +1063,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 
 		if(gtype == 5) {                         // line graph with scaling fix
 			if(drawdiag) ofp = fopen("graph.txt", "w");
-			mod->diagbox->Write(text.Format("line plot xrange %.4f  yscalemode %d  ylogbase %.4f  ylogmax %.4f\n", xrange, graph->yscalemode, ylogbase, ylogmax));
+			//mod->diagbox->Write(text.Format("line plot xrange %.4f  yscalemode %d  ylogbase %.4f  ylogmax %.4f\n", xrange, graph->yscalemode, ylogbase, ylogmax));
 
 			dir = 1;
 			pdir = 0;

@@ -178,7 +178,7 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	selectbox->AddStretchSpacer();
 	selectpanel->Layout();
 
-	// Data Loading 
+	// Data Loading - currently for batch loading 
 
 	ToolPanel *loadpanel = new ToolPanel(this, tabpanel);
 	loadpanel->SetFont(boxfont);
@@ -187,6 +187,10 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	activepanel = loadpanel;
 	paramset->panel = loadpanel;
 
+	wxBoxSizer *datapathbox = new wxBoxSizer(wxHORIZONTAL);
+	paramset->AddText("datapath", "Data Path", "", 60, 250);
+	datapathbox->Add(paramset->GetCon("datapath"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	AddButton(ID_PathBrowse, "Browse", 60, datapathbox);
 
 	wxBoxSizer *datatagbox = new wxBoxSizer(wxHORIZONTAL);
 	neurodatatag = new TagBox(activepanel, ID_Select, "", wxDefaultPosition, wxSize(150, -1), "neurodatatag", mod->GetPath());
@@ -202,6 +206,8 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	}
 
 	loadbox->AddStretchSpacer();
+	loadbox->Add(datapathbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	loadbox->AddSpacer(10);
 	loadbox->Add(datatagbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	loadbox->AddStretchSpacer();
 	loadpanel->Layout();
@@ -225,6 +231,9 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	Connect(200, 205, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnSub));
 	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnClear));
 	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnInvert));
+
+	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnBrowse));
+	Connect(ID_FileBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnBrowse));
 }
 
 
@@ -233,6 +242,25 @@ CellBox::~CellBox()
 	if(!spikeselectLink) {
 		delete[] selectspikes[0];
 		delete[] selectspikes[1];
+	}
+}
+
+
+void CellBox::OnBrowse(wxCommandEvent& event)
+{
+	if(event.GetId() == ID_PathBrowse) {
+		wxDirDialog *dirdialog = new wxDirDialog(this, "Choose a directory", paramset->GetCon("datapath")->GetLabel(), 0, wxDefaultPosition);
+		if(dirdialog->ShowModal() == wxID_OK) paramset->GetCon("datapath")->SetValue(dirdialog->GetPath()); 
+	}
+
+	if(event.GetId() == ID_OutputBrowse) {
+		wxDirDialog *dirdialog = new wxDirDialog(this, "Choose a directory", paramset->GetCon("outpath")->GetLabel(), 0, wxDefaultPosition);
+		if(dirdialog->ShowModal() == wxID_OK) paramset->GetCon("outpath")->SetValue(dirdialog->GetPath()); 
+	}
+
+	if(event.GetId() == ID_FileBrowse) {
+		wxFileDialog *filedialog = new wxFileDialog(this, "Choose a file", neurodatatag->GetLabel(), "", "", 0, wxDefaultPosition);
+		if(filedialog->ShowModal() == wxID_OK) neurodatatag->SetValue(filedialog->GetFilename()); 
 	}
 }
 
@@ -442,8 +470,8 @@ void CellBox::OnLoadData(wxCommandEvent& event)
 	FileDat *file;
 
 	filetag = neurodatatag->GetValue();
-	//filepath = paramset->GetCon("datapath")->GetString();
-	filepath = "C:/Data/VMN";
+	filepath = paramset->GetCon("datapath")->GetString();
+	//filepath = "C:/Data/VMN";
 	FileDat newfile = FileDat(filetag, filepath);
 
 	tagpos = neurodatatag->FindString(filetag);
@@ -536,6 +564,8 @@ void CellBox::OnEnter(wxCommandEvent& event)
 }
 
 
+// LoadDataList - batch loading of spike time data files into the grid
+
 void CellBox::LoadDataList(FileDat *file)
 {
 	int i, row, col;
@@ -586,6 +616,8 @@ void CellBox::LoadDataList(FileDat *file)
 }
 
 
+// LoadNeuroData - load data from spike time data file into the grid
+
 void CellBox::LoadNeuroData(FileDat file, int col)
 {
 	int i, row;
@@ -595,6 +627,8 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 	string line, filename;
 	long timeval;
 	double dataval;
+	int linecount = 0;
+	int datacount = 0;
 
 	if(file.path == "") {
 		mainwin->diagbox->Write("No file path\n");
@@ -618,8 +652,41 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 		infile.open(filename.c_str());
 	}
 
+	/*
+	readline = datfile->GetFirstLine();
+	datfiletag->SetValue(readline);
+	if(readline.GetChar(0) == '\'') {
+		readline = readline.AfterFirst('\'');
+		datname = readline.BeforeFirst('\'');
+	}
+	else if(readline.GetChar(0) == '\"') {
+		readline = datfile->GetNextLine();
+		readline = readline.AfterFirst('\"');
+		datname = readline.BeforeFirst('\"');
+	}
+	datfiletag->SetValue(datname);
+
+	if(readline.ToDouble(&datval)) rawdata[count++] = datval * 1000;        // rawdata in ms
+	readline = datfile->GetNextLine();
+
+	while(readline.IsEmpty() || readline.GetChar(0) == '\"' || readline.GetChar(0) == ':') 
+		readline = datfile->GetNextLine();
+
+	while(!readline.IsEmpty() && readline.GetChar(0) != '\"' && readline.GetChar(0) != ':') {
+		readline.Trim();
+		readline.ToDouble(&datval);
+		rawdata[count++] = datval * units;
+		readline = datfile->GetNextLine();
+		if(count == stretchdata) {
+			stretchdata = stretchdata + 1000;
+			rawdata.setsize(stretchdata);
+			loaddata->ReSize(stretchdata);
+		}
+	}*/
+
 	if(infile.is_open()) {
 		while(getline(infile, line)) {
+			linecount++;
 			//wxString readline(line);
 			//mainwin->diagbox->Write(readline + "\n");
 			//LoadNeuroData(FileDat(readline, file->path));
@@ -632,7 +699,19 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 				textgrid->ParseLabel(row++, col, line);
 				continue;
 			}
+			if(line.front() == '\"') {
+				if(linecount == 2) {
+					mainwin->diagbox->Write("Label detect\n");
+					textgrid->ParseLabel(row++, col, line);
+				}
+				continue;
+			}
+			if(line.empty()) {
+				if(datacount) break;
+				else continue;
+			}
 			textgrid->ParseLine(row++, col, line);
+			datacount++;
 			//if(i%100000 == 0) mainwin->diagbox->Write(text.Format("Line %d\n", i)); 
 		}
 		//mainwin->diagbox->Write(line + "\n");
@@ -642,7 +721,7 @@ void CellBox::LoadNeuroData(FileDat file, int col)
 		mainwin->diagbox->Write("\nUnable to open file\n"); 
 		mainwin->diagbox->Write(text.Format("filename %s\n", filename));
 	}
-	mainwin->diagbox->Write("\nFile OK\n"); 
+	mainwin->diagbox->Write(text.Format("\nFile OK, datacount = %d\n", datacount)); 
 }
 
 

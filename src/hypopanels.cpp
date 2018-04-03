@@ -133,6 +133,8 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 
 	paramset->GetCon("xshift")->SetMinMax(-100000, 100000);
 	paramset->GetCon("yshift")->SetMinMax(-100000, 100000);
+	paramset->GetCon("xlabelplaces")->SetMinMax(-1, 100);
+	paramset->GetCon("ylabelplaces")->SetMinMax(-1, 100);
 
 	paramset->AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
 	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
@@ -310,8 +312,8 @@ void GraphBox::SetControls()
 	paramset->GetCon("xdscale")->SetValue(graph->xunitdscale);
 	paramset->GetCon("xlabelgap")->SetValue(graph->xlabelgap);
 	paramset->GetCon("ylabelgap")->SetValue(graph->ylabelgap);
-	paramset->GetCon("xlabelplaces")->SetValue(graph->xlabelgap);
-	paramset->GetCon("ylabelplaces")->SetValue(graph->ylabelgap);
+	paramset->GetCon("xlabelplaces")->SetValue(graph->xlabelplaces);
+	paramset->GetCon("ylabelplaces")->SetValue(graph->ylabelplaces);
 	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
 	paramset->GetCon("labelfontsize")->SetValue(graph->labelfontsize);
 	paramset->GetCon("scattersize")->SetValue(graph->scattersize);

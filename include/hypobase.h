@@ -284,7 +284,9 @@ enum {
 	ID_Add1,
 	ID_Add2,
 	ID_Sub1,
-	ID_Sub2
+	ID_Sub2,
+	ID_monitor,
+	ID_formfilter
 };
 
 
