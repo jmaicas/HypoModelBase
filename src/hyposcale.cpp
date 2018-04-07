@@ -254,6 +254,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 			}
 		}
 
+		/*
 		if(boxtype == modFirstTest) {
 			if(i == 1) {
 				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
@@ -268,7 +269,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				}
 				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
-		}
+		}*/
 
 		if(boxtype == modPlot) {
 			if(i == 0) {
