@@ -33,6 +33,7 @@ public:
     TextGrid(wxWindow *parent, wxSize size);
 		~TextGrid();
 		int ostype;
+		DiagBox *diagbox;
 
 		wxGridStringTable *undogrid;
 		wxTextCtrl *vdu;
@@ -45,6 +46,7 @@ public:
 		void OnKey(wxKeyEvent& event);
 		void OnTypeKey(wxKeyEvent &event);
 		void OnSelectAll(wxCommandEvent& event);
+		void OnCut(wxCommandEvent& event);
 		void OnCopy(wxCommandEvent& event);
 		void Undo();
 		void OnPaste(wxCommandEvent& event);
@@ -53,6 +55,7 @@ public:
 		void CopyUndo();
 		void Copy();
 		void Paste();
+		void Cut();
 		void Delete();
 		void SetBold();
 		void ClearCol(int);

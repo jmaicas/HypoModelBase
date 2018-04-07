@@ -37,6 +37,9 @@ public:
 	int xscaletoggle;
 	bool oldhist;
 
+	// Prefs
+	int numdraw;
+
 	wxString modname;
 	wxString modtag;
 	wxString initparams;
@@ -52,6 +55,7 @@ public:
 	ModThread *modthread;
 	ParamStore *modeflags;
 	ParamStore *toolflags;
+	ParamStore prefstore;
 	ToolSet modtools;
 	wxString gcodes[10];
 	ScaleBox *scalebox;
@@ -80,6 +84,7 @@ public:
 	virtual void GHistLoad(wxComboBox *);
 	virtual void ModClose();
 	virtual void EvoRun();
+	virtual void ScaleCon(ScaleBox *scalebox, int condex);
 };
 
 

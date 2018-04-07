@@ -5,7 +5,7 @@
 
 
 
-ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, GraphDisp *gdisp, Model *model, GraphWindow3 **gwin, int start, short btype)
+ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, GraphDisp *gdisp, Model *model, GraphWindow3 **gwin, int start, int btype)
 	: wxPanel(draw, wxID_ANY, wxPoint(0, 0), size, wxBORDER_SIMPLE | wxFULL_REPAINT_ON_RESIZE)
 {
 	mainwin = main;
@@ -82,7 +82,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	//dc.SetTextBackground(backgroundColour);
 
 	panel = this;
-	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
+	vbox = new wxBoxSizer(wxVERTICAL);
 	vbox->AddSpacer(5);
 
 	wxBitmap rightarrow, leftarrow;
@@ -137,6 +137,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		psetbox->Add(zoombox, 0, wxALIGN_CENTRE_HORIZONTAL);
 
 		gsync[i] = NULL;
+
+		if(boxtype == -1) mod->ScaleCon(this, i);
+
 		if(boxtype == modVMN) {
 			//gsync[i] = new wxCheckBox(panel, i, "Sync");
 			//psetbox->Add(gsync[i], 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 2);
@@ -917,7 +920,7 @@ void ScaleBox::GraphCommand(int commid)
 	if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
 	else (*gflags)[tag] = 0;
 
-	mainwin->diagbox->Write(text.Format("graphcommand %s %.0f", tag, (*gflags)[tag]));
+	mainwin->diagbox->Write(text.Format("graphcommand %s %.0f\n", tag, (*gflags)[tag]));
 
 	GraphSwitch();
 }

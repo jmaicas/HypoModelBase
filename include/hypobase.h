@@ -279,11 +279,14 @@ enum {
 	ID_XYPos,
 	ID_Zoom,
 	ID_AddPlot,
+	ID_RemovePlot,
 	ID_quad,
 	ID_Add1,
 	ID_Add2,
 	ID_Sub1,
-	ID_Sub2
+	ID_Sub2,
+	ID_monitor,
+	ID_formfilter
 };
 
 
@@ -553,7 +556,7 @@ public:
 
 class ParamStore{
 	struct ParamData{
-		wxString indexName;
+		wxString tag;
 		double data;
 	};
 private:
@@ -563,37 +566,47 @@ public:
 	unsigned long size() {
 		return store.size();
 	}
-	void add(wxString indexName, double data){
+
+	void add(wxString tag, double data) {
 		for(unsigned long i=0; i<store.size(); i++) 
-			if(store[i].indexName == indexName) {
+			if(store[i].tag == tag) {
 				store[i].data = data;
 				return;
 			}                  
 		ParamData param;
-		param.indexName = indexName;
+		param.tag = tag;
 		param.data = data;
 		store.push_back(param);
 	}
-	double &operator [](long index){
+
+	double &operator [](long index) {
 		if(index < 0) index=0;
 		return store[index].data;
 	}
-	double &operator [](wxString indexName){
+
+	double &operator [](wxString tag) {
 		for(unsigned long i=0; i<store.size(); i++) 
-			if(store[i].indexName == indexName) {
+			if(store[i].tag == tag) {
 				return store[i].data;
 			}
 		long idx = store.size();
 		ParamData param;
-		param.indexName = indexName;
+		param.tag = tag;
 		param.data = 0;                  // New 26/10/17 to fix undefined return value
 		store.push_back(param);  
 		return store[idx].data;             
 	} 
-	int check(wxString indexName) {
+
+	int check(wxString tag) {
 		for(unsigned long i=0; i<store.size(); i++) 
-			if(store[i].indexName == indexName) return 1;
+			if(store[i].tag == tag) return 1;
 		return 0;
+	}
+
+	wxString gettag(long index) {
+		if(index < 0) index=0;
+		if(index >= store.size()) return "";
+		return store[index].tag;
 	}
 };
 

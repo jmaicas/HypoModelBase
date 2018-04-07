@@ -400,6 +400,8 @@ void BurstBox::BurstDataPanel(BurstPanel *datpanel)
 }
 
 
+// BurstBox - now used as general spike time data loading and analysis box
+
 BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode)
 	: ToolBox(model->mainwin, title, pos, size)
 {
@@ -882,7 +884,7 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	}
 	datfiletag->SetValue(datname);
 
-	if(readline.ToDouble(&datval)) rawdata[count++] = datval * 1000;
+	if(readline.ToDouble(&datval)) rawdata[count++] = datval * 1000;        // rawdata in ms
 	readline = datfile->GetNextLine();
 
 	while(readline.IsEmpty() || readline.GetChar(0) == '\"' || readline.GetChar(0) == ':') 

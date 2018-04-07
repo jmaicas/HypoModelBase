@@ -645,11 +645,12 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 }
 
 
-void SpikeDat::MeanSpikeForm(datdouble V, int filter, int substeps)
+void SpikeDat::MeanSpikeForm(datdouble V, int timerange, int filter, int substeps)
 {
 	int i, j, numspikes;
-	int timerange = 100;        // max 200
+	//int timerange = 2000;        // max 200   // why? March 2018
 	wxString text;
+	int maxtime = 1000000;
 
 	for(i=0; i<5000; i++) meanV[i] = 0;
 	numspikes = 0;
@@ -662,12 +663,12 @@ void SpikeDat::MeanSpikeForm(datdouble V, int filter, int substeps)
 			if(i > 0 && (times[i] - times[i-1] < timerange/2)) continue;
 			if(i < spikecount-1  && (times[i+1] - times[i] < timerange/2)) continue;
 		}
-		if(times[i] > 1000000) break;
+		if(times[i] > maxtime) break;
 		for(j=0; j<timerange*substeps; j++) meanV[j] += V[(times[i] - timerange/2) * substeps + j];
 		numspikes++;
 	}
 
-	diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d  filter %d\n", spikecount, numspikes));
+	diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d  filter %d  timerange %d\n", spikecount, numspikes, timerange));
 
 	for(i=0; i<5000; i++) meanV[i] = meanV[i] / numspikes;
 }
@@ -1011,6 +1012,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	//maxspikes = 100000;
 
+	//diagbox->Write("\nneurocalc\n");
+
 	calcdiag = false;
 	calcdiag2 = false;
 
@@ -1241,7 +1244,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	srate100s.max = (int)(times[spikecount-1]/100000 + 0.5);
 
 	for(i=0; i<spikecount; i++) {
-		if(times[i] < 1000000) srate1[(int)(times[i] + 0.5)]++;            // spike rate count (1ms)
+		if(start < 100000 && times[i] < 1000000) srate1[(int)(times[i] + 0.5)]++;            // spike rate count (1ms)
+		if(start >= 100000 && times[i] < (start + 1000000)) srate1[(int)(times[i] + 0.5 - start)]++;            // spike rate count (1ms) with deferred start point
 		if(times[i]/10 < 100000) srate10[(int)(times[i]/10 + 0.5)]++;
 		if(times[i]/100 < 100000) srate100[(int)(times[i]/100 + 0.5)]++;
 		if(times[i]/10000 < 100000) srate10s[(int)(times[i] + 0.5)/10000]++;

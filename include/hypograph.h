@@ -135,6 +135,7 @@ public:
 	wxChoice *typechoice;
 	TypeSet typeset;
 	wxRadioButton *xrad[2], *yrad[2];
+	wxRadioButton *xlabrad[2], *ylabrad[2];
 	wxRadioButton *xsrad[2], *ysrad[2];
 	wxCheckBox *clipcheck, *scattercheck, *linecheck;
 
@@ -194,7 +195,7 @@ public:
 	int ratedata;
 	int internflag;
 	int normtog;
-	unsigned int boxtype;
+	int boxtype;
 	int synchcon;
 
 	int xmin, xmax, ymin, ymax;
@@ -217,8 +218,9 @@ public:
 	wxComboBox *gstag;
 	wxToggleButton *syncbutton;
 	wxCheckBox *gsync[10];
+	wxBoxSizer *vbox;
 
-	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, short boxtype=0);
+	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, int boxtype=0);
 	~ScaleBox();
 
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);

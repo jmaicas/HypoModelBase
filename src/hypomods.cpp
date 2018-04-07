@@ -67,6 +67,7 @@ Model::Model(int type, wxString name, HypoMain *main)
 	graphbase->mainwin = mainwin;
 	modeflags = new ParamStore();
 	toolflags = new ParamStore();
+	//prefstore = new ParamStore();
 	scalebox = mainwin->scalebox;
 	diagbox = mainwin->diagbox;
 
@@ -79,6 +80,8 @@ Model::Model(int type, wxString name, HypoMain *main)
 	path = "";
 	oldhist = true;
 	xscaletoggle = 0;
+
+	prefstore["numdraw"] = 2;
 }
 
 
@@ -164,6 +167,11 @@ void Model::DataSelect(double x, double y)
 
 
 void Model::EvoRun()
+{
+}
+
+
+void Model::ScaleCon(ScaleBox *scalebox, int condex)
 {
 }
 
@@ -318,7 +326,8 @@ void Model::GLoad(wxComboBox *gstag)
 
 void Model::ModStore()
 {
-	short i;
+	int i;
+	int prefcount;
 	wxString filename, filepath;
 	wxString outline, text;
 
@@ -332,8 +341,18 @@ void Model::ModStore()
 		
   //modbox->StoreParam("default");
 
-	// Parameter history
 
+	// Prefs                                  February 2018
+	filename = modname + "prefs.ini";
+	outfile.New(filepath + "/" + filename);
+
+	prefcount = prefstore.size();
+	for(i=0; i<prefcount; i++) {
+		outfile.WriteLine(text.Format("%s %.0f", prefstore.gettag(i), prefstore[i]));
+	}
+	outfile.Close();
+
+	// Parameter history                   - no longer in use, replaced by box specific file tag history 
 	if(oldhist) {
 		filename = modname + "prefs.ini";
 		initparams = modbox->paramstoretag->GetValue();
@@ -371,10 +390,11 @@ void Model::ModLoad()
 
 	wxString filename, filepath;
 	wxString readline, numstring;
+	wxString tag;
 
 	TextFile infile, opfile;
 	wxPoint pos;
-  wxSize size;
+	wxSize size;
 
 	diagbox->Write("ModLoad....\n");
 
@@ -386,19 +406,33 @@ void Model::ModLoad()
 			filename = modname + "prefs.ini";
 			check = opfile.Open(filepath + "/" + filename);
 			if(!check) return;
-
 			readline = opfile.ReadLine();
 			while(!readline.IsEmpty()) {
 				readline = readline.AfterFirst(' ');
 				readline.Trim();
 				initparams = readline;
 				modbox->paramstoretag->Insert(initparams, 0);
-	
 				readline = opfile.ReadLine();
 			}
 			opfile.Close();	
 			modbox->paramstoretag->SetLabel(initparams);
 		}
+	}
+
+	// Prefs load
+	filename = modname + "prefs.ini";
+	check = infile.Open(filepath + "/" + filename);
+	if(check) {
+		readline = infile.ReadLine();
+		while(!readline.IsEmpty()) {
+				tag = readline.BeforeFirst(' ');
+				readline = readline.AfterFirst(' ');
+				readline.Trim();
+				readline.ToLong(&numdat);
+				prefstore[tag] = numdat;
+				readline = infile.ReadLine();
+		}
+		infile.Close();
 	}
 
 	diagbox->Write("ModLoad history ok, reading boxes...\n");
@@ -415,7 +449,6 @@ void Model::ModLoad()
 		numstring.ToLong(&numdat);
 		boxindex = numdat;
 		if(boxindex >= modtools.numtools) break;
-
 		pos.x = ReadNextData(&readline);
 		//if(pos.x < 0) pos.x = 0;
 		pos.y = ReadNextData(&readline);

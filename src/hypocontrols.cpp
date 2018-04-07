@@ -254,6 +254,7 @@ ParamCon::ParamCon(ToolPanel *pan, int tp, wxString pname, wxString labelname, d
 	Connect(wxEVT_SPIN_UP, wxSpinEventHandler(ParamCon::OnSpinUp));
 	Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(ParamCon::OnSpinDown));
 	Connect(wxEVT_SPIN, wxSpinEventHandler(ParamCon::OnSpin));
+	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ParamCon::OnEnter));
 }
 
 
@@ -342,8 +343,28 @@ void ParamCon::OnSpin(wxSpinEvent& event)
 {
 	wxString text;
 
-	int spindir = event.GetPosition();
-	if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText(text.Format("\nspin click %d\n", spindir));
+	//int spindir = event.GetPosition();
+	//if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText(text.Format("\nspin click %d\n", spindir));
+
+	if(panel->toolbox) {
+		//panel->toolbox->diagbox->Write("tool spin click\n");
+		panel->toolbox->SpinClick(name);
+	}
+
+	event.Skip();
+}
+
+
+void ParamCon::OnEnter(wxCommandEvent& event)
+{
+	wxString text;
+
+	//if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText(text.Format("\nspin click %d\n", spindir));
+
+	if(panel->toolbox) {
+		//panel->toolbox->diagbox->Write("tool box enter\n");
+		panel->toolbox->BoxEnter(name);
+	}
 
 	event.Skip();
 }
@@ -892,7 +913,19 @@ void ToolBox::OnToggle(wxCommandEvent& event)
 
 void ToolBox::TextClick(wxString tag)
 {
-	diagbox->Write("toolbox textclick\n");
+	diagbox->Write("toolbox textclick " + tag + "\n");
+}
+
+
+void ToolBox::SpinClick(wxString tag)
+{
+	diagbox->Write("toolbox spinclick  " + tag + "\n");
+}
+
+
+void ToolBox::BoxEnter(wxString tag)
+{
+	diagbox->Write("toolbox boxenter " + tag + "\n");
 }
 
 

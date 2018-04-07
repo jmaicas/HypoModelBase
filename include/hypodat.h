@@ -255,6 +255,7 @@ public:
 	DiagBox *diagbox;
 
 	datdouble times;
+	datdouble mag;
 	datdouble isis;
 	BurstDat *burstdata;
 	
@@ -273,7 +274,7 @@ public:
 	//datdouble haz1norm;
 	datdouble haz5norm;
 
-	datint srate;
+	datint srate;      // change to srate1s
 	datint srate1;
 	datint srate100;
 	datint srate10;
@@ -338,7 +339,7 @@ public:
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
-	void MeanSpikeForm(datdouble V, int filter = false, int substeps = 1);
+	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);
 	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	void Clear();
@@ -529,6 +530,7 @@ public:
 	};
 
 	void AddPlot(PlotDat);
+	int RemovePlot(int);
 	int SetPlot(int, PlotDat);
 };
 
@@ -606,6 +608,8 @@ public:
 	bool synchx;
 	int barwidth, barshift, bargap;
 	int xscalemode, yscalemode;
+	double xlogbase, ylogbase;
+	int scatterfield, scattermean;      // used for drawing scatter cloud oval and mean
 
 	int highstart, highstop, highcolour;
 
@@ -762,17 +766,18 @@ public:
 	wxBitmapButton *xzoomin;
 	int ypos;
 	int xpos;*/
-	GraphDat *plot[5];
+	GraphDat *plot[10];
+	static const int maxplots = 10;
 	int numplots;
 	int currentplot;
 	int spikedisp;
 	int sdex;
-	int maxplots;
 	//BurstDat *burstdata;
 	PlotSet *plotset;
 	
 	GraphDisp();
 	void Add(GraphDat *);
+	void Remove(int index);
 	void Front(GraphDat *);
 	GraphDat *GetFront();
 	void Set(int index, GraphDat *newplot);   // Set(0, newplot) equivalent to Front(newplot)

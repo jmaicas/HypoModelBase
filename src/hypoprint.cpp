@@ -25,7 +25,7 @@ void GraphWindow3::MultiEPS()
 
 
 	// Read panel data from OutBox
-	textgrid = mod->outbox->textgrid;
+	textgrid = mod->outbox->currgrid;
 
 	//celltext = textgrid->GetCell(0, 0);
 	//celltext.Trim(); 
@@ -81,7 +81,8 @@ void GraphWindow3::MultiEPS()
 			gwin = mainwin->graphwin[paneldex[i]];
 			gwin->PrintEPS(xb[i], yb[i], &out);
 		}
-		else if(panelcomm[i] == "hh") mainwin->scalebox->GraphCommand(ID_histhaz1);
+	  if(panelcomm[i] == "hh") mainwin->scalebox->GraphCommand(ID_histhaz1);
+		if(panelcomm[i] == "norm") mainwin->scalebox->GraphCommand(ID_norm);
 	}
 
 	// Close file
@@ -198,10 +199,15 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		barwidth = graph->barwidth;
 		bargap = graph->bargap;
 		gtitle = 0;
-		xlabelmode = 1;
-		ylabelmode = 1;
+		//xlabelmode = 2;
+		//ylabelmode = 2;         // 1 = label every tick, 2 = only label first and last tick
 
-		if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
+		//if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
+
+		if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(graph->xlogbase);
+		else xlogmax = 0;
+		if(graph->yscalemode == 1 && yfrom > 0) ylogmax = log(yto / yfrom) / log(graph->ylogbase);
+		else ylogmax = 0;
 
 		//xfrom = xfrom - xstart;                    // shift x-axis for non-zero start on data (to make 0 in figure)
 		//xto = xto - xstart;
@@ -435,10 +441,18 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 			for(i=1; i<=(xto - xfrom) / xsample; i++) {		
 				xindex = i * xsample + xfrom;
 				xpos = (xindex - xfrom) * xrange;
-				y = (*gdatadv)[xindex];
-				out->DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));
+
+				yval = (*gdatadv)[xindex];
+				if(graph->yscalemode == 1 && yfrom > 0) {
+					ypos = (int)((double)yplot * (log(yval / yfrom) / log(graph->ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					if(yval < yfrom) ypos = -yfrom * yrange;     // set below range values to xfrom
+				}
+				else ypos = yrange * (yval - yfrom);
+
+				//y = (*gdatadv)[xindex];
+				out->DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + ypos);
 				oldx = xpos + xbase + xoffset;
-				oldy = ybase + yrange * (y - yfrom);
+				oldy = ybase + ypos;
 			}
 			out->WriteLine("stroke");
 		}
@@ -484,9 +498,9 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		}
 
 		double xmin, xmax, ymin, ymax, xmid, ymid;
-		int scatterfield = 1;
+		int scatterfield = graph->scatterfield;
 		int width, height;
-		int scattermean = 1;
+		int scattermean = graph->scattermean;
 		double xmean, ymean, xvar, yvar, xsd, ysd;
 		double xsdneg, xsdpos, ysdneg, ysdpos;
 
@@ -641,6 +655,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 
 	double xcoord, ycoord;
 	double xplotstep, yplotstep;
+	double xlogrange, ylogrange;
 
 	if(graph->xtickmode && graph->xstep > 0) {
 		xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
@@ -658,6 +673,13 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		yplotstep = (yplot * graph->ystep) / (yto - yfrom);  
 	}
 
+	if(graph->ytickmode == 1 && graph->yscalemode == 1) {          // tick count and spacing for log scale, step size specifies exponent step
+		ylogrange = log(yto - yfrom) / log(graph->ylogbase);
+		ylabels = (int)(ylogrange / graph->ystep);
+		yplotstep = (yplot * graph->ystep) / ylogrange;
+		//mod->diagbox->Write(text.Format("ylog tick step %.2f ylabels %d stepsize %.2f ylogrange %.4f\n", graph->ystep, ylabels, yplotstep, ylogrange)); 
+	}
+
 	for(i=0; i<=ylabels && ylabels > 0; i++) {
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
@@ -671,7 +693,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	// Draw Tick Labels
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
-		if(xlabelmode == 2 && i > 0 && i < xlabels) continue;
+		if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
 		out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
@@ -693,14 +715,18 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	out->WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
 		mod->diagbox->Write(text.Format("ylabels %d %d\n", ylabels, i));
-		if(ylabelmode == 2 && i > 0 && i < ylabels) {
-			//mod->diagbox->Write("break\n");
-			continue;
-		}
+		if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
 		yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;
 		if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+
+		// log scale mode
+		if(graph->yscalemode == 1 && yfrom > 0) {
+			if(graph->ytickmode == 1) yval = pow(graph->ylogbase, graph->ystep * i);
+			if(graph->ytickmode == 0) yval = yfrom * pow(graph->ylogbase, ylogmax * yval / yto);
+		}
+
 		srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
 		if(graph->ylabelplaces == -1) {
 			if(srangey < 0.1) snum.Printf("%.3f", yval);

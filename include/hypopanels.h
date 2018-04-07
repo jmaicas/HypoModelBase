@@ -5,6 +5,7 @@
 
 #include "wx/wx.h"
 #include <wx/richtext/richtextctrl.h>
+#include <wx/grid.h>
 #include "hypocontrols.h"
 #include "hypotools.h"
 #include "hypodat.h"
@@ -87,7 +88,9 @@ public:
 	ParamSet *paramset;
 	ParamStore *modparams;
 	ParamStore *modflags;
+	ParamStore *conflags;
 	RefStore *flagrefs;
+	RefStore *conflagrefs;
 	RefStore *checkrefs;
 	RefStore *panelrefs;
 	wxNotebook *notebook;
@@ -137,7 +140,7 @@ public:
 	void SetVBox(int);
 	virtual void OnRun(wxCommandEvent& event);
 	virtual void OnDefault(wxCommandEvent& event);
-	void OnSpin(wxSpinEvent& event);
+	virtual void OnSpin(wxSpinEvent& event);
 	void OnDClick(wxMouseEvent& event);
 	void OnAutorun(wxCommandEvent& event);
 	void OnParamStore(wxCommandEvent& event);
@@ -158,6 +161,7 @@ public:
 	void InitMenu();
 	void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
+	void SetConFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
 	void ModData();
 	wxBoxSizer *StoreBox(wxString label="", wxPanel *storepanel=NULL);
@@ -256,7 +260,8 @@ class OutBox: public ParamBox
 public:
 	Model *mod;
 	wxTextCtrl *textbox;
-	TextGrid *textgrid;
+	TextGrid *textgrid;   // base grid
+	TextGrid *currgrid;   // pointer to selected grid, textgrid by default
 	DiagBox *diagbox;
 	wxNotebook *notebook;
 	//PlotBox *plotbox;
@@ -278,6 +283,7 @@ public:
 	void OnCopy(wxCommandEvent& event);
 	void OnButton(wxCommandEvent& event);
 	int ColumnData(int, datdouble *);
+	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);
 };
 

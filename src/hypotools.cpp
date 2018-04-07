@@ -42,6 +42,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	undogrid = new wxGridStringTable(size.x, size.y);
 	vdu = NULL;
 	outbox = NULL;
+	diagbox = NULL;
 
 	rightmenu = new wxMenu;
 	rightmenu->Append(ID_SelectAll, "Select All", "Grid Select", wxITEM_NORMAL);
@@ -56,6 +57,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	Connect(wxEVT_GRID_CELL_LEFT_CLICK, wxGridEventHandler(TextGrid::OnLeftClick));
 	Connect(wxEVT_GRID_LABEL_LEFT_CLICK, wxGridEventHandler(TextGrid::OnLabelClick));
 	Connect(ID_SelectAll, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnSelectAll));
+	Connect(ID_Cut, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnCut));
 	Connect(ID_Copy, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnCopy));
 	Connect(ID_Paste, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnPaste));
 	Connect(ID_Undo, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnUndo));
@@ -130,6 +132,8 @@ void TextGrid::OnKey(wxKeyEvent &event)
 
 	else if(event.GetUnicodeKey() == 'V' && event.ControlDown() == true) Paste();
 
+	else if(event.GetUnicodeKey() == 'X' && event.ControlDown() == true) Cut();
+
 	else if(event.GetUnicodeKey() == 'Z' && event.ControlDown() == true) Undo();
 
 	else if(event.GetUnicodeKey() == 'A' && event.ControlDown() == true) SelectAll();
@@ -170,8 +174,15 @@ void TextGrid::ParseLabel(int row, int col, wxString readline)
 	int i;
 	wxString text, label;
 
-	label = readline.AfterFirst('\'');
-	label = label.BeforeFirst('\'');
+	if(readline.GetChar(0) == '\'') {
+		label = readline.AfterFirst('\'');
+		label = label.BeforeFirst('\'');
+	}
+	if(readline.GetChar(0) == '\"') {
+		label = readline.AfterFirst('\"');
+		label = label.BeforeFirst('\"');
+	}
+	if(!label.BeforeFirst('.').IsEmpty()) label = label.BeforeFirst('.');
 	label.Trim();
 	SetCell(row, col++, label);
 }
@@ -205,6 +216,12 @@ void TextGrid::OnSelectAll(wxCommandEvent& event)
 }
 
 
+void TextGrid::OnCut(wxCommandEvent& event)
+{
+	Cut();
+}
+
+
 void TextGrid::OnCopy(wxCommandEvent& event)
 {
 	Copy();
@@ -234,6 +251,13 @@ void TextGrid::Delete()
 	for(i=0; i<GetNumberRows(); i++)     
 		for(j=0; j<GetNumberCols(); j++)
 			if(IsInSelection(i, j)) SetCellValue(i, j, "");
+}
+
+
+void TextGrid::Cut()
+{
+	Copy();
+	Delete();
 }
 
 
@@ -374,6 +398,8 @@ void TextGrid::OnLeftClick(wxGridEvent& event)
 	wxPoint pos = event.GetPosition();
 	r = GetGridCursorRow();
 	c = GetGridCursorCol();
+
+	if(diagbox) diagbox->Write("grid click\n");
 
 	/*
 	if(event.GetRow() == r && event.GetCol() == c) 

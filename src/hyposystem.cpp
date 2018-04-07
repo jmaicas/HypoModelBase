@@ -120,6 +120,7 @@ void OptionPanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	
 	numdrawcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->numdraw = stringnum;
+	mainwin->mod->prefstore["numdraw"] = mainwin->numdraw;
 	
 	viewheightcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->viewheight = stringnum;

@@ -183,6 +183,8 @@ SpikeDat::SpikeDat()
 	vasomean.data.resize(250);
 	vasomean.max = 200;
 
+	mag.setsize(maxspikes);
+
 	count = 0;
 	spikecount = 0;
 	start = 0;
@@ -393,7 +395,7 @@ GraphDat::GraphDat()             // See more specific versions below
 
 wxString GraphDat::StoreDat(wxString tag)
 {
-	wxString gtext;
+	wxString gtext1, gtext2;
 	wxString storegname, storextag, storeytag;
 
 	storegname = gname;                       // replace spaces with underscores for textfile storing
@@ -403,9 +405,14 @@ wxString GraphDat::StoreDat(wxString tag)
 	storeytag = ytag;
 	storeytag.Replace(" ", "_");
 
-	return gtext.Format("v7 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %d bg %d yu %.4f", 
+	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %d bg %d yu %.4f ", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
 		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
+		
+	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d", 
+		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode);
+
+	return gtext1 + gtext2;
 }
 
 
@@ -528,6 +535,15 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 
 	if(version > 6) {
 		yunitscale = ParseDouble(&readline, 'u');
+	}
+
+	if(version > 7) {
+		xlabelplaces = ParseLong(&readline, 'l');
+		ylabelplaces = ParseLong(&readline, 'l');
+		xlabelmode = ParseLong(&readline, 'm');
+		ylabelmode = ParseLong(&readline, 'm');
+		xscalemode = ParseLong(&readline, 's');
+		yscalemode = ParseLong(&readline, 's');
 	}
 }
 
@@ -653,6 +669,11 @@ void GraphDat::Init()
 	ylabelplaces = -1;
 	xscalemode = 0;
 	yscalemode = 0;
+	xlogbase = 2.7183;
+	ylogbase = 10;
+
+	scatterfield = 0;
+	scattermean = 0;
 }
 
 
@@ -667,11 +688,22 @@ GraphDisp::GraphDisp()
 
 void GraphDisp::Add(GraphDat *newplot)
 {
-	if(numplots < 5) {
+	if(numplots < maxplots) {
 		plot[numplots] = newplot;
 		numplots++;
 	}
 }
+
+
+void GraphDisp::Remove(int index)       // Remove plot layer from GraphDisp set
+{
+	int i;
+
+	if(index >= numplots) return;
+	for(i=index; i<numplots-1; i++) plot[i] = plot[i+1];   // re-index
+	numplots--;	
+}
+
 
 
 void GraphDisp::Set(int index, GraphDat *newplot)
