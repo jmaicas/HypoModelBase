@@ -606,7 +606,7 @@ public:
 	double yunitscale, yshift;
 	int clipmode;
 	bool synchx;
-	int barwidth, barshift, bargap;
+	double barwidth, barshift, bargap;
 	int xscalemode, yscalemode;
 	double xlogbase, ylogbase;
 	int scatterfield, scattermean;      // used for drawing scatter cloud oval and mean

@@ -276,26 +276,33 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		}
 
 		if(gtype == 1) {                             // scaled width bars, Histogram    
-			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 0, histogram\n"));
-			histbargap = 1.5;
-			if(xrange < 5) histbargap = 1;
-			if(xrange < 3) histbargap = 0;
+			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 1, histogram  xrange %.4f\n", xrange));
+			if(bargap) histbargap = bargap;
+			else {
+				histbargap = 1.5;
+				if(xrange < 5) histbargap = 1;
+				if(xrange < 3) histbargap = 0;
+			}
 			//out.WriteLine("0.5 setlinewidth");
+
+			mod->diagbox->Write(text.Format("histbargap %.4f  plotstroke %.4f\n", histbargap, plotstroke));
 
 			for(i=0; i<(xto - xfrom); i++) {
 				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
 				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
 				if(y == 0) continue;
-				xpos = i * xrange + xbase;
+				xpos = i * xrange + xbase + plotstroke;
 
 				//if(xrange <= 1) DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
 				//else for(k=0; k<xrange-1; k++) DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));	
 
+				// 4/5/18   TODO - fix for when xrange very small
+
 				out->WriteLine("newpath");
 				out->MoveTo(xpos, ybase);
 				out->LineTo(xpos, ybase + yrange * (y - yfrom));
-				out->LineTo(xpos + xrange - histbargap, ybase + yrange * (y - yfrom));
-				out->LineTo(xpos + xrange - histbargap, ybase);
+				out->LineTo(xpos + xrange - histbargap - plotstroke, ybase + yrange * (y - yfrom));
+				out->LineTo(xpos + xrange - histbargap - plotstroke, ybase);
 				out->WriteLine("closepath");
 				out->WriteLine("gsave");
 				out->WriteLine("fill");
