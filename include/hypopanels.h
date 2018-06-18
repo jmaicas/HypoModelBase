@@ -71,6 +71,7 @@ public:
 	int version;
 	int parallel;
 	int labelwidth;
+	int buttonwidth;
 	int numwidth;
 	int defbutt;
 	wxString redtag;
