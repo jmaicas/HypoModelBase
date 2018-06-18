@@ -932,7 +932,7 @@ void ParamBox::SetPanel(int id, ToolBox *toolbox)
 	panelrefs->AddTool(id, toolbox);
 	Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnPanel));
 
-	mainwin->diagbox->Write(text.Format("SetPanel %d %s\n", id, toolbox->boxname));
+	//mainwin->diagbox->Write(text.Format("SetPanel %d %s\n", id, toolbox->boxname));       // note, breaks if box not already initialised
 }
 
 

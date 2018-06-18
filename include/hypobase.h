@@ -194,6 +194,7 @@ enum {
 	ID_profile,
 	ID_Protocol,
 	ID_Signal,
+	ID_EvoFit,
 	ID_Ramp,
 	ID_Pulse,
 	ID_Range,
