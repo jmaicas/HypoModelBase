@@ -296,6 +296,9 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	Connect(ID_GraphAdd, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnGraphAdd));
 	Connect(ID_ModGen, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnModGen));
 	Connect(ID_Diag, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnDiagBox));
+	Connect(ID_Grid, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnGridBox));
+	Connect(ID_Neuro, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnNeuroBox));
+	Connect(ID_Plot, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnPlotBox));
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(HypoMain::OnEnter));
 }
 
@@ -426,7 +429,7 @@ void HypoMain::FullMenu()
 	//menuAnalysis->Append(ID_Burst, "Burst");
 	//menuAnalysis->Append(ID_XYPos, "XY Pos");
 	SetMenuFlag(ID_XYPos, "xypos", "XY Pos", 1, menuAnalysis); 
-	SetMenuFlag(ID_Zoom, "zoom", "Graph Zoom", 1, menuAnalysis); 
+	SetMenuFlag(ID_Zoom, "zoom", "Graph Zoom", 0, menuAnalysis); 
 
 	//menuTools->Append(ID_Info, "Info");
 	menuTools->Append(ID_Burst, "Spike Analysis");
@@ -470,9 +473,12 @@ void HypoMain::UserMenu()
 	menuFile->Append(ID_Quit, "E&xit");
 
 	SetMenuFlag(ID_XYPos, "xypos", "XY Pos", 1, menuAnalysis); 
-	SetMenuFlag(ID_Zoom, "zoom", "Graph Zoom", 1, menuAnalysis); 
+	SetMenuFlag(ID_Zoom, "zoom", "Graph Zoom", 0, menuAnalysis); 
 
 	menuTools->Append(ID_Diag, "Diagnostic Box");
+	menuTools->Append(ID_Grid, "Data Grid");
+	menuTools->Append(ID_Neuro, "Neuro Box");
+	menuTools->Append(ID_Plot, "Plot Box");
 
 	menuSystem->Append(ID_Options, "Options");
 
@@ -728,7 +734,7 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 	wxString message;
 
 	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2013\n\nSystem: %s", wxGetOsDescription());
-	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2017\n\nSystem: %s", wxGetOsDescription());
+	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
 	else message.Printf("Hypothalamic Network Model\n\nDuncan MacGregor 2010-2015\n\nSystem: %s", wxGetOsDescription());
 
 	wxMessageBox(message, "About Hypo Model", wxOK | wxICON_INFORMATION, this);
@@ -756,6 +762,24 @@ void HypoMain::OnModGen(wxCommandEvent& WXUNUSED(event))
 void HypoMain::OnDiagBox(wxCommandEvent& WXUNUSED(event))
 {
 	if(diagbox) diagbox->Show(true);
+}
+
+
+void HypoMain::OnGridBox(wxCommandEvent& WXUNUSED(event))
+{
+	if(gridbox) gridbox->Show(true);
+}
+
+
+void HypoMain::OnNeuroBox(wxCommandEvent& WXUNUSED(event))
+{
+	if(neurobox) neurobox->Show(true);
+}
+
+
+void HypoMain::OnPlotBox(wxCommandEvent& WXUNUSED(event))
+{
+	if(plotbox) plotbox->Show(true);
 }
 
 

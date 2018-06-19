@@ -258,6 +258,9 @@ enum {
 	ID_Default,
 	ID_ModGen,
 	ID_Diag,
+	ID_Grid,
+	ID_Neuro,
+	ID_Plot,
 	ID_s,
 	ID_ms,
 	ID_net, 
@@ -266,7 +269,6 @@ enum {
 	ID_clipmode,
 	ID_scatter,
 	ID_line,
-	ID_Plot,
 	ID_Load,
 	ID_Browse,
 	ID_Select,
@@ -332,6 +334,8 @@ class ModGenBox;
 class DiagBox;
 class ToolSet;
 class PlotBox;
+class NeuroBox;
+class OutBox;
 
 
 //DiagBox *gdiag;
@@ -369,7 +373,12 @@ public:
 	// Display
 	ScaleBox *scalebox;
 	GraphBox *graphbox;
+
+	// Modules
 	PlotBox *plotbox;
+	NeuroBox *neurobox;
+	OutBox *gridbox;
+
 	GraphWindow3 *graphwin[10];
     
 	int basic;

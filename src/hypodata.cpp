@@ -17,7 +17,7 @@ using namespace std;
 #include <sys/stat.h>
 
 
-CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
+NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 	: ParamBox(mod, title, pos, size, "cellbox", 1)
 {
 	int datwidth, labelwidth;
@@ -222,22 +222,22 @@ CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wx
 	winman->AddPane(tabpanel, wxAuiPaneInfo().Name("tabpane").CentrePane().PaneBorder(false));
 	winman->Update();
 
-	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(CellBox::OnEnter));
-	Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(CellBox::OnNext));
-	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(CellBox::OnPrev));
-	Connect(ID_Load, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnLoadData));
+	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(NeuroBox::OnEnter));
+	Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(NeuroBox::OnNext));
+	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(NeuroBox::OnPrev));
+	Connect(ID_Load, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnLoadData));
 
-	Connect(100, 105, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnAdd));
-	Connect(200, 205, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnSub));
-	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnClear));
-	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnInvert));
+	Connect(100, 105, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnAdd));
+	Connect(200, 205, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSub));
+	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnClear));
+	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnInvert));
 
-	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnBrowse));
-	Connect(ID_FileBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CellBox::OnBrowse));
+	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
+	Connect(ID_FileBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
 }
 
 
-CellBox::~CellBox()
+NeuroBox::~NeuroBox()
 {
 	if(!spikeselectLink) {
 		delete[] selectspikes[0];
@@ -246,7 +246,7 @@ CellBox::~CellBox()
 }
 
 
-void CellBox::OnBrowse(wxCommandEvent& event)
+void NeuroBox::OnBrowse(wxCommandEvent& event)
 {
 	if(event.GetId() == ID_PathBrowse) {
 		wxDirDialog *dirdialog = new wxDirDialog(this, "Choose a directory", paramset->GetCon("datapath")->GetLabel(), 0, wxDefaultPosition);
@@ -265,7 +265,7 @@ void CellBox::OnBrowse(wxCommandEvent& event)
 }
 
 
-void CellBox::OnToggle(wxCommandEvent& event)
+void NeuroBox::OnToggle(wxCommandEvent& event)
 {
 	int sel, type, i;
 	wxString text;
@@ -290,7 +290,7 @@ void CellBox::OnToggle(wxCommandEvent& event)
 
 
 
-void CellBox::OnClick(wxPoint pos)
+void NeuroBox::OnClick(wxPoint pos)
 {
 	wxString text;
 	int sel;
@@ -308,7 +308,7 @@ void CellBox::OnClick(wxPoint pos)
 }
 
 
-void CellBox::SetSelect(double from, double to)
+void NeuroBox::SetSelect(double from, double to)
 {
 	int id;
 
@@ -322,7 +322,7 @@ void CellBox::SetSelect(double from, double to)
 }
 
 
-void CellBox::SelectAdd()
+void NeuroBox::SelectAdd()
 {
 	int sfrom, sto;
 	wxString text;
@@ -353,7 +353,7 @@ void CellBox::SelectAdd()
 }
 
 
-void CellBox::SelectSub()
+void NeuroBox::SelectSub()
 {
 	int sfrom, sto;
 
@@ -380,7 +380,7 @@ void CellBox::SelectSub()
 }
 
 
-void CellBox::OnSub(wxCommandEvent& event)
+void NeuroBox::OnSub(wxCommandEvent& event)
 {
 	int i, id, sel;
 	wxString text;
@@ -393,7 +393,7 @@ void CellBox::OnSub(wxCommandEvent& event)
 }
 
 
-void CellBox::OnInvert(wxCommandEvent& event)
+void NeuroBox::OnInvert(wxCommandEvent& event)
 {
 	int i;
 	int sel = event.GetId() - 400;
@@ -409,7 +409,7 @@ void CellBox::OnInvert(wxCommandEvent& event)
 }
 
 
-void CellBox::OnClear(wxCommandEvent& event)
+void NeuroBox::OnClear(wxCommandEvent& event)
 {
 	int i;
 	int sel = event.GetId() - 300;
@@ -424,7 +424,7 @@ void CellBox::OnClear(wxCommandEvent& event)
 }
 
 
-void CellBox::OnAdd(wxCommandEvent& event)
+void NeuroBox::OnAdd(wxCommandEvent& event)
 {
 	int i, sel, selspike;
 	int numspikes, scount;
@@ -441,7 +441,7 @@ void CellBox::OnAdd(wxCommandEvent& event)
 }
 
 
-void CellBox::AnalyseSelection()
+void NeuroBox::AnalyseSelection()
 {
 	int i, selspike;
 	int numspikes, scount;
@@ -463,7 +463,7 @@ void CellBox::AnalyseSelection()
 }
 
 
-void CellBox::OnLoadData(wxCommandEvent& event)
+void NeuroBox::OnLoadData(wxCommandEvent& event)
 {
 	wxString filetag, filepath, text;
 	short tagpos;
@@ -497,7 +497,7 @@ void CellBox::OnLoadData(wxCommandEvent& event)
 }
 
 
-void CellBox::PanelData(NeuroDat *data)
+void NeuroBox::PanelData(NeuroDat *data)
 {
 	if(data->netflag) snum = "sum";
 	else snum = numstring(neuroindex, 0);
@@ -511,7 +511,7 @@ void CellBox::PanelData(NeuroDat *data)
 }
 
 
-void CellBox::NeuroData()
+void NeuroBox::NeuroData()
 {	
 	ParamStore *calcparams = GetParams();
 
@@ -526,7 +526,7 @@ void CellBox::NeuroData()
 }
 
 
-void CellBox::OnPrev(wxSpinEvent& WXUNUSED(event))
+void NeuroBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 {
 	if(!cellcount) return;
 	if(neuroindex > 0) neuroindex--;
@@ -536,7 +536,7 @@ void CellBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 }
 
 
-void CellBox::OnNext(wxSpinEvent& WXUNUSED(event))
+void NeuroBox::OnNext(wxSpinEvent& WXUNUSED(event))
 {
 	if(!cellcount) return;
 	if(neuroindex < cellcount-1) neuroindex++;
@@ -546,7 +546,7 @@ void CellBox::OnNext(wxSpinEvent& WXUNUSED(event))
 }
 
 
-void CellBox::OnEnter(wxCommandEvent& event)
+void NeuroBox::OnEnter(wxCommandEvent& event)
 {
 	int id = event.GetId();
 	long data;
@@ -566,7 +566,7 @@ void CellBox::OnEnter(wxCommandEvent& event)
 
 // LoadDataList - batch loading of spike time data files into the grid
 
-void CellBox::LoadDataList(FileDat *file)
+void NeuroBox::LoadDataList(FileDat *file)
 {
 	int i, row, col;
 	int start, filecount;
@@ -618,7 +618,7 @@ void CellBox::LoadDataList(FileDat *file)
 
 // LoadNeuroData - load data from spike time data file into the grid
 
-void CellBox::LoadNeuroData(FileDat file, int col)
+void NeuroBox::LoadNeuroData(FileDat file, int col)
 {
 	int i, row;
 	int start;
@@ -1289,7 +1289,7 @@ void OutBox::GridLoadFast()
 
 
 
-/*CellBox::CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
+/*NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 : ParamBox(mod, title, pos, size, "cellbox")
 {
 int datwidth;
@@ -1378,7 +1378,7 @@ mainbox->Add(notebook, 1, wxEXPAND);
 //panel->Layout();
 
 
-Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(CellBox::OnEnter));
-Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(CellBox::OnNext));
-Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(CellBox::OnPrev));
+Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(NeuroBox::OnEnter));
+Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(NeuroBox::OnNext));
+Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(NeuroBox::OnPrev));
 }*/

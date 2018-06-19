@@ -200,7 +200,7 @@ public:
 };
 
 
-class CellBox: public ParamBox
+class NeuroBox: public ParamBox
 {
 public:
 	Model *mod;
@@ -230,8 +230,8 @@ public:
 	bool spikeselectLink;
 	
 
-	CellBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
-	~CellBox();
+	NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
+	~NeuroBox();
 	void NeuroData();
 	//void NeuroAnalysis();
 	void PanelData(NeuroDat *);
