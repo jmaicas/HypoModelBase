@@ -316,7 +316,9 @@ HypoMain::~HypoMain()
 
 void HypoMain::ToolLoad()
 {
-	if((*mod->toolflags)["burstbox"] || (*mod->toolflags)["spikebox"]) SpikeBox(1); 
+	if((*mod->toolflags)["burstbox"]) SpikeBox(2); 
+
+	if((*mod->toolflags)["spikebox"]) SpikeBox(1); 
 }
 
 
@@ -842,8 +844,11 @@ void HypoMain::SpikeBox(int modmode)
 		boxheight = 500;
 	}
 
+	if(modmode == 2) burstbox = new BurstBox(mod, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
+
+	if(modmode == 1) burstbox = new BurstBox(mod, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
 	//mainpos = GetPosition();
-	burstbox = new BurstBox(mod, "Spike Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
+	
 	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
 	burstbox->loaddata = expdata;
 

@@ -71,6 +71,7 @@ public:
 	int version;
 	int parallel;
 	int labelwidth;
+	int buttonwidth;
 	int numwidth;
 	int defbutt;
 	wxString redtag;
@@ -378,6 +379,8 @@ public:
 	double filterthresh;
 	double units;
 
+	int burstmode;
+
 	HypoMain *mainwin;
 
 	wxString filetag, datname;
@@ -419,7 +422,7 @@ public:
 	wxComboBox *datfiletag;
 	wxStaticText *datstatus;
 
-	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst", bool evomode = false);
+	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst", bool evomode = false, int mode = 1);
 	void BurstDataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void DataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void BurstDataPanel(BurstPanel *);
