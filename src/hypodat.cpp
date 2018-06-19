@@ -405,7 +405,7 @@ wxString GraphDat::StoreDat(wxString tag)
 	storeytag = ytag;
 	storeytag.Replace(" ", "_");
 
-	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %d bg %d yu %.4f ", 
+	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
 		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
 		
@@ -529,8 +529,8 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 	}
 
 	if(version > 5) {
-		barwidth = ParseLong(&readline, 'w');
-		bargap = ParseLong(&readline, 'g');
+		barwidth = ParseDouble(&readline, 'w');
+		bargap = ParseDouble(&readline, 'g');
 	}
 
 	if(version > 6) {

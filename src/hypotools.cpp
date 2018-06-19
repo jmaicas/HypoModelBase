@@ -387,6 +387,8 @@ void TextGrid::OnLabelClick(wxGridEvent& event)
 
 	if(outbox && c >= 0) outbox->ColumnSelect(event.GetCol());
 
+	GoToCell(0, c);
+
 	event.Skip();
 }
 

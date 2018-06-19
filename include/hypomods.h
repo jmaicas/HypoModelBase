@@ -62,7 +62,7 @@ public:
 
 	DatStore *recdata;
 	OutBox *outbox;
-	CellBox *cellbox;
+	NeuroBox *neurobox;
 
 	Model(int, wxString, HypoMain *);
 	virtual ~Model();

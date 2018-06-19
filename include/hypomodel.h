@@ -220,6 +220,9 @@ public:
 	void OnEnter(wxCommandEvent& event);
 	void OnModGen(wxCommandEvent& event);
 	void OnDiagBox(wxCommandEvent& event);
+	void OnGridBox(wxCommandEvent& event);
+	void OnNeuroBox(wxCommandEvent& event);
+	void OnPlotBox(wxCommandEvent& event);
 };
 
 
