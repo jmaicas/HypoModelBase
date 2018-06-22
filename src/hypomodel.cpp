@@ -160,7 +160,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
 	if(basic) BasicMenu();
 	else if(user) UserMenu();
-	else FullMenu();
+	else UserMenu(); // FullMenu();
 
 	//GraphOut();
 	//graphpos = 0;
@@ -1049,6 +1049,8 @@ void HypoMain::OptionStore()
 
 	opfile.WriteLine(outline.Format("basic %d", basic));
 
+	opfile.WriteLine(outline.Format("user %d", user));
+
 	opfile.WriteLine(outline.Format("diagnostic %d", diagnostic));
 
 	opfile.Close();
@@ -1082,11 +1084,10 @@ void HypoMain::OptionLoad()
 		diagnostic = 1;
 		datsample = 1;
 		basic = 0;
+		user = 0;
 	}
 	else {
-
 		opfile.Open();
-
 		readline = opfile.GetFirstLine();
 
 		while(!readline.IsEmpty()) {
@@ -1109,8 +1110,8 @@ void HypoMain::OptionLoad()
 		ylabels = prefstore["ylabels"];
 		datsample = prefstore["datsample"];
 		basic = prefstore["basic"];
+		user = prefstore["user"];
 		diagnostic = prefstore["diagnostic"];
-
 	}
 
 	filename = "Init/hypopaths.ini";
