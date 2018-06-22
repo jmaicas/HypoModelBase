@@ -870,7 +870,7 @@ void HypoMain::SpikeBox(int modmode)
 
 	if(modmode == 2) burstbox = new BurstBox(mod, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
 
-	if(modmode == 1) burstbox = new BurstBox(mod, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
+	if(modmode == 1) burstbox = new BurstBox(mod, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
 	//mainpos = GetPosition();
 	
 	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
