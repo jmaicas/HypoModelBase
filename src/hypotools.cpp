@@ -300,12 +300,19 @@ void TextGrid::Copy()
 			wxMessageBox(_("Error opening clipboard."), _("Error"));
 		}
 	}
+	if(ostype == Windows) {
+		if (wxTheClipboard->Open()) {
+			wxTheClipboard->SetData(new wxTextDataObject(copy_data));
+			wxTheClipboard->Close();
+		}
+		else wxMessageBox("Error opening clipboard.", "Error");
+	}
 	else {
 #ifndef OSXClip
-		wxOpenClipboard();         
-		wxEmptyClipboard();
-		wxSetClipboardData(wxDF_TEXT, copy_data.c_str(), 0, 0);
-		wxCloseClipboard();
+		//wxOpenClipboard();         
+		//wxEmptyClipboard();
+		//wxSetClipboardData(wxDF_TEXT, copy_data.c_str(), 0, 0);
+		//wxCloseClipboard();
 #endif
 	} 
 }
@@ -326,7 +333,7 @@ void TextGrid::Paste()
 	if(vdu) vdu->AppendText("Pasting...\n");
 	if(vdu) vdu->AppendText("Copy clipboard...");
 
-	if(ostype == Mac) {
+	if(ostype == Mac || ostype == Windows) {
 		wxTheClipboard->Open();
 		wxTextDataObject data;
 		wxTheClipboard->GetData(data);
@@ -335,9 +342,9 @@ void TextGrid::Paste()
 	}
 	else {
 #ifndef OSXClip
-		wxOpenClipboard(); 
-		copy_data = (char *)wxGetClipboardData(wxDF_TEXT);
-		wxCloseClipboard();
+		//wxOpenClipboard(); 
+		//copy_data = (char *)wxGetClipboardData(wxDF_TEXT);
+		//wxCloseClipboard();
 #endif
 	}
 
