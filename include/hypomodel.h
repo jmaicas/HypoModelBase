@@ -31,7 +31,7 @@ public:
 	int viewheight, viewwidth;
 
 	virtual bool OnInit();
-	void OptionLoad();
+	void LoadPrefs();
 };
 
 

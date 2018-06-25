@@ -91,6 +91,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//toolset->AddBox(diagbox);
 
 	OptionLoad();
+	startmod = modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
 	MainLoad();
 
@@ -377,6 +378,7 @@ void HypoMain::CleanUp() {
 	delete selectdata;
 	delete burstdata;
 	delete filebase;
+	//delete mod;
 
 	//wxMenu *menuTools = new wxMenu;
 	//wxMenu *menuSystem = new wxMenu;
@@ -1673,7 +1675,7 @@ bool HypoApp::OnInit()
 	}
 	else pos = wxDefaultPosition;
 
-	OptionLoad();
+	LoadPrefs();
 	if(viewwidth < 400) viewwidth = 400;
 	y = viewheight;
 	x = viewwidth;
@@ -1693,7 +1695,7 @@ bool HypoApp::OnInit()
 }
 
 
-void HypoApp::OptionLoad()
+void HypoApp::LoadPrefs()
 {
 	long numdat;
 

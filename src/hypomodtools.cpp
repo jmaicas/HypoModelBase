@@ -626,8 +626,10 @@ BurstBox::~BurstBox()
 {
 	delete burstparams;
 	delete paramset;
-	delete datburst;
-	delete modburst;
+	if(burstmode) {
+		delete datburst;
+		delete modburst;
+	}
 	if(evoburst) delete evoburst;
 	delete blankevent;
 }
