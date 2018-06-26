@@ -1413,9 +1413,9 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				if(binsize == 0.01) res = 2;
 				if(binsize == 0.001) res = 3;
 
-				wxString diag;
-				diag.Printf("spikedisp %d  res %d ", gpos->spikedisp, res);
-				mainwin->SetStatusText(diag);
+				//wxString diag;
+				//diag.Printf("spikedisp %d  res %d ", gpos->spikedisp, res);
+				//mainwin->SetStatusText(diag);
 
 				if(burstdata == NULL || burstdata->burstdisp == 0) {
 					dc.SetPen(colourpen[red]);
