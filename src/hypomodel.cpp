@@ -91,7 +91,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//toolset->AddBox(diagbox);
 
 	OptionLoad();
-	startmod = modVMN;   // fix model for PLOS release   25/6/18
+	startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
 	MainLoad();
 
