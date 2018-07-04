@@ -36,6 +36,7 @@ public:
 	double xmin;
 	int xscaletoggle;
 	bool oldhist;
+	int basicmode;
 
 	// Prefs
 	int numdraw;
