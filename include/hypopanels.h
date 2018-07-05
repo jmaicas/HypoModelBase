@@ -139,9 +139,12 @@ public:
 
 	void Initialise();
 	void SetVBox(int);
+
 	virtual void OnRun(wxCommandEvent& event);
 	virtual void OnDefault(wxCommandEvent& event);
 	virtual void OnSpin(wxSpinEvent& event);
+	virtual void OnBox(wxCommandEvent& event);
+
 	void OnDClick(wxMouseEvent& event);
 	void OnAutorun(wxCommandEvent& event);
 	void OnParamStore(wxCommandEvent& event);

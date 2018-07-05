@@ -613,6 +613,8 @@ ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	diagmode = 0;
 	mainwin = mod->mainwin;
 
+	buttonwidth = 50;
+
 	model->mainwin->diagbox->Write("ParamBox init\n");
 
 	Initialise();
@@ -1074,6 +1076,11 @@ void ParamBox::OnSpin(wxSpinEvent& event)
 {
 	if(mainwin->diagnostic) mainwin->SetStatusText("on spin");
 	if(autorun) OnRun(event);
+}
+
+
+void ParamBox::OnBox(wxCommandEvent & event)
+{
 }
 
 
