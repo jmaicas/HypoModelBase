@@ -54,8 +54,12 @@ void NeuroDat::ratecalc()
 	isimean = 0;
 	isicount = spikecount - 1;
 
-
 	for(i=0; i<maxtime; i++) srate[i] = 0;
+
+	if(spikecount == 0) {
+		delete[] isis;
+		return;
+	}
 
 	for(i=0; i<spikecount-1; i++) {
 		//isis[i] = (currentset->times[i+1] - currentset->times[i]) * 1000;   // real
