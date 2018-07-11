@@ -1068,7 +1068,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			dir = 1;
 			pdir = 0;
 			xindex = (int)xfrom;
-			preval = (*gdatadv)[xindex];
+			if(gpar == -3) preval = (*gdatav)[xindex];
+			if(gpar == -4) preval = (*gdatadv)[xindex];
 			oldx = xbase + xoffset;
 			oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
 

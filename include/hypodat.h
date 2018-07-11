@@ -552,6 +552,7 @@ public:
 	datint *gdatav;
 	datdouble *gdatax;
 	PlotDat *plotdata;
+	int datatype;    // proposed replacement for gparam, not yet implemented 11/7/18
 
 	int xcount, ycount;
 	int scattermode;
