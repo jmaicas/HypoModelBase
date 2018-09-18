@@ -698,24 +698,35 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	out->WriteLine("stroke");
 
 	// Draw Tick Labels
-
+	out->WriteLine("newpath");
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
-		out->WriteLine("newpath");
+		//out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
 		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale / graph->xunitdscale - xshift;
 		if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - xshift;
 		if(graph->xscalemode == 1) xval = xfrom * pow(logbase, xlogmax * xval / xto);
 		srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
-		snum.Printf("%.0f", xval + xdis);	
-		if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
-		if(srangex < 1) snum.Printf("%.2f", xval + xdis);
-		if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
+
+		if(graph->xlabelplaces == -1) {
+			if(srangey < 0.1) snum.Printf("%.3f", xval + xdis);
+			else if(srangey < 1) snum.Printf("%.2f", xval + xdis);
+			else if(srangey < 10) snum.Printf("%.1f", xval + xdis);
+			else snum.Printf("%.0f", xval + xdis);
+		}
+		else snum = numstring(xval + xdis, graph->xlabelplaces);
+
+		//snum.Printf("%.0f", xval + xdis);	
+		//if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
+		//if(srangex < 1) snum.Printf("%.2f", xval + xdis);
+		//if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
+
 		out->MoveTo(xbase + xcoord, ybase - 15);
 		out->WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
-		out->WriteLine("stroke");
+		//out->WriteLine("stroke");
 	}
+	out->WriteLine("stroke");
 	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
 	xylab = 8;
 

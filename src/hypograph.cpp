@@ -860,10 +860,19 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			if(graph->xscalemode == 1 && xfrom > 0) xval = xfrom * pow(xlogbase, xlogmax * xval / xto);
 
 			srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
-			snum.Printf("%.0f", xval + xdis);	
-			if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
-			if(srangex < 1) snum.Printf("%.2f", xval + xdis);
-			if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
+			//snum.Printf("%.0f", xval + xdis);	
+			//if(srangex < 10) snum.Printf("%.1f", xval + xdis);	
+			//if(srangex < 1) snum.Printf("%.2f", xval + xdis);
+			//if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
+
+			if(graph->xlabelplaces == -1) {
+				if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);
+				else if(srangex < 1) snum.Printf("%.2f", xval + xdis);
+				else if(srangex < 10) snum.Printf("%.1f", xval + xdis);
+				else snum.Printf("%.0f", xval + xdis);
+			}
+			else snum = numstring(xval + xdis, graph->xlabelplaces);
+
 			textsize = dc.GetTextExtent(snum);
 			if(ostype == Mac)
 				dc.DrawText(snum, xbase + xcoord - textsize.GetWidth()/2, ybase + yplot + 10);
