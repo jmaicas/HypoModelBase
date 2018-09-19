@@ -710,9 +710,9 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
 
 		if(graph->xlabelplaces == -1) {
-			if(srangey < 0.1) snum.Printf("%.3f", xval + xdis);
-			else if(srangey < 1) snum.Printf("%.2f", xval + xdis);
-			else if(srangey < 10) snum.Printf("%.1f", xval + xdis);
+			if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);
+			else if(srangex < 1) snum.Printf("%.2f", xval + xdis);
+			else if(srangex < 10) snum.Printf("%.1f", xval + xdis);
 			else snum.Printf("%.0f", xval + xdis);
 		}
 		else snum = numstring(xval + xdis, graph->xlabelplaces);
