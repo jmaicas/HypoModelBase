@@ -69,7 +69,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	synchcon = 0;
 
 	xmin = -1000000;
-	xmax = 1000000;
+	xmax = 10000000;   // 1000000, extend for VasoMod long runs
 	ymin = -1000000;
 	ymax = 1000000;
 
