@@ -473,7 +473,8 @@ public:
 		//if(index > max) return zero;
 		if(index >= data.size()) {
 			if(stretchmode) data.resize(data.size() + 100);
-			if(textbox && index%100 == 0) textbox->AppendText(mess.Format("%s bad access, index %d\n", tag, index));
+			if(textbox && index%100 == 0) 
+				textbox->AppendText(mess.Format("%s bad access, index %d\n", tag, index));
 			return zero;		
 		}
 		if(index > maxindex) maxindex = index;
