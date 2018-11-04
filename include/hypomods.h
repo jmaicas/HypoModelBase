@@ -19,7 +19,7 @@ public:
 	HypoMain *mainwin;
 	wxString snum;
 
-	ModThread(ParamBox *box, HypoMain *main) { modbox = box, mainwin = main; };
+    ModThread(ParamBox *box, HypoMain *main) { modbox = box; mainwin = main; };
 };
 
 

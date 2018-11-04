@@ -109,17 +109,18 @@ void MainFrame::MainLoad()
 void MainFrame::MainStore()
 {
 	int i;
-	wxString filename, filepath;
+	wxString filename, mainpath;
 	wxString outline, text;
 
 	TextFile outfile, opfile;
 
 	//filepath = GetPath();
-	filepath = "Init//";
+	mainpath = "Init/";
+    if(!wxDirExists(mainpath)) wxMkdir(mainpath);
 
 	// box store
 	filename = "mainbox.ini";
-	outfile.New(filepath + filename);
+	outfile.New(mainpath + filename);
 	
 	for(i=0; i<toolset->numtools; i++)
 		if(toolset->box[i]) {
@@ -492,7 +493,7 @@ int GetSystem()
 {
 	wxString oslabel = wxGetOsDescription();
 	if(oslabel.StartsWith("Windows")) return 1;
-	if(oslabel.StartsWith("Mac")) return 2;
+	if(oslabel.StartsWith("Mac") || oslabel.StartsWith("mac")) return 2;
 	if(oslabel.StartsWith("Linux")) return 3;
 	return 0;
 }

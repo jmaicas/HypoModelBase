@@ -98,17 +98,22 @@ wxString ParamText::GetValue()
 
 ParamNum::ParamNum(wxPanel *panel, wxString pname, wxString labelname, double initval, int places)
 {
+    int numheight = -1;
+    
 	wxControl::Create(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
 	name = pname;
 	decimals = places;
 	ostype = GetSystem();
 	textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
-	if(ostype == Mac) textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
+    if(ostype == Mac) {
+        textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
+        numheight = 20;
+    }
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	snum = numstring(initval, places);
 	label = new wxStaticText(this, wxID_STATIC, labelname, wxDefaultPosition, wxSize(65, -1), wxALIGN_CENTRE);
-	numbox = new wxTextCtrl(this, wxID_ANY, snum, wxDefaultPosition, wxSize(40, -1), wxTE_PROCESS_ENTER);
+	numbox = new wxTextCtrl(this, wxID_ANY, snum, wxDefaultPosition, wxSize(40, numheight), wxTE_PROCESS_ENTER);
 
 	label->SetFont(textfont);
 	numbox->SetFont(textfont);
@@ -149,6 +154,7 @@ ParamCon::ParamCon(ToolPanel *pan, wxString pname, wxString labelname, wxString 
 	type = textcon;
 	labelwidth = labelwid;
 	numwidth = numwid;
+    numheight = -1;
 	pad = panel->controlborder;
 	if(ostype == Mac) pad = 0;
 	
@@ -159,6 +165,7 @@ ParamCon::ParamCon(ToolPanel *pan, wxString pname, wxString labelname, wxString 
 	if(ostype == Mac) {
 		textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 		smalltextfont = wxFont(9, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+        numheight = 12;
 	}
 
 	min = 0;
@@ -166,7 +173,7 @@ ParamCon::ParamCon(ToolPanel *pan, wxString pname, wxString labelname, wxString 
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
 	label = new ToolText(this, panel->toolbox, name, labelname, wxDefaultPosition, wxSize(labelwidth, -1), wxALIGN_CENTRE);
-	numbox = new wxTextCtrl(this, wxID_ANY, initval, wxDefaultPosition, wxSize(numwidth, -1), wxTE_PROCESS_ENTER);
+	numbox = new wxTextCtrl(this, wxID_ANY, initval, wxDefaultPosition, wxSize(numwidth, numheight), wxTE_PROCESS_ENTER);
 
 	label->SetFont(textfont);
 	if(ostype == Mac && labelwidth < 40) label->SetFont(smalltextfont);
@@ -893,6 +900,15 @@ void ToolBox::AddButton(int id, wxString label, int width, wxBoxSizer *box, int 
 	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, pad);
 }
 
+/*
+void ScaleBox::AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad, int height)
+{
+    if(height == 0) height = buttonheight;
+    wxButton *button = new wxButton(panel, id, label, wxDefaultPosition, wxSize(width, height));
+    button->SetFont(confont);
+    box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, pad);
+}
+ */
 
 wxToggleButton *ToolBox::ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point, wxPanel *pan)
 {

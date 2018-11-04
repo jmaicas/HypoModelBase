@@ -12,7 +12,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	drawframe = draw;
 	boxtype = btype;
 	ostype = GetSystem();
-	if(ostype == Mac) buttonheight = 25; else buttonheight = 23;
+	if(ostype == Mac) buttonheight = 30; else buttonheight = 23;
 	gbase = model->graphbase;
 	//greg = gbase->graphstore;
 	gpos = gdisp;
@@ -95,16 +95,23 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	uparrow = wxBitmap("Init/uparrow.png", wxBITMAP_TYPE_PNG);
 	if(ostype == Mac) {
 		//downarrow = wxBitmap("Init/arrow-down-15.png", wxBITMAP_TYPE_PNG);
-		downarrow = wxBitmap("Init/downarrow.png", wxBITMAP_TYPE_PNG);
+        uparrow = wxBitmap("Init/uparrow12.png", wxBITMAP_TYPE_PNG);
+		downarrow = wxBitmap("Init/downarrow12.png", wxBITMAP_TYPE_PNG);
+        rightarrow = wxBitmap("Init/rightarrow12.png", wxBITMAP_TYPE_PNG);
+        leftarrow = wxBitmap("Init/leftarrow12.png", wxBITMAP_TYPE_PNG);
 	}
 	else {
 		downarrow = wxBitmap("Init/downarrow.png", wxBITMAP_TYPE_PNG);
 	}
+    
+    int zbheight = 20;
+    int zbwidth = 24;
 
 	for(i=startgraph; i<numgraphs+startgraph; i++) {
 		//g = gpos[i].data;
 		graphwin[i]->scalebox = this;
 		psetbox = new wxBoxSizer(wxVERTICAL);
+        if(ostype == Mac) psetbox->AddSpacer(2);
 		//gpos[i].yf = AddScaleParam("YF", gpos[i].plot[0]->yfrom, psetbox);
 		//gpos[i].yt = AddScaleParam("YT", gpos[i].plot[0]->yto, psetbox);
 		//gpos[i].xf = AddScaleParam("XF", gpos[i].plot[0]->xfrom, psetbox);
@@ -115,10 +122,10 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		graphwin[i]->xt = AddScaleParam("XT", 500, psetbox, i);
 		wxBoxSizer *zoombox = new wxBoxSizer(wxHORIZONTAL);
 		if(ostype == Mac) {
-			graphwin[i]->yzoomin = new wxBitmapButton(this, 1000 + i, downarrow, wxDefaultPosition, wxSize(23, 25));
-			graphwin[i]->yzoomout = new wxBitmapButton(this, 1010 + i, uparrow, wxDefaultPosition, wxSize(23, 25));
-			graphwin[i]->xzoomin = new wxBitmapButton(this, 1100 + i, leftarrow, wxDefaultPosition, wxSize(23, 25));
-			graphwin[i]->xzoomout = new wxBitmapButton(this, 1110 + i, rightarrow, wxDefaultPosition, wxSize(23, 25));
+			graphwin[i]->yzoomin = new wxBitmapButton(this, 1000 + i, downarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
+			graphwin[i]->yzoomout = new wxBitmapButton(this, 1010 + i, uparrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
+			graphwin[i]->xzoomin = new wxBitmapButton(this, 1100 + i, leftarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
+			graphwin[i]->xzoomout = new wxBitmapButton(this, 1110 + i, rightarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
 		}
 		else {
 			graphwin[i]->yzoomin = new wxBitmapButton(this, 1000 + i, downarrow, wxDefaultPosition, wxSize(20, 20));
@@ -134,6 +141,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		zoombox->AddSpacer(2);
 		zoombox->Add(graphwin[i]->xzoomin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 		zoombox->Add(graphwin[i]->xzoomout, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+        if(ostype == Mac) psetbox->AddSpacer(2);
 		psetbox->Add(zoombox, 0, wxALIGN_CENTRE_HORIZONTAL);
 
 		gsync[i] = NULL;
@@ -155,8 +163,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				if(ostype == Mac) {
 					ScaleButton(ID_data, "Dat", 43, modebox);
 					ScaleButton(ID_intern, "Int", 43, modebox);
-					ScaleButton(ID_spikes, "Sp", 43, resbox);     // 37
-					ScaleButton(ID_rateres, "Ra", 43, resbox);    // 37
+					ScaleButton(ID_spikes, "Spike", 43, resbox);     // 37
+					ScaleButton(ID_rateres, "Rate", 43, resbox);    // 37
 				}
 				else {
 					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
@@ -311,8 +319,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
 
 				if(ostype == Mac) {
-					ScaleButton(ID_spikes, "Sp", 40, resbox);   
-					ScaleButton(ID_rateres, "Ra", 40, resbox); 
+					ScaleButton(ID_spikes, "Spike", 40, resbox);
+					ScaleButton(ID_rateres, "Rate", 40, resbox);
 				}
 				else {
 					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
@@ -325,7 +333,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
 					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin", 45, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
 				}
 				else {
@@ -359,8 +367,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
 
 				if(ostype == Mac) {
-					ScaleButton(ID_spikes, "Sp", 40, resbox);   
-					ScaleButton(ID_rateres, "Ra", 40, resbox); 
+					ScaleButton(ID_spikes, "Spike", 40, resbox);
+					ScaleButton(ID_rateres, "Rate", 40, resbox);
 					GraphButton("nettog", 0, ID_net, "Net", 43, modebox);
 				}
 				else {
@@ -378,7 +386,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
 				if(ostype == Mac) {
 					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+					GraphButton("binrestog1", 0, ID_binres1, "Bin", 45, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
 					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
@@ -965,7 +973,7 @@ TextBox *ScaleBox::AddScaleParam(wxString name, double initval, wxBoxSizer *pset
 	numbox->SetFont(confont);
 	pbox->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	pbox->Add(numbox, 0, wxALIGN_CENTER_VERTICAL, 0);
-	if(ostype == Mac) psetbox->Add(pbox, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1); 
+	if(ostype == Mac) psetbox->Add(pbox, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
 	else psetbox->Add(pbox, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
 
 	numbox->Bind(wxEVT_SET_FOCUS, &ScaleBox::OnConFocus, this);

@@ -253,6 +253,7 @@ public:
 	int ostype;
 	int type;
 	int numwidth, labelwidth;
+    int numheight;
 	int pad;
 	wxFont textfont, smalltextfont;
 	wxTextCtrl *numbox;

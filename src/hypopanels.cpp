@@ -864,8 +864,8 @@ wxBoxSizer *ParamBox::StoreBox(wxString label, wxPanel *storepanel)
 	if(label != "") paramstoretag->SetLabel(label);
 	paramstoretag->Show(true);
 	if(ostype == Mac) {
-		AddButton(ID_paramstore, "Store", 60, parambuttons);
-		AddButton(ID_paramload, "Load", 60, parambuttons);
+		AddButton(ID_paramstore, "Store", 40, parambuttons);
+		AddButton(ID_paramload, "Load", 40, parambuttons);
 	}
 	else {
 		AddButton(ID_paramstore, "Store", 40, parambuttons);

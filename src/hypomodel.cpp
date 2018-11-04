@@ -181,8 +181,6 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	mod = NULL;
 
 	ModInit();
-	if(mod->prefstore.check("numdraw")) numdraw = mod->prefstore["numdraw"];
-	else diagbox->Write("mod numdraw not found\n");
 
 	diagbox->Write("HypoMain graph start\n\n");
 
@@ -191,8 +189,12 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		graphsizer->Add(defpan, 0, wxEXPAND);
 		numdraw = 0;
 		diagbox->Show();
-		return;
+		//return;
 	}
+    else {
+    
+    if(mod->prefstore.check("numdraw")) numdraw = mod->prefstore["numdraw"];
+    else diagbox->Write("mod numdraw not found\n");
 
 	if(mod->gcount < numdraw) numdraw = mod->gcount;
 
@@ -215,8 +217,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	scalebox = new ScaleBox(this, this, wxDefaultSize, numdraw, gpos, mod, graphwin, 0, scaletype);
 	scalebox->GraphSwitch(0);
 
-	//scalebox->GraphSwitch(0);
-
+	
 	//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call ok\n");
 	if(mod->graphload) scalebox->GLoad("default");
 
@@ -232,35 +233,13 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	if(scalebox) mainsizer->Add(scalebox, 0, wxEXPAND);
 	//mainsizer->Add(scalebox, 1);
 	mainsizer->Add(graphsizer, 7, wxEXPAND);
+        
+    }
+    
 	SetSizer(mainsizer);
 	Layout();
 
 
-
-	//if(mod->path != "" && !wxDirExists(mod->path)) wxMkdir(mod->path);
-	//scalebox->SetMod(mod);
-
-	/*wxSize boxsize;
-	if(ostype == Mac) boxsize = wxSize(315, 380);
-	else boxsize = wxSize(320, 430);
-	mainpos = GetPosition();
-	protocolbox = new ProtocolBox(mod, "Protocol", wxPoint(320, 455), boxsize);
-	toolset.AddBox(protocolbox);
-	protocolbox->Show(true);*/
-
-
-	//burstbox = new BurstBox(this, "Burst Analysis", wxPoint(mainpos.x+1020, mainpos.y+340), wxSize(300, 350), burstdata);
-	//burstbox->Show(true);
-
-
-	//SetStatusText("Hypo Net Model");
-	//fclose(ofp);
-	//wxofp->Write();
-	//wxofp->Close();
-
-
-
-	//diagbox->Raise();
 	//long valmax;
 
 	//valmax = std::numeric_limits<int>::max();
@@ -577,9 +556,11 @@ void HypoMain::OnClose(wxCloseEvent& event)
 	OptionStore();
 	//ViewStore();
 	MainStore();
-	mod->ModClose();
-	mod->ModStore();
-	mod->GHistStore();
+    if(mod) {
+        mod->ModClose();
+        mod->ModStore();
+        mod->GHistStore();
+    }
 	CleanUp();
 	Destroy();
 
@@ -607,20 +588,27 @@ void HypoMain::OnMove(wxMoveEvent& event)
 	}
 	//if(diagnostic) SetStatusText(snum);
 
-	for(i=0; i<mod->modtools.numtools; i++) if(mod->modtools.box[i] != NULL) mod->modtools.box[i]->SetPosition();
-	snum.Printf("Move %d modtools", mod->modtools.numtools);
-	if(diagnostic) SetStatusText(snum);
+    if(mod) {
+        for(i=0; i<mod->modtools.numtools; i++) if(mod->modtools.box[i] != NULL) mod->modtools.box[i]->SetPosition();
+        snum.Printf("Move %d modtools", mod->modtools.numtools);
+        if(diagnostic) SetStatusText(snum);
+    }
 
 	//gwindow->Refresh();
 }
 
 
-void HypoMain::OnSize(wxSizeEvent& WXUNUSED(event))
+void HypoMain::OnSize(wxSizeEvent& event)
 {
 	int gspace, gspacex;
 	int scalewidth = 155;
 	wxSize statusSize;
 	int i;
+    
+    if(!numdraw) {
+        wxFrame::OnSize(event);
+        return;
+    }
 
 	wxSize newsize = GetSize();
 	wxSize graphsize = graphsizer->GetSize();
@@ -739,7 +727,7 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2013\n\nSystem: %s", wxGetOsDescription());
 	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
-	else message.Printf("Hypothalamic Network Model\n\nDuncan MacGregor 2010-2015\n\nSystem: %s", wxGetOsDescription());
+	else message.Printf("Hypothalamic Network Model\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
 
 	wxMessageBox(message, "About Hypo Model", wxOK | wxICON_INFORMATION, this);
 }

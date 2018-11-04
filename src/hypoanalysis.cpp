@@ -584,7 +584,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 			bindex++;
 		}
 		if(bindex > burstdata->numbursts) break;   
-		if(scandiag) fprintf(ofp, "Spike %d  Burst ID  %.0f\n", i, burstdata->spikes[i]);
+		if(scandiag) fprintf(ofp, "Spike %d  Burst ID  %d\n", i, burstdata->spikes[i]);
 	}
 
 	// Mean burst spikes and time

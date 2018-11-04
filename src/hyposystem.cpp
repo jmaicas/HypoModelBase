@@ -9,7 +9,7 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 : wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(450, 450),
 		wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
-	int i;
+	int i, modindex;
 	int nummods = 9;
 	mainwin = main; 
 	wxPanel *panel = new wxPanel(this, -1);
@@ -40,7 +40,7 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 	modpathcon = new ParamText(panel, "modpath", "Mod", mainwin->modpath, 30, 320);
 	modpathcon->AddButton("Path", ID_ModBrowse, 40);
 
-	nummods = mainwin->moddex - 1;
+	//nummods = mainwin->moddex - 1;
 	nummods = mainwin->modset.modcount;
 
 	//modrad[0] = new wxRadioButton(panel, 0, "Blank", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -51,7 +51,8 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 		mainwin->diagbox->Write(text.Format("button %d %s\n", mainwin->modset.modeldat[i].index, mainwin->modset.modeldat[i].title)); 
 		startbox->Add(modrad[i+1], 1, wxTOP | wxBOTTOM, 3);
 	}
-	modrad[mainwin->modset.GetDex(mainwin->startmod) + 1]->SetValue(true);
+    modindex = mainwin->modset.GetDex(mainwin->startmod);
+    if(modindex != -1) modrad[modindex + 1]->SetValue(true);
 
 	mainwin->diagbox->Write(text.Format("startmod %d button %d\n", mainwin->startmod, mainwin->modset.GetDex(mainwin->startmod) + 1));
 	
@@ -120,7 +121,7 @@ void OptionPanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	
 	numdrawcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->numdraw = stringnum;
-	mainwin->mod->prefstore["numdraw"] = mainwin->numdraw;
+	if(mainwin->mod) mainwin->mod->prefstore["numdraw"] = mainwin->numdraw;
 	
 	viewheightcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->viewheight = stringnum;
@@ -145,8 +146,6 @@ void OptionPanel::OnOK(wxCommandEvent& WXUNUSED(event))
 
 void OptionPanel::OnBrowse(wxCommandEvent& event)
 {
-	int i;
-
 	if(event.GetId() == ID_DataBrowse) {
 		wxDirDialog *d = new wxDirDialog(this, "Choose a directory", mainwin->datapath, 0, wxDefaultPosition);
 		if(d->ShowModal() == wxID_OK) datapathcon->textbox->SetLabel(d->GetPath()); 

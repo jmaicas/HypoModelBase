@@ -157,7 +157,6 @@ void TextGrid::OnKey(wxKeyEvent &event)
 
 void TextGrid::ParseLine(int row, int col, wxString readline)
 {
-	int i;
 	wxString text;
 
 	while(!readline.IsEmpty()) {
@@ -171,7 +170,6 @@ void TextGrid::ParseLine(int row, int col, wxString readline)
 
 void TextGrid::ParseLabel(int row, int col, wxString readline)
 {
-	int i;
 	wxString text, label;
 
 	if(readline.GetChar(0) == '\'') {

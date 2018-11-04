@@ -356,7 +356,7 @@ public:
 	SpikeDat *spikedata;
 
 	IoDDat(int binsize, SpikeDat *);
-	IoDDat::~IoDDat();
+	~IoDDat();
 	void ratecalc();
 	double dispcalc();
 };
