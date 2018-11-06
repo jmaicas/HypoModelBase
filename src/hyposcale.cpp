@@ -12,7 +12,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	drawframe = draw;
 	boxtype = btype;
 	ostype = GetSystem();
-	if(ostype == Mac) buttonheight = 30; else buttonheight = 23;
+	if(ostype == Mac) buttonheight = 20; else buttonheight = 23;
 	gbase = model->graphbase;
 	//greg = gbase->graphstore;
 	gpos = gdisp;
@@ -104,7 +104,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		downarrow = wxBitmap("Init/downarrow.png", wxBITMAP_TYPE_PNG);
 	}
     
-    int zbheight = 20;
+    int zbheight = 16;
     int zbwidth = 24;
 
 	for(i=startgraph; i<numgraphs+startgraph; i++) {
@@ -507,6 +507,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	else Connect(ID_Sync, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSync));
 
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScaleBox::OnOK));
+    Connect(wxEVT_TEXT_ENTER, wxCommandEventHandler(ScaleBox::OnOK));
+    //wxEVT_TEXT_ENTER
 	//Connect(ID_histhaz1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz1));
 	//Connect(ID_histhaz2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz2));
 	//Connect(ID_binres1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes1));
@@ -961,14 +963,21 @@ wxToggleButton *ScaleBox::ToggleButton(int id, wxString label, int width, wxBoxS
 
 TextBox *ScaleBox::AddScaleParam(wxString name, double initval, wxBoxSizer *psetbox, int gpos)
 {
+    int boxwidth = 45;
+    int boxheight = -1;
+    
 	snum.Printf("%.1f", initval);
 	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-	if(ostype == Mac) confont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    if(ostype == Mac) {
+        confont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+        boxwidth = 45;
+        boxheight = 20;
+    }
 
 	wxBoxSizer *pbox = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticText *label = new wxStaticText(panel, wxID_STATIC, name, wxDefaultPosition, wxSize(-1, -1), 0);
 	//wxTextCtrl *numbox = new wxTextCtrl(panel, wxID_ANY, snum, wxDefaultPosition, wxSize(45, -1), wxTE_PROCESS_ENTER);
-	TextBox *numbox = new TextBox(panel, wxID_ANY, snum, wxDefaultPosition, wxSize(45, -1), wxTE_PROCESS_ENTER);
+	TextBox *numbox = new TextBox(panel, wxID_ANY, snum, wxDefaultPosition, wxSize(boxwidth, boxheight), wxTE_PROCESS_ENTER);
 	label->SetFont(confont);
 	numbox->SetFont(confont);
 	pbox->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);

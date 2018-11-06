@@ -24,7 +24,7 @@ ToolButton::ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wx
 
 void ToolButton::OnLeftDClick(wxMouseEvent& event)
 {
-	diagbox->Write("tool button double click\n");
+	//diagbox->Write("tool button double click\n");
 	event.Skip();
 }
 
