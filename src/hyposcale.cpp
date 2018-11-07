@@ -32,8 +32,11 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	//boxfont.New(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//boxfont.New(12, wxFONTFAMILY_ROMAN, wxNORMAL, wxNORMAL);
 	//boxfont = wxFont(12, wxFONTFAMILY_ROMAN, wxNORMAL, wxNORMAL);
-	boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+	//boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL);
+    
+    boxfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+    
 
 	hazmode1 = 0;
 	hazmode2 = 0;
@@ -701,7 +704,7 @@ void ScaleBox::GLoad(wxString tag)
 		readline.Trim();
 		readline.ToLong(&flagval);
 		(*gflags)[tag] = flagval;
-		mainwin->diagbox->Write(text.Format("Graph flag tag %s, value %d\n", tag, flagval)); 
+		mainwin->diagbox->Write(text.Format("Graph flag tag %s, value %ld\n", tag, flagval)); 
 		readline = infile.ReadLine();	
 	}
 
@@ -887,8 +890,9 @@ void ScaleBox::OnXZoomOut(wxCommandEvent& event)
 
 wxButton *ScaleBox::ScaleButton(int id, wxString label, int width, wxBoxSizer *box, int point)
 {
-	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-	if(ostype == Mac) confont = wxFont(point, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    if(ostype == Mac) confont = wxFont(wxFontInfo(point).FaceName("Tahoma"));
 	wxButton *button = new wxButton(this, id, label, wxDefaultPosition, wxSize(width, buttonheight), 0);
 	button->SetFont(confont);
 	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
@@ -952,8 +956,11 @@ wxCheckBox *ParamBox::SetModCheck(int id, wxString checktag, wxString checktext,
 
 wxToggleButton *ScaleBox::ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point)
 {
-	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-	if(ostype == Mac) confont = wxFont(point, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    
+    if(ostype == Mac) confont = wxFont(wxFontInfo(point).FaceName("Tahoma"));
+	//if(ostype == Mac) confont = wxFont(point, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	wxToggleButton *button = new wxToggleButton(this, id, label, wxDefaultPosition, wxSize(width, buttonheight), 0);
 	button->SetFont(confont);
 	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
@@ -967,9 +974,11 @@ TextBox *ScaleBox::AddScaleParam(wxString name, double initval, wxBoxSizer *pset
     int boxheight = -1;
     
 	snum.Printf("%.1f", initval);
-	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
     if(ostype == Mac) {
-        confont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+        confont = wxFont(wxFontInfo(11).FaceName("Tahoma"));
+        //confont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
         boxwidth = 45;
         boxheight = 20;
     }

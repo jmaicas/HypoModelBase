@@ -904,8 +904,9 @@ void GraphPrint::DrawPageTwo()
 	wxString words[7] = {"This ", "is ", "GetTextExtent ", "testing ", "string. ", "Enjoy ", "it!" };
 	wxCoord width, height;
 	long x = 200, y= 250;
-	wxFont fnt(15, wxSWISS, wxNORMAL, wxNORMAL);
-
+	//wxFont fnt(15, wxSWISS, wxNORMAL, wxNORMAL);
+    wxFont fnt(wxFontInfo(15).Family(wxFONTFAMILY_SWISS));
+    
 	dc->SetFont(fnt);
 
 	for(int i=0; i<7; i++) {

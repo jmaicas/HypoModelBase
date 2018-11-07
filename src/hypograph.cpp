@@ -156,12 +156,16 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	SetBackgroundColour("WHITE");
 
 	if(ostype == Mac) {
-		textfont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
-		smallfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
+        textfont = wxFont(wxFontInfo(10).FaceName("Tahoma"));
+        smallfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+		//textfont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
+		//smallfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
 	}
 	else {
-		textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
-		smallfont = wxFont(6, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
+        textfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+        smallfont = wxFont(wxFontInfo(6).FaceName("Tahoma"));
+		//textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
+		//smallfont = wxFont(6, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Helvetica");
 	}
 
 	//double cf = 0.96;
@@ -1586,9 +1590,12 @@ void GraphWindow3::OnPaintGC(wxPaintEvent &WXUNUSED(event))
 	colourpen[8].Set(wxT("#8080FF"));       // 8 light blue
 
 	//wxFont textfont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("MS Sans Serif"));
-	wxFont textfont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Helvetica"));
+	//wxFont textfont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Helvetica"));
 	//wxFont smallfont(6, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("MS Sans Serif"));
-	wxFont smallfont(6, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Helvetica"));
+	//wxFont smallfont(6, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Helvetica"));
+    
+    wxFont textfont(wxFontInfo(8).FaceName("Helvetica"));
+    wxFont smallfont(wxFontInfo(6).FaceName("Helvetica"));
 
 	for(gplot=0; gplot<gpos->numplots; gplot++) {
 		graph = gpos->plot[gplot];

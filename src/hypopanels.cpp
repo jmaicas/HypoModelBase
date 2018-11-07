@@ -30,12 +30,16 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	autosynch = true;
 
 	buttonheight = 23;
-	boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    boxfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+	//confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	if(ostype == Mac) {
 		buttonheight = 25;
-		boxfont = wxFont(12, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-		confont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+        boxfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+        confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+		//boxfont = wxFont(12, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+		//confont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	}
 	column = 0;
 

@@ -48,8 +48,10 @@ ParamText::ParamText(wxPanel *panel, wxString pname, wxString labelname, wxStrin
 	textwidth = textwid;
 	buttonwidth = 0;
 	ostype = GetSystem();
-	textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-	if(ostype == Mac) textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    textfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    if(ostype == Mac) textfont = wxFont(wxFontInfo(11).FaceName("Tahoma"));
+    
 	confont = textfont;
 
 	sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -104,9 +106,13 @@ ParamNum::ParamNum(wxPanel *panel, wxString pname, wxString labelname, double in
 	name = pname;
 	decimals = places;
 	ostype = GetSystem();
-	textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
+    textfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+    //textfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+    
+	//textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
     if(ostype == Mac) {
-        textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
+        textfont = wxFont(wxFontInfo(11).FaceName("Tahoma"));
+        //textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
         numheight = 20;
     }
 
@@ -160,11 +166,14 @@ ParamCon::ParamCon(ToolPanel *pan, wxString pname, wxString labelname, wxString 
 	
 	mainwin = panel->mainwin;
 	
-	textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+	//textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    textfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
 	
 	if(ostype == Mac) {
-		textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-		smalltextfont = wxFont(9, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+        textfont = wxFont(wxFontInfo(11).FaceName("Tahoma"));
+        smalltextfont = wxFont(wxFontInfo(9).FaceName("Tahoma"));
+		//textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+		//smalltextfont = wxFont(9, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
         numheight = 12;
 	}
 
@@ -209,12 +218,14 @@ ParamCon::ParamCon(ToolPanel *pan, int tp, wxString pname, wxString labelname, d
 	if(ostype == Mac) pad = 0;
 	mainwin = panel->mainwin;
 	//wxFont textfont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
-
-	textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    textfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//textfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//if(ostype == Mac) textfont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	if(ostype == Mac) {
-		textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-		smalltextfont = wxFont(9, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+        textfont = wxFont(wxFontInfo(11).FaceName("Tahoma"));
+        smalltextfont = wxFont(wxFontInfo(9).FaceName("Tahoma"));
+		//textfont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+		//smalltextfont = wxFont(9, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	}
 	//boxfont.New(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, wxT("Tahoma"));
 	//wxFont textfont(wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT));
@@ -804,12 +815,16 @@ void ToolBox::Init()
 	status = NULL;
 
 	buttonheight = 23;
-	boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    boxfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//boxfont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+	//confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	if(ostype == Mac) {
 		buttonheight = 25;
-		boxfont = wxFont(12, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-		confont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+        boxfont = wxFont(wxFontInfo(12).FaceName("Tahoma"));
+        confont = wxFont(wxFontInfo(10).FaceName("Tahoma"));
+		//boxfont = wxFont(12, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+		//confont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	}
 
 	if(boxtype == 1) {
@@ -853,7 +868,9 @@ wxStaticText *ToolBox::StatusBar()
 
 wxStaticText *ToolBox::TextLabel(wxString label)
 {
-	if(ostype == Mac) confont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    if(ostype == Mac) confont = wxFont(wxFontInfo(11).FaceName("Tahoma"));
+        
+    //confont = wxFont(11, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//wxStaticText *text = new (_NORMAL_BLOCK, __FILE__, __LINE__)wxStaticText(activepanel, wxID_ANY, label);
 	wxStaticText *text = new wxStaticText(activepanel, wxID_ANY, label);
 	text->SetFont(confont);
@@ -913,8 +930,14 @@ void ScaleBox::AddButton(int id, wxString label, int width, wxBoxSizer *box, int
 wxToggleButton *ToolBox::ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point, wxPanel *pan)
 {
 	if(pan == NULL) pan = activepanel;
-	confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-	if(ostype == Mac) confont = wxFont(point, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+    //8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    //wxFont f(wxFontInfo(12).Underlined().FaceName("Courier"));
+    //confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    
+    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	//if(ostype == Mac) confont = wxFont(point, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
+    if(ostype == Mac) confont = wxFont(wxFontInfo(point).FaceName("Tahoma"));
 	wxToggleButton *button = new wxToggleButton(pan, id, label, wxDefaultPosition, wxSize(width, buttonheight), 0);
 	button->SetFont(confont);
 	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
