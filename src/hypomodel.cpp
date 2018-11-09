@@ -727,7 +727,7 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 
 	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2013\n\nSystem: %s", wxGetOsDescription());
 	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
-	else message.Printf("Hypothalamic Network Model\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
+	else message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
 
 	wxMessageBox(message, "About Hypo Model", wxOK | wxICON_INFORMATION, this);
 }
