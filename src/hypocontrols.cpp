@@ -422,6 +422,14 @@ ParamSet::ParamSet(ToolPanel *pan)
 	numparams = 0;
 	currlay = 0;
 	paramstore = new ParamStore();
+
+	// Default field widths
+	num_labelwidth = 65;
+	num_numwidth = 40;
+	con_labelwidth = 60;
+	con_numwidth = 60;
+	text_labelwidth = 60;
+	text_textwidth = 150;
 }
 
 
@@ -459,9 +467,11 @@ ParamCon *ParamSet::GetCon(wxString tag)
 
 ParamCon *ParamSet::AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth, int numwidth) 
 {
+	if(labelwidth < 0) labelwidth = con_labelwidth;
+	if(numwidth < 0) numwidth = con_numwidth;
+
 	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);           // number + spin
 	ref[name] = numparams;
-	//numparams++;
 
 	return con[numparams++];
 }
@@ -469,19 +479,23 @@ ParamCon *ParamSet::AddCon(wxString name, wxString labelname, double initval, do
 
 ParamCon *ParamSet::AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth, int numwidth)
 {
+	if(labelwidth < 0) labelwidth = num_labelwidth;
+	if(numwidth < 0) numwidth = num_numwidth;
+
 	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);              // number
 	ref[name] = numparams;
-	//numparams++;
-
+	
 	return con[numparams++];
 }
 
 
 ParamCon *ParamSet::AddText(wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth)
 {
+	if(labelwidth < 0) labelwidth = text_labelwidth;
+	if(textwidth < 0) textwidth = text_textwidth;
+
 	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);								   // text
 	ref[name] = numparams;
-	//numparams++;
 
 	return con[numparams++];
 }

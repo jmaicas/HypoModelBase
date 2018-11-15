@@ -328,13 +328,18 @@ public:
 	ParamNum *num[100];
 	ParamStore ref;
 	ParamStore *paramstore;
-	
+
+	// New default width settings   Novemeber 2018
+	int num_labelwidth, num_numwidth;
+	int con_labelwidth, con_numwidth;
+	int text_labelwidth, text_textwidth;
+
 	ParamSet(ToolPanel *);
 	~ParamSet();
 
-	ParamCon *AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=65, int numwidth=40);
-	ParamCon *AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=60);
-	ParamCon *AddText(wxString name, wxString labelname, wxString initval, int labelwidth=60, int textwidth=150);
+	ParamCon *AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=-1, int numwidth=-1);
+	ParamCon *AddCon(wxString name, wxString labelname, double initval, double step, int places, int labelwidth=-1, int numwidth=-1);
+	ParamCon *AddText(wxString name, wxString labelname, wxString initval, int labelwidth=-1, int textwidth=-1);
 	ParamCon *GetCon(wxString);
 	ParamStore *GetParams();
 	ParamStore *GetParamsNew(BoxOut *boxout);
