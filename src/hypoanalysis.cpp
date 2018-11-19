@@ -655,7 +655,7 @@ void SpikeDat::MeanSpikeForm(datdouble V, int timerange, int filter, int substep
 	for(i=0; i<5000; i++) meanV[i] = 0;
 	numspikes = 0;
 
-	diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d\n", spikecount));
+	//diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d\n", spikecount));
 
 	for(i=0; i<spikecount; i++) {
 		if(times[i] < timerange) continue;
@@ -668,7 +668,7 @@ void SpikeDat::MeanSpikeForm(datdouble V, int timerange, int filter, int substep
 		numspikes++;
 	}
 
-	diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d  filter %d  timerange %d\n", spikecount, numspikes, timerange));
+	//diagbox->Write(text.Format("MeanSpikeForm\nspikecount %d  filter %d  timerange %d\n", spikecount, numspikes, timerange));
 
 	for(i=0; i<5000; i++) meanV[i] = meanV[i] / numspikes;
 }
