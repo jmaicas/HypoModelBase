@@ -81,8 +81,9 @@ void GraphWindow3::MultiEPS()
 			gwin = mainwin->graphwin[paneldex[i]];
 			gwin->PrintEPS(xb[i], yb[i], &out);
 		}
-	  if(panelcomm[i] == "hh") mainwin->scalebox->GraphCommand(ID_histhaz1);
+		if(panelcomm[i] == "hh") mainwin->scalebox->GraphCommand(ID_histhaz1);
 		if(panelcomm[i] == "norm") mainwin->scalebox->GraphCommand(ID_norm);
+		if(panelcomm[i] == "net") mainwin->scalebox->GraphCommand(ID_net);
 	}
 
 	// Close file
