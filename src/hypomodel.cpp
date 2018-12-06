@@ -122,6 +122,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
 	expdata = new SpikeDat();
 	expdata->burstdata = new BurstDat();
+	expdata->burstdata->spikedata = expdata;
+
 	selectdata = new SpikeDat();
 	burstdata = new BurstDat();
 

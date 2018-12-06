@@ -443,14 +443,20 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 			out->WriteLine("newpath");
 			out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
 
+			if(gpar == -3) yval = (*gdatav)[(int)xfrom];
+			if(gpar == -4) yval = (*gdatadv)[(int)xfrom];
+
 			oldx = xbase;
-			oldy = ybase + yrange * ((*gdatadv)[xfrom] - yfrom);            // TODO proper start coordinates
+			oldy = ybase + yrange * (yval - yfrom);            // TODO proper start coordinates
 
 			for(i=1; i<=(xto - xfrom) / xsample; i++) {		
 				xindex = i * xsample + xfrom;
 				xpos = (xindex - xfrom) * xrange;
 
-				yval = (*gdatadv)[xindex];
+				//yval = (*gdatadv)[xindex];
+				if(gpar == -3) yval = (*gdatav)[xindex];
+				if(gpar == -4) yval = (*gdatadv)[xindex];
+
 				if(graph->yscalemode == 1 && yfrom > 0) {
 					ypos = (int)((double)yplot * (log(yval / yfrom) / log(graph->ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
 					if(yval < yfrom) ypos = -yfrom * yrange;     // set below range values to xfrom

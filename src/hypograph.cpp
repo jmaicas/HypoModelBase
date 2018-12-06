@@ -1089,10 +1089,14 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			for(i=1; i<xplot; i++) {
 				if(xrange < 1) {
 					xindex = (int)((i * xnum) + xfrom);
-					mpoint = (*gdatadv)[xindex];
+					//mpoint = (*gdatadv)[xindex];
+					if(gpar == -3) mpoint = (*gdatav)[xindex];
+					if(gpar == -4) mpoint = (*gdatadv)[xindex];
 					if(drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  dir %d\n", i, preval, dir);
 					for(j=1; j<xnum; j++) {
-						data = (*gdatadv)[xindex + j];
+						//data = (*gdatadv)[xindex + j];
+						if(gpar == -3) data = (*gdatav)[xindex + j];
+						if(gpar == -4) data = (*gdatadv)[xindex + j];
 						if(drawdiag) fprintf(ofp, "xdraw %d, xnum %d, data %.4f\n", i, j, data);
 						if(dir) {
 							if(data > mpoint) mpoint = data;
@@ -1122,7 +1126,9 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					//oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				} 
 				else {
-					yval = (*gdatadv)[(int)(i + xfrom)];
+					//yval = (*gdatadv)[(int)(i + xfrom)];
+					if(gpar == -3) yval = (*gdatav)[(int)(i + xfrom)];
+					if(gpar == -4) yval = (*gdatadv)[(int)(i + xfrom)];
 					if(graph->yscalemode == 1 && yfrom > 0) {
 						ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
 						if(yval < yfrom) ypos = -yfrom * yrange;
