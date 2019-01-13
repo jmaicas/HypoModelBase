@@ -1080,6 +1080,7 @@ void ParamBox::OnSpin(wxSpinEvent& event)
 {
 	if(mainwin->diagnostic) mainwin->SetStatusText("on spin");
 	if(autorun) OnRun(event);
+	//diagbox->Write("on spin\n");
 }
 
 
