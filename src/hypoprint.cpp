@@ -127,6 +127,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	int xlabelmode, ylabelmode;
 	double xlogmax, ylogmax;    
 	double logbase = 2.71828182845904523536028747135266250;   // 3;
+	double xticklength, yticklength;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -230,6 +231,12 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		yrange = (double)yplot / (yto - yfrom);
 		xrange = (double)xplot / (xto - xfrom); 
 		xnum = (double)(xto - xfrom) / xplot;
+
+		xticklength = 5;
+		yticklength = 5;
+		// Auto tick length 
+		if(xplot < 200) yticklength = 3;
+		if(yplot < 100) xticklength = 3;
 
 		out->WriteLine(text.Format("gsave"));
 
@@ -679,7 +686,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
-		out->DrawLine(xbase + xcoord, ybase, xbase + xcoord, ybase - 5);
+		out->DrawLine(xbase + xcoord, ybase, xbase + xcoord, ybase - xticklength);
 	}
 
 	if(graph->ytickmode && graph->ystep > 0) {
@@ -697,18 +704,22 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	for(i=0; i<=ylabels && ylabels > 0; i++) {
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;
-		out->DrawLine(xbase, ybase + ycoord, xbase - 5, ybase + ycoord);
+		out->DrawLine(xbase, ybase + ycoord, xbase - yticklength, ybase + ycoord);
 	}
 
 	//for(i=0; i<=ylabels; i+=1) out->DrawLine(xbase, ybase + i*yplot/ylabels, xbase - 5, ybase + i*yplot/ylabels);
 
 	out->WriteLine("stroke");
 
+
+	// Problems with text in EPS import into Illustrator, use new path for each label on x-axis, results in extra blank path but correct spacing
+	// still need to solve incorrect behaviour with decimals, get split into two paths with incorrect spacing
+
 	// Draw Tick Labels
-	out->WriteLine("newpath");
+	//out->WriteLine("newpath");
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
-		//out->WriteLine("newpath");
+		out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
 		if(graph->xtickmode) xcoord = xplotstep * i;
 		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale / graph->xunitdscale - xshift;
@@ -731,13 +742,13 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 
 		out->MoveTo(xbase + xcoord, ybase - 15);
 		out->WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", snum));
-		//out->WriteLine("stroke");
+		out->WriteLine("stroke");
 	}
-	out->WriteLine("stroke");
+	//out->WriteLine("stroke");
 	//if(yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
 	xylab = 8;
 
-	out->WriteLine("newpath");
+	//out->WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
 		mod->diagbox->Write(text.Format("ylabels %d %d\n", ylabels, i));
 		if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
@@ -763,7 +774,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		out->MoveTo(xbase - xylab, ybase + ycoord - 2.75);
 		out->WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", snum));
 	}
-	out->WriteLine("stroke");
+	//out->WriteLine("stroke");
 
 
 	// Draw Axis Labels

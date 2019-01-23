@@ -612,6 +612,7 @@ public:
 	double xlogbase, ylogbase;
 	int scatterfield, scattermean;      // used for drawing scatter cloud oval and mean
 
+
 	int highstart, highstop, highcolour;
 
 	BurstDat *burstdata;

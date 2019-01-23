@@ -391,9 +391,25 @@ void GraphBox::SynchLayers() {
 }
 
 
+void GraphBox::SynchPlotSize() {
+
+	int i;
+
+	HypoMain *mainwin = graphwin->mainwin;
+	GraphDat *setgraph;
+
+	for(i=0; i<mainwin->numdraw; i++) {
+		setgraph = mainwin->graphwin[i]->dispset[0]->plot[0];
+		setgraph->xplot = graph->xplot;
+		setgraph->yplot = graph->yplot;
+	}
+}
+
+
 void GraphBox::OnSynch(wxCommandEvent& WXUNUSED(event))
 {
 	SynchLayers();
+	SynchPlotSize();
 }
 
 

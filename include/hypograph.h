@@ -163,6 +163,7 @@ public:
 	void SetParams(GraphDat *setgraph=NULL);
 	void SetParamsCopy(GraphDat *setgraph);
 	void SynchLayers();
+	void SynchPlotSize();
 };
 
 
