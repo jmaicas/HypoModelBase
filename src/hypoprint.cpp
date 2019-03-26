@@ -6,6 +6,17 @@
 #include <hypomodel.h>
 
 
+// MultiCell()
+//
+// Multi cell EPS figures for PLoS VMN    V1
+void GraphWindow3::MultiCell()
+{
+	int i;
+
+
+}
+
+
 // MultiEPS()
 //
 // Uses a set of panel data, currently set manually, to print multiple EPS to a single file for building figures

@@ -101,11 +101,13 @@ public:
 	void OnGraphPrint(wxCommandEvent& event);
 	void OnGraphEPS(wxCommandEvent& event);
 	void OnMultiEPS(wxCommandEvent& event);
+	void OnMultiCell(wxCommandEvent& event);
 	void OnScale(wxCommandEvent& event);
 	void OnUnZoom(wxCommandEvent& event);
 	void DrawLine(wxDC& dc, wxGraphicsContext *gc, int xfrom, int yfrom, int xto, int yto);
 	void PrintEPS(double xbase = -1, double ybase = -1, TextFile *ofp = NULL);
 	void MultiEPS();
+	void MultiCell();
 	void XYSynch();
 	wxRealPoint GraphPos(wxPoint);
 };

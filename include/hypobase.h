@@ -218,6 +218,7 @@ enum {
 	ID_Print,
 	ID_GraphEPS,
 	ID_MultiEPS,
+	ID_MultiCell,
 	ID_Scale,
 	ID_UnZoom,
 	ID_Go,
