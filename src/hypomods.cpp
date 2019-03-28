@@ -171,6 +171,11 @@ void Model::EvoRun()
 }
 
 
+void Model::SetCell(int cellindex)
+{
+}
+
+
 void Model::ScaleCon(ScaleBox *scalebox, int condex)
 {
 }

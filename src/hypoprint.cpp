@@ -12,6 +12,83 @@
 void GraphWindow3::MultiCell()
 {
 	int i;
+	int cellcount, cellstart;
+	TextFile out;
+	wxString filepath, filetag, filename;
+	TextGrid *textgrid;
+	wxString celltext;
+	double celldata;
+
+	double ypos, ygap;
+	double xpos, xgap;
+	int row, col, numcols;
+
+	cellcount = 1;
+	ypos = 100;
+	xpos = 100;
+
+	mod->diagbox->Write("MultiCell\n");
+
+
+	// Read panel data from OutBox
+	textgrid = mod->outbox->currgrid;
+	cellcount = (int)textgrid->ReadDouble(0, 1);
+	if(!cellcount) return;
+	cellstart = (int)textgrid->ReadDouble(1, 1);
+	if(cellstart < 0) cellstart = 0;
+	numcols = (int)textgrid->ReadDouble(2, 1);
+	if(numcols <= 0) numcols = 1;
+	xgap = textgrid->ReadDouble(3, 1);
+	if(xgap <= 0) xgap = 100;
+	ygap = textgrid->ReadDouble(4, 1);
+	if(ygap <= 0) ygap = 100;
+
+
+	mod->diagbox->Write("MultiCell parameters read\n");
+
+
+	// Construct file string
+	filepath = mainwin->outpath;
+	filetag = mod->modbox->paramstoretag->GetValue();
+	//filetag = "test";
+	filename = filepath + "/" + filetag + "-" + "multi" + ".eps";
+
+	// Initialise postscript file and write header
+	//out.New("C:/Users/Duncan/Desktop/plot.eps");
+	out.New(filename);
+	out.WriteLine("%!PS-Adobe-3.0 EPSF-3.0");
+	out.WriteLine("%%BoundingBox: 0 0 1000 500");
+	out.WriteLine("/pu {1 mul} def");                        // pu = plot units, set scaling to points
+	out.WriteLine("0 0 0 setrgbcolor");
+	out.WriteLine("1 setlinecap");
+	out.WriteLine("1 setlinejoin");
+	out.WriteLine("");
+
+
+	col = 0;
+	row = 0;
+
+	// PrintEPS for panels
+	for(i=0; i<cellcount; i++) {
+		PrintEPS(xpos + xgap * col, ypos + ygap * row, &out);
+		col++;
+		if(col == numcols) {
+			col = 0;
+			row++;
+		}
+
+		//if(panelcomm[i] == "") {
+		//	gwin = mainwin->graphwin[paneldex[i]];
+		//	gwin->PrintEPS(xb[i], yb[i], &out);
+		//}
+		//if(panelcomm[i] == "hh") mainwin->scalebox->GraphCommand(ID_histhaz1);
+		//if(panelcomm[i] == "norm") mainwin->scalebox->GraphCommand(ID_norm);
+		//if(panelcomm[i] == "net") mainwin->scalebox->GraphCommand(ID_net);
+	}
+
+	// Close file
+	out.Close();
+
 
 
 }
@@ -729,6 +806,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	// Draw Tick Labels
 	//out->WriteLine("newpath");
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
+		if(graph->xlabelmode == 0) break;
 		if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
 		out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
@@ -762,6 +840,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	//out->WriteLine("newpath");
 	for(i=0; i<=ylabels; i+=1) {
 		mod->diagbox->Write(text.Format("ylabels %d %d\n", ylabels, i));
+		if(graph->ylabelmode == 0) break;
 		if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode) ycoord = yplotstep * i;

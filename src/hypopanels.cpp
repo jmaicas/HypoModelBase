@@ -70,11 +70,13 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	xrad[graph->xtickmode]->SetValue(true);
 
 	wxStaticBoxSizer *xlabradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Labels");
-	xlabrad[0] = new wxRadioButton(panel, 100, "All", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	xlabrad[1] = new wxRadioButton(panel, 101, "Ends");
+	xlabrad[0] = new wxRadioButton(panel, 100, "None", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	xlabrad[1] = new wxRadioButton(panel, 101, "All");
+	xlabrad[2] = new wxRadioButton(panel, 102, "Ends");
 	xlabradbox->Add(xlabrad[0], 1, wxTOP | wxBOTTOM, 3);
 	xlabradbox->Add(xlabrad[1], 1, wxTOP | wxBOTTOM, 3);
-	xlabrad[graph->xlabelmode-1]->SetValue(true);
+	xlabradbox->Add(xlabrad[2], 1, wxTOP | wxBOTTOM, 3);
+	xlabrad[graph->xlabelmode]->SetValue(true);
 
 	wxStaticBoxSizer *yradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Tick Mode");
 	yrad[0] = new wxRadioButton(panel, 2, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -84,11 +86,13 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	yrad[graph->ytickmode]->SetValue(true);
 
 	wxStaticBoxSizer *ylabradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Labels");
-	ylabrad[0] = new wxRadioButton(panel, 102, "All", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	ylabrad[1] = new wxRadioButton(panel, 103, "Ends");
+	ylabrad[0] = new wxRadioButton(panel, 200, "None", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	ylabrad[1] = new wxRadioButton(panel, 201, "All");
+	ylabrad[2] = new wxRadioButton(panel, 202, "Ends");
 	ylabradbox->Add(ylabrad[0], 1, wxTOP | wxBOTTOM, 3);
 	ylabradbox->Add(ylabrad[1], 1, wxTOP | wxBOTTOM, 3);
-	ylabrad[graph->ylabelmode-1]->SetValue(true);
+	ylabradbox->Add(ylabrad[2], 1, wxTOP | wxBOTTOM, 3);
+	ylabrad[graph->ylabelmode]->SetValue(true);
 
 	wxBoxSizer *radbox = new wxBoxSizer(wxHORIZONTAL);
 	radbox->Add(xradbox, 1, wxALL, 5);
@@ -455,10 +459,13 @@ void GraphBox::OnRadio(wxCommandEvent& event)
 	if(event.GetId() == 12) graph->yscalemode = 0;
 	if(event.GetId() == 13) graph->yscalemode = 1;
 
-	if(event.GetId() == 100) graph->xlabelmode = 1;
-	if(event.GetId() == 101) graph->xlabelmode = 2;
-	if(event.GetId() == 102) graph->ylabelmode = 1;
-	if(event.GetId() == 103) graph->ylabelmode = 2;
+	if(event.GetId() == 100) graph->xlabelmode = 0;
+	if(event.GetId() == 101) graph->xlabelmode = 1;
+	if(event.GetId() == 102) graph->xlabelmode = 2;
+
+	if(event.GetId() == 200) graph->ylabelmode = 0;
+	if(event.GetId() == 201) graph->ylabelmode = 1;
+	if(event.GetId() == 202) graph->ylabelmode = 2;
 
 	OnOK(event);
 }

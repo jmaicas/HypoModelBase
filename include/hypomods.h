@@ -88,6 +88,7 @@ public:
 	virtual void ModClose();
 	virtual void EvoRun();
 	virtual void ScaleCon(ScaleBox *scalebox, int condex);
+	virtual void SetCell(int cellindex);
 };
 
 
