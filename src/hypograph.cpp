@@ -865,7 +865,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			xcoord = i * xplot / xlabels;
 			if(graph->xtickmode) xcoord = (int)(xplotstep * i);
 			dc.DrawLine(xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
-			if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
+			if(!graph->xlabelmode || (graph->xlabelmode == 2 && i > 0 && i < xlabels)) continue;
 			xval = ((double)(xto - xfrom) / xlabels*i + xfrom) / xscale * graph->xunitscale / graph->xunitdscale - graph->xshift;
 			if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - graph->xshift;
 
@@ -912,7 +912,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 			ycoord = i * yplot / ylabels;
 			if(graph->ytickmode) ycoord = (int)(yplotstep * i);
 			dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
-			if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
+			if(!graph->ylabelmode || (graph->ylabelmode == 2 && i > 0 && i < ylabels)) continue;
 			if(graph->ytickmode == 0) yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale - graph->yshift;
 			if(graph->ytickmode == 1) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
 

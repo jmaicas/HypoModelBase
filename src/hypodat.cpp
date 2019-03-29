@@ -402,11 +402,16 @@ wxString GraphDat::StoreDat(wxString tag)
 	wxString gtext1, gtext2;
 	wxString storegname, storextag, storeytag;
 
-	storegname = gname;                       // replace spaces with underscores for textfile storing
+	if(!gname.IsEmpty()) storegname = gname;                       // replace spaces with underscores for textfile storing
+	else storegname = " ";
 	storegname.Replace(" ", "_");
-	storextag = xtag;
+
+	if(!xtag.IsEmpty()) storextag = xtag;
+	else storextag = " ";
 	storextag.Replace(" ", "_");
-	storeytag = ytag;
+
+	if(!ytag.IsEmpty()) storeytag = ytag;
+	else storeytag = " ";
 	storeytag.Replace(" ", "_");
 
 	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
@@ -510,6 +515,7 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		
 		gname = ParseString(&readline, 'e');
 		gname.Replace("_", " ");
+		//if(gname == " ") gname = "";
 
 		xtag = ParseString(&readline, 'g');
 		xtag.Replace("_", " ");

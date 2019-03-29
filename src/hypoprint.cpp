@@ -33,7 +33,10 @@ void GraphWindow3::MultiCell()
 	// Read panel data from OutBox
 	textgrid = mod->outbox->currgrid;
 	cellcount = (int)textgrid->ReadDouble(0, 1);
-	if(!cellcount) return;
+	if(!cellcount) {
+		mod->diagbox->Write("ERROR parameters zero cellcount\n");
+		return;
+	}
 	cellstart = (int)textgrid->ReadDouble(1, 1);
 	if(cellstart < 0) cellstart = 0;
 	numcols = (int)textgrid->ReadDouble(2, 1);
@@ -51,7 +54,7 @@ void GraphWindow3::MultiCell()
 	filepath = mainwin->outpath;
 	filetag = mod->modbox->paramstoretag->GetValue();
 	//filetag = "test";
-	filename = filepath + "/" + filetag + "-" + "multi" + ".eps";
+	filename = filepath + "/" + filetag + "-" + "multicell" + ".eps";
 
 	// Initialise postscript file and write header
 	//out.New("C:/Users/Duncan/Desktop/plot.eps");
@@ -68,8 +71,12 @@ void GraphWindow3::MultiCell()
 	col = 0;
 	row = 0;
 
+	graph = dispset[0]->plot[0];
+
 	// PrintEPS for panels
 	for(i=0; i<cellcount; i++) {
+		(*graph).gname.Printf("n%d", i);
+		mod->SetCell(i);
 		PrintEPS(xpos + xgap * col, ypos + ygap * row, &out);
 		col++;
 		if(col == numcols) {
@@ -288,7 +295,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		ylabels = graph->ylabels;
 		barwidth = graph->barwidth;
 		bargap = graph->bargap;
-		gtitle = 0;
+		gtitle = 1;
 		//xlabelmode = 2;
 		//ylabelmode = 2;         // 1 = label every tick, 2 = only label first and last tick
 
@@ -869,13 +876,17 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 
 	// Draw Axis Labels
 
-	out->MoveTo(xbase + xplot/2, ybase - graph->xlabelgap);
-	out->WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->xtag));
+	if(graph->xtag != "") {
+		out->MoveTo(xbase + xplot/2, ybase - graph->xlabelgap);
+		out->WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->xtag));
+	}
 
-	out->MoveTo(xbase - graph->ylabelgap, ybase + yplot/2);
-	out->WriteLine(text.Format("90 rotate"));
-	out->WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->ytag));
-	out->WriteLine(text.Format("270 rotate"));
+	if(graph->ytag != "") {
+		out->MoveTo(xbase - graph->ylabelgap, ybase + yplot/2);
+		out->WriteLine(text.Format("90 rotate"));
+		out->WriteLine(text.Format("(%s) dup stringwidth pop 2 div neg 0 rmoveto show", graph->ytag));
+		out->WriteLine(text.Format("270 rotate"));
+	}
 
 	//if(yplot < 150) dc.SetFont(textfont);
 
@@ -884,7 +895,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 
 
 	// Graph Title
-	if(gtitle) {
+	if(gtitle && gname != "") {
 		out->MoveTo(xbase + xplot, ybase + yplot - 30);
 		out->WriteLine(text.Format("(%s) dup stringwidth pop neg 0 rmoveto show", gname));
 	}

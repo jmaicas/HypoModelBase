@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 850),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 880),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -76,7 +76,8 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	xlabradbox->Add(xlabrad[0], 1, wxTOP | wxBOTTOM, 3);
 	xlabradbox->Add(xlabrad[1], 1, wxTOP | wxBOTTOM, 3);
 	xlabradbox->Add(xlabrad[2], 1, wxTOP | wxBOTTOM, 3);
-	xlabrad[graph->xlabelmode]->SetValue(true);
+	if(graph->xlabelmode >= 0 && graph->xlabelmode < 3) xlabrad[graph->xlabelmode]->SetValue(true);
+	else diagbox->Write(text.Format("ERROR xlabelmode %d\n", graph->xlabelmode));
 
 	wxStaticBoxSizer *yradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Tick Mode");
 	yrad[0] = new wxRadioButton(panel, 2, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -92,7 +93,8 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	ylabradbox->Add(ylabrad[0], 1, wxTOP | wxBOTTOM, 3);
 	ylabradbox->Add(ylabrad[1], 1, wxTOP | wxBOTTOM, 3);
 	ylabradbox->Add(ylabrad[2], 1, wxTOP | wxBOTTOM, 3);
-	ylabrad[graph->ylabelmode]->SetValue(true);
+	if(graph->ylabelmode >= 0 && graph->ylabelmode < 3) ylabrad[graph->ylabelmode]->SetValue(true);
+	else diagbox->Write(text.Format("ERROR ylabelmode %d\n", graph->ylabelmode));
 
 	wxBoxSizer *radbox = new wxBoxSizer(wxHORIZONTAL);
 	radbox->Add(xradbox, 1, wxALL, 5);
