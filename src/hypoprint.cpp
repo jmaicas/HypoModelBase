@@ -21,10 +21,11 @@ void GraphWindow3::MultiCell()
 
 	double ypos, ygap;
 	double xpos, xgap;
+	//double ystart;
 	int row, col, numcols;
 
 	cellcount = 1;
-	ypos = 100;
+	ypos = 800;
 	xpos = 100;
 
 	mod->diagbox->Write("MultiCell\n");
@@ -45,6 +46,8 @@ void GraphWindow3::MultiCell()
 	if(xgap <= 0) xgap = 100;
 	ygap = textgrid->ReadDouble(4, 1);
 	if(ygap <= 0) ygap = 100;
+	ypos = textgrid->ReadDouble(5, 1);
+	if(ypos < 0) ypos = 100;
 
 
 	mod->diagbox->Write("MultiCell parameters read\n");
@@ -71,13 +74,15 @@ void GraphWindow3::MultiCell()
 	col = 0;
 	row = 0;
 
+	//int ystart = 700;
+
 	graph = dispset[0]->plot[0];
 
 	// PrintEPS for panels
 	for(i=0; i<cellcount; i++) {
 		(*graph).gname.Printf("n%d", i);
 		mod->SetCell(i);
-		PrintEPS(xpos + xgap * col, ypos + ygap * row, &out);
+		PrintEPS(xpos + xgap * col, ypos - ygap * row, &out);
 		col++;
 		if(col == numcols) {
 			col = 0;
