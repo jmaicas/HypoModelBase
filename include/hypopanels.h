@@ -235,7 +235,7 @@ public:
 
 	NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	~NeuroBox();
-	void NeuroData();
+	void NeuroData(bool dispupdate = true);
 	//void NeuroAnalysis();
 	void PanelData(NeuroDat *);
 	void OnNext(wxSpinEvent& event);

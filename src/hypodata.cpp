@@ -511,7 +511,7 @@ void NeuroBox::PanelData(NeuroDat *data)
 }
 
 
-void NeuroBox::NeuroData()
+void NeuroBox::NeuroData(bool dispupdate)
 {	
 	ParamStore *calcparams = GetParams();
 
@@ -521,8 +521,10 @@ void NeuroBox::NeuroData()
 	currcell->id = neuroindex;
 	
 	//PanelData(&((*cells)[neuroindex]));
-	PanelData(&(*cells)[neuroindex]);
-	mainwin->scalebox->GraphUpdate();	
+	if(dispupdate) {
+		PanelData(&(*cells)[neuroindex]);
+		mainwin->scalebox->GraphUpdate();	
+	}
 }
 
 

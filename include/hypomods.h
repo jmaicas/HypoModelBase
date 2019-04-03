@@ -88,7 +88,8 @@ public:
 	virtual void ModClose();
 	virtual void EvoRun();
 	virtual void ScaleCon(ScaleBox *scalebox, int condex);
-	virtual void SetCell(int cellindex);
+	virtual void SetCell(int cellindex, GraphDat *);
+	virtual int GetCellIndex();
 };
 
 

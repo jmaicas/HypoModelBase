@@ -519,9 +519,11 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 
 		xtag = ParseString(&readline, 'g');
 		xtag.Replace("_", " ");
+		if(xtag == " ") xtag = "";
 
 		ytag = ParseString(&readline, 'g');
 		ytag.Replace("_", " ");
+		if(ytag == " ") ytag = "";
 	}	
 
 	if(version > 2) {

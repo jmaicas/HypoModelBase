@@ -171,8 +171,14 @@ void Model::EvoRun()
 }
 
 
-void Model::SetCell(int cellindex)
+void Model::SetCell(int cellindex, GraphDat *graph)
 {
+}
+
+
+int Model::GetCellIndex()
+{
+	return 0;
 }
 
 

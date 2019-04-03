@@ -77,11 +77,11 @@ void GraphWindow3::MultiCell()
 	//int ystart = 700;
 
 	graph = dispset[0]->plot[0];
+	int oldindex = mod->GetCellIndex();
 
 	// PrintEPS for panels
 	for(i=0; i<cellcount; i++) {
-		(*graph).gname.Printf("n%d", i);
-		mod->SetCell(i);
+		mod->SetCell(i + cellstart, graph);
 		PrintEPS(xpos + xgap * col, ypos - ygap * row, &out);
 		col++;
 		if(col == numcols) {
@@ -97,6 +97,8 @@ void GraphWindow3::MultiCell()
 		//if(panelcomm[i] == "norm") mainwin->scalebox->GraphCommand(ID_norm);
 		//if(panelcomm[i] == "net") mainwin->scalebox->GraphCommand(ID_net);
 	}
+
+	mod->SetCell(oldindex, graph);
 
 	// Close file
 	out.Close();
