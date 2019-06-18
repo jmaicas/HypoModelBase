@@ -554,7 +554,8 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxBoxSizer *datbox = new wxBoxSizer(wxVERTICAL);
 
 	
-	wxString histpath = mainwin->modpath + "\\" + "Tools";
+	//wxString histpath = mainwin->modpath + "\\" + "Tools";
+	wxString histpath = mainwin->toolpath;
 	if(!wxDirExists(histpath)) wxMkdir(histpath);
 	datfiletag = TextInputCombo(100, 20, "", boxname, histpath);
 

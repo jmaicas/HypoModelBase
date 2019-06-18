@@ -292,7 +292,8 @@ enum {
 	ID_Sub1,
 	ID_Sub2,
 	ID_monitor,
-	ID_formfilter
+	ID_formfilter,
+	ID_boxflag
 };
 
 
