@@ -550,7 +550,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	wxBoxSizer *datfilebox = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *datbuttons = new wxBoxSizer(wxHORIZONTAL);
-	wxBoxSizer *datcon = new wxBoxSizer(wxHORIZONTAL);
+	//wxBoxSizer *datcon = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *datbox = new wxBoxSizer(wxVERTICAL);
 
 	
