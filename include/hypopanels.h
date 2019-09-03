@@ -457,7 +457,7 @@ public:
 	int numwidth;
 	wxString text;
 
-	DatPanel(ToolBox *box, int size = 10);
+	DatPanel(ToolBox *box, int size = 20);
 	~DatPanel();
 	void AddDat(wxString tag, wxString value = "");
 	wxStaticText *GetDat(wxString tag);
