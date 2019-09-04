@@ -322,6 +322,9 @@ public:
 	double kHAP, kAHP, kDAP;
 	double th0, vrest;
 	MainFrame *mainwin;
+
+	int fitType; 
+	wxString label;
 	
 	void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
@@ -336,6 +339,7 @@ public:
 	void BurstScan(BurstBox *);
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *);
+	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);

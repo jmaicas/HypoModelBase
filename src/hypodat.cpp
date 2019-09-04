@@ -196,6 +196,9 @@ SpikeDat::SpikeDat()
 	normscale = 10000;
 	mainwin = NULL;
 	graphs = false;
+
+	fitType = 0;    // 0 for basic, 1 for oxy, 2 for vaso
+	label = "";
 }
 
 

@@ -16,9 +16,15 @@ void SpikeDat::BurstProfile()
 	int protime, oldtime;
 	FILE *ofp;
 	int tailspikes = 50;
+	wxString text;
+
+	bool diagnostic = true;
 
 	ofp = fopen("bprofile.txt", "w");
 
+	diagbox->Write("BurstProfile call " + label + "\n");
+
+	
 	stime = 0;
 	oldtime = 0;
 	for(i=0; i<500; i++) {
@@ -37,10 +43,11 @@ void SpikeDat::BurstProfile()
 		stime = 0;
 		oldtime = 0;
 		procount[0]++;
-		//fprintf(ofp, "burst %d  start %d  end %d\n", burst, start, end);
+		if(diagnostic) fprintf(ofp, "\nburst %d  start %d  end %d\n", burst, start, end);
+		
 		while(i <= end && stime < 500) {
-			stime = times[i] - times[start]; 
-			//fprintf(ofp, "burst %d  stime %.2f\n", burst, stime); 
+			stime = (times[i] - times[start]) / 1000; 
+			if(diagnostic) fprintf(ofp, "burst %d  spike %d  stime %.2f\n", burst, i, stime); 
 			protime = (int)stime;
 			if(protime > oldtime) {
 				procount[protime]++;
@@ -49,15 +56,15 @@ void SpikeDat::BurstProfile()
 			prosum[(int)stime]++;
 			i++;
 		}
-
+		
 		// Tail based profile
 		i = end;
 		stime = 0;
 		oldtime = 0;
 		procounttail[0]++;
 		while(i >= start && stime < 500) {
-			stime = times[end] - times[i]; 
-			//fprintf(ofp, "tail burst %d  stime %.2f\n", burst, stime); 
+			stime = (times[end] - times[i]) / 1000; 
+			//if(diagnostic) fprintf(ofp, "tail burst %d  stime %.2f\n", burst, stime); 
 			protime = (int)stime;
 			if(protime > oldtime) {
 				procounttail[protime]++;
@@ -66,18 +73,20 @@ void SpikeDat::BurstProfile()
 			prosumtail[(int)stime]++;
 			i--;
 		}
+		
 	}
 
+	
 	for(i=0; i<500; i++) {
 		if(procount[i] > 0) burstdata->profile[i+1] = (double)prosum[i] / procount[i];
 		else burstdata->profile[i] = 0;
 		if(procounttail[i] > 0) burstdata->tailprofile[i+1] = (double)prosumtail[i] / procounttail[i];
 		else burstdata->tailprofile[i] = 0;
-		fprintf(ofp, "btime %d  rate sum %.2f  count %d  mean %.2f\n", i, burstdata->profile[i], procount[i], burstdata->profile[i]);
+		if(diagnostic) fprintf(ofp, "btime %d  rate sum %.2f  count %d  mean %.2f\n", i, burstdata->profile[i], procount[i], burstdata->profile[i]);
 		burstdata->bursthaz[i] = 100 * procount[i] / burstdata->numbursts;  
 	}
-
-
+	
+	
 	// Profile Smoothing for Fitting      December 2012
 
 	int profmax = 500;
@@ -108,11 +117,12 @@ void SpikeDat::BurstProfile()
 	burstdata->pmodetime = pmode;
 	burstdata->pmoderate = burstdata->profilesm[pmode];
 
-
-
+	diagbox->Write(text.Format("modetime %.2f  moderate %.2f\n\n", burstdata->pmodetime, burstdata->pmoderate));
+	
 
 	// Burst tail analysis  (Nancy, 2006 paper)
 
+	/*
 	double tailsum, varsum;
 	double logint[50000];
 	//double tailmean[1000];
@@ -157,6 +167,7 @@ void SpikeDat::BurstProfile()
 		fprintf(ofp, "\nMean %.4f  Stdev %.4f  Bursts %d\n\n", tailsum, burstdata->tailstdev[j+1], burstnum);
 		//burstdata->tailspikesum[j] = tailsum;
 	}
+	*/
 	fclose(ofp);
 }
 
@@ -1585,7 +1596,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&burstdata->hist5, 0, 500, 0, 500, btag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "bursthist5ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->haz1, 0, 500, 0, 0.04, btag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "bursthaz1ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->haz5, 0, 500, 0, 0.2, btag + tag + "Haz 5ms", 1, 5, colour + shift), reftag + "bursthaz5ms", reftag);
-	graphbase->Add(GraphDat(&burstdata->profile, 0, 250, 0, 20, tag + "Burst Profile", 4, 1, colour + shift), reftag + "-burst-headprofile", reftag);
+	graphbase->Add(GraphDat(&burstdata->profile, 0, 250, 0, 20, tag + "Burst Head Profile", 4, 1, colour + shift), reftag + "-burst-headprofile", reftag);
 	graphbase->Add(GraphDat(&burstdata->tailprofile, 0, 250, 0, 20, tag + "Burst Tail Profile", 4, 1, colour + shift), reftag + "-burst-tailprofile", reftag);
 	graphbase->Add(GraphDat(&burstdata->profilesm, 0, 250, 0, 20, tag + "Burst Profile Smooth", 4, 1, colour + shift), reftag + "-burst-headprofilesm", reftag);
 	graphbase->Add(GraphDat(&burstdata->bursthaz, 0, 250, 0, 200, tag + "Burst Haz", 1, 1, colour + shift), reftag + "-bursthaz", reftag);

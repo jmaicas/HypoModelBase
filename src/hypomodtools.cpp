@@ -695,7 +695,7 @@ void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 	if(moddata != NULL) {
 		//if(moddata->spikecount == 0) 
 		moddata->BurstScan(this);
-		//if(moddata->burstdata->numbursts > 0) moddata->BurstProfile();
+		if(moddata->burstdata->numbursts > 0) moddata->BurstProfile();
 		BurstDataDisp(moddata, modburst);
 	}
 
@@ -704,7 +704,8 @@ void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 
 	//mainwin->gpos[0].burstdata = spikedata->burstdata;
 	//burstdata->spikedata = spikedata;
-	mainwin->scalebox->BurstDisp(1);
+
+	//mainwin->scalebox->BurstDisp(1);
 }
 
 
