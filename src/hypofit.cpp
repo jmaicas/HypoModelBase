@@ -5,17 +5,17 @@
 #include <cmath>
 
 
-void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitConSet *conset)
+void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitConSet *conset, BurstBox *burstbox)
 {
 	if(fitType == 1) FitScoreOxy(testdata, fitdat, fitset, conset);
 
-	else if(fitType == 2) FitScoreVaso(testdata, fitdat, fitset, conset);
+	else if(fitType == 2 && burstbox != NULL) FitScoreVaso(testdata, fitdat, fitset, conset, burstbox);
 
 	else FitScoreBasic(testdata, fitdat, fitset, conset);
 }
 
 
-void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitConSet *conset)
+void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitConSet *conset, BurstBox *burstbox)
 {
 	int i;
 	int histmax = 512;
@@ -25,11 +25,13 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 	//ParamStore *fitweights;
 	TextFile ofp;
 	bool burstmode = true;
-	bool IoDmode = true;
+	bool IoDmode = false;
 
 	bool fitdiag = false;
 
 	if(fitdiag) ofp.New("fitscore-diag.txt");
+
+	//diagbox->Write("FitScoreVaso...");
 
 
 	//fitweights = new ParamStore();
@@ -281,6 +283,12 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 
 	if(burstmode) {
 
+		//diagbox->Write("BurstScan...");
+
+		BurstScanFit(burstbox);
+
+		//diagbox->Write("Scan OK...");
+
 		// Burst Mode
 		int pmode = 0;
 		burstdata->pnzcount = 0;
@@ -448,6 +456,8 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 	delete fitparams;
 
 	if(fitdiag) ofp.Close();
+
+	//diagbox->Write("OK\n\n");
 }
 
 

@@ -437,6 +437,8 @@ public:
 	void OnDatOutput(wxCommandEvent& event);
 	void OnDatRadio(wxCommandEvent& event);
 
+	void BurstScanCall();   // New scan call function, replacing data director role of OnScan()   DM 5/9/19
+
 	//void OnClose(wxCloseEvent& event);
 	//void OnMouseMove(wxMouseEvent& event);
 	~BurstBox();

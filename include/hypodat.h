@@ -337,11 +337,12 @@ public:
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
+	void BurstScanFit(BurstBox *);
 	void IntraSelectAnalysis();
-	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *);
+	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *, BurstBox * = NULL);
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);
-	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *);
+	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *, BurstBox *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);

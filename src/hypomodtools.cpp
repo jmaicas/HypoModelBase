@@ -658,14 +658,20 @@ void BurstBox::SpikeDataDisp(SpikeDat *dispdata)
 }
 
 
-void BurstBox::Scan(SpikeDat *data)
+void BurstBox::Scan(SpikeDat *data)        // Old data setting call function, previous to BurstScan();
 {	
 	spikedata = data;
-	OnScan(*blankevent);
+	BurstScanCall();
 }
 
 
 void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
+{
+	BurstScanCall();
+}
+
+
+void BurstBox::BurstScanCall()
 {
 	//mainwin->SetStatus("Burst Scan");
 	//for(i=0; i<paramset->numparams; i++)
