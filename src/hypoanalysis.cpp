@@ -1272,7 +1272,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	meanisi = mean;
 	isivar = variance;
 
-	if(diagbox) diagbox->Write(text.Format("spikecount %d freq %.2f\n", spikecount, freq)); 
+	//if(diagbox) diagbox->Write(text.Format("spikecount %d freq %.2f\n", spikecount, freq)); 
 
 
 	// Quad Binned Histogram                      24th November 2012

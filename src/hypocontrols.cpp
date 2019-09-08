@@ -1107,9 +1107,11 @@ void ToolBox::OnClose(wxCloseEvent& event)
 	if(servant || child) {
 		Show(false);
 		ofp.WriteLine(text.Format("hide box %d, child %d", boxindex, child));
+        //diagbox->Write(text.Format("hide box %d, child %d", boxindex, child));
 	}
 	else if(canclose) {
 		ofp.WriteLine(text.Format("close box %d, mod boxes %d", boxindex, toolset->numtools));
+        //diagbox->Write(text.Format("close box %d, mod boxes %d", boxindex, toolset->numtools));
 		//if(mod != NULL) mod->modtools.RemoveBox(boxindex);
 		//mainwin->toolset.RemoveBox(boxindex);
 		toolset->RemoveBox(boxindex);

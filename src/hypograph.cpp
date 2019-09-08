@@ -106,6 +106,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	for(i=0; i<mod->graphbase->numsets; i++) {
 	menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
 	//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("menu set Index %d Name %s\n", 1000+i, mod->graphbase->setstore[i].name));
+     */
 	/*graphset = mod->graphbase->GetSet(i);
 	if(graphset->single) 
 	menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
@@ -844,7 +845,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 		int xcoord, ycoord;
 		double xplotstep, yplotstep;
 
-		if(graph->xtickmode && graph->xstep > 0) {
+        if(graph->xtickmode) { // && graph->xstep > 0) {
 			xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
 			xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
 		}
@@ -1951,7 +1952,7 @@ gc->Translate(2*base, 0);
 
 gc->PopState();              // restore saved state
 gc->PushState();             // save it again
-/*
+*//*
 gc->Translate(60, 200);      // offset to the lower part of the window
 
 gc->DrawText(wxT("Scale"), 0, -base2);
