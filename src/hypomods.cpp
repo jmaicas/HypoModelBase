@@ -80,6 +80,7 @@ Model::Model(int type, wxString name, HypoMain *main)
 	path = "";
 	oldhist = true;
 	xscaletoggle = 0;
+    runflag = false;   // Set to indicate model thread is running
 
 	prefstore["numdraw"] = 2;
 }

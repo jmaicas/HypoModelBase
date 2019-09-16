@@ -39,6 +39,7 @@ public:
 	int xscaletoggle;
 	bool oldhist;
 	int basicmode;
+    bool runflag;
 
 	// Prefs
 	int numdraw;

@@ -733,6 +733,8 @@ OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wx
 	int gridrows, gridcols;
 	wxBoxSizer *vdubox;
 	mod = model;
+    
+    undomode = true;
 
 	redtag = "";
 	gridrows = rows;
@@ -943,7 +945,7 @@ void OutBox::OnGridStore(wxCommandEvent& event)
 
 void OutBox::OnGridLoad(wxCommandEvent& event)
 {
-	textgrid->CopyUndo();
+	if(undomode) textgrid->CopyUndo();
 	//GridLoad();
 	//int ioflag = (*modflags)["ioflag"];
 	int ioflag = true;

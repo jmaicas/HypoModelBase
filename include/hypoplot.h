@@ -48,6 +48,8 @@ public:
 	void DataEdit(int col);
 	void OnParamStore(wxCommandEvent& event);
 	void OnParamLoad(wxCommandEvent& event);
+    
+    void OnV1(wxCommandEvent& event);
 };
 
 

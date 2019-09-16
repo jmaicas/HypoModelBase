@@ -270,6 +270,7 @@ public:
 	wxNotebook *notebook;
 	//PlotBox *plotbox;
 	bool bookmode, vdumode;
+    bool undomode;
 
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true);
 
