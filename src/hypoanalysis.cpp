@@ -200,6 +200,13 @@ int i;
 }
 */
 
+
+void BurstDat::FitAnalysis()
+{
+	int i;
+}
+
+
 void BurstDat::IntraBurstAnalysis()
 {
 	int i;

@@ -463,6 +463,7 @@ public:
 	~BurstDat();
 	int spikeburst(int);
 	void IntraBurstAnalysis();
+	void FitAnalysis();
 	//void Scan(BurstBox *);
 };
 
