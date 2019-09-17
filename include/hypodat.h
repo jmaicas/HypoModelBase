@@ -324,6 +324,7 @@ public:
 	MainFrame *mainwin;
 
 	int fitType; 
+	bool fitdiag;
 	wxString label;
 	
 	void datacalc();

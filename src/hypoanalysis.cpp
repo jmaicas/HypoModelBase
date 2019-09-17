@@ -18,11 +18,11 @@ void SpikeDat::BurstProfile()
 	int tailspikes = 50;
 	wxString text;
 
-	bool diagnostic = true;
+	bool diagnostic = false;
 
 	ofp = fopen("bprofile.txt", "w");
 
-	diagbox->Write("BurstProfile call " + label + "\n");
+	if(diagnostic) diagbox->Write("BurstProfile call " + label + "\n");
 
 	
 	stime = 0;
@@ -117,7 +117,7 @@ void SpikeDat::BurstProfile()
 	burstdata->pmodetime = pmode;
 	burstdata->pmoderate = burstdata->profilesm[pmode];
 
-	diagbox->Write(text.Format("modetime %.2f  moderate %.2f\n\n", burstdata->pmodetime, burstdata->pmoderate));
+	if(diagnostic) diagbox->Write(text.Format("modetime %.2f  moderate %.2f\n\n", burstdata->pmodetime, burstdata->pmoderate));
 	
 
 	// Burst tail analysis  (Nancy, 2006 paper)
@@ -559,6 +559,9 @@ void SpikeDat::BurstScanFit(BurstBox *burstbox)
 		burstdata->meancount = 0;
 		burstdata->meantime = 0;
 		burstdata->meanlength = 0;
+		burstdata->meansilence = 0;
+		burstdata->sdlength = 0;
+		burstdata->sdsilence = 0;
 		burstdata->burstdisp = 0;
 		return;
 	}
@@ -595,8 +598,8 @@ void SpikeDat::BurstScanFit(BurstBox *burstbox)
 	burstdata->meantime = (double)intratime / burstdata->numbursts;
 	burstdata->meanlength = burstdata->meantime / 1000;
 	burstdata->meansilence = (double)silencetime / burstdata->numbursts-1;
-	burstfreq = intracount / (intratime / 1000);
-	burstdata->actQ = intratime / times[spikecount-1];  
+	burstdata->freq = intracount / (intratime / 1000);
+	burstdata->actQ = intratime / times[spikecount-1];   // looks odd, correct?  17/9/19
 	if(burstdata->numbursts == 0) burstdata->actQ = 1;
 
 	for(i=1; i<burstdata->numbursts; i++) {

@@ -27,42 +27,11 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 	bool burstmode = true;
 	bool IoDmode = false;
 
-	bool fitdiag = true;
+	fitdiag = false;
 
 	if(fitdiag) ofp.New("fitscore-diag.txt");
 
 	//diagbox->Write("FitScoreVaso...");
-
-
-	//fitweights = new ParamStore();
-	//(*fitweights)["ISImode"] = 5;
-	//(*fitweights)["ISImean"] = 5;
-	//(*fitweights)["RMSFirstNBins"] = 100;
-	//(*fitweights)["RMSBinRange"] = 100;
-	//(*fitweights)["RMSHaz"] = 60;
-	//(*fitweights)["RMSIoD"] = 20;
-
-	//// Burst fit
-
-	//if(burstmode) {
-	//	(*fitweights)["RMSFirstNBinsBurst"] = 30;
-	//	(*fitweights)["burstmode"] = 20;
-	//	(*fitweights)["burstlengthmean"] = 30;
-	//	(*fitweights)["burstlengthsd"] = 5;
-	//	(*fitweights)["burstsilencemean"] = 15;
-	//	(*fitweights)["burstsilencesd"] = 5;
-	//	(*fitweights)["burstintrafreq"] = 20;
-	//}
-	//else {																			// Non-Burst fit
-	//	(*fitweights)["RMSFirstNBinsBurst"] = 0;			
-	//	(*fitweights)["burstmode"] = 0;
-	//	(*fitweights)["burstlengthmean"] = 0;
-	//	(*fitweights)["burstlengthsd"] = 0;
-	//	(*fitweights)["burstsilencemean"] = 0;
-	//	(*fitweights)["burstsilencesd"] = 0;
-	//	(*fitweights)["burstintrafreq"] = 0;
-	//}
-
 
 	ParamStore *fitparams = new ParamStore();
 
@@ -283,20 +252,21 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 
 	if(burstmode) {
 
-		//diagbox->Write("BurstScan...");
+		if(fitdiag) diagbox->Write("BurstScan...");
 
 
-		BurstScan(burstbox);
-		if(burstdata->numbursts > 0) {
-			burstdata->IntraBurstAnalysis();
-			BurstProfile();
+		BurstScanFit(burstbox);
+		if(burstdata->numbursts > 0) BurstProfile();
+		else {
+			for(i=0; i<histmax; i++) burstdata->profilesm[i] = 0; 
 		}
+		
 
 		//BurstScanFit(burstbox);
 		//burstdata->IntraBurstAnalysis();
 		//BurstProfile();
 
-		//diagbox->Write("Scan OK...");
+		if(fitdiag) diagbox->Write(text.Format("Scan OK, %d bursts", burstdata->numbursts));
 
 		// Burst Mode
 		int pmode = 0;
@@ -354,6 +324,12 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 		fitdat->burstmode += (abs(testdata->burstdata->pmodetime - burstdata->pmodetime) / testdata->burstdata->pmodetime) * 50.0;
 		fitdat->scores["BurstMode"] = fitdat->burstmode;
 		//fitdat->score += fitdat->burstmode * (*fitweights)["burstmode"];
+
+		if(fitdiag) {
+			diagbox->Write(text.Format("pmode rate time mod %.6f  exp %.6f  score %.6f\n", 
+				burstdata->pmoderate, burstdata->pmodetime, testdata->burstdata->pmoderate, testdata->burstdata->pmodetime, fitdat->burstmode)); 
+			//ofp.WriteLine(text.Format("mode rate time mod %.6f  exp %.6f  score %.6f", burstdata->meanlength, testdata->burstdata->meanlength, fitdat->burstlengthmean)); 
+		}
 
 		// Burst Stats
 
@@ -481,6 +457,36 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 	//diagbox->Write("OK\n\n");
 }
 
+
+
+//fitweights = new ParamStore();
+	//(*fitweights)["ISImode"] = 5;
+	//(*fitweights)["ISImean"] = 5;
+	//(*fitweights)["RMSFirstNBins"] = 100;
+	//(*fitweights)["RMSBinRange"] = 100;
+	//(*fitweights)["RMSHaz"] = 60;
+	//(*fitweights)["RMSIoD"] = 20;
+
+	//// Burst fit
+
+	//if(burstmode) {
+	//	(*fitweights)["RMSFirstNBinsBurst"] = 30;
+	//	(*fitweights)["burstmode"] = 20;
+	//	(*fitweights)["burstlengthmean"] = 30;
+	//	(*fitweights)["burstlengthsd"] = 5;
+	//	(*fitweights)["burstsilencemean"] = 15;
+	//	(*fitweights)["burstsilencesd"] = 5;
+	//	(*fitweights)["burstintrafreq"] = 20;
+	//}
+	//else {																			// Non-Burst fit
+	//	(*fitweights)["RMSFirstNBinsBurst"] = 0;			
+	//	(*fitweights)["burstmode"] = 0;
+	//	(*fitweights)["burstlengthmean"] = 0;
+	//	(*fitweights)["burstlengthsd"] = 0;
+	//	(*fitweights)["burstsilencemean"] = 0;
+	//	(*fitweights)["burstsilencesd"] = 0;
+	//	(*fitweights)["burstintrafreq"] = 0;
+	//}
 
 
 void SpikeDat::FitScoreBasic(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitConSet *conset)
