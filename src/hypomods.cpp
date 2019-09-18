@@ -83,6 +83,7 @@ Model::Model(int type, wxString name, HypoMain *main)
     runflag = false;   // Set to indicate model thread is running
 
 	prefstore["numdraw"] = 2;
+	evoflag = false;
 }
 
 

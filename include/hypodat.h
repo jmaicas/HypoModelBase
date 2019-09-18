@@ -292,6 +292,10 @@ public:
 
 	datdouble meanV;
 
+	// BurstProfile arrays
+	double prosum[1000], prosumtail[1000];
+	int procount[1000], procounttail[1000];
+
 	double threshrec[10000];
 	int *rate;
 	int graphindex;
@@ -338,12 +342,13 @@ public:
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
-	void BurstScanFit(BurstBox *);
+	void BurstScanFit(ParamStore *);
 	void IntraSelectAnalysis();
-	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *, BurstBox * = NULL);
+	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *burstparams = NULL);
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);
-	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *, BurstBox *);
+	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *);
+	void FitScoreVasoFast(SpikeDat *, FitDat *, FitSet *, ParamStore *, ParamStore *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);

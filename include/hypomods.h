@@ -40,6 +40,7 @@ public:
 	bool oldhist;
 	int basicmode;
     bool runflag;
+	bool evoflag;
 
 	// Prefs
 	int numdraw;

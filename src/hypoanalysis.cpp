@@ -11,20 +11,21 @@ void SpikeDat::BurstProfile()
 	int i, j, burst;
 	int start, end;
 	double stime;
-	double prosum[1000], prosumtail[1000];
-	int procount[1000], procounttail[1000];
+	
 	int protime, oldtime;
 	FILE *ofp;
 	int tailspikes = 50;
 	wxString text;
 
 	bool diagnostic = false;
+	bool tailmode = false;
 
-	ofp = fopen("bprofile.txt", "w");
 
-	if(diagnostic) diagbox->Write("BurstProfile call " + label + "\n");
+	if(diagnostic) {
+		ofp = fopen("bprofile.txt", "w");
+		diagbox->Write("BurstProfile call " + label + "\n");
+	}
 
-	
 	stime = 0;
 	oldtime = 0;
 	for(i=0; i<500; i++) {
@@ -47,36 +48,37 @@ void SpikeDat::BurstProfile()
 		
 		while(i <= end && stime < 500) {
 			stime = (times[i] - times[start]) / 1000; 
-			if(diagnostic) fprintf(ofp, "burst %d  spike %d  stime %.2f\n", burst, i, stime); 
+			if(diagnostic) fprintf(ofp, "burst %d  spike %d  stime %d\n", burst, i, stime); 
 			protime = (int)stime;
 			if(protime > oldtime) {
 				procount[protime]++;
 				oldtime = protime;
 			}
-			prosum[(int)stime]++;
+			prosum[protime]++;
 			i++;
 		}
 		
 		// Tail based profile
-		i = end;
-		stime = 0;
-		oldtime = 0;
-		procounttail[0]++;
-		while(i >= start && stime < 500) {
-			stime = (times[end] - times[i]) / 1000; 
-			//if(diagnostic) fprintf(ofp, "tail burst %d  stime %.2f\n", burst, stime); 
-			protime = (int)stime;
-			if(protime > oldtime) {
-				procounttail[protime]++;
-				oldtime = protime;
+		if(tailmode) {
+			i = end;
+			stime = 0;
+			oldtime = 0;
+			procounttail[0]++;
+			while(i >= start && stime < 500) {
+				stime = (times[end] - times[i]) / 1000; 
+				//if(diagnostic) fprintf(ofp, "tail burst %d  stime %.2f\n", burst, stime); 
+				protime = (int)stime;
+				if(protime > oldtime) {
+					procounttail[protime]++;
+					oldtime = protime;
+				}
+				prosumtail[protime]++;
+				i--;
 			}
-			prosumtail[(int)stime]++;
-			i--;
 		}
 		
 	}
 
-	
 	for(i=0; i<500; i++) {
 		if(procount[i] > 0) burstdata->profile[i+1] = (double)prosum[i] / procount[i];
 		else burstdata->profile[i] = 0;
@@ -168,7 +170,7 @@ void SpikeDat::BurstProfile()
 		//burstdata->tailspikesum[j] = tailsum;
 	}
 	*/
-	fclose(ofp);
+	if(diagnostic) fclose(ofp);
 }
 
 
@@ -463,7 +465,7 @@ void SpikeDat::IntraSelectAnalysis()
 }
 
 
-void SpikeDat::BurstScanFit(BurstBox *burstbox)
+void SpikeDat::BurstScanFit(ParamStore *burstparams)
 {
 	int i, bstart;
 	int numspikes;
@@ -481,7 +483,7 @@ void SpikeDat::BurstScanFit(BurstBox *burstbox)
 	bool scandiag;
 
 	// Parameter transfer
-	ParamStore *burstparams = burstbox->GetParams();
+	//ParamStore *burstparams = burstbox->GetParams();
 	maxint = (int)(*burstparams)["maxint"];
 	minspikes = (int)(*burstparams)["minspikes"];
 	maxspikes = (int)(*burstparams)["maxspikes"];
