@@ -10,7 +10,7 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 {
 	int artnum, antinum, inpnum, rampnum;
 	int numwidth;
-	boxname = "PROTO";
+	boxtag = "PROTO";
 
 	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
 	wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);

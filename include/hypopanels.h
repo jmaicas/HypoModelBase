@@ -81,6 +81,7 @@ public:
 	short histmode;
 	bool defstore;
 	int diagmode;
+	int storemode;
 
 	HypoMain *mainwin;
 	Model *mod;
@@ -133,7 +134,7 @@ public:
 	wxBoxSizer *parambox;
 	wxBoxSizer *buttonbox;
 
-	ParamBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, wxString name = "", int type=0);
+	ParamBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, wxString name = "", int type=0, int storeflag = 0);
 	//ParamBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);
 	virtual ~ParamBox();
 

@@ -125,6 +125,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	expdata = new SpikeDat();
 	expdata->burstdata = new BurstDat();
 	expdata->burstdata->spikedata = expdata;
+	expdata->diagbox = diagbox;
 
 	selectdata = new SpikeDat();
 	burstdata = new BurstDat();
@@ -350,10 +351,11 @@ void HypoMain::CleanUp() {
 
 	//for(i=0; i<numdraw; i++) delete graphwin[i];
 
-	if(graphbox) graphbox->wxDialog::Destroy();
+	//if(graphbox) graphbox->wxDialog::Destroy();
 
-	delete mod;
+	//delete mod;
 	delete[] gpos;
+	//delete mod;
 	delete flagrefs;
 	delete hypoflags;
 	delete expdata;
@@ -587,8 +589,8 @@ void HypoMain::OnMove(wxMoveEvent& event)
 
 	for(i=0; i<toolset->numtools; i++) {
 		if(toolset->box[i] != NULL) diagpos = toolset->box[i]->SetPosition();
-		//snum.Printf("Move %d tools, box 0 = %s xpos %d ypos %d", toolset.numtools, toolset.box[0]->boxname, diagpos.x, diagpos.y);
-		//snum.Printf("Move %d tools, box 0 = %s", toolset.numtools, toolset.box[0]->boxname);
+		//snum.Printf("Move %d tools, box 0 = %s xpos %d ypos %d", toolset.numtools, toolset.box[0]->boxtag, diagpos.x, diagpos.y);
+		//snum.Printf("Move %d tools, box 0 = %s", toolset.numtools, toolset.box[0]->boxtag);
 	}
 	//if(diagnostic) SetStatusText(snum);
 
@@ -862,6 +864,9 @@ void HypoMain::SpikeBox(int modmode)
 		boxheight = 500;
 	}
 
+	diagbox->Write(text.Format("Spike box init type %d\n", modmode));
+
+
 	if(modmode == 2) burstbox = new BurstBox(mod, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
 
 	if(modmode == 1) burstbox = new BurstBox(mod, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
@@ -870,10 +875,14 @@ void HypoMain::SpikeBox(int modmode)
 	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
 	burstbox->loaddata = expdata;
 
+	diagbox->Write(text.Format("SpikeModule modmode %d\n", modmode));
+
 	if(!expdata->graphs) {
 		SpikeModule(mod);
 		if(!modmode) scalebox->GraphSwitch();
 	}
+
+	diagbox->Write(text.Format("SpikeModule OK\n"));
 
 	mod->modtools.AddBox(burstbox, true);
 
@@ -894,7 +903,11 @@ void HypoMain::SpikeModule(Model *mod)
 	GraphSet *graphset;
 	wxString gtag, tag = "exp";
 
+	diagbox->Write("SpikeModule entered\n");
+
 	expdata->GraphSet(mod->graphbase, "Exp ", green, 1, "exp");
+
+	diagbox->Write("SpikeModule graphset ok\n");
 
 	graphset = mod->graphbase->NewSet("Exp Spikes", tag + "spikes");
 	graphset->AddFlag("timeres", 1);

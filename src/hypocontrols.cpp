@@ -737,7 +737,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	boxtype = type;
 	servant = serve;
 	child = chi;
-	boxname = title;
+	boxlabel = title;
 	canclose = true;
 	vdu = NULL;
 
@@ -755,7 +755,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	mpos = pos;
 	boxsize = size;
 	boxtype = 0;
-	boxname = title;
+	boxlabel = title;
 	canclose = close;
 	vdu = NULL;
 	
@@ -776,7 +776,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	pinmode = 1;	
 	ostype = GetSystem();
 	visible = true;
-	boxname = title;
+	boxtag = title;
 	canclose = close;
 	boxtype = 0;
 
@@ -994,14 +994,14 @@ void ToolSet::AddBox(ToolBox *newbox, bool serve, bool child) {
 	newbox->toolset = this;
 
 	if(serve && !newbox->servant) newbox->servant = true;
-	//ofp.WriteLine(text.Format("box %s, child %d", newbox->boxname, child));
+	//ofp.WriteLine(text.Format("box %s, child %d", newbox->boxtag, child));
 	newbox->child = child;
 	//if(mod) newbox->mod = mod;
 	for(i=0; i<numtools; i++)             // Allow adding boxes after removal (not yet implemented)
 		if(box[i] == NULL) {
 			box[i] = newbox;
 			newbox->boxindex = i;
-			tagindex[newbox->boxname] = i;
+			tagindex[newbox->boxtag] = i;
 			return;
 		}
 
@@ -1122,7 +1122,7 @@ void ToolBox::OnClose(wxCloseEvent& event)
 }
 
 
-TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxname, wxString modpath)
+TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxtag, wxString modpath)
 	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
 	wxString filename, filepath;
@@ -1131,7 +1131,7 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 	bool check;
 
 	path = modpath;
-	name = boxname;
+	name = boxtag;
 	diagbox = NULL;
 	labelset = false;
 	tag = "";

@@ -390,7 +390,7 @@ void Model::ModStore()
 		if(modtools.box[i]) {
 			outfile.WriteLine(text.Format("%d %d %d %d %d %d %s", i, 
 			modtools.box[i]->mpos.x, modtools.box[i]->mpos.y, modtools.box[i]->boxsize.x, modtools.box[i]->boxsize.y, 
-			modtools.box[i]->IsVisible(), modtools.box[i]->boxname));
+			modtools.box[i]->IsVisible(), modtools.box[i]->boxtag));
 		}
 	outfile.Close();
 }

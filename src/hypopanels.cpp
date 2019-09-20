@@ -625,15 +625,16 @@ wxBoxSizer *GraphBox::ParamLayout(int columns)
 }
 
 
-ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, wxString name, int type)
+ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, wxString tag, int type, int storeflag)
 	: ToolBox(model->mainwin, title, pos, size, type)
 	//wxFRAME_FLOAT_ON_PARENT | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER | wxMINIMIZE_BOX)
 {	
 	autorun = 0;
 	//blankevent = new wxCommandEvent();
-	boxname = name;
+	boxtag = tag;
 	redtag = "";
 	histmode = 0;
+	storemode = storeflag;
 	mod = model;
 	boxtype = type;
 	//status = NULL;
@@ -655,7 +656,7 @@ ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, cons
 : ToolBox(model->mainwin, title, pos, size, close)
 {	
 autorun = 0;
-boxname = "";
+boxtag = "";
 redtag = "";
 histmode = 0;
 mod = model;
@@ -720,33 +721,13 @@ void ParamBox::Initialise()
 	panelrefs = new RefStore();
 
 	paramstoretag = NULL;
-	if(boxtype == 0 || boxtype == 1) {
-		mainwin->diagbox->Write("Store Box initialise " + boxname + "\n");
-		paramstoretag = TextInputCombo(120, 20, "", boxname, mod->GetPath());
+	if(storemode) {
+		mainwin->diagbox->Write("Store Box initialise " + boxtag + "\n");
+		paramstoretag = TextInputCombo(120, 20, "", boxtag, mod->GetPath());
 		paramstoretag->Show(false);
 	}
-	
-	//flagset = new FlagSet();
-
-	//panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize); 
-	//panel->SetFont(boxfont);
-
-	//vbox1 = new wxBoxSizer(wxVERTICAL);
-	//vbox2 = new wxBoxSizer(wxVERTICAL);
-	//vbox3 = new wxBoxSizer(wxVERTICAL);
-	//vbox4 = new wxBoxSizer(wxVERTICAL);
-	//vbox5 = new wxBoxSizer(wxVERTICAL);
 
 	if(boxtype == 0) parambox = new wxBoxSizer(wxHORIZONTAL);
-	//mainbox = new wxBoxSizer(wxVERTICAL);
-
-	//vbox1->AddSpacer(5);
-	//vbox2->AddSpacer(5);
-	//vbox3->AddSpacer(5);
-	//vbox4->AddSpacer(5);
-	//vbox5->AddSpacer(5);
-
-	//panel->SetSizer(mainbox);
 
 	Connect(ID_autorun, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnAutorun));
 	Connect(ID_Run, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnRun));
@@ -821,7 +802,7 @@ void ParamBox::HistStore()
 	wxString outline;
 
 	filepath = mod->GetPath();
-	filename = filepath + "/" + boxname + "-hist.ini";
+	filename = filepath + "/" + boxtag + "-hist.ini";
 	initparams = paramstoretag->GetValue();
 
 	wxTextFile opfile(filename);
@@ -845,7 +826,7 @@ void ParamBox::HistLoad()
 	wxString readline, numstring;
 
 	filepath = mod->GetPath();
-	filename = filepath + "/" + boxname + "-hist.ini";
+	filename = filepath + "/" + boxtag + "-hist.ini";
 
 	wxTextFile opfile(filename);
 
@@ -963,7 +944,7 @@ void ParamBox::SetPanel(int id, ToolBox *toolbox)
 	panelrefs->AddTool(id, toolbox);
 	Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ParamBox::OnPanel));
 
-	//mainwin->diagbox->Write(text.Format("SetPanel %d %s\n", id, toolbox->boxname));       // note, breaks if box not already initialised
+	//mainwin->diagbox->Write(text.Format("SetPanel %d %s\n", id, toolbox->boxtag));       // note, breaks if box not already initialised
 }
 
 
@@ -1062,7 +1043,7 @@ mainwin->RunModel(this);
 
 void ParamBox::OnRun(wxCommandEvent& WXUNUSED(event))
 {
-	if(mainwin->diagnostic) mainwin->SetStatusText(boxname + " Run");
+	if(mainwin->diagnostic) mainwin->SetStatusText(boxtag + " Run");
 
 	countmark = 0;
 	//GetParams();
@@ -1144,7 +1125,7 @@ ParamStore *ParamBox::GetParams(ParamStore *pstore)
 
 	//SetStatus("");
 
-	//if(mainwin->diagnostic) mod->diagbox->textbox->AppendText(text.Format("%s get params\n", boxname));
+	//if(mainwin->diagnostic) mod->diagbox->textbox->AppendText(text.Format("%s get params\n", boxtag));
 
 	if(pstore == NULL) pstore = modparams;
 	for(i=0; i<paramset->numparams; i++) {
@@ -1189,19 +1170,19 @@ void ParamBox::OnParamLoad(wxCommandEvent& event)
 
 	if(event.GetId() == ID_Compare) {
 		compmode = true;
-		mainwin->diagbox->Write(boxname + " param compare\n");
+		mainwin->diagbox->Write(boxtag + " param compare\n");
 	}
 	ParamLoad("", compmode);
 }
 
 
-void ParamBox::ParamLoad(wxString tag, bool compmode)
+void ParamBox::ParamLoad(wxString filetag, bool compmode)
 {
 	int id;
 	long flagval;
 	double datval;
 	short diagnostic;
-	wxString filetag, filename, filepath;
+	wxString filename, filepath;
 	wxString readline, datname;
 	wxColour redpen("#dd0000"), blackpen("#000000"), greenpen("#009900"), bluepen("#0000dd");
 	//TextFile ofp;
@@ -1211,21 +1192,23 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 
 	ParamStore *oldparams = GetParams();
 
-	mod->diagbox->Write(text.Format("param load %s\n", boxname));
+	mod->diagbox->Write(text.Format("param load %s\n", boxtag));
 
 	//if(mod->path == "") filepath = mod->mainwin->parampath;
 	//else filepath = mod->path + "/Params";
 	filepath = mod->GetPath() + "/Params";
 
-	//if(diagnostic) ofp.New(boxname + "paramload.txt");
+	//if(diagnostic) ofp.New(boxtag + "paramload.txt");
 
 	// Param data file
 
 	//if(diagnostic) ofp.WriteLine(text.Format("tag %s", tag));
-	if(tag == "") filetag = paramstoretag->GetValue();
-	else filetag = tag;
+	if(paramstoretag) {
+		if(filetag == "") filetag = paramstoretag->GetValue();
+		else paramstoretag->SetValue(filetag);
+	}
 
-	filename = filepath + "/" + filetag + "-" + boxname + "param.dat";
+	filename = filepath + "/" + filetag + "-" + boxtag + "param.dat";
 
 	diagbox->Write("paramload " + filename + "\n");
 
@@ -1238,7 +1221,7 @@ void ParamBox::ParamLoad(wxString tag, bool compmode)
 	}
 
 	// Param file history
-	if(filetag != "default") {
+	if(paramstoretag && filetag != "default") {
 		short tagpos = paramstoretag->FindString(filetag);
 		if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
 		paramstoretag->Insert(filetag, 0);
@@ -1325,16 +1308,18 @@ void ParamBox::OnParamStore(wxCommandEvent& event)
 }
 
 
-void ParamBox::StoreParam(wxString tag)
+void ParamBox::StoreParam(wxString filetag)
 {
-	wxString filetag, filename, filepath;
+	wxString filename, filepath;
 	wxString outline;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	wxString text;
 	//TextFile paramfile;
-	//bool check;
+	bool newtag = false;
 
-	mainwin->diagbox->Write(text.Format("param store %s\n", boxname));
+	if(filetag == "") newtag = true;
+
+	mainwin->diagbox->Write(text.Format("param store %s\n", boxtag));
 
 	//if(mod->path == "") filepath = mod->mainwin->parampath;
 	//else filepath = mod->path + "/Params";
@@ -1343,13 +1328,18 @@ void ParamBox::StoreParam(wxString tag)
 	filepath = mod->GetPath() + "/Params";
 	if(!wxDirExists(filepath)) wxMkdir(filepath);
 
+	if(paramstoretag) {
+		if(filetag == "") filetag = paramstoretag->GetValue();
+		else paramstoretag->SetValue(filetag);
+	}
+
 	// Param data file
-	if(tag == "") filetag = paramstoretag->GetValue();
-	else filetag = tag;
-	filename = filepath + "/" + filetag + "-" + boxname + "param.dat";
+	//if(tag == "") filetag = paramstoretag->GetValue();
+	//else filetag = tag;
+	filename = filepath + "/" + filetag + "-" + boxtag + "param.dat";
 
 	// Param file history
-	if(filetag != "default") {
+	if(paramstoretag && filetag != "default") {
 		short tagpos = paramstoretag->FindString(filetag);
 		if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
 		paramstoretag->Insert(filetag, 0);
@@ -1358,7 +1348,7 @@ void ParamBox::StoreParam(wxString tag)
 	wxTextFile paramfile(filename);
 	//check = paramfile.Open(filename);
 	if(!paramfile.Exists()) paramfile.Create();
-	else if(tag == "" && redtag != filetag) {
+	else if(newtag && redtag != filetag) {
 		paramstoretag->SetForegroundColour(redpen);
 		paramstoretag->SetValue("");
 		paramstoretag->SetValue(filetag);

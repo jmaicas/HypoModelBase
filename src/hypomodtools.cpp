@@ -223,7 +223,7 @@ void ModGenBox::Line(int pindex, wxString code)
 {
 	wxString text;
 
-	code.Replace("%", "\%");
+	code.Replace("\%", "\\%%");
 	text.Printf(code);
 	page[pindex]->AppendText(text + "\n");
 }
@@ -254,7 +254,7 @@ void ModGenBox::GenModCode()
 	pageindex = 1;
 	page[pageindex]->Clear();
 	notebook->SetPageText(pageindex, text.Format("%smodel.cpp", modtag));
-	text.Printf("#include \"%smod.h\"\n\n %sDat::%sDat()\n\{\n\tunsigned int size = 350000;\n\tunsigned int max = 100000;\n\n\twater.data.resize(size);", modtag, modname, modname);
+	text.Printf("#include \"%smod.h\"\n\n %sDat::%sDat()\n{\n\tunsigned int size = 350000;\n\tunsigned int max = 100000;\n\n\twater.data.resize(size);", modtag, modname, modname);
 	page[pageindex]->AppendText(text);
 	text.Printf("\n\twater.max = max;\n\tsalt.data.resize(size);\n\tsalt.max = max;\n\tosmo.data.resize(size);\n\tosmo.max = max;\n\theat.data.resize(size);\n\theat.max = max;\n}");
 	page[pageindex]->AppendText(text);
@@ -411,7 +411,9 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	burstmode = mode;
 
 	units = 1000;
-	boxname = "SpikeAnalysis";
+	boxtag = "SpikeAnalysis";
+
+	diagbox->Write("BurstBox init...\n");
 
 	mainwin = model->mainwin;
 	//burstdata = bdat;
@@ -557,7 +559,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	//wxString histpath = mainwin->modpath + "\\" + "Tools";
 	wxString histpath = mainwin->toolpath;
 	if(!wxDirExists(histpath)) wxMkdir(histpath);
-	datfiletag = TextInputCombo(100, 20, "", boxname, histpath);
+	datfiletag = TextInputCombo(100, 20, "", boxtag, histpath);
 
 	if(ostype == Mac) {
 		AddButton(ID_datload, "Load", 60, datbuttons, 2);
@@ -620,6 +622,8 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(ID_datoutput, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatOutput));
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(BurstBox::OnDatRadio));
 	//Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(BurstBox::OnClose));
+
+	diagbox->Write("BurstBox OK\n");
 }
 
 

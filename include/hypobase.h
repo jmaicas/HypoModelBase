@@ -353,7 +353,7 @@ public:
 	wxString name;
 
 	BoxOut() {status = NULL; diagbox = NULL; name = "";}
-	BoxOut(wxStaticText *statustext, DiagBox *diag, wxString boxname) {status = statustext; diagbox =diag; name = boxname;}
+	BoxOut(wxStaticText *statustext, DiagBox *diag, wxString boxtag) {status = statustext; diagbox =diag; name = boxtag;}
 };
 
 

@@ -832,6 +832,8 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	wxString text;
 	GraphSet *graphset = NULL;
 
+	mainwin->diagbox->Write(text.Format("Graphbase Add %s to set %s\n", tag, settag));
+
 	newgraph.diagbox = mainwin->diagbox;
 	newgraph.strokecolour = mainwin->colourpen[newgraph.colour];
 	newgraph.gtag = tag;
@@ -857,9 +859,10 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	nameindex[newgraph.gname] = numgraphs;
 	indextag[numgraphs] = tag;
 
-	//if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
+	if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
 	
 	numgraphs++;
+
 	return numgraphs-1; 
 };
 

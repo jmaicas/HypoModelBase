@@ -728,7 +728,7 @@ void NeuroBox::LoadNeuroData(FileDat file, int col)
 
 
 OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols, bool bmode)
-	: ParamBox(model, title, pos, size, "outbox")
+	: ParamBox(model, title, pos, size, "outbox", 0, 1)
 {
 	int gridrows, gridcols;
 	wxBoxSizer *vdubox;

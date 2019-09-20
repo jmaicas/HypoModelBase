@@ -1744,6 +1744,8 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	//graphbase->NewSet(tag, reftag);
 	//diagbox->Write(text.Format("\nGraphSet tag %s test %d\n", btag, burstdata->test));
 
+	if(diagbox) diagbox->Write(text.Format("GraphSet entered... tag %s\n", tag));
+
 	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
 	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", reftag);
 	graphbase->Add(GraphDat(&srate10s, 0, 500, 0, 200, tag + "Spike Rate 10s", this, 10, red + shift), reftag + "rate10s", reftag);
@@ -1755,6 +1757,9 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Haz 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);
 	graphbase->Add(GraphDat(&haz5, 0, 500, 0, 0.2, tag + "Haz 5ms", 1, 5, colour + shift), reftag + "haz5ms", reftag);
 	graphbase->Add(GraphDat(&winfreq, 0, 500, 0, 20, tag + "Win Freq", 4, 1, green + shift), reftag + "winfreq", reftag);
+
+	if(diagbox) diagbox->Write(text.Format("GraphSet burst... tag %s\n", btag));
+
 	graphbase->Add(GraphDat(&burstdata->hist1, 0, 500, 0, 100, btag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "bursthist1ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->hist5, 0, 500, 0, 500, btag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "bursthist5ms", reftag);
 	graphbase->Add(GraphDat(&burstdata->haz1, 0, 500, 0, 0.04, btag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "bursthaz1ms", reftag);
@@ -1763,6 +1768,8 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&burstdata->tailprofile, 0, 250, 0, 20, tag + "Burst Tail Profile", 4, 1, colour + shift), reftag + "-burst-tailprofile", reftag);
 	graphbase->Add(GraphDat(&burstdata->profilesm, 0, 250, 0, 20, tag + "Burst Profile Smooth", 4, 1, colour + shift), reftag + "-burst-headprofilesm", reftag);
 	graphbase->Add(GraphDat(&burstdata->bursthaz, 0, 250, 0, 200, tag + "Burst Haz", 1, 1, colour + shift), reftag + "-bursthaz", reftag);
+
+	if(diagbox) diagbox->Write(text.Format("GraphSet stage 1 OK\n"));
 
 	//graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, green + shift), reftag + "histquad", reftag);                // old colours 9/2/17
 	//graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, blue + shift), reftag + "histquadsmooth", reftag);
@@ -1793,6 +1800,8 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
 	graphs = true;
+
+	if(diagbox) diagbox->Write(text.Format("GraphSet Finished\n"));
 
 	return setindex;
 }
