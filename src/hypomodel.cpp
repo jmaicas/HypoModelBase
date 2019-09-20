@@ -353,7 +353,7 @@ void HypoMain::CleanUp() {
 
 	//if(graphbox) graphbox->wxDialog::Destroy();
 
-	//delete mod;
+	delete mod;
 	delete[] gpos;
 	//delete mod;
 	delete flagrefs;

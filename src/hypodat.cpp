@@ -271,12 +271,12 @@ BurstDat::BurstDat(bool select)
 
 	burstdisp = 0;
 	numbursts = 0;
-	hist1.data.resize(10000);
-	hist5.data.resize(10000);
-	hist1norm.data.resize(10000);
-	hist5norm.data.resize(10000);
-	haz1.data.resize(10000);
-	haz5.data.resize(10000);
+	hist1.setsize(10000);
+	hist5.setsize(10000);
+	hist1norm.setsize(10000);
+	hist5norm.setsize(10000);
+	haz1.setsize(10000);
+	haz5.setsize(10000);
 	//spikes.data.resize(100000);
 	//spikes.max = 100000;
 	profile.data.resize(1000);
@@ -767,6 +767,8 @@ GraphSet::GraphSet(GraphBase *gbase, int gdex)
 	numflags = 0;
 	modesum = 0;
 	single = true;
+	capacity = 20;
+	diagbox = NULL;
 	if(gdex != -1) Add(gdex);
 };
 
@@ -777,6 +779,8 @@ void GraphSet::Add(int gdex, int gcode)
 	gcodes[numgraphs] = gcode;
 	numgraphs++;
 	if(numgraphs > 1) single = false;
+
+	//if(diagbox) diagbox->Write(text.Format("GraphSet %s Add numgraphs %d gdex %d gcode %d\n", name, numgraphs, gdex, gcode));
 }
 
 
@@ -831,8 +835,9 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	int sdex;
 	wxString text;
 	GraphSet *graphset = NULL;
+	bool diag = false;
 
-	mainwin->diagbox->Write(text.Format("Graphbase Add %s to set %s\n", tag, settag));
+	if(diag) mainwin->diagbox->Write(text.Format("Graphbase Add %s to set %s, set flag %d  numgraphs %d storesize %d\n", tag, settag, set, numgraphs, storesize));
 
 	newgraph.diagbox = mainwin->diagbox;
 	newgraph.strokecolour = mainwin->colourpen[newgraph.colour];
@@ -842,26 +847,42 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	if(set) {
 		if(settag == "") graphset = NewSet(newgraph.gname, tag);
 		else graphset = GetSet(settag);
-		if(graphset) graphset->Add(numgraphs);
+		
+		if(graphset) {
+			graphset->diagbox = mainwin->diagbox;
+			graphset->Add(numgraphs);
+		}
+		//else mainwin->diagbox->Write("Graphset not found\n"); 
 		//newgraph.sdex = graphset->sdex;
 	}
 
+	if(diag) mainwin->diagbox->Write("GraphSet Add OK\n");
+
+	
 	// Expand graphbase if necessary
 	if(numgraphs == storesize) {
-		storesize++;
+		storesize += 10;
+		if(diag) mainwin->diagbox->Write(text.Format("GraphBase expand %d", storesize));
 		graphstore.resize(storesize);
+		if(diag) mainwin->diagbox->Write(text.Format(" newsize %d\n", (int)graphstore.size()));
 	}
+	else if(diag) mainwin->diagbox->Write(text.Format("GraphBase sufficient %d size %d\n", storesize, (int)graphstore.size()));
+	
+
 
 	// Add the new graph to graphbase
+	//graphstore.push_back(newgraph);
 	graphstore[numgraphs] = newgraph;
 	graphstore[numgraphs].gindex = numgraphs;
 	tagindex[tag] = numgraphs;
 	nameindex[newgraph.gname] = numgraphs;
 	indextag[numgraphs] = tag;
 
-	if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
+	//if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
 	
 	numgraphs++;
+
+	if(diag) mainwin->diagbox->Write("GraphBase Add OK\n");
 
 	return numgraphs-1; 
 };

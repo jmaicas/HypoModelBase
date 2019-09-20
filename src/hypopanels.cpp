@@ -1185,7 +1185,7 @@ void ParamBox::ParamLoad(wxString filetag, bool compmode)
 	wxString filename, filepath;
 	wxString readline, datname;
 	wxColour redpen("#dd0000"), blackpen("#000000"), greenpen("#009900"), bluepen("#0000dd");
-	//TextFile ofp;
+	TextFile checkfile;
 	wxString text;
 
 	diagnostic = false;
@@ -1211,6 +1211,10 @@ void ParamBox::ParamLoad(wxString filetag, bool compmode)
 	filename = filepath + "/" + filetag + "-" + boxtag + "param.dat";
 
 	diagbox->Write("paramload " + filename + "\n");
+
+	if(!checkfile.Exists(filename)) {
+		if(filename.Contains("EVOFIT")) filename = filepath + "/" + filetag + "-" + "VASOFIT" + "param.dat";
+	}
 
 	wxTextFile paramfile(filename);
 
@@ -1346,20 +1350,23 @@ void ParamBox::StoreParam(wxString filetag)
 	}
 
 	wxTextFile paramfile(filename);
-	//check = paramfile.Open(filename);
 	if(!paramfile.Exists()) paramfile.Create();
 	else if(newtag && redtag != filetag) {
-		paramstoretag->SetForegroundColour(redpen);
-		paramstoretag->SetValue("");
-		paramstoretag->SetValue(filetag);
+		if(paramstoretag) {
+			paramstoretag->SetForegroundColour(redpen);
+			paramstoretag->SetValue("");
+			paramstoretag->SetValue(filetag);
+		}
 		redtag = filetag;
 		return;
 	}
 
 	redtag = "";
-	paramstoretag->SetForegroundColour(blackpen);
-	paramstoretag->SetValue("");
-	paramstoretag->SetValue(filetag);
+	if(paramstoretag) {
+		paramstoretag->SetForegroundColour(blackpen);
+		paramstoretag->SetValue("");
+		paramstoretag->SetValue(filetag);
+	}
 
 	paramfile.Open();
 	paramfile.Clear();

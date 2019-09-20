@@ -665,6 +665,10 @@ public:
 	bool single;
 	wxString modeflag[20];          // Set of flags is used to control the selected, displayed graph 
 	int modeweight[20];
+	int capacity;
+
+	DiagBox *diagbox;
+	wxString text;
 
 	GraphSet() {};
 
