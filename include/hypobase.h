@@ -194,6 +194,7 @@ enum {
 	ID_Iratio,
 	ID_artspikes,
 	ID_profile,
+	ID_smooth,
 	ID_Protocol,
 	ID_Signal,
 	ID_EvoFit,
