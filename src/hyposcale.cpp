@@ -216,20 +216,22 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 			//vbox->AddSpacer(2);
 			if(i == 2) {		
-				wxBoxSizer *secbox = new wxBoxSizer(wxHORIZONTAL); 
+				wxBoxSizer *profbox = new wxBoxSizer(wxHORIZONTAL); 
 				wxBoxSizer *quadbox = new wxBoxSizer(wxHORIZONTAL); 
 				GraphButton("quadtog", 0, ID_quad, "Quad", 35, quadbox);
 				ScaleButton(ID_expdat, "Exp", 35, quadbox);
 				vbox->Add(quadbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				ScaleButton(ID_profile, "Profile", 55, vbox);
+				GraphButton("proftype", 0, ID_profile, "Prof", 35, profbox);
+				profbox->AddSpacer(2);
+				GraphButton("profsmooth", 0, ID_smooth, "Smoo", 35, profbox);
 				//wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
 				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
 				if(ostype == Mac) {
 					//ScaleButton(ID_histhaz2, "His", 43, hbox2);
 					//ScaleButton(ID_binres2, "Bin", 43, hbox2);
-					ScaleButton(ID_secretion, "Sec", 43, secbox);
+					//ScaleButton(ID_secretion, "Sec", 43, secbox);
 					//secbox->AddSpacer(2);
-					ScaleButton(ID_dendmode, "Den", 45, secbox);
+					//ScaleButton(ID_dendmode, "Den", 45, secbox);
 					ScaleButton(ID_overlay, "Ovl", 43, hbox);
 					ScaleButton(ID_position, "Pos", 43, hbox);
 				}
@@ -237,14 +239,14 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 					//ScaleButton(ID_histhaz2, "His/Hz", 40, hbox2);
 					//hbox2->AddSpacer(2);
 					//ScaleButton(ID_binres2, "BinRes", 40, hbox2);
-					ScaleButton(ID_secretion, "Sec", 37, secbox);
-					secbox->AddSpacer(2);
-					ScaleButton(ID_dendmode, "Dend", 37, secbox);
+					//ScaleButton(ID_secretion, "Sec", 37, secbox);
+					//secbox->AddSpacer(2);
+					//ScaleButton(ID_dendmode, "Dend", 37, secbox);
 					ScaleButton(ID_overlay, "Over", 35, hbox);
 					hbox->AddSpacer(2);
 					ScaleButton(ID_position, "Pos", 35, hbox);
 				}
-				vbox->Add(secbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+				vbox->Add(profbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
 		}
@@ -520,7 +522,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	//Connect(ID_norm, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNorm));
 
 	Connect(ID_allburst, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnAllBurst));
-	Connect(ID_profile, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnProfMode));
+	//Connect(ID_profile, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnProfMode));
 	Connect(ID_expdat, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnExpMode));
 	Connect(ID_secretion, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSecMode));
 	Connect(ID_dendmode, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnDendMode));
@@ -1244,6 +1246,7 @@ ParamStore *ScaleBox::GetFlags()
 {
 
 	// Old manually defined gflags
+
 	(*gflags)["cortflag"] = cortflag;
 	(*gflags)["rateres"] = rateres;
 	(*gflags)["timeres"] = timeres;
@@ -1252,7 +1255,7 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["burstmode"] = burstmode;
 	(*gflags)["ratedata"] = ratedata;
 	(*gflags)["profmode"] = profmode;
-	(*gflags)["proftype"] = proftype;
+	//(*gflags)["proftype"] = proftype;
 	(*gflags)["internflag"] = internflag;
 	(*gflags)["secmode"] = secmode;
 	(*gflags)["sectype"] = sectype;
