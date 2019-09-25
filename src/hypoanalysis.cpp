@@ -327,8 +327,12 @@ void BurstDat::IntraBurstAnalysis()
 	}
 
 
+
+
 	// Index of Dispersion
 
+	IoDrange();
+	/*
 	IoDdata[0] = IoDcalc(500, intraspikes, &times);
 	IoDdata[1] = IoDcalc(1000, intraspikes, &times);
 	IoDdata[2] = IoDcalc(2000, intraspikes, &times);
@@ -343,7 +347,7 @@ void BurstDat::IntraBurstAnalysis()
 	IoDdataX[3] = 35;
 	IoDdataX[4] = 45;
 	IoDdataX[5] = 55;
-	IoDdataX[6] = 65;
+	IoDdataX[6] = 65;*/
 
 	if(scandiag) outfile.Close();
 }
@@ -616,6 +620,11 @@ void SpikeDat::BurstScanFit(ParamStore *burstparams)
 	silencevar = silencevar / burstdata->numbursts-1;
 	burstdata->sdlength = sqrt(intravar);
 	burstdata->sdsilence = sqrt(silencevar);
+
+	// Index of Dispersion
+
+	burstdata->maxint = maxint;
+	burstdata->IoDrange();
 }
 
 
@@ -813,6 +822,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		fprintf(ofp, "Intra burst rate : %.2f\n\n", burstfreq);
 	}
 
+	burstdata->maxint = maxint;
 	burstdata->IntraBurstAnalysis();
 
 	if(ofp) fclose(ofp);
@@ -1660,6 +1670,8 @@ return dispersion;
 }*/
 
 
+
+// IoDDat class not currently in use
 
 IoDDat::IoDDat(int bsize, SpikeDat *sdata)
 {

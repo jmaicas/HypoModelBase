@@ -110,6 +110,7 @@ public:
 	double RMSHaz;
 	double RMSIoD;
 	double RMSFirstNBinsBurst;
+	double RMSBurstIoD;
 	//double IoD;
 	double burstmode;
 	double burstlengthmean;
@@ -464,12 +465,15 @@ public:
 	double pmodetime;
 	int pnzcount;
 	int test;
+	int maxint;
 	
 	BurstDat(bool select=false);
 	~BurstDat();
 	int spikeburst(int);
 	void IntraBurstAnalysis();
 	void FitAnalysis();
+	double dispcalcburst(int binsize, int maxint);
+	void IoDrange();
 	//void Scan(BurstBox *);
 };
 

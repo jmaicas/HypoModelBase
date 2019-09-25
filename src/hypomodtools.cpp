@@ -716,6 +716,7 @@ void BurstBox::BurstScanCall()
 	//burstdata->spikedata = spikedata;
 
 	//mainwin->scalebox->BurstDisp(1);
+	mainwin->scalebox->GraphUpdate();
 }
 
 

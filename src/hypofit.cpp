@@ -25,6 +25,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	TextFile ofp;
 	bool burstmode = true;
 	bool IoDmode = false;
+	bool IoDburstmode = true;
 
 
 	//ParamStore *fitparams = new ParamStore();
@@ -314,6 +315,35 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		fitdat->scores["RMSIoD"] = RMSError / 100;
 
 		if(fitdiag) ofp.WriteLine(text.Format("IoD %.6f\n", fitdat->RMSIoD)); 
+	}
+
+
+	if(IoDburstmode) {
+
+		RMSError = 0;
+
+		for(i=0; i<IoDcount; i++) {
+
+			if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->burstdata->IoDdata[i], burstdata->IoDdata[i])); 
+
+			if(testdata->burstdata->IoDdata[i] > burstdata->IoDdata[i]) {
+				Big = testdata->burstdata->IoDdata[i];
+				Small = burstdata->IoDdata[i];
+			}
+			else {
+				Big = burstdata->IoDdata[i];
+				Small = testdata->burstdata->IoDdata[i];
+			}
+
+			Error = (Big - Small) / Big * 100;
+			RMSError += Error * Error;
+			if(fitdiag) ofp.WriteLine(text.Format("Error %.6f  RMSError %.6f\n", Error, RMSError)); 
+		}
+
+		fitdat->RMSBurstIoD = RMSError / 100;
+		fitdat->scores["RMSBurstIoD"] = RMSError / 100;
+
+		if(fitdiag) ofp.WriteLine(text.Format("IoD %.6f\n", fitdat->RMSBurstIoD)); 
 	}
 
 
