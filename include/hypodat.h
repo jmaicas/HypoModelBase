@@ -109,7 +109,7 @@ public:
 	double RMSBinRange;
 	double RMSHaz;
 	double RMSIoD;
-	double RMSFirstNBinsBurst;
+	double RMSBurstHead;
 	double RMSBurstIoD;
 	//double IoD;
 	double burstmode;
@@ -330,7 +330,12 @@ public:
 
 	int fitType; 
 	bool fitdiag;
-	wxString label;
+	wxString label, text;
+
+	// Fit Params
+	double RMSHeadStart, RMSHeadStop;
+	double RMSBinRangeStart, RMSBinRangeFinish;
+	double RMSBurstHeadBins;
 	
 	void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
