@@ -9,7 +9,10 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 {
 	if(fitType == 1) FitScoreOxy(testdata, fitdat, fitset, conset);
 
-	else if(fitType == 2 && burstparams != NULL) FitScoreVaso(testdata, fitdat, fitset, conset, burstparams);
+	else if(fitType == 2 && burstparams != NULL) {
+		ParamStore *fitparams = conset->GetParams();
+		FitScoreVasoFast(testdata, fitdat, fitset, burstparams, fitparams);
+	}
 
 	else FitScoreBasic(testdata, fitdat, fitset, conset);
 }
@@ -28,14 +31,8 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	bool IoDburstmode = true;
 
 
-	//ParamStore *fitparams = new ParamStore();
+	if(fitdiag) ofp.New("fitscorevaso-diag.txt");
 
-	/*
-	(*fitparams)["RMSHeadStart"] = conset->GetCon("RMSHeadStart").value;
-	(*fitparams)["RMSHeadStop"] = conset->GetCon("RMSHeadStop").value;
-	(*fitparams)["RMSBinRangeStart"] = conset->GetCon("RMSBinRangeStart").value;
-	(*fitparams)["RMSBinRangeFinish"] = conset->GetCon("RMSBinRangeFinish").value;
-	(*fitparams)["RMSBurstHeadBins"] = 20;*/
 
 	if(spikecount < 10) {
 		fitdat->scores["RMSFirstNBins"] = -1;
@@ -198,7 +195,6 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	fitdat->scores["RMSHaz"] = RMSError; 
 
 
-
 	//// Burst Profile Analysis
 
 	if(burstmode) {
@@ -287,8 +283,8 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		IoDdata[1] = dispcalc(1000);
 		IoDdata[2] = dispcalc(2000);
 		IoDdata[3] = dispcalc(4000);
-		IoDdata[4] = dispcalc(8000);
-		IoDdata[5] = dispcalc(6000);
+		IoDdata[4] = dispcalc(6000);
+		IoDdata[5] = dispcalc(8000);
 		IoDdata[6] = dispcalc(10000);
 
 		RMSError = 0;
@@ -318,7 +314,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	}
 
 
-	if(IoDburstmode) {
+	if(fitset->GetMeasure("RMSBurstIoD").weight > 0) {
 
 		RMSError = 0;
 
@@ -343,7 +339,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		fitdat->RMSBurstIoD = RMSError / 100;
 		fitdat->scores["RMSBurstIoD"] = RMSError / 100;
 
-		if(fitdiag) ofp.WriteLine(text.Format("IoD %.6f\n", fitdat->RMSBurstIoD)); 
+		if(fitdiag) ofp.WriteLine(text.Format("Burst IoD %.6f\n", fitdat->RMSBurstIoD)); 
 	}
 
 
@@ -360,7 +356,6 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 	fitdat->score = fitdat->score / fitdat->weightsum;
 
-	//delete fitparams;
 
 	if(fitdiag) ofp.Close();
 }
@@ -390,7 +385,7 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 	(*fitparams)["RMSHeadStop"] = conset->GetCon("RMSHeadStop").value;
 	(*fitparams)["RMSBinRangeStart"] = conset->GetCon("RMSBinRangeStart").value;
 	(*fitparams)["RMSBinRangeFinish"] = conset->GetCon("RMSBinRangeFinish").value;
-	(*fitparams)["RMSBurstHeadBins"] = 20;
+	(*fitparams)["RMSBurstHeadBins"] = conset->GetCon("RMSBurstHeadBins").value;     // default 20
 
 	if(spikecount < 10) {
 		fitdat->scores["RMSFirstNBins"] = -1;

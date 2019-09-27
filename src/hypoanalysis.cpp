@@ -288,7 +288,6 @@ void BurstDat::IntraBurstAnalysis()
 	}
 
 	burstdisp = 1;
-	times = spikedata->times;
 	maxtime = times[spikedata->spikecount-1];
 
 	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, times[i]));
@@ -327,11 +326,10 @@ void BurstDat::IntraBurstAnalysis()
 	}
 
 
-
-
 	// Index of Dispersion
 
 	IoDrange();
+
 	/*
 	IoDdata[0] = IoDcalc(500, intraspikes, &times);
 	IoDdata[1] = IoDcalc(1000, intraspikes, &times);
@@ -569,6 +567,8 @@ void SpikeDat::BurstScanFit(ParamStore *burstparams)
 		burstdata->sdlength = 0;
 		burstdata->sdsilence = 0;
 		burstdata->burstdisp = 0;
+		burstdata->maxint = maxint;
+		burstdata->IoDrange();
 		return;
 	}
 
@@ -621,10 +621,15 @@ void SpikeDat::BurstScanFit(ParamStore *burstparams)
 	burstdata->sdlength = sqrt(intravar);
 	burstdata->sdsilence = sqrt(silencevar);
 
-	// Index of Dispersion
+	burstdata->times = times;
 
 	burstdata->maxint = maxint;
 	burstdata->IoDrange();
+
+	// Index of Dispersion
+
+	//burstdata->maxint = maxint;
+	//burstdata->IoDrange();
 }
 
 
@@ -822,6 +827,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		fprintf(ofp, "Intra burst rate : %.2f\n\n", burstfreq);
 	}
 
+	burstdata->times = times;
 	burstdata->maxint = maxint;
 	burstdata->IntraBurstAnalysis();
 

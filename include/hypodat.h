@@ -72,14 +72,14 @@ public:
 	ParamStore ref;
 	wxString *tags;
 	FitCon *cons;
-	//ParamStore fitcon;
-	//double *values;
+	ParamStore *fitconparams;
 
 	FitConSet(int size);
 	~FitConSet();
 
 	void AddCon(wxString tag, wxString label, double value);
 	FitCon GetCon(wxString tag);
+	ParamStore *GetParams(ParamStore *params = NULL);
 };
 
 
@@ -436,7 +436,8 @@ public:
 	datdouble IoDdataX;
 
 	int *spikes;
-	int *burstspikes;
+	//int *burstspikes;
+	std::vector <int> burstspikes;
 
 	//burst *bustore;
 	std::vector <burst> bustore;

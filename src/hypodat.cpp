@@ -205,7 +205,7 @@ SpikeDat::SpikeDat()
 
 SpikeDat::~SpikeDat()
 {
-	if(burstdata) delete burstdata;
+	//if(burstdata) delete burstdata;
 }
 
 
@@ -305,15 +305,15 @@ BurstDat::BurstDat(bool select)
 	maxbursts = 1000;
 	//bustore = new burst[maxbursts];
 	bustore.resize(maxbursts);
-	burstspikes = new int[100000];
-	spikes = burstspikes;
+	burstspikes.resize(100000);
+	spikes = burstspikes.data();
 }
 
 
 BurstDat::~BurstDat()
 {
 	//delete[] bustore;
-	delete [] burstspikes;
+	//delete [] burstspikes;
 }
 
 
@@ -1058,6 +1058,7 @@ FitConSet::FitConSet(int size)
 	max = size;
 	tags = new wxString[size];
 	cons = new FitCon[size];
+	fitconparams = new ParamStore();
 }
 
 
@@ -1080,6 +1081,15 @@ void FitConSet::AddCon(wxString tag, wxString label, double value)
 FitCon FitConSet::GetCon(wxString tag)
 {
 	return cons[(int)ref[tag]];
+}
+
+
+ParamStore *FitConSet::GetParams(ParamStore *pstore)
+{ 
+	if(pstore == NULL) pstore = fitconparams;
+	for(int i=0; i<count; i++) (*fitconparams)[tags[i]] = cons[i].value;
+
+	return pstore;
 }
 
 
