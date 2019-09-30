@@ -1124,6 +1124,24 @@ FitMeasure FitSet::GetMeasure(wxString tag)
 }
 
 
+void FitDat::ScoreConvert()
+{
+	scores["RMSFirstNBins"] = RMSFirstNBins;
+	scores["RMSBinRange"] = RMSBinRange;
+	scores["RMSHaz"] = RMSHaz;
+	scores["RMSIoD"] = RMSIoD;
+
+	scores["RMSBurstHead"] = RMSBurstHead;
+	scores["BurstMode"] = burstmode;
+	scores["BurstLengthMean"] = burstlengthmean;
+	scores["BurstLengthSD"] = burstlengthsd;
+	scores["BurstSilenceMean"] = burstsilencemean;
+	scores["BurstSilenceSD"] = burstsilencesd;
+	scores["BurstIntraFreq"] = burstintrafreq;
+	scores["RMSBurstIoD"] = RMSBurstIoD;
+}
+
+
 
 double IoDcalc(int binsize, int spikecount, datdouble *times)
 {

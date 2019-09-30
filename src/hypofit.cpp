@@ -351,6 +351,8 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 	double score = 0;
 
+	//diagbox->Write(text.Format("score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[0].weight, fitdat->RMSFirstNBins));
+
 	score += fitset->measures[0].weight * fitdat->RMSFirstNBins;
 	score += fitset->measures[1].weight * fitdat->RMSBinRange;
 	score += fitset->measures[2].weight * fitdat->RMSHaz;
@@ -358,6 +360,9 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	score += fitset->measures[4].weight * fitdat->RMSBurstHead;
 	score += fitset->measures[5].weight * fitdat->burstmode;
 	score += fitset->measures[6].weight * fitdat->burstlengthmean;
+
+	//diagbox->Write(text.Format("score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[6].weight, fitdat->burstlengthmean));
+
 	score += fitset->measures[7].weight * fitdat->burstlengthsd;
 	score += fitset->measures[8].weight * fitdat->burstsilencemean;
 	score += fitset->measures[9].weight * fitdat->burstsilencesd;
@@ -369,8 +374,11 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		//fitdat->score += fitset->measures[i].weight * fitdat->scores[fitset->tags[i]];      // check score tag and weight ordering   27/9/19
 		fitdat->weightsum += fitset->measures[i].weight;
 	}
+
+
+	//diagbox->Write(text.Format("score sum %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[6].weight, fitdat->burstlengthmean));
 	
-	fitdat->score = fitdat->score / fitdat->weightsum;
+	fitdat->score = score / fitdat->weightsum;
 
 	//if(fitdiag) ofp.Close();
 }

@@ -97,6 +97,7 @@ public:
 };
 
 
+// FitDat used to store and transfer sets of fit scores
 class FitDat{
 public:
 	ParamStore scores;
@@ -111,7 +112,7 @@ public:
 	double RMSIoD;
 	double RMSBurstHead;
 	double RMSBurstIoD;
-	//double IoD;
+	
 	double burstmode;
 	double burstlengthmean;
 	double burstlengthsd;
@@ -122,14 +123,9 @@ public:
 	double scoresum;
 	double weightsum;
 
-	/*FitDat::FitDat() {
-		scores = ParamStore;
-	}*/
+	void ScoreConvert();   // Copy individual variables to ParamStore format
 
-	//FitSet *fitset;
-	//FitDat::FitDat(FitSet *fs) {
-	//	fitset = fs;
-	//};
+	// The old pre-ParamStore format is retained for faster processing in population fit score generation.
 };
 
 
