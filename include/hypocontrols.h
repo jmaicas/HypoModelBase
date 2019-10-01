@@ -346,6 +346,7 @@ public:
 	int GetID(wxString);
 	wxString GetText(wxString);
 	double GetValue(wxString);
+	void SetValue(wxString, double);
 	void SetMinMax(wxString tag, double, double);
 };
 

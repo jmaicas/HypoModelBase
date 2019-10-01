@@ -501,6 +501,13 @@ ParamCon *ParamSet::AddText(wxString name, wxString labelname, wxString initval,
 }
 
 
+void ParamSet::SetValue(wxString tag, double value)
+{
+	int id = GetID(tag);
+	con[id]->SetValue(value);
+}
+
+
 double ParamSet::GetValue(wxString tag)
 {
 	int id;
