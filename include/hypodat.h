@@ -349,7 +349,7 @@ public:
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
-	void BurstScanFit();
+	//void BurstScanFit();     // moved to BurstDat to reduce pointer dereferencing
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *burstparams = NULL);
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
@@ -431,7 +431,7 @@ public:
 	datdouble hist5;
 	datdouble hist5norm;
 	//datdouble spikes;
-	datdouble times;
+	//datdouble times;
 	datdouble profile;
 	datdouble tailprofile;
 	datdouble bursthaz;
@@ -441,6 +441,7 @@ public:
 	datdouble IoDdata;
 	datdouble IoDdataX;
 
+	double *times;
 	int *spikes;
 	//int *burstspikes;
 	std::vector <int> burstspikes;
@@ -481,6 +482,7 @@ public:
 	void FitAnalysis();
 	double dispcalcburst(int binsize, int maxint);
 	void IoDrange();
+	void BurstScanFit();
 	//void Scan(BurstBox *);
 };
 

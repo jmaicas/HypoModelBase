@@ -429,7 +429,7 @@ void SpikeDat::IntraSelectAnalysis()
 	//burstdata->meanisi = mean;
 	//fprintf(ofp, "\nIntra burst time total = %.2f\n", inttime);
 	burstdata->burstdisp = 1;
-	burstdata->times = times;
+	burstdata->times = times.data.data();
 	burstdata->maxtime = times[spikecount-1];
 	//burstbox->BurstDataDisp();
 	//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
@@ -467,7 +467,7 @@ void SpikeDat::IntraSelectAnalysis()
 }
 
 
-void SpikeDat::BurstScanFit()
+void BurstDat::BurstScanFit()
 {
 	int i, bstart;
 	int numspikes;
@@ -492,11 +492,11 @@ void SpikeDat::BurstScanFit()
 	startspike = (int)(*burstparams)["startspike"];
 	endspike = (int)(*burstparams)["endspike"];*/
 
-	maxint = burst_maxint;
-	minspikes = burst_minspikes;
-	maxspikes = burst_maxspikes;
-	startspike = burst_startspike;
-	endspike = burst_endspike;
+	maxint = spikedata->burst_maxint;
+	minspikes = spikedata->burst_minspikes;
+	maxspikes = spikedata->burst_maxspikes;
+	startspike = spikedata->burst_startspike;
+	endspike = spikedata->burst_endspike;
 
 	// Initialise scan
 	burston = 0;
@@ -508,7 +508,8 @@ void SpikeDat::BurstScanFit()
 	btime = 0;
 	bstart = 0;
 
-	numspikes = spikecount;
+	times = spikedata->times.data.data();
+	numspikes = spikedata->spikecount;
 
 
 	// Burst Scan (Based on Nancy's algorithm)
@@ -537,10 +538,10 @@ void SpikeDat::BurstScanFit()
 				if(bcheck) {
 					if(!maxspikes || bcount <= maxspikes) { 
 						bindex++;		
-						burstdata->bustore[bindex].start = bstart;
-						burstdata->bustore[bindex].end = i;
-						burstdata->bustore[bindex].count = bcount;
-						burstdata->bustore[bindex].time = btime;					
+						bustore[bindex].start = bstart;
+						bustore[bindex].end = i;
+						bustore[bindex].count = bcount;
+						bustore[bindex].time = btime;					
 						tstart = times[bstart];
 						tend = times[i];
 					}
@@ -557,40 +558,40 @@ void SpikeDat::BurstScanFit()
 			}
 		}
 	}
-	burstdata->numbursts = bindex;
+	numbursts = bindex;
 
 
 	// Burst Analysis
-	if(burstdata->numbursts == 0) {
-		burstdata->intraspikes = 0;
-		burstdata->isisd = 0;
-		burstdata->freq = 0;
-		burstdata->meanisi = 0;
-		burstdata->meancount = 0;
-		burstdata->meantime = 0;
-		burstdata->meanlength = 0;
-		burstdata->meansilence = 0;
-		burstdata->sdlength = 0;
-		burstdata->sdsilence = 0;
-		burstdata->burstdisp = 0;
-		burstdata->maxint = maxint;
-		burstdata->IoDrange();
+	if(numbursts == 0) {
+		intraspikes = 0;
+		isisd = 0;
+		freq = 0;
+		meanisi = 0;
+		meancount = 0;
+		meantime = 0;
+		meanlength = 0;
+		meansilence = 0;
+		sdlength = 0;
+		sdsilence = 0;
+		burstdisp = 0;
+		maxint = maxint;
+		IoDrange();
 		return;
 	}
 
 	bindex = 1;
 	int silence = 0;
 
-	for(i=0; i<numspikes; i++) burstdata->spikes[i] = 0;
+	for(i=0; i<numspikes; i++) spikes[i] = 0;
 
 	for(i=0; i<numspikes; i++) {
-		if(i == burstdata->bustore[bindex].start) silence = 1;
-		burstdata->spikes[i] = silence * bindex;
-		if(i == burstdata->bustore[bindex].end) {
+		if(i == bustore[bindex].start) silence = 1;
+		spikes[i] = silence * bindex;
+		if(i == bustore[bindex].end) {
 			silence = 0;
 			bindex++;
 		}
-		if(bindex > burstdata->numbursts) break;   
+		if(bindex > numbursts) break;   
 	}
 
 	// Mean burst spikes and time
@@ -599,38 +600,38 @@ void SpikeDat::BurstScanFit()
 	silencetime = 0;
 	intravar = 0;
 	silencevar = 0;
-	for(i=1; i<=burstdata->numbursts; i++) {
-		intracount = intracount + burstdata->bustore[i].count;
-		intratime = intratime + burstdata->bustore[i].time;
-		if(i < burstdata->numbursts) {
-			silencetime += (times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end]) / 1000;
+	for(i=1; i<=numbursts; i++) {
+		intracount = intracount + bustore[i].count;
+		intratime = intratime + bustore[i].time;
+		if(i < numbursts) {
+			silencetime += (times[bustore[i+1].start] - times[bustore[i].end]) / 1000;
 		}
 	}
-	burstdata->meancount = (double)intracount / burstdata->numbursts;
-	burstdata->meantime = (double)intratime / burstdata->numbursts;
-	burstdata->meanlength = burstdata->meantime / 1000;
-	burstdata->meansilence = (double)silencetime / burstdata->numbursts-1;
-	burstdata->freq = intracount / (intratime / 1000);
-	burstdata->actQ = intratime / times[spikecount-1];   // looks odd, correct?  17/9/19
-	if(burstdata->numbursts == 0) burstdata->actQ = 1;
+	meancount = (double)intracount / numbursts;
+	meantime = (double)intratime / numbursts;
+	meanlength = meantime / 1000;
+	meansilence = (double)silencetime / numbursts-1;
+	freq = intracount / (intratime / 1000);
+	actQ = intratime / times[numspikes-1];   // looks odd, correct?  17/9/19
+	if(numbursts == 0) actQ = 1;
 
-	for(i=1; i<burstdata->numbursts; i++) {
-		intravar += pow((burstdata->bustore[i].time - burstdata->meantime) / 1000, 2);
-		if(i < burstdata->numbursts) {
-			silencetime = (times[burstdata->bustore[i+1].start] - times[burstdata->bustore[i].end]) / 1000;
-			silencevar += pow(silencetime - burstdata->meansilence, 2);
+	for(i=1; i<numbursts; i++) {
+		intravar += pow((bustore[i].time - meantime) / 1000, 2);
+		if(i < numbursts) {
+			silencetime = (times[bustore[i+1].start] - times[bustore[i].end]) / 1000;
+			silencevar += pow(silencetime - meansilence, 2);
 		}
 	}
 
-	intravar = intravar / burstdata->numbursts;
-	silencevar = silencevar / burstdata->numbursts-1;
-	burstdata->sdlength = sqrt(intravar);
-	burstdata->sdsilence = sqrt(silencevar);
+	intravar = intravar / numbursts;
+	silencevar = silencevar / numbursts-1;
+	sdlength = sqrt(intravar);
+	sdsilence = sqrt(silencevar);
 
-	burstdata->times = times;
+	times = times;
 
-	burstdata->maxint = maxint;
-	burstdata->IoDrange();
+	maxint = maxint;
+	IoDrange();
 
 	// Index of Dispersion
 
@@ -833,7 +834,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		fprintf(ofp, "Intra burst rate : %.2f\n\n", burstfreq);
 	}
 
-	burstdata->times = times;
+	burstdata->times = times.data.data();
 	burstdata->maxint = maxint;
 	burstdata->IntraBurstAnalysis();
 
