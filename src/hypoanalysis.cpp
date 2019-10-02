@@ -467,7 +467,7 @@ void SpikeDat::IntraSelectAnalysis()
 }
 
 
-void SpikeDat::BurstScanFit(ParamStore *burstparams)
+void SpikeDat::BurstScanFit()
 {
 	int i, bstart;
 	int numspikes;
@@ -486,11 +486,17 @@ void SpikeDat::BurstScanFit(ParamStore *burstparams)
 
 	// Parameter transfer
 	//ParamStore *burstparams = burstbox->GetParams();
-	maxint = (int)(*burstparams)["maxint"];
+	/*maxint = (int)(*burstparams)["maxint"];
 	minspikes = (int)(*burstparams)["minspikes"];
 	maxspikes = (int)(*burstparams)["maxspikes"];
 	startspike = (int)(*burstparams)["startspike"];
-	endspike = (int)(*burstparams)["endspike"];
+	endspike = (int)(*burstparams)["endspike"];*/
+
+	maxint = burst_maxint;
+	minspikes = burst_minspikes;
+	maxspikes = burst_maxspikes;
+	startspike = burst_startspike;
+	endspike = burst_endspike;
 
 	// Initialise scan
 	burston = 0;

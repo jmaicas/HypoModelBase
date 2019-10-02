@@ -198,7 +198,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 	if(burstmode) {
 
-		BurstScanFit(burstparams);
+		BurstScanFit();
 		if(burstdata->numbursts > 0) BurstProfile();
 		else {
 			for(i=0; i<histmax; i++) burstdata->profilesm[i] = 0; 
@@ -624,7 +624,7 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 		if(fitdiag) diagbox->Write("BurstScan...");
 
 
-		BurstScanFit(burstparams);
+		BurstScanFit();
 		if(burstdata->numbursts > 0) BurstProfile();
 		else {
 			for(i=0; i<histmax; i++) burstdata->profilesm[i] = 0; 

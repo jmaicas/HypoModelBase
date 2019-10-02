@@ -332,6 +332,11 @@ public:
 	double RMSHeadStart, RMSHeadStop;
 	double RMSBinRangeStart, RMSBinRangeFinish;
 	double RMSBurstHeadBins;
+
+	// Burst Scan Params
+	int burst_maxint;
+	int burst_minspikes, burst_maxspikes;
+	int burst_startspike, burst_endspike;
 	
 	void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
@@ -344,7 +349,7 @@ public:
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
-	void BurstScanFit(ParamStore *);
+	void BurstScanFit();
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *burstparams = NULL);
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
