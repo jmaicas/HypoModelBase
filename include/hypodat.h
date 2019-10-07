@@ -251,7 +251,7 @@ public:
 
 	DiagBox *diagbox;
 
-	datdouble times;
+	std::vector<double> times;
 	datdouble mag;
 	datdouble isis;
 	BurstDat *burstdata;
@@ -265,6 +265,11 @@ public:
 	datdouble histquadx;
 	datdouble histquadsm;
 	datdouble histquadlin;
+
+	double *histquadsmfit;
+	double *hazquadfit;
+	double *histquadlinfit;
+	double *histquadxfit;
 
 	datdouble hist1norm;
 	datdouble hist5norm;
@@ -314,7 +319,7 @@ public:
 	double meanisi;
 	double isivar;
 	double isisd;
-	double histquadmode;
+	int histquadmode;
 	short freqwindow;
 	int hazquadbins;
 	bool graphs;
@@ -338,14 +343,14 @@ public:
 	int burst_minspikes, burst_maxspikes;
 	int burst_startspike, burst_endspike;
 	
-	void datacalc();
+	//void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
 	void neurocalcBasic(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
 	double dispcalc(int binsize);
 	void quadhist();
 	void ISIanalysis();
 	//void autocalc();
-	void netneurocalc(int);
+	//void netneurocalc(int);
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
@@ -355,7 +360,7 @@ public:
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *);
-	void FitScoreVasoFast(SpikeDat *, FitDat *, FitSet *, ParamStore *, ParamStore *);
+	void FitScoreVasoFast(SpikeDat *, FitDat *, FitSet *);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);
@@ -441,6 +446,14 @@ public:
 	datdouble IoDdata;
 	datdouble IoDdataX;
 
+	// BurstProfile arrays
+	double prosum[1000];
+	int procount[1000];
+	int spikerate[10000];
+
+	double *profilesmfit;
+	double *profilefit;
+
 	double *times;
 	int *spikes;
 	//int *burstspikes;
@@ -483,6 +496,7 @@ public:
 	double dispcalcburst(int binsize, int maxint);
 	void IoDrange();
 	void BurstScanFit();
+	void BurstProfileFit();
 	//void Scan(BurstBox *);
 };
 

@@ -6,6 +6,105 @@
 
 
 
+
+// BurstProfile() stripped for GPU fitting, tail profile removed
+
+void BurstDat::BurstProfileFit()
+{
+	int i, j, burst;
+	int start, end;
+	double stime;
+
+	int protime, oldtime;
+	FILE* ofp;
+	int tailspikes = 50;
+	wxString text;
+
+	bool diagnostic = false;
+	bool tailmode = false;
+
+
+	if (diagnostic) {
+		ofp = fopen("bprofile.txt", "w");
+		spikedata->diagbox->Write("BurstProfile call " + spikedata->label + "\n");
+	}
+
+	stime = 0;
+	oldtime = 0;
+	for (i = 0; i < 500; i++) {
+		prosum[i] = 0;
+		procount[i] = 0;
+	}
+
+	for (burst = 1; burst <= numbursts; burst++) {
+		start = bustore[burst].start;
+		end = bustore[burst].end;
+
+		// Head based profile
+		i = start;
+		stime = 0;
+		oldtime = 0;
+		procount[0]++;
+		if (diagnostic) fprintf(ofp, "\nburst %d  start %d  end %d\n", burst, start, end);
+
+		while (i <= end && stime < 500) {
+			stime = (times[i] - times[start]) / 1000;
+			if (diagnostic) fprintf(ofp, "burst %d  spike %d  stime %.2f\n", burst, i, stime);
+			protime = (int)stime;
+			if (protime > oldtime) {
+				procount[protime]++;
+				oldtime = protime;
+			}
+			prosum[protime]++;
+			i++;
+		}
+	}
+
+	for (i = 0; i < 500; i++) {
+		if (procount[i] > 0) profilefit[i + 1] = (double)prosum[i] / procount[i];
+		else profilefit[i] = 0;
+		if (diagnostic) fprintf(ofp, "btime %d  rate sum %.2f  count %d  mean %.2f\n", i, profilefit[i], procount[i], profilefit[i]);
+		bursthaz[i] = 100 * procount[i] / numbursts;
+	}
+
+
+	// Profile Smoothing for Fitting      December 2012
+
+	int profmax = 500;
+	int wincount;
+	int bscount = 0;
+
+	for (i = 0; i < profmax; i++) {
+		profilesmfit[i] = 0;
+		wincount = 0;
+		for (j = i - 2; j < i + 3; j++) {
+			if ((j > -1) & (j < profmax)) {
+				profilesmfit[i] += profilefit[j];
+				wincount++;
+			}
+		}
+		profilesmfit[i] /= wincount;
+		bscount += profilesmfit[i];
+	}
+
+
+	// find mode
+	int pmode = 0;
+	pnzcount = 0;
+	for (i = 0; i < profmax; i++) {
+		if (profilesmfit[i] > profilesmfit[pmode]) pmode = i;
+		if (profilesmfit[i] > 0) pnzcount = i;
+	}
+	pmodetime = pmode;
+	pmoderate = profilesmfit[pmode];
+
+	if (diagnostic) {
+		spikedata->diagbox->Write(text.Format("modetime %.2f  moderate %.2f\n\n", pmodetime, pmoderate));
+		fclose(ofp);
+	}
+}
+
+
 void SpikeDat::BurstProfile()
 {
 	int i, j, burst;
@@ -48,7 +147,7 @@ void SpikeDat::BurstProfile()
 		
 		while(i <= end && stime < 500) {
 			stime = (times[i] - times[start]) / 1000; 
-			if(diagnostic) fprintf(ofp, "burst %d  spike %d  stime %d\n", burst, i, stime); 
+			if(diagnostic) fprintf(ofp, "burst %d  spike %d  stime %.2f\n", burst, i, stime); 
 			protime = (int)stime;
 			if(protime > oldtime) {
 				procount[protime]++;
@@ -429,7 +528,7 @@ void SpikeDat::IntraSelectAnalysis()
 	//burstdata->meanisi = mean;
 	//fprintf(ofp, "\nIntra burst time total = %.2f\n", inttime);
 	burstdata->burstdisp = 1;
-	burstdata->times = times.data.data();
+	burstdata->times = times.data();
 	burstdata->maxtime = times[spikecount-1];
 	//burstbox->BurstDataDisp();
 	//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
@@ -508,7 +607,7 @@ void BurstDat::BurstScanFit()
 	btime = 0;
 	bstart = 0;
 
-	times = spikedata->times.data.data();
+	times = spikedata->times.data();
 	numspikes = spikedata->spikecount;
 
 
@@ -834,7 +933,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		fprintf(ofp, "Intra burst rate : %.2f\n\n", burstfreq);
 	}
 
-	burstdata->times = times.data.data();
+	burstdata->times = times.data();
 	burstdata->maxint = maxint;
 	burstdata->IntraBurstAnalysis();
 

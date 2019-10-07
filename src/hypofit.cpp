@@ -11,14 +11,14 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 
 	else if(fitType == 2 && burstparams != NULL) {
 		ParamStore *fitparams = conset->GetParams();
-		FitScoreVasoFast(testdata, fitdat, fitset, burstparams, fitparams);
+		FitScoreVasoFast(testdata, fitdat, fitset);
 	}
 
 	else FitScoreBasic(testdata, fitdat, fitset, conset);
 }
 
 
-void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, ParamStore *burstparams, ParamStore *fitparams)
+void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
 {
 	int i;
 	int histmax = 512;
@@ -54,35 +54,35 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	// Mode for fitness
 	maxcount = 0;
 	for(i=0; i<histmax; i++) {	
-		if(histquadsm[i] > maxcount) {
-			maxcount = histquadsm[i];
+		if(histquadsmfit[i] > maxcount) {
+			maxcount = histquadsmfit[i];
 			histquadmode = i;
 		}
 	}
 
 	// Quad bin x
-	for (i=0; i<histmax; i++) histquadx[i] = i * initbinwidth + (i * (i - 1) / 2) * bininc;
+	for (i=0; i<histmax; i++) histquadxfit[i] = i * initbinwidth + (i * (i - 1) / 2) * bininc;
 
 	// Linearise
 	histsum = 0;
 	for(i=0; i<histmax-1; i++) {
-		width = (histquadx[i+1] - histquadx[i]);        
-		histquadlin[i] = histquadsm[i] / width;
-		histsum += histquadlin[i];
+		width = (histquadxfit[i+1] - histquadxfit[i]);        
+		histquadlinfit[i] = histquadsmfit[i] / width;
+		histsum += histquadlinfit[i];
 	}
-	for(i=0; i<histmax-1; i++) histquadlin[i] = histquadlin[i] / histsum;
+	for(i=0; i<histmax-1; i++) histquadlinfit[i] = histquadlinfit[i] / histsum;
 
 	// Quad Hazard
 	hazmin = 0.01;
 	hazremain = 1;
 	for(i=0; i<histmax-1; i++) {
-		hazquad[i] = histquadlin[i] / hazremain;
+		hazquadfit[i] = histquadlinfit[i] / hazremain;
 		if(hazremain < hazmin) {
-			hazquad[i] = 0;
+			hazquadfit[i] = 0;
 			hazquadbins = i;
 			break;
 		}
-		hazremain -= histquadlin[i];
+		hazremain -= histquadlinfit[i];
 	}
 
 
@@ -96,19 +96,19 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	double CutOff;
 	double Big, Small;
 
-	if(histquadsm[histquadmode] > testdata->histquadsm[testdata->histquadmode])
-		CutOff = histquadsm[histquadmode] * 0.1;
-	else CutOff = testdata->histquadsm[testdata->histquadmode] * 0.1;
+	if(histquadsmfit[histquadmode] > testdata->histquadsmfit[testdata->histquadmode])
+		CutOff = histquadsmfit[histquadmode] * 0.1;
+	else CutOff = testdata->histquadsmfit[testdata->histquadmode] * 0.1;
 
 	RMSError = 0;
 	for(i=RMSHeadStart; i<RMSHeadStop; i++) {    
-		if(testdata->histquadsm[i] > histquadsm[i]) {
-			Big = testdata->histquadsm[i];
-			Small = histquadsm[i];
+		if(testdata->histquadsmfit[i] > histquadsmfit[i]) {
+			Big = testdata->histquadsmfit[i];
+			Small = histquadsmfit[i];
 		}
 		else {
-			Big = histquadsm[i];
-			Small = testdata->histquadsm[i];
+			Big = histquadsmfit[i];
+			Small = testdata->histquadsmfit[i];
 		}
 
 		//If both are less than the cutoff then use alternate rules
@@ -127,13 +127,13 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	// ISI Histogram Bin Range RMS
 	RMSError = 0;
 	for(i=RMSBinRangeStart; i<RMSBinRangeFinish; i++) {
-		if(testdata->histquadsm[i] > histquadsm[i]) {
-			Big = testdata->histquadsm[i];
-			Small = histquadsm[i];
+		if(testdata->histquadsmfit[i] > histquadsmfit[i]) {
+			Big = testdata->histquadsmfit[i];
+			Small = histquadsmfit[i];
 		}
 		else {
-			Big = histquadsm[i];
-			Small = testdata->histquadsm[i];
+			Big = histquadsmfit[i];
+			Small = testdata->histquadsmfit[i];
 		}
 
 		//If both are less than the cutoff then use alternate rules
@@ -168,13 +168,13 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	CutOff = 0.01;
 
 	for(i=0; i<MinHazSize; i++) {
-		if(testdata->hazquad[i] > hazquad[i]) {
-			Big = testdata->hazquad[i];
-			Small = hazquad[i];
+		if(testdata->hazquadfit[i] > hazquadfit[i]) {
+			Big = testdata->hazquadfit[i];
+			Small = hazquadfit[i];
 		}
 		else {
-			Big = hazquad[i];
-			Small = testdata->hazquad[i];
+			Big = hazquadfit[i];
+			Small = testdata->hazquadfit[i];
 		}
 
 		//If both are less than the cutoff then use alternate rules
@@ -199,20 +199,22 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	if(burstmode) {
 
 		burstdata->BurstScanFit();
-		if(burstdata->numbursts > 0) BurstProfile();
+		if(burstdata->numbursts > 0) burstdata->BurstProfileFit();
 		else {
-			for(i=0; i<histmax; i++) burstdata->profilesm[i] = 0; 
+			for(i=0; i<histmax; i++) burstdata->profilesmfit[i] = 0; 
+			burstdata->pmodetime = 0;
+			burstdata->pmoderate = 0;
 		}
 
 		// Burst Mode
-		int pmode = 0;
+		/*int pmode = 0;
 		burstdata->pnzcount = 0;
 		for(i=0; i<histmax; i++) {
 			if(burstdata->profilesm[i] > burstdata->profilesm[pmode]) pmode = i;
 			if(burstdata->profilesm[i] > 0) burstdata->pnzcount = i;
 		}
 		burstdata->pmodetime = pmode;
-		burstdata->pmoderate = burstdata->profilesm[pmode];
+		burstdata->pmoderate = burstdata->profilesm[pmode];*/
 
 		// First N Bins RMS
 
@@ -223,7 +225,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		if(burstdata->pnzcount < burstheadbins) burstdata->pnzcount = burstheadbins + 10;
 
 		double AvSum = 0;   // Profile average after burst profile head
-		for (i = burstheadbins; i < testdata->burstdata->pnzcount; i++) AvSum += testdata->burstdata->profilesm[i];
+		for (i = burstheadbins; i < testdata->burstdata->pnzcount; i++) AvSum += testdata->burstdata->profilesmfit[i];
 		AvSum /= testdata->burstdata->pnzcount - burstheadbins;
 
 		CutOff = AvSum / 5.0;
@@ -235,7 +237,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 			//If a bin has a value of below 0.01 (1% of all events) then it is not normalised
 
 			testrate = testdata->burstdata->profilesm[i] - AvSum;
-			datarate = burstdata->profilesm[i] - AvSum;
+			datarate = burstdata->profilesmfit[i] - AvSum;
 
 			if (testrate > datarate) { Big = testrate; Small = datarate; }
 			else { Big = datarate; Small = testrate; }
@@ -474,9 +476,9 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 	hazmin = 0.01;
 	hazremain = 1;
 	for(i=0; i<histmax-1; i++) {
-		hazquad[i] = histquadlin[i] / hazremain;
+		hazquadfit[i] = histquadlin[i] / hazremain;
 		if(hazremain < hazmin) {
-			hazquad[i] = 0;
+			hazquadfit[i] = 0;
 			hazquadbins = i;
 			break;
 		}
@@ -589,13 +591,13 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 	CutOff = 0.01;
 
 	for(i=0; i<MinHazSize; i++) {
-		if(testdata->hazquad[i] > hazquad[i]) {
-			Big = testdata->hazquad[i];
-			Small = hazquad[i];
+		if(testdata->hazquadfit[i] > hazquadfit[i]) {
+			Big = testdata->hazquadfit[i];
+			Small = hazquadfit[i];
 		}
 		else {
-			Big = hazquad[i];
-			Small = testdata->hazquad[i];
+			Big = hazquadfit[i];
+			Small = testdata->hazquadfit[i];
 		}
 
 		//If both are less than the cutoff then use alternate rules
@@ -983,9 +985,9 @@ void SpikeDat::FitScoreBasic(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset,
 	hazmin = 0.01;
 	hazremain = 1;
 	for(i=0; i<histmax-1; i++) {
-		hazquad[i] = histquadlin[i] / hazremain;
+		hazquadfit[i] = histquadlin[i] / hazremain;
 		if(hazremain < hazmin) {
-			hazquad[i] = 0;
+			hazquadfit[i] = 0;
 			hazquadbins = i;
 			break;
 		}
@@ -1114,13 +1116,13 @@ void SpikeDat::FitScoreBasic(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset,
 	CutOff = 0.01;
 
 	for(i=0; i<MinHazSize; i++) {
-		if(testdata->hazquad[i] > hazquad[i]) {
-			Big = testdata->hazquad[i];
-			Small = hazquad[i];
+		if(testdata->hazquadfit[i] > hazquadfit[i]) {
+			Big = testdata->hazquadfit[i];
+			Small = hazquadfit[i];
 		}
 		else {
-			Big = hazquad[i];
-			Small = testdata->hazquad[i];
+			Big = hazquadfit[i];
+			Small = testdata->hazquadfit[i];
 		}
 
 		//If both are less than the cutoff then use alternate rules

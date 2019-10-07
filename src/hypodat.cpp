@@ -128,8 +128,8 @@ void SpikeDat::ReSize(int newsize)
 	//srate.data.resize(newsize);
 	//srate.max = newsize;
 	srate.setsize(newsize);
-	times.data.resize(newsize);
-	times.max = newsize;
+	times.resize(newsize);
+	//times.max = newsize;
 	isis.data.resize(newsize);
 	isis.max = newsize;
 
@@ -151,6 +151,11 @@ SpikeDat::SpikeDat()
 	histquadlin.setsize(1000);
 	hazquad.setsize(10000);
 
+	histquadsmfit = histquadsm.data.data();
+	hazquadfit = hazquad.data.data();
+	histquadlinfit = histquadlin.data.data();
+	histquadxfit = histquadx.data.data();
+
 	hist1norm.setsize(10000);
 	hist5norm.setsize(10000);
 	//haz1norm.setsize(10000);
@@ -168,8 +173,8 @@ SpikeDat::SpikeDat()
 
 	maxspikes = 100000;
 
-	times.data.resize(maxspikes);
-	times.max = 100000;
+	times.resize(maxspikes);
+	//times.max = 100000;
 	isis.data.resize(maxspikes);
 	isis.max = 100000;
 	winfreq.data.resize(11000);
@@ -306,7 +311,10 @@ BurstDat::BurstDat(bool select)
 	//bustore = new burst[maxbursts];
 	bustore.resize(maxbursts);
 	burstspikes.resize(100000);
+
 	spikes = burstspikes.data();
+	profilefit = profile.data.data();
+	profilesmfit = profilesm.data.data();
 }
 
 

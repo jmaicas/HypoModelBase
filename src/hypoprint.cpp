@@ -30,7 +30,6 @@ void GraphWindow3::MultiCell()
 
 	mod->diagbox->Write("MultiCell\n");
 
-
 	// Read panel data from OutBox
 	textgrid = mod->outbox->currgrid;
 	cellcount = (int)textgrid->ReadDouble(0, 1);
