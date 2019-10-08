@@ -74,15 +74,6 @@ enum {                 // IGF = 1   Vaso = 2   VMN = 3   Cort = 4
 
 
 enum {
-	vProto = 1,
-	vTom = 2,
-	vABC = 3,
-	vIGF = 4,
-	vBasic = 5
-};
-
-
-enum {
 	none = 0,
 	synaptic = 1,
 	antidromic = 2,
@@ -93,6 +84,12 @@ enum {
 	secfreq = 7,
 	pulse = 8,
 	range = 9
+};
+
+
+enum {
+	menu_model = 0,
+	menu_outbox = 1
 };
 
 
@@ -294,7 +291,11 @@ enum {
 	ID_Sub2,
 	ID_monitor,
 	ID_formfilter,
-	ID_boxflag
+	ID_boxflag,
+	ID_ParamScan,
+	ID_NeuroScan,
+	ID_ParamMode,
+	ID_NeuroMode
 };
 
 

@@ -983,7 +983,6 @@ void ParamBox::OnPanel(wxCommandEvent& event)
 }
 
 
-
 void ParamBox::DataMenu()
 {
     menuData = new wxMenu;
@@ -996,21 +995,31 @@ void ParamBox::DataMenu()
     SetMenuBar(menuBar);
 }
 
-void ParamBox::InitMenu()
+
+void ParamBox::InitMenu(int type)
 {
-	menuControls = new wxMenu;
-	menuControls->Append(ID_autorun, "Auto Run", "Toggle Autorun", wxITEM_CHECK);
-	menuControls->Check(ID_autorun, autorun);
+	if(type == menu_model) {
+		menuControls = new wxMenu;
+		menuControls->Append(ID_autorun, "Auto Run", "Toggle Autorun", wxITEM_CHECK);
+		menuControls->Check(ID_autorun, autorun);
 
-	menuModel = new wxMenu;
+		menuModel = new wxMenu;
 
-	//menuParamSet = new wxMenu;
+		//menuParamSet = new wxMenu;
 
-	menuBar = new wxMenuBar;
+		menuBar = new wxMenuBar;
 
-	menuBar->Append(menuControls, "Controls");
-	menuBar->Append(menuModel, "Model");
-	//menuBar->Append(menuParamSet, "Parameters");
+		menuBar->Append(menuControls, "Controls");
+		menuBar->Append(menuModel, "Model");
+		//menuBar->Append(menuParamSet, "Parameters");
+	}
+
+	if (type == menu_outbox) {
+		menuMode = new wxMenu;
+		menuBar = new wxMenuBar;
+		menuBar->Append(menuMode, "Mode");
+	}
+
 	SetMenuBar(menuBar);
 }
 

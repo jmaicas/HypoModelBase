@@ -92,6 +92,7 @@ public:
 	virtual void ScaleCon(ScaleBox *scalebox, int condex);
 	virtual void SetCell(int cellindex, GraphDat *);
 	virtual int GetCellIndex();
+	virtual void ParamScan();
 };
 
 

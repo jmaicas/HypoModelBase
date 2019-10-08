@@ -116,6 +116,7 @@ public:
 	wxMenu *menuParamSet;
 	wxMenu *menuData;
 	wxMenu *menuTools;
+	wxMenu *menuMode;
 	wxMenuBar *menuBar;
 
 	wxButton *runbutton; 
@@ -163,7 +164,7 @@ public:
 	void SetCount(double);
 	void SetStatus(wxString);
 	void WriteVDU(wxString);
-	void InitMenu();
+	void InitMenu(int type = 0);
 	void DataMenu();
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	void SetConFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
@@ -289,6 +290,10 @@ public:
 	void OnCopy(wxCommandEvent& event);
 	void OnButton(wxCommandEvent& event);
 	int ColumnData(int, datdouble *);
+
+	void OnParamMode(wxCommandEvent& event);
+	void OnParamScan(wxCommandEvent& event);
+
 	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);
 };

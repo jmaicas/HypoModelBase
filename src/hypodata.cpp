@@ -836,6 +836,23 @@ OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wx
 };
 
 
+void OutBox::OnParamMode(wxCommandEvent& event)
+{
+	WriteVDU("param mode");
+	buttonbox->AddSpacer(2);
+	AddButton(ID_ParamScan, "Params", 40, buttonbox);
+	Connect(ID_ParamScan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnParamScan));
+}
+
+
+void OutBox::OnParamScan(wxCommandEvent& event)
+{
+	mod->ParamScan();
+	WriteVDU("Param Scan\n");
+	//diagbox->Write("param scan\n");
+}
+
+
 void OutBox::OnUndo(wxCommandEvent& event)
 {
 	textgrid->Undo();
