@@ -594,7 +594,10 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	datfilebox->Add(sec, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datfilebox->Add(msec, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
+	paramset->AddNum("filterthresh", "Filter", 0, 0, 30); 
+
 	datbox->Add(datfilebox, 0);
+	datbox->Add(paramset->GetCon("filterthresh"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 	//datbox->AddStretchSpacer(5);
 	if(ostype == Mac) datbox->AddStretchSpacer(5); else datbox->AddSpacer(2);
 	//datbox->Add(datcon, 0);
@@ -791,7 +794,9 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	datdouble rawdata;
 	wxString readline, filename;
 
-	filterthresh = 2;
+	GetParams();
+	filterthresh = (*burstparams)["filterthresh"];
+
 	maxdata = 100000;
 	stretchdata = maxdata;
 	rawdata.setsize(maxdata);
@@ -852,7 +857,7 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 	}
 	datfiletag->SetValue(datname);
 
-	if(readline.ToDouble(&datval)) rawdata[count++] = datval * 1000;        // rawdata in ms
+	if(readline.ToDouble(&datval)) rawdata[count++] = datval * 1000;        // rawdata in ms, assumes data file times in s
 	readline = datfile->GetNextLine();
 
 	while(readline.IsEmpty() || readline.GetChar(0) == '\"' || readline.GetChar(0) == ':') 
@@ -876,11 +881,21 @@ void BurstBox::OnDatLoad(wxCommandEvent& event)
 		if(spikeint > filterthresh) loaddata->isis[s++] = spikeint;
 	}
 
-	// 
+	//for(i=0; i<count; i++) loaddata->times[i] = rawdata[i];                // February 2014  interval recode, need to fix filtering	
 
-	for(i=0; i<count; i++) loaddata->times[i] = rawdata[i];                // February 2014  interval recode, need to fix filtering
+	// New times based filtering             October 2019
+	loaddata->times[0] = rawdata[0];
+	s = 1;
+	for(i=1; i<count; i++) {
+		spikeint = rawdata[i] - loaddata->times[s-1];       // calculate interval based on last accepted spike time
+		if(spikeint > filterthresh) loaddata->times[s++] = rawdata[i];     
+	}
+		
+	
+	
 
-	loaddata->spikecount = count;
+	//loaddata->spikecount = count;
+	loaddata->spikecount = s;
 	loaddata->start = rawdata[0];
 	loaddata->neurocalc();
 	//mainwin->scalebox->expdatflag = 1;
