@@ -20,6 +20,7 @@ class ToolBox;
 class Model;
 class ToolSet;
 class ToolPanel;
+//class HypoMain;
 
 
 
@@ -37,16 +38,20 @@ public:
 class TagBox: public wxComboBox
 {
 public:
-	wxString name, path;
+	wxString name, path, tagpath;
 	bool labelset, histmode;
 	DiagBox *diagbox;
+	//HypoMain *mainwin;
 
 	TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
 	~TagBox();
 
-	//void HistLoad();
+	void HistLoad();
 	//void HistStore();
 	void SetLabel(wxString);
+	void SetFile();
+	void OnDClick(wxMouseEvent & event);
+	void OnRClick(wxMouseEvent & event);
 };
 
 

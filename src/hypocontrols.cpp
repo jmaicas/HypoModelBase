@@ -1132,28 +1132,95 @@ void ToolBox::OnClose(wxCloseEvent& event)
 TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxtag, wxString modpath)
 	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
-	wxString filename, filepath;
-	wxString readline, tag, text;
-	TextFile opfile;
-	bool check;
-
-	path = modpath;
+	path = modpath + "/Tags/";
 	name = boxtag;
 	diagbox = NULL;
 	labelset = false;
-	tag = "";
+
+	bool check;
+	TextFile opfile;
+	wxString readline;
+
+	if(!wxDirExists(path)) wxMkdir(path);
+
+	check = opfile.Open(path + name + "op.ini");
+	if(!check) {
+		if(diagbox) diagbox->Write("No tagpath found, setting default\n");
+		tagpath = path + name + "tags.ini";
+	}
+	else {
+		readline = opfile.ReadLine();
+		if(readline.IsEmpty()) tagpath = path + name + "tags.ini";
+		else tagpath = readline;
+	}
+
+	//if(tagpath == "") tagpath = path + name + "tags.ini";
+
+	
+	//mainwin = panel->mainwin;
 
 	if(panel->mainwin) diagbox = panel->mainwin->diagbox;
 
 	diagbox->Write("\nTagBox init " + name + "\n");
 
+	HistLoad();
+
+	//Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(TagBox::OnDClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(TagBox::OnDClick));
+	Connect(wxEVT_RIGHT_UP, wxMouseEventHandler(TagBox::OnRClick));
+}
+
+
+TagBox::~TagBox()
+{
+	int i;
+	wxString filename, filepath, outline, text;
+	TextFile opfile, tagfile;
+
+	//if(diagbox) diagbox->Write(text.Format("closing tag box %s\n", name)); 
+
+
+
+	// Tag history
+	if(tagpath == "") return;
+	//filename = name + "tags.ini";
+	//filepath = path + "/Tags/";
+	//if(!wxDirExists(path)) wxMkdir(path);
+
+	tagfile.New(tagpath);
+	for(i=GetCount()-1; i>=0; i--) {
+		outline.Printf("tag %s", GetString(i));
+		tagfile.WriteLine(outline);
+	}
+	tagfile.Close();
+
+	opfile.New(path + name + "op.ini");
+	opfile.WriteLine(tagpath);
+	opfile.Close();
+}
+
+
+
+void TagBox::HistLoad()
+{
+	wxString filename, filepath;
+	wxString readline, tag, text;
+	TextFile opfile;
+	bool check;
+
+	tag = "";
+
 	// tag history load
-	if(name == "") {
+	if(tagpath == "") {
 		diagbox->Write("Tag file not set\n");
 		return;
 	}
-	filename =  name + "tags.ini";
-	check = opfile.Open(path + "/Tags/" + filename);
+	//filename =  name + "tags.ini";
+	//filename = tagfile;
+	//check = opfile.Open(path + "/Tags/" + filename);
+
+	//filepath = path + "/Tags/" + tagfile;
+	check = opfile.Open(tagpath);
 	if(!check) {
 		if(diagbox) diagbox->Write("No tag history\n");
 		return;
@@ -1180,26 +1247,32 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 }
 
 
-TagBox::~TagBox()
+void TagBox::OnDClick(wxMouseEvent& event)
 {
-	int i;
-	wxString filename, filepath, outline, text;
-	TextFile opfile;
+	if(diagbox) diagbox->Write("\ntag dclick\n");
+}
 
-	//if(diagbox) diagbox->Write(text.Format("closing tag box %s\n", name)); 
 
-	// Tag history
-	if(name == "") return;
-	filename = name + "tags.ini";
-	filepath = path + "/Tags/";
-	if(!wxDirExists(filepath)) wxMkdir(filepath);
-	opfile.New(filepath + filename);
+void TagBox::OnRClick(wxMouseEvent& event)
+{
+	if(diagbox) diagbox->Write("\ntag rclick\n");
+	SetFile();
+}
 
-	for(i=GetCount()-1; i>=0; i--) {
-		outline.Printf("tag %s", GetString(i));
-		opfile.WriteLine(outline);
-	}
-	opfile.Close();
+
+void TagBox::SetFile()
+{
+	diagbox->Write("Set File\n");
+
+	wxFileDialog *filebox = new wxFileDialog(this, _("Choose tag file"), "", "",
+		"INI files (*.ini)|*.ini", wxFD_OVERWRITE_PROMPT);
+
+	//wxFileDialog *filebox = new wxFileDialog(this, "Choose a directory", path, 0, wxDefaultPosition);
+	if(filebox->ShowModal() == wxID_OK) tagpath = filebox->GetPath(); 
+	Clear();
+	HistLoad();
+	//path = filebox->GetPath();
+	diagbox->Write(tagpath);
 }
 
 
