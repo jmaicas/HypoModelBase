@@ -38,7 +38,7 @@ public:
 class TagBox: public wxComboBox
 {
 public:
-	wxString name, path, tagpath;
+	wxString name, modpath, tagpath, tagfilepath, tagfilename;
 	bool labelset, histmode;
 	DiagBox *diagbox;
 	//HypoMain *mainwin;
