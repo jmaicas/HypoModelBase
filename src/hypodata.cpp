@@ -246,6 +246,47 @@ NeuroBox::~NeuroBox()
 }
 
 
+void NeuroBox::Analysis()           // Specific to generating histogram and hazard grid output - currently out of use
+{
+	int i, j;
+	int binsize = 5;
+	int timerange = 1000;
+	int gridmax = 500;
+	int histcount;
+	wxString text;
+
+	ParamStore *calcparams = GetParams();
+	currcell->normscale = (*calcparams)["normscale"];
+	timerange = (*calcparams)["histrange"];
+	//binsize = (*calcparams)["binsize"];
+	if(timerange < 0) timerange = 0;
+	histcount = timerange / binsize;
+	if(histcount > gridmax) histcount = gridmax;
+
+	/*
+	for(j=0; j<histcount; j++) {
+		gridbox->histgrid->SetCell(j + 1, 0, text.Format("%d", j * 5));
+		gridbox->hazgrid->SetCell(j + 1, 0, text.Format("%d", j * 5));
+	}
+
+	for(i=0; i<cellcount; i++) {
+		//diagbox->Write(text.Format("Scanning cell %d %s ", i, celldata[i].name));
+		databox->histgrid->SetCell(0, i, celldata[i].name);
+		databox->hazgrid->SetCell(0, i, celldata[i].name);
+		//diagbox->Write("Calling neurocalc\n");
+		viewcell[0].neurocalc(&(celldata[i]));
+		//diagbox->Write("OK\n"); 
+		for(j=0; j<histcount; j++) {
+			databox->histgrid->SetCell(j + 1, i + 1, text.Format("%.4f", viewcell[0].hist5norm[j]));
+			databox->hazgrid->SetCell(j + 1, i + 1, text.Format("%.4f", viewcell[0].haz5[j]));
+		}
+	}
+	*/
+	//databox->notebook->SetPageText(1, text.Format("%dms Histograms", binsize));
+	//databox->notebook->SetPageText(2, text.Format("%dms Hazards", binsize));
+}
+
+
 void NeuroBox::OnBrowse(wxCommandEvent& event)
 {
 	if(event.GetId() == ID_PathBrowse) {
@@ -727,6 +768,28 @@ void NeuroBox::LoadNeuroData(FileDat file, int col)
 }
 
 
+void NeuroBox::SetCell(int cellindex, GraphDat* graph)
+{
+	neuroindex = cellindex;
+	//(*graph).gname.Printf("n%d", cellindex);
+	(*graph).gname = (*cells)[cellindex].name;
+	NeuroData(false);
+}
+
+
+int NeuroBox::GetCellIndex()
+{
+	return neuroindex;
+}
+
+
+void NeuroBox::DataSelect(double from, double to)
+{
+	SetSelect(from, to);
+}
+
+
+
 OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols, bool bmode)
 	: ParamBox(model, title, pos, size, "outbox", 0, 1)
 {
@@ -834,6 +897,23 @@ OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wx
 	Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(OutBox::OnRightClick));
 	Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(OutBox::OnCellChange));
 };
+
+
+
+void OutBox::ParamButton()
+{
+	buttonbox->AddSpacer(2);
+	AddButton(ID_ParamScan, "Param", 40, buttonbox);
+	Connect(ID_ParamScan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnParamScan));
+}
+
+
+void OutBox::NeuroButton()
+{
+	buttonbox->AddSpacer(2);
+	AddButton(ID_Neuron, "Neuro", 40, buttonbox);
+	Connect(ID_Neuron, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnNeuroScan));
+}
 
 
 void OutBox::OnParamMode(wxCommandEvent& event)
@@ -1305,7 +1385,95 @@ void OutBox::GridLoadFast()
 	}
 
 	ifp.Close();
+}
 
+/*
+void OutBox::OnCellChange(wxGridEvent& event)
+{
+	int col = event.GetCol();
+
+	diagbox->Write(text.Format("plot grid cell change col %d\n", col));
+
+	plotbox->DataEdit(col);
+}
+
+
+void OutBox::ColumnSelect(int col)
+{
+	OutBox::ColumnSelect(col);
+
+	plotbox->SetColumn(col);
+}*/
+
+
+void OutBox::OnNeuroScan(wxCommandEvent& event)
+{
+	int col, row;
+	int spikecount, cellcount;
+	wxString text, celltext;
+	double cellval;
+	int view = 0;
+	int filterthresh = 2;
+	double spikeint;
+
+	diagbox->Write("Neuro data scan\n");
+	//mod->cellbox->datneuron->SetLabel("OK");
+	WriteVDU("Neural data scan...");
+
+	cellcount = 0;
+	col = 0;
+	celltext = currgrid->GetCell(0, 0);
+	celltext.Trim();
+
+	while(!celltext.IsEmpty()) {
+		celltext = currgrid->GetCell(0, col);
+		celltext.Trim();
+		if (celldata->size() <= cellcount) celldata->resize(cellcount + 10);
+		//diagbox->Write(text.Format("cellcount %d  cell data size %d\n", cellcount, (int)mod->celldata.size()));
+		(*celldata)[cellcount].name = celltext;
+		celltext = currgrid->GetCell(1, col);
+		celltext.Trim();
+		spikecount = 0;
+		row = 1;
+
+		while(!celltext.IsEmpty()) {
+			celltext.ToDouble(&cellval);
+			cellval = cellval * 1000;
+			if(spikecount && filterthresh) {         // Spike Filtering
+				spikeint = cellval - (*celldata)[cellcount].times[spikecount];
+				if(spikeint <= filterthresh) continue;
+			}
+			(*celldata)[cellcount].times[spikecount] = cellval;
+			spikecount++;
+			row++;
+			celltext = currgrid->GetCell(row, col);
+			celltext.Trim();
+		}
+
+		(*celldata)[cellcount].spikecount = spikecount;
+		cellcount++;
+		col++;
+		celltext = currgrid->GetCell(0, col);
+		celltext.Trim();
+	}
+
+	if (!cellcount) {
+		diagbox->Write("Neuro scan: NO DATA\n");
+		//mod->cellbox->datneuron->SetLabel("NO DATA");
+	}
+	else {
+		diagbox->Write(text.Format("Neuro scan: %d cells read OK\n", cellcount));
+		//mod->cellcount = cellcount;
+		neurobox->neuroindex = 0;
+		neurobox->cellcount = cellcount;
+		//diagbox->Write(text.Format("Neuro analysis...."));
+		//neurobox->Analysis();
+		//diagbox->Write(text.Format("OK\n"));
+		diagbox->Write(text.Format("Neuro data...."));
+		neurobox->NeuroData();
+		diagbox->Write(text.Format("OK\n"));
+	}
+	WriteVDU("OK\n");
 }
 
 

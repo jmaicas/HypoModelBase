@@ -217,6 +217,7 @@ public:
 	//SpikeDat *selected;
 	//NeuroDat *cells;
 	vector<NeuroDat>*cells;
+	OutBox *gridbox;
 
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
@@ -258,6 +259,12 @@ public:
 	void OnToggle(wxCommandEvent& event);
 	void SelectAdd();
 	void SelectSub();
+
+	// Functions ported from PlotModel
+	void DataSelect(double, double);
+	void SetCell(int, GraphDat*);
+	int GetCellIndex();
+	void Analysis();
 };
 
 
@@ -273,6 +280,9 @@ public:
 	//PlotBox *plotbox;
 	bool bookmode, vdumode;
     bool undomode;
+
+	NeuroBox *neurobox;
+	vector<NeuroDat>* celldata;
 
 	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true);
 
@@ -291,11 +301,17 @@ public:
 	void OnButton(wxCommandEvent& event);
 	int ColumnData(int, datdouble *);
 
+	void ParamButton();
+	void NeuroButton();
+
 	void OnParamMode(wxCommandEvent& event);
 	void OnParamScan(wxCommandEvent& event);
+	void OnNeuroScan(wxCommandEvent& event);
 
 	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);
+
+	//void OnNeuro(wxCommandEvent& event);
 };
 
 
