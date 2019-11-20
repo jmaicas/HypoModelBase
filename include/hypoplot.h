@@ -50,6 +50,7 @@ public:
 	void OnParamLoad(wxCommandEvent& event);
     
     void OnV1(wxCommandEvent& event);
+	void OnNeuroDice(wxCommandEvent& event);
 };
 
 
