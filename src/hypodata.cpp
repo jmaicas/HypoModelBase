@@ -16,6 +16,8 @@ using namespace std;
 //#include <sys/mman.h>
 #include <sys/stat.h>
 
+#include <wx/numformatter.h>
+
 
 NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
 	: ParamBox(mod, title, pos, size, "cellbox", 1)
@@ -54,6 +56,7 @@ NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	wxBoxSizer *histparambox = new wxBoxSizer(wxVERTICAL);
 	paramset->AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
 	paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
+	paramset->AddNum("filterthresh", "ISI Filter", 5, 0, 70, 50);
 	//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
 	PanelParamLayout(histparambox);
 
@@ -1413,12 +1416,17 @@ void OutBox::OnNeuroScan(wxCommandEvent& event)
 	wxString text, celltext;
 	double cellval;
 	int view = 0;
-	int filterthresh = 2;
+	int filterthresh;
 	double spikeint;
+	wxNumberFormatter numform;
+	wxString typetext;
 
 	diagbox->Write("Neuro data scan\n");
 	//mod->cellbox->datneuron->SetLabel("OK");
 	WriteVDU("Neural data scan...");
+
+	ParamStore *params = neurobox->GetParams();
+	filterthresh = (*params)["filterthresh"];
 
 	cellcount = 0;
 	col = 0;
@@ -1428,7 +1436,7 @@ void OutBox::OnNeuroScan(wxCommandEvent& event)
 	while(!celltext.IsEmpty()) {
 		celltext = currgrid->GetCell(0, col);
 		celltext.Trim();
-		if (celldata->size() <= cellcount) celldata->resize(cellcount + 10);
+		if(celldata->size() <= cellcount) celldata->resize(cellcount + 10);
 		//diagbox->Write(text.Format("cellcount %d  cell data size %d\n", cellcount, (int)mod->celldata.size()));
 		(*celldata)[cellcount].name = celltext;
 		celltext = currgrid->GetCell(1, col);
@@ -1436,20 +1444,43 @@ void OutBox::OnNeuroScan(wxCommandEvent& event)
 		spikecount = 0;
 		row = 1;
 
-		while(!celltext.IsEmpty()) {
-			celltext.ToDouble(&cellval);
-			cellval = cellval * 1000;
-			if(spikecount && filterthresh) {         // Spike Filtering
-				spikeint = cellval - (*celldata)[cellcount].times[spikecount];
-				if(spikeint <= filterthresh) continue;
-			}
-			(*celldata)[cellcount].times[spikecount] = cellval;
-			spikecount++;
+		// Specific to data with type text, reject non-vasopressin types
+		typetext = currgrid->GetCell(3, col);
+		if(typetext.Contains("OT") || typetext.Contains("NR")) {
+			diagbox->Write(text.Format("col %d typetext %s rejected\n", col, typetext));
+			col++;
+			celltext = currgrid->GetCell(0, col);
+			celltext.Trim();
+			continue;
+		}
+		else diagbox->Write(text.Format("col %d typetext %s accepted\n", col, typetext));
+
+		// Skip non-spike time rows
+		while (!numform.FromString(celltext, &cellval)) {
+			//diagbox->Write(text.Format("col %d row %d %s\n", col, row, celltext));
 			row++;
 			celltext = currgrid->GetCell(row, col);
 			celltext.Trim();
 		}
 
+		// Read and filter spike time data
+		while(!celltext.IsEmpty()) {
+			celltext.ToDouble(&cellval);
+			cellval = cellval * 1000;
+			if(spikecount > 0) {       
+				spikeint = cellval - (*celldata)[cellcount].times[spikecount-1];
+				//if(spikecount < 10) diagbox->Write(text.Format("col %d spikeint %.2f filter %d\n", col, spikeint, filterthresh));
+			}
+			if(spikecount == 0 || spikeint > filterthresh) {
+				(*celldata)[cellcount].times[spikecount] = cellval;
+				spikecount++;
+			}
+			row++;
+			celltext = currgrid->GetCell(row, col);
+			celltext.Trim();
+		}
+
+		// Record spike time and initialise next column
 		(*celldata)[cellcount].spikecount = spikecount;
 		cellcount++;
 		col++;
