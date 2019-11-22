@@ -714,6 +714,7 @@ public:
 	void AddFlag(wxString, int);
 	int GetPlot(ParamStore *);
 	wxString Display();
+	void IntervalSet(wxString tag);
 };
 
 

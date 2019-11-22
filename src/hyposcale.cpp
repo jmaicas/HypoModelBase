@@ -921,7 +921,7 @@ void ScaleBox::OnGraphButton(wxCommandEvent& event)
 	if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
 	else (*gflags)[tag] = 0;
 
-	mainwin->diagbox->Write(text.Format("graphbutton %s %.0f", tag, (*gflags)[tag]));
+	//mainwin->diagbox->Write(text.Format("graphbutton %s %.0f", tag, (*gflags)[tag]));
 
 	GraphSwitch();
 }

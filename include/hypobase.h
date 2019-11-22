@@ -295,7 +295,9 @@ enum {
 	ID_ParamScan,
 	ID_NeuroScan,
 	ID_ParamMode,
-	ID_NeuroMode
+	ID_NeuroMode,
+	ID_file,
+	ID_grid
 };
 
 

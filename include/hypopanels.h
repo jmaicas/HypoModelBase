@@ -408,6 +408,7 @@ public:
 	int burstmode;
 
 	HypoMain *mainwin;
+	Model *mod;
 
 	wxString filetag, datname;
 	SpikeDat *spikedata;

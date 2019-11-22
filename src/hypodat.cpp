@@ -837,6 +837,38 @@ wxString GraphSet::Display()
 	return output;
 }
 
+// IntervalSet, sets up graph switching for ISI analysis plots, currently specific to VasoModel graph button panel
+void GraphSet::IntervalSet(wxString tag)
+{
+	AddFlag("hazmode1", 10);
+	AddFlag("binrestog1", 1);
+	AddFlag("burstmode", 100);
+	AddFlag("normtog", 1000);
+	AddFlag("quadtog", 10000);
+	Add(tag + "hist1ms", 0);
+	Add(tag + "haz1ms", 10);
+	Add(tag + "hist5ms", 1);
+	Add(tag + "haz5ms", 11);
+
+	Add(tag + "bursthist1ms", 100);
+	Add(tag + "bursthaz1ms", 110);
+	Add(tag + "bursthist5ms", 101);
+	Add(tag + "bursthaz5ms", 111);
+
+	Add(tag + "burstnormhist1ms", 1100);
+	Add(tag + "bursthaz1ms", 1110);
+	Add(tag + "burstnormhist5ms", 1101);
+	Add(tag + "bursthaz5ms", 1111);
+
+	Add(tag + "normhist1ms", 1000);
+	Add(tag + "haz1ms", 1010);
+	Add(tag + "normhist5ms", 1001);
+	Add(tag + "haz5ms", 1011);
+
+	Add(tag + "histquadsmooth", 10001);
+	Add(tag + "histquadsmooth", 11001);
+}
+
 
 int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)       // default settag = "", set=true
 {
@@ -876,8 +908,6 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	}
 	else if(diag) mainwin->diagbox->Write(text.Format("GraphBase sufficient %d size %d\n", storesize, (int)graphstore.size()));
 	
-
-
 	// Add the new graph to graphbase
 	//graphstore.push_back(newgraph);
 	graphstore[numgraphs] = newgraph;

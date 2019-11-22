@@ -416,6 +416,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	diagbox->Write("BurstBox init...\n");
 
 	mainwin = model->mainwin;
+	mod = model;
 	//burstdata = bdat;
 	burstparams = new ParamStore;
 	//spikedata = burstdata->spikedata;
@@ -602,6 +603,12 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	if(ostype == Mac) datbox->AddStretchSpacer(5); else datbox->AddSpacer(2);
 	//datbox->Add(datcon, 0);
 
+	wxRadioButton *file = new wxRadioButton(panel, ID_file, "File", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	wxRadioButton *grid  = new wxRadioButton(panel, ID_grid, "Grid");
+	datbox->AddSpacer(10);
+	datbox->Add(file, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datbox->Add(grid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
 	if(ostype == Windows) mainbox->AddSpacer(3);
 	mainbox->Add(datbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
 	//mainbox->Add(datcon, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
@@ -647,6 +654,14 @@ void BurstBox::OnDatRadio(wxCommandEvent& event)
 {
 	if(event.GetId() == ID_s) units = 1000;
 	if(event.GetId() == ID_ms) units = 1;
+
+	if(event.GetId() == ID_file) loaddata = mainwin->expdata;
+	if(event.GetId() == ID_grid) loaddata = mod->neurobox->currcell;
+
+	loaddata->BurstScan(this);
+	if(loaddata->burstdata->numbursts > 0) loaddata->BurstProfile();
+	BurstDataDisp(loaddata, datburst);
+	SpikeDataDisp(loaddata);
 }
 
 

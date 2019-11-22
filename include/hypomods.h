@@ -69,6 +69,8 @@ public:
 	OutBox *outbox;
 	NeuroBox *neurobox;
 
+	SpikeDat *expdata;
+
 	Model(int, wxString, HypoMain *);
 	virtual ~Model();
 
