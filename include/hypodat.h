@@ -366,6 +366,7 @@ public:
 	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);
 	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	//void IoDGraph(GraphBase *, wxString, wxString, int, int barshift=0);
 	void Clear();
 	void ReSize(int);
 };

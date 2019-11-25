@@ -369,37 +369,6 @@ void InfoBox::OnDatLoad(wxCommandEvent& event)
 }
 
 
-
-
-
-/*
-BurstDispData::BurstDispData(wxPanel *pan)
-{
-panel = pan;
-}*/
-
-
-void BurstBox::BurstDataPanel(BurstPanel *datpanel)
-{
-	int numwidth = 50;
-
-	datpanel->numbursts = NumPanel(50);
-	datpanel->meanspikes = NumPanel(50);
-	datpanel->meanlength = NumPanel(50);
-	datpanel->meansilence = NumPanel(50);
-	datpanel->sdlength = NumPanel(50);
-	datpanel->sdsilence = NumPanel(50);
-	datpanel->actQ = NumPanel(50);
-	datpanel->modetime = NumPanel(50);
-	datpanel->moderate = NumPanel(50);
-
-	datpanel->intraspikes = NumPanel(numwidth);
-	datpanel->intrafreq = NumPanel(numwidth);
-	datpanel->intraisimean = NumPanel(numwidth);
-	datpanel->intraisisd = NumPanel(numwidth);
-}
-
-
 // BurstBox - now used as general spike time data loading and analysis box
 
 BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode, int mode)
@@ -423,6 +392,8 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	spikedata = sdat;
 	moddata = sdat;
 	blankevent = new wxCommandEvent();
+	
+	legacymode = false;
 
 	activepanel = panel;
 	BurstPanel *burstpanset[5];
@@ -552,6 +523,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	}
 
 	wxBoxSizer *datfilebox = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *datconbox = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *datbuttons = new wxBoxSizer(wxHORIZONTAL);
 	//wxBoxSizer *datcon = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *datbox = new wxBoxSizer(wxVERTICAL);
@@ -605,9 +577,10 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	wxRadioButton *file = new wxRadioButton(panel, ID_file, "File", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	wxRadioButton *grid  = new wxRadioButton(panel, ID_grid, "Grid");
+	datconbox->Add(file, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datconbox->Add(grid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datbox->AddSpacer(10);
-	datbox->Add(file, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	datbox->Add(grid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datbox->Add(datconbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	if(ostype == Windows) mainbox->AddSpacer(3);
 	mainbox->Add(datbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
@@ -632,6 +605,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(ID_datoutput, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnDatOutput));
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(BurstBox::OnDatRadio));
 	//Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(BurstBox::OnClose));
+	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(BurstBox::OnScan));
 
 	diagbox->Write("BurstBox OK\n");
 }
@@ -650,6 +624,40 @@ BurstBox::~BurstBox()
 }
 
 
+void BurstBox::BurstDataPanel(BurstPanel *datpanel)
+{
+	int numwidth = 50;
+
+	datpanel->numbursts = NumPanel(50);
+	datpanel->meanspikes = NumPanel(50);
+	datpanel->meanlength = NumPanel(50);
+	datpanel->meansilence = NumPanel(50);
+	datpanel->sdlength = NumPanel(50);
+	datpanel->sdsilence = NumPanel(50);
+	datpanel->actQ = NumPanel(50);
+	datpanel->modetime = NumPanel(50);
+	datpanel->moderate = NumPanel(50);
+
+	datpanel->intraspikes = NumPanel(numwidth);
+	datpanel->intrafreq = NumPanel(numwidth);
+	datpanel->intraisimean = NumPanel(numwidth);
+	datpanel->intraisisd = NumPanel(numwidth);
+}
+
+
+
+void BurstBox::ExpDataScan(SpikeDat *data)
+{
+	if(data != NULL) loaddata = data;
+	if(!loaddata) return;
+
+	loaddata->BurstScan(this);
+	if(loaddata->burstdata->numbursts > 0) loaddata->BurstProfile();
+	BurstDataDisp(loaddata, datburst);
+	SpikeDataDisp(loaddata);
+}
+
+
 void BurstBox::OnDatRadio(wxCommandEvent& event)
 {
 	if(event.GetId() == ID_s) units = 1000;
@@ -658,10 +666,7 @@ void BurstBox::OnDatRadio(wxCommandEvent& event)
 	if(event.GetId() == ID_file) loaddata = mainwin->expdata;
 	if(event.GetId() == ID_grid) loaddata = mod->neurobox->currcell;
 
-	loaddata->BurstScan(this);
-	if(loaddata->burstdata->numbursts > 0) loaddata->BurstProfile();
-	BurstDataDisp(loaddata, datburst);
-	SpikeDataDisp(loaddata);
+	ExpDataScan();
 }
 
 
@@ -683,50 +688,54 @@ void BurstBox::SpikeDataDisp(SpikeDat *dispdata)
 void BurstBox::Scan(SpikeDat *data)        // Old data setting call function, previous to BurstScan();
 {	
 	spikedata = data;
-	BurstScanCall();
+	BurstScan();
 }
 
 
 void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 {
-	BurstScanCall();
+	BurstScan();
 }
 
 
-void BurstBox::BurstScanCall()
+void BurstBox::BurstScan()
 {
 	//mainwin->SetStatus("Burst Scan");
-	//for(i=0; i<paramset->numparams; i++)
-	//	paramset->con[i]->numbox->GetValue().ToDouble(&((*burstparams)[paramset->con[i]->name]));
-	//GetParams();
 
-	if(spikedata == NULL && mainwin->focusdata != NULL) spikedata = mainwin->focusdata;
-	if(spikedata != NULL && spikedata->burstdata == NULL) {
-		spikedata->burstdata = new BurstDat();
-		//spikedata->burstdata->spikedata = spikedata;
-	}
-	//spikedata = burstdata->spikedata;
-	if(spikedata == NULL || spikedata->spikecount == 0) {
-		snum.Printf("no data");
-		modburst->numbursts->SetLabel(snum);
-		return;
-	}
-	//snum.Printf("scan...");
-	//numbursts->SetLabel(snum);
+	diagbox->Write("BurstBox scan...\n");
 
-	if(loaddata != NULL) {
+	if(loaddata != NULL && loaddata->spikecount) {
 		loaddata->BurstScan(this);
 		if(loaddata->burstdata->numbursts > 0) loaddata->BurstProfile();
 		BurstDataDisp(loaddata, datburst);
+		diagbox->Write("BurstBox loaddata scan\n");
 	}
 
-	if(moddata != NULL) {
+	if(moddata != NULL && moddata->spikecount) {
 		//if(moddata->spikecount == 0) 
 		moddata->BurstScan(this);
 		if(moddata->burstdata->numbursts > 0) moddata->BurstProfile();
 		BurstDataDisp(moddata, modburst);
+		diagbox->Write("BurstBox moddata scan\n");
 	}
 
+
+	// Legacy code, needs checking what still uses it and cleaning up
+
+	if(legacymode) {
+		if(spikedata == NULL && mainwin->focusdata != NULL) spikedata = mainwin->focusdata;
+		if(spikedata != NULL && spikedata->burstdata == NULL) {
+			spikedata->burstdata = new BurstDat();
+			//spikedata->burstdata->spikedata = spikedata;
+		}
+		//spikedata = burstdata->spikedata;
+		if(spikedata == NULL || spikedata->spikecount == 0) {
+			snum.Printf("no data");
+			modburst->numbursts->SetLabel(snum);
+			return;
+		}
+	}
+	
 	//if(spikedata->burstdata->numbursts > 0) spikedata->BurstProfile();
 	//BurstDataDisp();
 

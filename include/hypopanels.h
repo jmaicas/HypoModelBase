@@ -218,6 +218,7 @@ public:
 	//NeuroDat *cells;
 	vector<NeuroDat>*cells;
 	OutBox *gridbox;
+	BurstBox *burstbox;
 
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
@@ -406,6 +407,7 @@ public:
 	double units;
 
 	int burstmode;
+	bool legacymode;
 
 	HypoMain *mainwin;
 	Model *mod;
@@ -461,7 +463,8 @@ public:
 	void OnDatOutput(wxCommandEvent& event);
 	void OnDatRadio(wxCommandEvent& event);
 
-	void BurstScanCall();   // New scan call function, replacing data director role of OnScan()   DM 5/9/19
+	void BurstScan();   // New scan call function, replacing data director role of OnScan()   DM 5/9/19
+	void ExpDataScan(SpikeDat *data=NULL);
 
 	//void OnClose(wxCloseEvent& event);
 	//void OnMouseMove(wxMouseEvent& event);

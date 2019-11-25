@@ -21,6 +21,16 @@ NeuroMod::~NeuroMod()
 }
 
 
+void NeuroMod::IoDGraph(datdouble *IoDdata, datdouble *IoDdataX, wxString label, wxString tag, int colour, int barshift)
+{
+	graphbase->Add(GraphDat(IoDdata, 0, 70, 0, 2, label, 2, 1, colour), tag);
+	graphbase->GetGraph(tag)->gdatax = IoDdataX;
+	graphbase->GetGraph(tag)->xcount = 7;   // 7  // 5 for Trystan data
+	graphbase->GetGraph(tag)->synchx = false;
+	graphbase->GetGraph(tag)->barshift  = barshift;
+}
+
+
 void NeuroMod::EvoGraphs()
 {
 	evodata->GraphSet(graphbase, "Evo ", purple, 1, "evo");

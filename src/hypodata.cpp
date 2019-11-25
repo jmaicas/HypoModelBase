@@ -563,7 +563,9 @@ void NeuroBox::NeuroData(bool dispupdate)
 	//currcell->neurocalc(&((*cells)[neuroindex]));
 	currcell->neurocalc(&(*cells)[neuroindex]);
 	currcell->id = neuroindex;
-	
+
+	burstbox->ExpDataScan(currcell);
+
 	//PanelData(&((*cells)[neuroindex]));
 	if(dispupdate) {
 		PanelData(&(*cells)[neuroindex]);

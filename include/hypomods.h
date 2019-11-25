@@ -108,6 +108,7 @@ public:
 	virtual ~NeuroMod();
 
 	void EvoGraphs();
+	void IoDGraph(datdouble *, datdouble *, wxString, wxString, int, int barshift=0);
 };
 
 
