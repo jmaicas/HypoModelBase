@@ -895,6 +895,21 @@ void ParamBox::OnFocus(wxFocusEvent& event)
 }
 
 
+// Copied from SetModCheck, not currently in use
+wxCheckBox *ParamBox::SetBoxCheck(int id, wxString checktag, wxString checktext, int state)
+{
+	wxCheckBox *newcheck;
+	(*modflags)[checktag] = state;
+	newcheck = new wxCheckBox(activepanel, id, checktext);
+	newcheck->SetFont(confont);
+	newcheck->SetValue(state);
+	checkrefs->AddRef(id, checktag, newcheck);
+	Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(ParamBox::OnBoxCheck));
+
+	return newcheck;
+}
+
+
 wxCheckBox *ParamBox::SetModCheck(int id, wxString checktag, wxString checktext, int state)
 {
 	wxCheckBox *newcheck;
@@ -949,6 +964,16 @@ void ParamBox::SetPanel(int id, ToolBox *toolbox)
 
 
 void ParamBox::OnCheck(wxCommandEvent &event)
+{
+	int id = event.GetId();
+	wxString checktag = checkrefs->GetRef(id);
+
+	if((*modflags)[checktag] == 0) (*modflags)[checktag] = 1;
+	else (*modflags)[checktag] = 0;
+}
+
+
+void ParamBox::OnBoxCheck(wxCommandEvent &event)
 {
 	int id = event.GetId();
 	wxString checktag = checkrefs->GetRef(id);

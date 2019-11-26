@@ -104,6 +104,12 @@ NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	datagrid->Add(mean);
 	datagrid->Add(new wxStaticText(activepanel, -1, "Std Dev"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	datagrid->Add(sd);
+	//datagrid->Add(new wxStaticText(activepanel, -1, "Filter"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	//datagrid->Add(filtercheck);
+
+	filtercheck = SetBoxCheck(ID_filtercheck, "filter", "Filter", false);
+	//wxBoxSizer* filterbox = new wxBoxSizer(wxHORIZONTAL);
+	//filterbox->Add(filtercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	datneuron = new wxTextCtrl(activepanel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
 	datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
@@ -122,7 +128,8 @@ NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	databox->Add(datbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 0);
 	databox->AddSpacer(5);
 	databox->Add(datagrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
-
+	databox->AddSpacer(5);
+	databox->Add(filtercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 
 	// Spike selection
 
@@ -163,11 +170,17 @@ NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	currselect = 0;
 	addbutton[currselect]->SetValue(true);
 
+	filterbox = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Filter");
+	AddButton(ID_filter, "Grid Update", 80, filterbox);
+
+
 	selectpanelbox->Add(fromtobox, 0, wxALIGN_CENTRE_HORIZONTAL);
 	selectpanelbox->AddSpacer(20);
 	selectpanelbox->Add(selectbox1, 0);
 	selectpanelbox->AddSpacer(10);
 	selectpanelbox->Add(selectbox2, 0);
+	selectpanelbox->AddSpacer(10);
+	selectpanelbox->Add(filterbox, 0);
 
 	wxBoxSizer *colbox2 = new wxBoxSizer(wxHORIZONTAL); 
 	colbox2->AddStretchSpacer();
@@ -235,6 +248,8 @@ NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnClear));
 	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnInvert));
 
+	Connect(ID_filter, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnGridFilter));
+
 	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
 	Connect(ID_FileBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
 }
@@ -246,6 +261,27 @@ NeuroBox::~NeuroBox()
 		delete[] selectspikes[0];
 		delete[] selectspikes[1];
 	}
+}
+
+
+void NeuroBox::OnBoxCheck(wxCommandEvent &event)
+{
+	int id = event.GetId();
+	wxString checktag = checkrefs->GetRef(id);
+
+	if((*modflags)[checktag] == 0) (*modflags)[checktag] = 1;
+	else (*modflags)[checktag] = 0;
+
+	// Set cell for filtering
+	if(checktag == "filter") {
+		(*cells)[neuroindex].filter = (*modflags)[checktag];
+	}
+}
+
+
+void NeuroBox::OnGridFilter(wxCommandEvent &event)
+{
+	diagbox->Write("Grid filter clicked\n");
 }
 
 
@@ -566,11 +602,12 @@ void NeuroBox::NeuroData(bool dispupdate)
 
 	burstbox->ExpDataScan(currcell);
 
-	//PanelData(&((*cells)[neuroindex]));
 	if(dispupdate) {
 		PanelData(&(*cells)[neuroindex]);
 		mainwin->scalebox->GraphUpdate();	
 	}
+
+	SetCheck(filtercheck, (*cells)[neuroindex].filter);
 }
 
 
@@ -1411,6 +1448,29 @@ void OutBox::ColumnSelect(int col)
 }*/
 
 
+
+void OutBox::NeuroFilter()
+{
+	int i;
+	int col;
+	int newcol[1000];
+	//int newcol;
+
+	for(i=0; i<currgrid->GetNumberCols(); i++) colflag[i] = 0;
+
+	for(i=0; neurobox->cellcount; i++) {
+		col = (*celldata)[i].gridcol;
+		colflag[col] = (*celldata)[i].filter;
+		newcol[i]
+	}
+
+	col = 0;
+	for(i=0; i<currgrid->GetNumberCols(); i++) {
+		
+	}
+}
+
+
 void OutBox::OnNeuroScan(wxCommandEvent& event)
 {
 	int col, row;
@@ -1450,10 +1510,11 @@ void OutBox::OnNeuroScan(wxCommandEvent& event)
 		typetext = currgrid->GetCell(3, col);
 		if(typetext.Contains("OT") || typetext.Contains("NR")) {
 			diagbox->Write(text.Format("col %d typetext %s rejected\n", col, typetext));
-			col++;
-			celltext = currgrid->GetCell(0, col);
-			celltext.Trim();
-			continue;
+			(*celldata)[cellcount].filter = 1;
+			//col++;
+			//celltext = currgrid->GetCell(0, col);
+			//celltext.Trim();
+			//continue;
 		}
 		else diagbox->Write(text.Format("col %d typetext %s accepted\n", col, typetext));
 
@@ -1482,8 +1543,9 @@ void OutBox::OnNeuroScan(wxCommandEvent& event)
 			celltext.Trim();
 		}
 
-		// Record spike time and initialise next column
+		// Record spike count and initialise next column
 		(*celldata)[cellcount].spikecount = spikecount;
+		(*celldata)[cellcount].gridcol = col;
 		cellcount++;
 		col++;
 		celltext = currgrid->GetCell(0, col);

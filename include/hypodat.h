@@ -146,6 +146,10 @@ public:
 	int netflag;
 	int type;
 	wxString name;
+
+	int filter;
+	int gridcol;
+
 	static const int maxtime = 100000;
 	static const int maxspikes = 100000;
 	

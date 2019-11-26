@@ -157,6 +157,7 @@ public:
 	void HistLoad();
 	void OnFlag(wxCommandEvent& event);
 	void OnCheck(wxCommandEvent& event);
+	virtual void OnBoxCheck(wxCommandEvent& event);
 	void OnPanel(wxCommandEvent& event);
 	void SetCheck(wxCheckBox *, bool state);
 	void SetPanel(int, ToolBox *);
@@ -169,6 +170,7 @@ public:
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	void SetConFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
+	wxCheckBox *SetBoxCheck(int, wxString, wxString, int state=0); 
 	void ModData();
 	wxBoxSizer *StoreBox(wxString label="", wxPanel *storepanel=NULL);
 	wxBoxSizer *StoreBoxSync(wxString label="", wxPanel *storepanel=NULL);
@@ -225,7 +227,7 @@ public:
 	TagBox *neurodatatag;
 	TextGrid *textgrid;
 
-	wxStaticBoxSizer *selectbox1, *selectbox2;
+	wxStaticBoxSizer *selectbox1, *selectbox2, *filterbox;
 	wxToggleButton *addbutton[5];
 	wxToggleButton *subbutton[5];
 	int selectmode[5];
@@ -235,6 +237,8 @@ public:
 	//BurstDat *selectdata[5];
 	int *selectspikes[2];
 	bool spikeselectLink;
+
+	wxCheckBox *filtercheck;
 	
 
 	NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
@@ -261,6 +265,10 @@ public:
 	void SelectAdd();
 	void SelectSub();
 
+	void OnBoxCheck(wxCommandEvent& event);
+	void OnGridFilter(wxCommandEvent& event);
+
+
 	// Functions ported from PlotModel
 	void DataSelect(double, double);
 	void SetCell(int, GraphDat*);
@@ -281,6 +289,7 @@ public:
 	//PlotBox *plotbox;
 	bool bookmode, vdumode;
     bool undomode;
+	int colflag[1000];
 
 	NeuroBox *neurobox;
 	vector<NeuroDat>* celldata;
@@ -308,6 +317,7 @@ public:
 	void OnParamMode(wxCommandEvent& event);
 	void OnParamScan(wxCommandEvent& event);
 	void OnNeuroScan(wxCommandEvent& event);
+	void NeuroFilter();
 
 	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);

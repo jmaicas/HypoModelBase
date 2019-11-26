@@ -148,6 +148,7 @@ enum {
 	ID_cellcheck,
 	ID_unicheck,
 	ID_seedcheck,
+	ID_filtercheck,
 	ID_netstore,
 	ID_netload,
 	ID_output,
@@ -297,7 +298,8 @@ enum {
 	ID_ParamMode,
 	ID_NeuroMode,
 	ID_file,
-	ID_grid
+	ID_grid,
+	ID_filter
 };
 
 

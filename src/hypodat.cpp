@@ -9,20 +9,16 @@ NeuroDat::NeuroDat()
 	//srate(std::make_shared<int>(maxtime)),
 	//srate10(std::make_shared<int>(maxtime))
 {
-	//times = new double[maxspikes];
-	//srate = new int[maxtime];
-	//srate10 = new int[maxtime];
 	times.resize(maxspikes);
 	srate.resize(maxtime);
 	srate10.resize(maxtime);
+
+	filter = 0;
 }
 
 
 NeuroDat::~NeuroDat()
 {
-	//delete[] times;
-	//delete[] srate;
-	//delete[] srate10;
 }
 
 
