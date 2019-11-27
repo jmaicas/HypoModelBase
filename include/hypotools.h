@@ -64,6 +64,7 @@ public:
 	void SetCell(int row, int col, wxString data);
 	double ReadDouble(int row, int col);
 	wxString GetCell(int row, int col);
+	void CopyColumn(int source, int dest);
 };
 
 

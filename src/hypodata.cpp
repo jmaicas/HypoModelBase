@@ -113,6 +113,8 @@ NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 
 	datneuron = new wxTextCtrl(activepanel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
 	datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+	datspin->SetRange(-1000000, 1000000);
+
 	wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
 	datbox->Add(datspin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datbox->AddSpacer(5);
@@ -282,6 +284,9 @@ void NeuroBox::OnBoxCheck(wxCommandEvent &event)
 void NeuroBox::OnGridFilter(wxCommandEvent &event)
 {
 	diagbox->Write("Grid filter clicked\n");
+
+	gridbox->NeuroGridFilter();
+	gridbox->NeuroScan();
 }
 
 
@@ -608,6 +613,8 @@ void NeuroBox::NeuroData(bool dispupdate)
 	}
 
 	SetCheck(filtercheck, (*cells)[neuroindex].filter);
+
+	diagbox->Write(text.Format("NeuroData cell %d gridcol %d\n", neuroindex, (*cells)[neuroindex].gridcol));
 }
 
 
@@ -1449,29 +1456,47 @@ void OutBox::ColumnSelect(int col)
 
 
 
-void OutBox::NeuroFilter()
+void OutBox::NeuroGridFilter()
 {
 	int i;
 	int col;
 	int newcol[1000];
-	//int newcol;
+	int numcols, newnumcols;
+	
+	numcols = currgrid->GetNumberCols();
 
-	for(i=0; i<currgrid->GetNumberCols(); i++) colflag[i] = 0;
+	for(i=0; i<numcols; i++) colflag[i] = 0;
 
-	for(i=0; neurobox->cellcount; i++) {
+	for(i=0; i<neurobox->cellcount; i++) {
 		col = (*celldata)[i].gridcol;
 		colflag[col] = (*celldata)[i].filter;
-		newcol[i]
 	}
 
+	// Mark columns with their replacement
 	col = 0;
 	for(i=0; i<currgrid->GetNumberCols(); i++) {
-		
+		if(!colflag[i]) {
+			newcol[col] = i;
+			col++;
+		}
 	}
+	newnumcols = col - 1;
+
+	// Copy over replacement columns
+	for(i=0; i<newnumcols; i++) currgrid->CopyColumn(newcol[i], i);
+
+	// Delete remaining copied columns
+	currgrid->DeleteCols(newnumcols, numcols - newnumcols);
 }
 
 
 void OutBox::OnNeuroScan(wxCommandEvent& event)
+{
+	NeuroScan();
+}
+
+
+void OutBox::NeuroScan()
 {
 	int col, row;
 	int spikecount, cellcount;

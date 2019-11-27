@@ -317,7 +317,9 @@ public:
 	void OnParamMode(wxCommandEvent& event);
 	void OnParamScan(wxCommandEvent& event);
 	void OnNeuroScan(wxCommandEvent& event);
-	void NeuroFilter();
+
+	void NeuroGridFilter();
+	void NeuroScan();
 
 	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);

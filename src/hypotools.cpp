@@ -74,6 +74,20 @@ TextGrid::~TextGrid()
 }
 
 
+void TextGrid::CopyColumn(int source, int dest)
+{
+	int i;
+	wxString celltext;
+
+	int numrows = GetNumberRows();
+
+	for(i=0; i<numrows; i++) {
+		celltext = GetCellValue(i, source);
+		SetCellValue(i, dest, celltext);
+	}
+}
+
+
 double TextGrid::ReadDouble(int row, int col)
 {
 	double celldata;
