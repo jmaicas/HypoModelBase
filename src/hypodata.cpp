@@ -606,6 +606,7 @@ void NeuroBox::NeuroData(bool dispupdate)
 	currcell->id = neuroindex;
 
 	burstbox->ExpDataScan(currcell);
+	burstbox->SetExpGrid();
 
 	if(dispupdate) {
 		PanelData(&(*cells)[neuroindex]);
@@ -615,6 +616,7 @@ void NeuroBox::NeuroData(bool dispupdate)
 	SetCheck(filtercheck, (*cells)[neuroindex].filter);
 
 	diagbox->Write(text.Format("NeuroData cell %d gridcol %d\n", neuroindex, (*cells)[neuroindex].gridcol));
+	gridbox->currgrid->SelectCol((*cells)[neuroindex].gridcol);
 }
 
 
@@ -1534,14 +1536,17 @@ void OutBox::NeuroScan()
 		// Specific to data with type text, reject non-vasopressin types
 		typetext = currgrid->GetCell(3, col);
 		if(typetext.Contains("OT") || typetext.Contains("NR")) {
-			diagbox->Write(text.Format("col %d typetext %s rejected\n", col, typetext));
+			//diagbox->Write(text.Format("col %d typetext %s rejected\n", col, typetext));
 			(*celldata)[cellcount].filter = 1;
 			//col++;
 			//celltext = currgrid->GetCell(0, col);
 			//celltext.Trim();
 			//continue;
 		}
-		else diagbox->Write(text.Format("col %d typetext %s accepted\n", col, typetext));
+		else {
+			//diagbox->Write(text.Format("col %d typetext %s accepted\n", col, typetext));
+			(*celldata)[cellcount].filter = 0;
+		}
 
 		// Skip non-spike time rows
 		while (!numform.FromString(celltext, &cellval)) {

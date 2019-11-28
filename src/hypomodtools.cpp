@@ -575,10 +575,10 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	if(ostype == Mac) datbox->AddStretchSpacer(5); else datbox->AddSpacer(2);
 	//datbox->Add(datcon, 0);
 
-	wxRadioButton *file = new wxRadioButton(panel, ID_file, "File", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	wxRadioButton *grid  = new wxRadioButton(panel, ID_grid, "Grid");
-	datconbox->Add(file, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	datconbox->Add(grid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	filerad = new wxRadioButton(panel, ID_file, "File", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	gridrad  = new wxRadioButton(panel, ID_grid, "Grid");
+	datconbox->Add(filerad, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datconbox->Add(gridrad, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datbox->AddSpacer(10);
 	datbox->Add(datconbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
@@ -644,6 +644,11 @@ void BurstBox::BurstDataPanel(BurstPanel *datpanel)
 	datpanel->intraisisd = NumPanel(numwidth);
 }
 
+
+void BurstBox::SetExpGrid()
+{
+	gridrad->SetValue(true);
+}
 
 
 void BurstBox::ExpDataScan(SpikeDat *data)

@@ -33,7 +33,7 @@ void GraphPanel::Draw(wxDC& dc)
 {
 	PrepareDC(dc);
 
-  //m_owner->PrepareDC(dc);
+	//m_owner->PrepareDC(dc);
 	PaintBackground(dc);
 }
 
