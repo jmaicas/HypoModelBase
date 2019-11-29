@@ -417,7 +417,8 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *rightbox = new wxBoxSizer(wxVERTICAL);
 
-	
+
+	// Loaded spike data panel
 	allspikes = NumPanel(numwidth);
 	allfreq = NumPanel(numwidth);
 	allisimean = NumPanel(numwidth);
@@ -566,21 +567,23 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	datfilebox->AddSpacer(10);
 	datfilebox->Add(sec, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datfilebox->Add(msec, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datbox->Add(datfilebox, 0);
+	datbox->AddSpacer(5);
+	datbox->AddStretchSpacer();
 
 	paramset->AddNum("filterthresh", "Filter", 0, 0, 30); 
-
-	datbox->Add(datfilebox, 0);
-	datbox->Add(paramset->GetCon("filterthresh"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
-	//datbox->AddStretchSpacer(5);
-	if(ostype == Mac) datbox->AddStretchSpacer(5); else datbox->AddSpacer(2);
-	//datbox->Add(datcon, 0);
-
 	filerad = new wxRadioButton(panel, ID_file, "File", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	gridrad  = new wxRadioButton(panel, ID_grid, "Grid");
+	
+	datconbox->Add(paramset->GetCon("filterthresh"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	//datbox->AddStretchSpacer(5);
+	
+	//datbox->Add(datcon, 0);
 	datconbox->Add(filerad, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datconbox->Add(gridrad, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	datbox->AddSpacer(10);
+	//datbox->AddSpacer(10);
 	datbox->Add(datconbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	if(ostype == Mac) datbox->AddStretchSpacer(5); else datbox->AddSpacer(2);
 
 	if(ostype == Windows) mainbox->AddSpacer(3);
 	mainbox->Add(datbox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
@@ -670,6 +673,8 @@ void BurstBox::OnDatRadio(wxCommandEvent& event)
 
 	if(event.GetId() == ID_file) loaddata = mainwin->expdata;
 	if(event.GetId() == ID_grid) loaddata = mod->neurobox->currcell;
+
+	mod->ExpDataSwitch(loaddata);
 
 	ExpDataScan();
 }

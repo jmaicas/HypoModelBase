@@ -12,6 +12,7 @@ NeuroMod::NeuroMod(int type, wxString name, HypoMain *main)
 	: Model(type, name, main)
 {
 	evodata = NULL;
+	fitbox = NULL;
 }
 
 
@@ -63,6 +64,49 @@ void NeuroMod::EvoGraphs()
 }
 
 
+/*void NeuroMod::SpikeBox(int modmode)
+{
+	int boxwidth, boxheight;
+
+	//wxString tag;
+
+	//SetStatusText("Burst Box");
+	//burstdata->spikedata = vasodata->spikedat;
+	if(ostype == Mac) {
+		boxwidth = 285;
+		boxheight = 380;
+	}
+	else {
+		boxwidth = 425;
+		boxheight = 500;
+	}
+
+	diagbox->Write(text.Format("Spike box init type %d\n", modmode));
+
+
+	if(modmode == 2) burstbox = new BurstBox(mod, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
+
+	if(modmode == 1) burstbox = new BurstBox(mod, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
+	//mainpos = GetPosition();
+
+	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
+	burstbox->loaddata = expdata;
+
+	diagbox->Write(text.Format("SpikeModule modmode %d\n", modmode));
+
+	if(!expdata->graphs) {
+		SpikeModule(mod);
+		if(!modmode) scalebox->GraphSwitch();
+	}
+
+	diagbox->Write(text.Format("SpikeModule OK\n"));
+
+	mod->modtools.AddBox(burstbox, true);
+
+	//toolset->AddBox(burstbox);
+	burstbox->Show(true);
+*/
+
 
 Model::Model(int type, wxString name, HypoMain *main)
 {
@@ -102,6 +146,12 @@ Model::~Model()
 	delete graphbase;
 	delete modeflags;
 	delete toolflags;
+}
+
+
+void Model::ExpDataSwitch(SpikeDat *data)
+{
+	if(fitbox) fitbox->expdata = data;
 }
 
 

@@ -1015,7 +1015,6 @@ void OutBox::OnCellChange(wxGridEvent& event)
 
 void OutBox::OnRightClick(wxMouseEvent& event)
 {
-	int i;
 	//int id = event.GetId();
 	//wxWindow *pos = FindWindowById(id, toolpanel);
 	//wxPoint point = this->GetPosition();

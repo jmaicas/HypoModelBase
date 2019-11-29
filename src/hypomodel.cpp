@@ -894,7 +894,7 @@ void HypoMain::SpikeBox(int modmode)
 void HypoMain::OnBurst(wxCommandEvent& WXUNUSED(event))
 { 
 	if(burstbox) burstbox->Show(true); 
-	else SpikeBox();
+	//else mod->SpikeBox();
 }
 
 

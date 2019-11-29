@@ -7,9 +7,12 @@
 #include "hypodat.h"
 #include "hypopanels.h"
 //#include "hypograph.h"
+#include "evofitbasic.h"
 
 
 class HypoMain;
+class EvoFitBox;
+class EvoChrome;
 
 
 class ModThread : public wxThread
@@ -67,9 +70,13 @@ public:
 
 	DatStore *recdata;
 	OutBox *outbox;
+
 	NeuroBox *neurobox;
+	EvoFitBox *fitbox;
+	EvoChrome *fitchrome;
 
 	SpikeDat *expdata;
+
 
 	Model(int, wxString, HypoMain *);
 	virtual ~Model();
@@ -95,6 +102,7 @@ public:
 	virtual void SetCell(int cellindex, GraphDat *);
 	virtual int GetCellIndex();
 	virtual void ParamScan();
+	virtual void ExpDataSwitch(SpikeDat *);
 };
 
 
@@ -104,9 +112,12 @@ public:
 	// Data
 	SpikeDat *evodata;
 
+	// Boxes
+
 	NeuroMod(int, wxString, HypoMain *);
 	virtual ~NeuroMod();
 
+	//void SpikeBox(int modmode = 0);
 	void EvoGraphs();
 	void IoDGraph(datdouble *, datdouble *, wxString, wxString, int, int barshift=0);
 };

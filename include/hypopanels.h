@@ -16,6 +16,7 @@ using namespace std;
 class Model;
 class HypoMain;
 class TextGrid;
+class NeuroMod;
 
 class OptionPanel : public wxDialog
 {
