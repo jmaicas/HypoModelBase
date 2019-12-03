@@ -714,7 +714,7 @@ void NeuroBox::LoadDataList(FileDat *file)
 
 void NeuroBox::LoadNeuroData(FileDat file, int col)
 {
-	int i, row;
+	int row;
 	int start;
 	wxString filepath;
 	wxString datstring, readline, text;

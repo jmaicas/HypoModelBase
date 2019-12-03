@@ -674,7 +674,7 @@ void BurstBox::OnDatRadio(wxCommandEvent& event)
 	if(event.GetId() == ID_file) loaddata = mainwin->expdata;
 	if(event.GetId() == ID_grid) loaddata = mod->neurobox->currcell;
 
-	mod->ExpDataSwitch(loaddata);
+	if(mod) mod->SpikeDataSwitch(loaddata);
 
 	ExpDataScan();
 }
