@@ -346,6 +346,7 @@ public:
 	int burst_maxint;
 	int burst_minspikes, burst_maxspikes;
 	int burst_startspike, burst_endspike;
+	int burstmode;
 	
 	//void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);

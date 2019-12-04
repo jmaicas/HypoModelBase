@@ -25,7 +25,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	double maxcount;
 
 	//TextFile ofp;
-	bool burstmode = true;
+	//bool burstmode = true;
 	bool IoDmode = false;
 	bool IoDburstmode = true;
 
