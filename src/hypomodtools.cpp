@@ -705,6 +705,7 @@ void BurstBox::Scan(SpikeDat *data)        // Old data setting call function, pr
 void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 {
 	BurstScan();
+	mod->BurstUpdate();
 }
 
 

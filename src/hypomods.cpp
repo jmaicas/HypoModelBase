@@ -50,8 +50,11 @@ Model::~Model()
 
 
 void Model::SpikeDataSwitch(SpikeDat *data)
-{
-}
+{}
+
+
+void Model::BurstUpdate()
+{}
 
 
 void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)

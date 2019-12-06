@@ -19,11 +19,13 @@ using namespace std;
 #include <wx/numformatter.h>
 
 
-NeuroBox::NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size)
-	: ParamBox(mod, title, pos, size, "cellbox", 1)
+NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size)
+	: ParamBox(model, title, pos, size, "cellbox", 1, false)
+	//ParamBox(model, title, pos, size, "outbox", 0, 1)
 {
 	int datwidth, labelwidth;
 
+	mod = model;
 	diagbox = mod->diagbox;
 	cellcount = 0;
 	paramindex = 0;
@@ -607,6 +609,7 @@ void NeuroBox::NeuroData(bool dispupdate)
 
 	burstbox->ExpDataScan(currcell);
 	burstbox->SetExpGrid();
+	mod->SpikeDataSwitch(currcell);
 
 	if(dispupdate) {
 		PanelData(&(*cells)[neuroindex]);

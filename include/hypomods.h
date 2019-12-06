@@ -103,6 +103,7 @@ public:
 	virtual int GetCellIndex();
 	virtual void ParamScan();
 	virtual void SpikeDataSwitch(SpikeDat *);
+	virtual void BurstUpdate();
 };
 
 

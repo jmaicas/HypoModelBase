@@ -733,7 +733,7 @@ void ToolPanel::OnMouseMove(wxMouseEvent &event)
 }
 
 
-ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type, bool serve, bool chi)
+/*ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type, bool serve, bool chi)
 	: wxFrame(main, -1, title, pos, size,
 	//wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxRESIZE_BORDER)
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxRESIZE_BORDER | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX)
@@ -746,6 +746,27 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	child = chi;
 	boxlabel = title;
 	canclose = true;
+	vdu = NULL;
+
+	//main->diagbox->Write("ToolBox init\n");
+
+	Init();
+}*/
+
+
+ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type, bool close)
+	: wxFrame(main, -1, title, pos, size,
+		//wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxRESIZE_BORDER)
+		wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxRESIZE_BORDER | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX)
+{
+	mainwin = main;
+	mpos = pos;
+	boxsize = size;
+	boxtype = type;
+	//servant = serve;
+	//child = chi;
+	boxlabel = title;
+	canclose = close;
 	vdu = NULL;
 
 	//main->diagbox->Write("ToolBox init\n");
