@@ -886,12 +886,97 @@ void ToolBox::Init()
 	}
 
 	activepanel = panel;
+	//paramset = new ParamSet(activepanel);
 
 	//mod->diagbox->Write("ToolBox init\n");
 
 	Connect(wxEVT_MOVE, wxMoveEventHandler(ToolBox::OnMove));
 	Connect(wxEVT_SIZE, wxSizeEventHandler(ToolBox::OnSize));
 	Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ToolBox::OnClose));
+}
+
+
+void ToolBox::Store()
+{
+	wxString filename, filepath;
+	wxString outline;
+
+	wxString text;
+	TextFile toolfile;
+
+	mainwin->diagbox->Write(text.Format("tool store %s\n", boxtag));
+
+	/*
+	filepath = mainwin->toolpath;
+	if(!wxDirExists(filepath)) wxMkdir(filepath);
+
+	filename = filepath + "/" + boxtag + ".dat";
+	toolfile.New(filename);
+
+	for(i=0; i<paramset->numparams; i++) {
+		if(paramset->con[i]->type != textcon) {
+			paramset->con[i]->numbox->GetValue().ToDouble(&((*toolparams)[paramset->con[i]->name]));
+			outline.Printf("%.8f", (*toolparams)[paramset->con[i]->name]);
+		}
+		else outline = paramset->con[i]->GetString();
+		toolfile.WriteLine(paramset->con[i]->name + " " + outline);
+	}
+	
+	toolfile.Close();
+	*/
+
+	mainwin->diagbox->Write("Tool File OK\n");
+}
+
+
+void ToolBox::Load()
+{
+	int id;
+	double datval;
+	bool diagnostic;
+	wxString filename, filepath;
+	wxString readline, datname;
+	TextFile toolfile;
+	wxString text;
+
+	diagnostic = false;
+	diagbox = mainwin->diagbox;
+
+	// Tool data file
+	filepath = mainwin->toolpath;
+	filename = filepath + "/" + boxtag + ".dat";
+
+	diagbox->Write("ToolLoad " + filename + "\n");
+
+	if(!toolfile.Exists(filename)) {
+		diagbox->Write("ToolLoad file not found\n");
+		return;
+	}
+
+	/*
+	toolfile.Open(filename);
+	readline = toolfile.ReadLine();
+
+	while(!readline.IsEmpty()) {
+		datname = readline.BeforeFirst(' ');
+		readline = readline.AfterFirst(' ');
+		readline.Trim();
+		if(paramset->ref.check(datname)) {
+			id = paramset->ref[datname];
+			if(paramset->con[id]->type != textcon) {
+				readline.ToDouble(&datval);
+				//paramset->con[id]->SetValue("");
+				paramset->con[id]->SetValue(datval);
+			}
+			else paramset->con[id]->SetValue(readline);
+		}
+		//if(diagnostic) mainwin->diagbox->Write(text.Format("Model Param ID %d, Name %s, Value %.4f\n", id, datname, datval)); 
+		if(toolfile.End()) return;
+		readline = toolfile.ReadLine();	
+	}
+	*/
+	
+    toolfile.Close();
 }
 
 
