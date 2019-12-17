@@ -1868,7 +1868,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	//graphbase->NewSet(tag, reftag);
 	//diagbox->Write(text.Format("\nGraphSet tag %s test %d\n", btag, burstdata->test));
 
-	if(diagbox) diagbox->Write(text.Format("GraphSet entered... tag %s\n", tag));
+	//if(diagbox) diagbox->Write(text.Format("GraphSet entered... tag %s\n", tag));
 
 	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
 	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", reftag);
@@ -1927,7 +1927,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	//graphbase->datdex[datset] = setindex; 
 	graphs = true;
 
-	if(diagbox) diagbox->Write(text.Format("GraphSet Finished\n"));
+	//if(diagbox) diagbox->Write(text.Format("GraphSet Finished\n"));
 
 	return setindex;
 }

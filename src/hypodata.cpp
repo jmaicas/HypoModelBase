@@ -620,7 +620,6 @@ void NeuroBox::NeuroData(bool dispupdate)
 
 	diagbox->Write(text.Format("NeuroData cell %d gridcol %d\n", neuroindex, (*cells)[neuroindex].gridcol));
 	gridbox->currgrid->SelectCol((*cells)[neuroindex].gridcol);
-	gridbox->currgrid->MakeCellVisible(0, (*cells)[neuroindex].gridcol);
 }
 
 

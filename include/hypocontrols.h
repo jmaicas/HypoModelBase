@@ -20,7 +20,6 @@ class ToolBox;
 class Model;
 class ToolSet;
 class ToolPanel;
-class ParamSet;
 //class HypoMain;
 
 
@@ -142,9 +141,6 @@ public:
 	wxStaticText *status;
 	wxTextCtrl *vdu;
 	wxGauge *gauge;
-
-	//ParamSet *paramset;
-	ParamStore *toolparams;
 	
 	wxPoint SetPosition();
 	void ReSize();
@@ -176,15 +172,12 @@ public:
 			winman->UnInit(); 
 			delete winman;
 		}
-		Store();
 	} 
 
 	virtual void OnToggle(wxCommandEvent& event);
 	virtual void TextClick(wxString tag);
 	virtual void SpinClick(wxString tag);
 	virtual void BoxEnter(wxString tag);
-	virtual void Load();
-	virtual void Store();
 };
 
 

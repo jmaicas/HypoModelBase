@@ -379,7 +379,6 @@ public:
 	ToolSet *toolset;
 	DiagBox *diagbox;
 	wxColour colourpen[10];
-	wxString toolpath;
 
 	// Display
 	ScaleBox *scalebox;

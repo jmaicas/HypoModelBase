@@ -599,8 +599,6 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	panel->Layout();
 	if(spikedata != NULL) SpikeDataDisp();
 
-	//Load();   // load default tool parameter values
-
 	//snum.Printf("con x %d", paramset->con[0]->numwidth + paramset->con[0]->labelwidth);
 	//datstatus->SetLabel(snum);
 
