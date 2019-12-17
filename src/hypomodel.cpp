@@ -93,7 +93,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	OptionLoad();
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
-	toolpath = "Tools";
+	//toolpath = "Tools";
 
 	MainLoad();
 

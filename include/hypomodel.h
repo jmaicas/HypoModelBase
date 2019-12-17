@@ -102,7 +102,7 @@ public:
 	wxTextFile *wxofp;
 	wxString outline; 
 	wxString datapath, outpath, parampath;
-	wxString modpath, toolpath;
+	wxString modpath;
 	wxBoxSizer *graphsizer;
 	ParamStore prefstore;
 	wxPrintData *printdata;
