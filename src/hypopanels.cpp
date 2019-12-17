@@ -626,12 +626,12 @@ wxBoxSizer *GraphBox::ParamLayout(int columns)
 
 
 ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, wxString tag, int type, int storeflag)
-	: ToolBox(model->mainwin, title, pos, size, type)
+	: ToolBox(model->mainwin, tag, title, pos, size, type)
 	//wxFRAME_FLOAT_ON_PARENT | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER | wxMINIMIZE_BOX)
 {	
 	autorun = 0;
 	//blankevent = new wxCommandEvent();
-	boxtag = tag;
+	//boxtag = tag;
 	redtag = "";
 	histmode = 0;
 	storemode = storeflag;
@@ -714,7 +714,7 @@ void ParamBox::Initialise()
 	modflags = new ParamStore;
 	conflags = new ParamStore;
 	activepanel = panel;
-	paramset = new ParamSet(activepanel);
+	//paramset = new ParamSet(activepanel);
 	flagrefs = new RefStore();
 	conflagrefs = new RefStore();
 	checkrefs = new RefStore();

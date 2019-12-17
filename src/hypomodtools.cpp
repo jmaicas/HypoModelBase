@@ -17,7 +17,7 @@ using namespace stk;
 
 
 ModGenBox::ModGenBox(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size)
-	: ToolBox(main, title, pos, size)
+	: ToolBox(main, "ModGen", title, pos, size)
 {
 	int i;
 	int pagecount;
@@ -262,7 +262,7 @@ void ModGenBox::GenModCode()
 
 
 InfoBox::InfoBox(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size)
-	: ToolBox(main, title, pos, size)
+	: ToolBox(main, "Info", title, pos, size)
 {
 	mainwin = main;
 	artparams = new ParamStore;
@@ -372,7 +372,7 @@ void InfoBox::OnDatLoad(wxCommandEvent& event)
 // BurstBox - now used as general spike time data loading and analysis box
 
 BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode, int mode)
-	: ToolBox(model->mainwin, title, pos, size)
+	: ToolBox(model->mainwin, "BurstBox", title, pos, size)
 {
 	int numwidth = 50;
 	int gridwidth = 65;
@@ -394,6 +394,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	blankevent = new wxCommandEvent();
 	
 	legacymode = false;
+	selfstore = true;
 
 	activepanel = panel;
 	BurstPanel *burstpanset[5];
@@ -599,7 +600,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	panel->Layout();
 	if(spikedata != NULL) SpikeDataDisp();
 
-	//Load();   // load default tool parameter values
+	if(selfstore) Load();   // load self-stored tool parameter values
 
 	//snum.Printf("con x %d", paramset->con[0]->numwidth + paramset->con[0]->labelwidth);
 	//datstatus->SetLabel(snum);
@@ -708,6 +709,7 @@ void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 {
 	BurstScan();
 	mod->BurstUpdate();
+	Store();
 }
 
 

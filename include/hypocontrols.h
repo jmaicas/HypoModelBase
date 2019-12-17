@@ -128,6 +128,7 @@ public:
 	bool child;
 	bool visible;
 	bool canclose;
+	bool selfstore;   // Defaults to false, if true box stores its parameter values to file on closing
 	wxPoint mpos, oldpos;
 	wxSize boxsize;
 	wxFont boxfont, confont;
@@ -143,8 +144,9 @@ public:
 	wxTextCtrl *vdu;
 	wxGauge *gauge;
 
-	//ParamSet *paramset;
+	ParamSet *paramset;
 	ParamStore *toolparams;
+	wxString toolpath;
 	
 	wxPoint SetPosition();
 	void ReSize();
@@ -168,16 +170,10 @@ public:
 	TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
 	
 	//ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool serve=false, bool child=false);
-	ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);
-	ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool close=true);
+	ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);
+	ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool close=true);
 
-	~ToolBox() {
-		if(boxtype == 1) {
-			winman->UnInit(); 
-			delete winman;
-		}
-		Store();
-	} 
+	~ToolBox();
 
 	virtual void OnToggle(wxCommandEvent& event);
 	virtual void TextClick(wxString tag);

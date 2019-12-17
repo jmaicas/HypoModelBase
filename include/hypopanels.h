@@ -88,7 +88,7 @@ public:
 	Model *mod;
 	
 	wxString labelset[100];
-	ParamSet *paramset;
+	//ParamSet *paramset;
 	ParamStore *modparams;
 	ParamStore *modflags;
 	ParamStore *conflags;
@@ -435,7 +435,7 @@ public:
 	BurstPanel *evoburst;
 
 	//BurstDat *burstdata;
-	ParamSet *paramset;
+	//ParamSet *paramset;
 	wxStaticText *numbursts;
 	wxStaticText *meanspikes;
 	wxStaticText *meanlength;

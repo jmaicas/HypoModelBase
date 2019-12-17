@@ -43,7 +43,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	colourpen[6].Set("#FF8080");       // 6 light red
 	colourpen[7].Set("#80FF80");       // 7 light green
 	colourpen[8].Set("#8080FF");       // 8 light blue
-	colourpen[9].Set("#000000");       // 9 custom
+	colourpen[9].Set("#FFFF80");       // 9 light yellow
+	colourpen[10].Set("#FF80FF");      // 10 light purple
+	colourpen[11].Set("#000000");      // 11 custom
 
 	toolset = new ToolSet();
 	toolset->AddBox(diagbox, true);

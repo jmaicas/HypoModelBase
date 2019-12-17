@@ -754,7 +754,7 @@ void ToolPanel::OnMouseMove(wxMouseEvent &event)
 }*/
 
 
-ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type, bool close)
+ToolBox::ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, int type, bool close)
 	: wxFrame(main, -1, title, pos, size,
 		//wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxRESIZE_BORDER)
 		wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxRESIZE_BORDER | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX)
@@ -767,6 +767,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	//child = chi;
 	boxlabel = title;
 	canclose = close;
+	boxtag = tag;
 	vdu = NULL;
 
 	//main->diagbox->Write("ToolBox init\n");
@@ -775,7 +776,7 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 }
 
 
-ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, bool close)
+ToolBox::ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, bool close)
 	: wxFrame(main, -1, title, pos, size, wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxRESIZE_BORDER)
 	//wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxRESIZE_BORDER | wxSYSTEM_MENU | wxCAPTION | wxCLOSE_BOX)
 {
@@ -785,10 +786,20 @@ ToolBox::ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, con
 	boxtype = 0;
 	boxlabel = title;
 	canclose = close;
+	boxtag = tag;
 	vdu = NULL;
 	
 	Init();
 }
+
+
+ToolBox::~ToolBox() {
+	if(boxtype == 1) {
+		winman->UnInit(); 
+		delete winman;
+	}
+	//if(selfstore) Store();   // doesn't work here because of already deleted class data
+} 
 	
 
 /*
@@ -852,6 +863,7 @@ void ToolBox::Init()
 	pinmode = 1;	
 	ostype = GetSystem();
 	diagbox = mainwin->diagbox;
+	toolpath = mainwin->toolpath;
 	
 	visible = true;
 	status = NULL;
@@ -885,8 +897,11 @@ void ToolBox::Init()
 		panel->SetSizer(mainbox);
 	}
 
+	selfstore = false;
+
 	activepanel = panel;
-	//paramset = new ParamSet(activepanel);
+	paramset = new ParamSet(activepanel);
+	toolparams = new ParamStore();
 
 	//mod->diagbox->Write("ToolBox init\n");
 
@@ -898,19 +913,21 @@ void ToolBox::Init()
 
 void ToolBox::Store()
 {
-	wxString filename, filepath;
+	wxString filename;
 	wxString outline;
 
 	wxString text;
 	TextFile toolfile;
 
-	mainwin->diagbox->Write(text.Format("tool store %s\n", boxtag));
+	if(!selfstore) return;
 
-	/*
-	filepath = mainwin->toolpath;
-	if(!wxDirExists(filepath)) wxMkdir(filepath);
+	//mainwin->diagbox->Write(text.Format("tool store %s\n", boxtag));
+	
+	if(!wxDirExists(toolpath)) wxMkdir(toolpath);
+	filename = toolpath + "/" + boxtag + ".dat";
 
-	filename = filepath + "/" + boxtag + ".dat";
+	//mainwin->diagbox->Write(text.Format("tool store path %s file %s params %d\n", toolpath, filename, paramset->numparams));
+	
 	toolfile.New(filename);
 
 	for(i=0; i<paramset->numparams; i++) {
@@ -923,9 +940,7 @@ void ToolBox::Store()
 	}
 	
 	toolfile.Close();
-	*/
-
-	mainwin->diagbox->Write("Tool File OK\n");
+	//mainwin->diagbox->Write("Tool File OK\n");
 }
 
 
@@ -934,17 +949,17 @@ void ToolBox::Load()
 	int id;
 	double datval;
 	bool diagnostic;
-	wxString filename, filepath;
+	wxString filename;
 	wxString readline, datname;
 	TextFile toolfile;
 	wxString text;
 
-	diagnostic = false;
+	diagnostic = true;
 	diagbox = mainwin->diagbox;
 
 	// Tool data file
-	filepath = mainwin->toolpath;
-	filename = filepath + "/" + boxtag + ".dat";
+	//filepath = mainwin->toolpath;
+	filename = toolpath + "/" + boxtag + ".dat";
 
 	diagbox->Write("ToolLoad " + filename + "\n");
 
@@ -953,7 +968,7 @@ void ToolBox::Load()
 		return;
 	}
 
-	/*
+	
 	toolfile.Open(filename);
 	readline = toolfile.ReadLine();
 
@@ -970,11 +985,11 @@ void ToolBox::Load()
 			}
 			else paramset->con[id]->SetValue(readline);
 		}
-		//if(diagnostic) mainwin->diagbox->Write(text.Format("Model Param ID %d, Name %s, Value %.4f\n", id, datname, datval)); 
+		if(diagnostic) mainwin->diagbox->Write(text.Format("Model Param ID %d, Name %s, Value %.4f\n", id, datname, datval)); 
 		if(toolfile.End()) return;
 		readline = toolfile.ReadLine();	
 	}
-	*/
+	
 	
     toolfile.Close();
 }

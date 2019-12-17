@@ -9,7 +9,7 @@
 
 
 DiagBox::DiagBox(MainFrame *mainwin, const wxString& title, const wxPoint& pos, const wxSize& size)
-	: ToolBox(mainwin, title, pos, size)
+	: ToolBox(mainwin, "DiagBox", title, pos, size)
 {
 	textbox = new wxTextCtrl(panel, -1, "", wxDefaultPosition, wxSize(300, 400), wxTE_MULTILINE);
 
