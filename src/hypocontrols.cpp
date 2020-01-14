@@ -416,12 +416,12 @@ void ParamCon::OnSpinDown(wxSpinEvent& WXUNUSED(event))
 }
 
 
-ParamSet::ParamSet(ToolPanel *pan)
+ParamSet::ParamSet()
 {
-	panel = pan;
+	//panel = pan;
 	numparams = 0;
 	currlay = 0;
-	paramstore = new ParamStore();
+	//paramstore = new ParamStore();
 
 	// Default field widths
 	num_labelwidth = 65;
@@ -435,10 +435,10 @@ ParamSet::ParamSet(ToolPanel *pan)
 
 ParamSet::~ParamSet()
 {
-	delete paramstore;
+	//delete paramstore;
 }
 
-//paramset->AddCon("runtime", "Run Time", 2000, 1, 0);
+//paramset.AddCon("runtime", "Run Time", 2000, 1, 0);
 
 
 void ParamSet::SetMinMax(wxString tag, double min, double max)
@@ -535,8 +535,8 @@ ParamStore *ParamSet::GetParams()
 	int i;
 	//if(pstore == NULL) pstore = modparams;
 	for(i=0; i<numparams; i++)
-		con[i]->numbox->GetValue().ToDouble(&((*paramstore)[con[i]->name]));
-	return paramstore;
+		con[i]->numbox->GetValue().ToDouble(&(paramstore[con[i]->name]));
+	return &paramstore;
 }
 
 
@@ -565,10 +565,10 @@ ParamStore *ParamSet::GetParamsNew(BoxOut *boxout)
 			//SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
 		}
 		//boxout->diagbox->Write(text.Format("param %s type %d value %.4f\n", con[i]->name, con[i]->type, value));
-		(*paramstore)[con[i]->name] = value;
+		paramstore[con[i]->name] = value;
 		pcon->oldvalue = value;
 	}
-	return paramstore;
+	return &paramstore;
 }
 
 
@@ -799,6 +799,8 @@ ToolBox::~ToolBox() {
 		delete winman;
 	}
 	//if(selfstore) Store();   // doesn't work here because of already deleted class data
+	//delete paramset;
+	//delete toolparams;
 } 
 	
 
@@ -898,10 +900,10 @@ void ToolBox::Init()
 	}
 
 	selfstore = false;
-
 	activepanel = panel;
-	paramset = new ParamSet(activepanel);
-	toolparams = new ParamStore();
+	//paramset = new ParamSet(activepanel);
+	paramset.panel = activepanel;
+	//toolparams = new ParamStore();
 
 	//mod->diagbox->Write("ToolBox init\n");
 
@@ -926,17 +928,17 @@ void ToolBox::Store()
 	if(!wxDirExists(toolpath)) wxMkdir(toolpath);
 	filename = toolpath + "/" + boxtag + ".dat";
 
-	//mainwin->diagbox->Write(text.Format("tool store path %s file %s params %d\n", toolpath, filename, paramset->numparams));
+	//mainwin->diagbox->Write(text.Format("tool store path %s file %s params %d\n", toolpath, filename, paramset.numparams));
 	
 	toolfile.New(filename);
 
-	for(i=0; i<paramset->numparams; i++) {
-		if(paramset->con[i]->type != textcon) {
-			paramset->con[i]->numbox->GetValue().ToDouble(&((*toolparams)[paramset->con[i]->name]));
-			outline.Printf("%.8f", (*toolparams)[paramset->con[i]->name]);
+	for(i=0; i<paramset.numparams; i++) {
+		if(paramset.con[i]->type != textcon) {
+			paramset.con[i]->numbox->GetValue().ToDouble(&(toolparams[paramset.con[i]->name]));
+			outline.Printf("%.8f", toolparams[paramset.con[i]->name]);
 		}
-		else outline = paramset->con[i]->GetString();
-		toolfile.WriteLine(paramset->con[i]->name + " " + outline);
+		else outline = paramset.con[i]->GetString();
+		toolfile.WriteLine(paramset.con[i]->name + " " + outline);
 	}
 	
 	toolfile.Close();
@@ -976,14 +978,14 @@ void ToolBox::Load()
 		datname = readline.BeforeFirst(' ');
 		readline = readline.AfterFirst(' ');
 		readline.Trim();
-		if(paramset->ref.check(datname)) {
-			id = paramset->ref[datname];
-			if(paramset->con[id]->type != textcon) {
+		if(paramset.ref.check(datname)) {
+			id = paramset.ref[datname];
+			if(paramset.con[id]->type != textcon) {
 				readline.ToDouble(&datval);
-				//paramset->con[id]->SetValue("");
-				paramset->con[id]->SetValue(datval);
+				//paramset.con[id]->SetValue("");
+				paramset.con[id]->SetValue(datval);
 			}
-			else paramset->con[id]->SetValue(readline);
+			else paramset.con[id]->SetValue(readline);
 		}
 		if(diagnostic) mainwin->diagbox->Write(text.Format("Model Param ID %d, Name %s, Value %.4f\n", id, datname, datval)); 
 		if(toolfile.End()) return;

@@ -188,7 +188,7 @@ public:
 class ModGenBox : public ToolBox
 {
 public:
-	ParamSet *paramset;
+	//ParamSet paramset;
 	wxString modname, modtag, modnum;
 	int modindex, platecount;
 	wxNotebook *notebook;
@@ -342,7 +342,7 @@ public:
 	wxTextCtrl *datfiletag;
 
 	ParamStore *artparams;
-	ParamSet *paramset;
+	//ParamSet *paramset;
 
 	InfoBox(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//void BurstData();

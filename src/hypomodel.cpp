@@ -132,7 +132,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	burstdata = new BurstDat();
 
 	expdata2 = new SpikeDat();
-	expdata2->burstdata = NULL;
+	//expdata2->burstdata = NULL;
 
 
 	//GraphData();
@@ -358,12 +358,14 @@ void HypoMain::CleanUp() {
 
 	//if(graphbox) graphbox->wxDialog::Destroy();
 
-	//delete mod;
+	delete mod;
 
 	delete[] gpos;
 	delete flagrefs;
 	delete hypoflags;
+	//if(expdata->burstdata) delete expdata->burstdata;
 	delete expdata;
+
 	delete expdata2;
 	delete selectdata;
 	delete burstdata;

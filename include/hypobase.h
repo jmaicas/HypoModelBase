@@ -48,6 +48,11 @@ using namespace std;
 //using namespace stk
 
 
+#ifdef __WXMSW__
+#include <wx/msw/msvcrt.h>      // redefines the new() operator 
+#endif
+
+
 
 enum {
 	spincon = 1,

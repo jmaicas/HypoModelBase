@@ -53,13 +53,13 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxBoxSizer *analysisbox = new wxBoxSizer(wxVERTICAL);
 	analysispanel->SetSizer(analysisbox);
 	activepanel = analysispanel;
-	paramset->panel = analysispanel;
+	paramset.panel = analysispanel;
 
 	wxBoxSizer *histparambox = new wxBoxSizer(wxVERTICAL);
-	paramset->AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
-	paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
-	paramset->AddNum("filterthresh", "ISI Filter", 5, 0, 70, 50);
-	//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
+	paramset.AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
+	paramset.AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
+	paramset.AddNum("filterthresh", "ISI Filter", 5, 0, 70, 50);
+	//paramset.AddNum("binsize", "Bin Size", 5, 0, 70, 50);
 	PanelParamLayout(histparambox);
 
 	wxBoxSizer *colbox = new wxBoxSizer(wxHORIZONTAL); 
@@ -82,7 +82,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxBoxSizer *selectbox = new wxBoxSizer(wxVERTICAL);
 	selectpanel->SetSizer(selectbox);
 	activepanel = selectpanel;
-	paramset->panel = selectpanel;
+	paramset.panel = selectpanel;
 
 
 	// Neuron selection
@@ -137,16 +137,16 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	// Spike selection
 
-	paramset->AddNum("from", "From", 0, 0, 30); 
-	paramset->AddNum("to", "To", 100, 0, 20); 
+	paramset.AddNum("from", "From", 0, 0, 30); 
+	paramset.AddNum("to", "To", 100, 0, 20); 
 
 	wxBoxSizer *selectpanelbox = new wxBoxSizer(wxVERTICAL);
 	selectbox1 = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Selection 1");
 	selectbox2 = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Selection 2");
 	wxBoxSizer *fromtobox = new wxBoxSizer(wxHORIZONTAL);
 
-	fromtobox->Add(paramset->GetCon("from"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
-	fromtobox->Add(paramset->GetCon("to"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	fromtobox->Add(paramset.GetCon("from"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	fromtobox->Add(paramset.GetCon("to"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 
 	int buttspace = 20;
 
@@ -205,11 +205,11 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxBoxSizer *loadbox = new wxBoxSizer(wxVERTICAL);
 	loadpanel->SetSizer(loadbox);
 	activepanel = loadpanel;
-	paramset->panel = loadpanel;
+	paramset.panel = loadpanel;
 
 	wxBoxSizer *datapathbox = new wxBoxSizer(wxHORIZONTAL);
-	paramset->AddText("datapath", "Data Path", "", 60, 250);
-	datapathbox->Add(paramset->GetCon("datapath"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	paramset.AddText("datapath", "Data Path", "", 60, 250);
+	datapathbox->Add(paramset.GetCon("datapath"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 	AddButton(ID_PathBrowse, "Browse", 60, datapathbox);
 
 	wxBoxSizer *datatagbox = new wxBoxSizer(wxHORIZONTAL);
@@ -336,13 +336,13 @@ void NeuroBox::Analysis()           // Specific to generating histogram and haza
 void NeuroBox::OnBrowse(wxCommandEvent& event)
 {
 	if(event.GetId() == ID_PathBrowse) {
-		wxDirDialog *dirdialog = new wxDirDialog(this, "Choose a directory", paramset->GetCon("datapath")->GetLabel(), 0, wxDefaultPosition);
-		if(dirdialog->ShowModal() == wxID_OK) paramset->GetCon("datapath")->SetValue(dirdialog->GetPath()); 
+		wxDirDialog *dirdialog = new wxDirDialog(this, "Choose a directory", paramset.GetCon("datapath")->GetLabel(), 0, wxDefaultPosition);
+		if(dirdialog->ShowModal() == wxID_OK) paramset.GetCon("datapath")->SetValue(dirdialog->GetPath()); 
 	}
 
 	if(event.GetId() == ID_OutputBrowse) {
-		wxDirDialog *dirdialog = new wxDirDialog(this, "Choose a directory", paramset->GetCon("outpath")->GetLabel(), 0, wxDefaultPosition);
-		if(dirdialog->ShowModal() == wxID_OK) paramset->GetCon("outpath")->SetValue(dirdialog->GetPath()); 
+		wxDirDialog *dirdialog = new wxDirDialog(this, "Choose a directory", paramset.GetCon("outpath")->GetLabel(), 0, wxDefaultPosition);
+		if(dirdialog->ShowModal() == wxID_OK) paramset.GetCon("outpath")->SetValue(dirdialog->GetPath()); 
 	}
 
 	if(event.GetId() == ID_FileBrowse) {
@@ -399,10 +399,10 @@ void NeuroBox::SetSelect(double from, double to)
 {
 	int id;
 
-	id = paramset->ref["from"];
-	paramset->con[id]->SetValue(from);
-	id = paramset->ref["to"];
-	paramset->con[id]->SetValue(to);
+	id = paramset.ref["from"];
+	paramset.con[id]->SetValue(from);
+	id = paramset.ref["to"];
+	paramset.con[id]->SetValue(to);
 
 	if(selectmode[currselect] == 1) SelectAdd();
 	if(selectmode[currselect] == 2) SelectSub();
@@ -557,7 +557,7 @@ void NeuroBox::OnLoadData(wxCommandEvent& event)
 	FileDat *file;
 
 	filetag = neurodatatag->GetValue();
-	filepath = paramset->GetCon("datapath")->GetString();
+	filepath = paramset.GetCon("datapath")->GetString();
 	//filepath = "C:/Data/VMN";
 	FileDat newfile = FileDat(filetag, filepath);
 
@@ -1624,7 +1624,7 @@ analysispanel->SetFont(boxfont);
 wxBoxSizer *analysisbox = new wxBoxSizer(wxVERTICAL);
 analysispanel->SetSizer(analysisbox);
 activepanel = analysispanel;
-paramset->panel = analysispanel;
+paramset.panel = analysispanel;
 
 
 notebook->AddPage(analysispanel, "Analysis");
@@ -1635,9 +1635,9 @@ notebook->AddPage(analysispanel, "Analysis");
 
 
 wxBoxSizer *histparambox = new wxBoxSizer(wxVERTICAL);
-paramset->AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
-paramset->AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
-//paramset->AddNum("binsize", "Bin Size", 5, 0, 70, 50);
+paramset.AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
+paramset.AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
+//paramset.AddNum("binsize", "Bin Size", 5, 0, 70, 50);
 PanelParamLayout(histparambox);
 
 

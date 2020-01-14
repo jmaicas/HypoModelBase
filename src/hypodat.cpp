@@ -202,12 +202,14 @@ SpikeDat::SpikeDat()
 	fitType = 0;    // 0 for basic, 1 for oxy, 2 for vaso
 	label = "";
 	fitdiag = false;
+
+	burstdata = NULL;
 }
 
 
 SpikeDat::~SpikeDat()
 {
-	//if(burstdata) delete burstdata;
+	if(burstdata) delete burstdata;
 }
 
 
@@ -1101,6 +1103,7 @@ FitConSet::~FitConSet()
 {
 	delete[] cons;
 	delete[] tags;
+	delete fitconparams;
 }
 
 

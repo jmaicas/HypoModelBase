@@ -32,32 +32,32 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	// Artificial Spike Panel
 
 	activepanel = antipanel;
-	paramset->panel = activepanel;
+	paramset.panel = activepanel;
 	labelwidth = 50;
 	numwidth = 40;
-	paramset->AddNum("artfreq", "Freq", 4, 0, labelwidth, numwidth); 
-	paramset->AddNum("artburst", "Burst", 100, 0, labelwidth, numwidth); 
-	paramset->AddNum("artsilence", "Silence", 50, 0, labelwidth, numwidth); 
-	paramset->AddNum("startspike", "Start", 0, 0, labelwidth, numwidth); 
-	paramset->AddNum("endspike", "End", 0, 0, labelwidth, numwidth); 
-	artnum = paramset->numparams;
+	paramset.AddNum("artfreq", "Freq", 4, 0, labelwidth, numwidth); 
+	paramset.AddNum("artburst", "Burst", 100, 0, labelwidth, numwidth); 
+	paramset.AddNum("artsilence", "Silence", 50, 0, labelwidth, numwidth); 
+	paramset.AddNum("startspike", "Start", 0, 0, labelwidth, numwidth); 
+	paramset.AddNum("endspike", "End", 0, 0, labelwidth, numwidth); 
+	artnum = paramset.numparams;
 
-	paramset->AddNum("antistart", "Start", 0, 0, labelwidth, numwidth); 
-	paramset->AddNum("antifreq", "Freq", 20, 0, labelwidth, numwidth); 
-	paramset->AddNum("anticount", "Spikes", 4, 0, labelwidth, numwidth); 
-	paramset->AddNum("antiperiod", "Period", 5000, 0, labelwidth, numwidth); 
-	paramset->AddNum("antistim", "Count", 100, 0, labelwidth, numwidth); 
-	paramset->AddNum("antipulsedur", "Pulse Dur", 5000, 0, labelwidth, numwidth); 
-	paramset->AddNum("antipulsepsps", "Pulse PSP", 100, 0, labelwidth, numwidth); 
-	antinum = paramset->numparams;
+	paramset.AddNum("antistart", "Start", 0, 0, labelwidth, numwidth); 
+	paramset.AddNum("antifreq", "Freq", 20, 0, labelwidth, numwidth); 
+	paramset.AddNum("anticount", "Spikes", 4, 0, labelwidth, numwidth); 
+	paramset.AddNum("antiperiod", "Period", 5000, 0, labelwidth, numwidth); 
+	paramset.AddNum("antistim", "Count", 100, 0, labelwidth, numwidth); 
+	paramset.AddNum("antipulsedur", "Pulse Dur", 5000, 0, labelwidth, numwidth); 
+	paramset.AddNum("antipulsepsps", "Pulse PSP", 100, 0, labelwidth, numwidth); 
+	antinum = paramset.numparams;
 
 	for(i=0; i<artnum; i++) {
-		artspikebox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		artspikebox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 
 	for(i=artnum; i<antinum; i++) {
-		antispikebox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		antispikebox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 
@@ -79,42 +79,42 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	synpanel->SetSizer(synbox);
 
 	activepanel = synpanel;
-	paramset->panel = activepanel;
+	paramset.panel = activepanel;
 	labelwidth = 50;
 	numwidth = 40;
 
-	paramset->AddNum("synstart", "Start", 0, 0, labelwidth, numwidth); 
-	paramset->AddNum("synfreq", "Freq", 20, 0, labelwidth, numwidth); 
-	paramset->AddNum("syncount", "Spikes", 4, 0, labelwidth, numwidth); 
-	paramset->AddNum("synperiod", "Period", 5000, 0, labelwidth, numwidth); 
-	paramset->AddNum("synstim", "Count", 100, 0, labelwidth, numwidth); 
-	paramset->AddNum("synpulsedur", "Pulse Dur", 5000, 0, labelwidth, numwidth); 
-	paramset->AddNum("synpulsepsps", "Pulse PSP", 100, 0, labelwidth, numwidth); 
-	short synnum = paramset->numparams;
+	paramset.AddNum("synstart", "Start", 0, 0, labelwidth, numwidth); 
+	paramset.AddNum("synfreq", "Freq", 20, 0, labelwidth, numwidth); 
+	paramset.AddNum("syncount", "Spikes", 4, 0, labelwidth, numwidth); 
+	paramset.AddNum("synperiod", "Period", 5000, 0, labelwidth, numwidth); 
+	paramset.AddNum("synstim", "Count", 100, 0, labelwidth, numwidth); 
+	paramset.AddNum("synpulsedur", "Pulse Dur", 5000, 0, labelwidth, numwidth); 
+	paramset.AddNum("synpulsepsps", "Pulse PSP", 100, 0, labelwidth, numwidth); 
+	short synnum = paramset.numparams;
 
 	wxStaticBoxSizer *synpulsebox = new wxStaticBoxSizer(wxVERTICAL, synpanel, "Synaptic Pulse");
 	synpulsebox->AddSpacer(5);
 	for(i=antinum; i<synnum; i++) {
-		synpulsebox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		synpulsebox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 	synpulsebox->AddSpacer(10);
 	AddButton(ID_RunSyn, "Run", 50, synpulsebox);
 
-	paramset->AddNum("synratestart", "Start", 0, 0, labelwidth, numwidth); 
-	paramset->AddNum("synrateamp", "Pulse Amp", 100, 0, labelwidth, numwidth); 
-	paramset->AddNum("synratedur", "Pulse Dur", 1, 2, labelwidth, numwidth); 
-	paramset->AddNum("synrateperiod", "Pulse Per", 100, 1, labelwidth, numwidth); 
-	paramset->AddNum("synratecount", "Pulse Count", 1, 0, labelwidth, numwidth); 
-	paramset->AddNum("synbaseval", "Base Start", 200, 0, labelwidth, numwidth); 
-	paramset->AddNum("synstepval", "Base Step", 10, 0, labelwidth, numwidth); 
-	paramset->AddNum("synnumvals", "Num Vals", 1, 0, labelwidth, numwidth); 
-	short synratenum = paramset->numparams;
+	paramset.AddNum("synratestart", "Start", 0, 0, labelwidth, numwidth); 
+	paramset.AddNum("synrateamp", "Pulse Amp", 100, 0, labelwidth, numwidth); 
+	paramset.AddNum("synratedur", "Pulse Dur", 1, 2, labelwidth, numwidth); 
+	paramset.AddNum("synrateperiod", "Pulse Per", 100, 1, labelwidth, numwidth); 
+	paramset.AddNum("synratecount", "Pulse Count", 1, 0, labelwidth, numwidth); 
+	paramset.AddNum("synbaseval", "Base Start", 200, 0, labelwidth, numwidth); 
+	paramset.AddNum("synstepval", "Base Step", 10, 0, labelwidth, numwidth); 
+	paramset.AddNum("synnumvals", "Num Vals", 1, 0, labelwidth, numwidth); 
+	short synratenum = paramset.numparams;
 
 	wxStaticBoxSizer *synratebox = new wxStaticBoxSizer(wxVERTICAL, synpanel, "Synaptic Rate");
 	synpulsebox->AddSpacer(5);
 	for(i=synnum; i<synratenum; i++) {
-		synratebox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		synratebox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 	synratebox->AddSpacer(10);
@@ -139,28 +139,28 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	osmopanel->SetSizer(osmopansizer);
 
 	activepanel = osmopanel;
-	paramset->panel = activepanel;
+	paramset.panel = activepanel;
 	labelwidth = 60;
 	numwidth = 55;
 
-	paramset->AddNum("injecttime", "Inject Time", 1000, 0, labelwidth, numwidth); 
-	paramset->AddNum("injectstep", "Inject Step", 20, 2, labelwidth, numwidth); 
-	short osmonum = paramset->numparams;
+	paramset.AddNum("injecttime", "Inject Time", 1000, 0, labelwidth, numwidth); 
+	paramset.AddNum("injectstep", "Inject Step", 20, 2, labelwidth, numwidth); 
+	short osmonum = paramset.numparams;
 
 	wxStaticBoxSizer *osmobox = new wxStaticBoxSizer(wxVERTICAL, osmopanel, "Osmotic Injection");
 	osmobox->AddSpacer(5);
 	for(i=synratenum; i<osmonum; i++) {
-		osmobox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		osmobox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 
-	paramset->AddNum("vasoinjecttime", "Inject Time", 1000, 0, labelwidth, numwidth); 
-	paramset->AddNum("vasoinjectstep", "Inject Step", 20, 2, labelwidth, numwidth); 
-	short vasonum = paramset->numparams;
+	paramset.AddNum("vasoinjecttime", "Inject Time", 1000, 0, labelwidth, numwidth); 
+	paramset.AddNum("vasoinjectstep", "Inject Step", 20, 2, labelwidth, numwidth); 
+	short vasonum = paramset.numparams;
 	wxStaticBoxSizer *vasobox = new wxStaticBoxSizer(wxVERTICAL, osmopanel, "Vasopressin Injection");
 	vasobox->AddSpacer(5);
 	for(i=osmonum; i<vasonum; i++) {
-		vasobox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		vasobox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 	}
 
 	wxBoxSizer *osmopanhbox = new wxBoxSizer(wxHORIZONTAL);
@@ -179,20 +179,20 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	// Input Panel
 
 	activepanel = inputpanel;
-	paramset->panel = activepanel;
+	paramset.panel = activepanel;
 
 	labelwidth = 50;
 	numwidth = 45;
 
-	paramset->AddNum("baseval", "Start", 200, 0, labelwidth, numwidth); 
-	paramset->AddNum("stepval", "Step", 10, 0, labelwidth, numwidth); 
-	paramset->AddNum("numvals", "Num Vals", 20, 0, labelwidth, numwidth); 
-	paramset->AddNum("numruns", "Num Runs", 1, 0, labelwidth, numwidth); 
-	inpnum = paramset->numparams;
+	paramset.AddNum("baseval", "Start", 200, 0, labelwidth, numwidth); 
+	paramset.AddNum("stepval", "Step", 10, 0, labelwidth, numwidth); 
+	paramset.AddNum("numvals", "Num Vals", 20, 0, labelwidth, numwidth); 
+	paramset.AddNum("numruns", "Num Runs", 1, 0, labelwidth, numwidth); 
+	inpnum = paramset.numparams;
 
 	wxStaticBoxSizer *inputrangebox = new wxStaticBoxSizer(wxVERTICAL, inputpanel, "Input Range");
 	for(i=vasonum; i<inpnum; i++) {
-		inputrangebox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		inputrangebox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 	wxBoxSizer *inputrunbox = new wxBoxSizer(wxHORIZONTAL);
@@ -206,16 +206,16 @@ ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos
 	inputrangebox->AddSpacer(10);
 	AddButton(ID_Run, "Run", 50, inputrangebox);
 
-	paramset->AddNum("rampbase", "Base", 200, 0, labelwidth, numwidth); 
-	paramset->AddNum("rampstart", "Start", 200, 0, labelwidth, numwidth); 
-	paramset->AddNum("rampstop", "Stop", 300, 0, labelwidth, numwidth); 
-	paramset->AddNum("rampinit", "Initial", 200, 0, labelwidth, numwidth); 
-	paramset->AddNum("rampstep", "1s Step", 0.1, 2, labelwidth, numwidth); 
-	rampnum = paramset->numparams;
+	paramset.AddNum("rampbase", "Base", 200, 0, labelwidth, numwidth); 
+	paramset.AddNum("rampstart", "Start", 200, 0, labelwidth, numwidth); 
+	paramset.AddNum("rampstop", "Stop", 300, 0, labelwidth, numwidth); 
+	paramset.AddNum("rampinit", "Initial", 200, 0, labelwidth, numwidth); 
+	paramset.AddNum("rampstep", "1s Step", 0.1, 2, labelwidth, numwidth); 
+	rampnum = paramset.numparams;
 
 	wxStaticBoxSizer *rampbox = new wxStaticBoxSizer(wxVERTICAL, inputpanel, "Input Ramp");
 	for(i=inpnum; i<rampnum; i++) {
-		rampbox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		rampbox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 	rampbox->AddSpacer(10);

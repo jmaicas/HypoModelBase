@@ -48,7 +48,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox = new wxBoxSizer(wxVERTICAL);
 	panel->SetSizer(mainbox);
 
-	paramset = new ParamSet(panel);
+	paramset.panel = panel; // = new ParamSet(panel);
 	boxout = new BoxOut(NULL, graphwin->mainwin->diagbox, "Axis Panel"); 
 	parambox = new wxBoxSizer(wxHORIZONTAL);
 
@@ -56,10 +56,10 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	numwidth = 50;
 	if(ostype == Mac) labelwidth = 50;
 	graph = graphwin->dispset[0]->plot[0];
-	paramset->AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth, numwidth);
-	paramset->AddNum("xstep", "X Step", graph->xstep, 2, labelwidth, numwidth);
-	paramset->AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth, numwidth);
-	paramset->AddNum("ystep", "Y Step", graph->ystep, 2, labelwidth, numwidth);
+	paramset.AddNum("xlabels", "X Ticks", (double)graph->xlabels, 0, labelwidth, numwidth);
+	paramset.AddNum("xstep", "X Step", graph->xstep, 2, labelwidth, numwidth);
+	paramset.AddNum("ylabels", "Y Ticks", (double)graph->ylabels, 0, labelwidth, numwidth);
+	paramset.AddNum("ystep", "Y Step", graph->ystep, 2, labelwidth, numwidth);
 	wxBoxSizer *tickparams = ParamLayout(2);
 
 	wxStaticBoxSizer *xradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
@@ -123,38 +123,38 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 
 	numwidth = 50;
 
-	paramset->AddNum("xshift", "XShift", graph->xshift, 2, labelwidth, numwidth);
-	paramset->AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
-	paramset->AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
-	paramset->AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
-	paramset->AddNum("xlogbase", "XLogB", graph->xlogbase, 4, labelwidth, numwidth);
-	paramset->AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
-	paramset->AddNum("xlabelplaces", "X Places", graph->xlabelplaces, 0, labelwidth, numwidth);
-	paramset->AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
-	paramset->AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
-	paramset->AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
-	paramset->AddNum("yscale", "YScale", graph->yunitscale, 3, labelwidth, numwidth);
-	paramset->AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
-	paramset->AddNum("ylogbase", "YLogB", graph->ylogbase, 4, labelwidth, numwidth);
-	paramset->AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
-	paramset->AddNum("ylabelplaces", "Y Places", graph->ylabelplaces, 0, labelwidth, numwidth);
-	paramset->AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
+	paramset.AddNum("xshift", "XShift", graph->xshift, 2, labelwidth, numwidth);
+	paramset.AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
+	paramset.AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
+	paramset.AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
+	paramset.AddNum("xlogbase", "XLogB", graph->xlogbase, 4, labelwidth, numwidth);
+	paramset.AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
+	paramset.AddNum("xlabelplaces", "X Places", graph->xlabelplaces, 0, labelwidth, numwidth);
+	paramset.AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
+	paramset.AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
+	paramset.AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
+	paramset.AddNum("yscale", "YScale", graph->yunitscale, 3, labelwidth, numwidth);
+	paramset.AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
+	paramset.AddNum("ylogbase", "YLogB", graph->ylogbase, 4, labelwidth, numwidth);
+	paramset.AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
+	paramset.AddNum("ylabelplaces", "Y Places", graph->ylabelplaces, 0, labelwidth, numwidth);
+	paramset.AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
 	wxBoxSizer *plotparams = ParamLayout(2);
 
-	paramset->GetCon("xshift")->SetMinMax(-100000, 100000);
-	paramset->GetCon("yshift")->SetMinMax(-100000, 100000);
-	paramset->GetCon("xlabelplaces")->SetMinMax(-1, 100);
-	paramset->GetCon("ylabelplaces")->SetMinMax(-1, 100);
+	paramset.GetCon("xshift")->SetMinMax(-100000, 100000);
+	paramset.GetCon("yshift")->SetMinMax(-100000, 100000);
+	paramset.GetCon("xlabelplaces")->SetMinMax(-1, 100);
+	paramset.GetCon("ylabelplaces")->SetMinMax(-1, 100);
 
-	paramset->AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
+	paramset.AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
 	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
 	clipcheck->SetFont(confont);
 	clipcheck->SetValue(graph->clipmode);
 	wxBoxSizer *fontparams = new wxBoxSizer(wxHORIZONTAL);
-	fontparams->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	fontparams->Add(paramset.GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	fontparams->AddSpacer(5);
 	fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	paramset->currlay++;
+	paramset.currlay++;
 
 	linecheck = new wxCheckBox(panel, ID_line, "");
 	linecheck->SetFont(confont);
@@ -165,42 +165,42 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	scattercheck->SetValue(graph->scattermode);
 
 	//wxBoxSizer *checkbox = new wxBoxSizer(wxHORIZONTAL);
-	//scatterparams->Add(paramset->GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//scatterparams->Add(paramset.GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	//scatterparams->AddSpacer(5);
 	//checkbox->Add(linecheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	//checkbox->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	//paramset->currlay++;
+	//paramset.currlay++;
 
 	//wxGridSizer *plotgrid = new wxFlexGridSizer(2, 5, 5);
-	//plotgrid->Add(paramset->GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
+	//plotgrid->Add(paramset.GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
 	//plotgrid->Add(clipcheck, 0, wxALIGN_CENTRE_VERTICAL);
-	//plotgrid->Add(paramset->GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
+	//plotgrid->Add(paramset.GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
 	//plotgrid->Add(scattercheck, 0, wxALIGN_CENTRE_VERTICAL);
 
 	strokepicker = new wxColourPickerCtrl(panel, 0, graph->strokecolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
-	paramset->AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
+	paramset.AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
 	wxBoxSizer *strokebox = new wxBoxSizer(wxHORIZONTAL);
 	//wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Stroke");
 	//label->SetFont(confont);
 	//colourbox->Add(label, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
-	strokebox->Add(paramset->con[paramset->GetID("plotstroke")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
-	paramset->currlay++;
+	strokebox->Add(paramset.con[paramset.GetID("plotstroke")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	paramset.currlay++;
 	strokebox->Add(linecheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	strokebox->Add(strokepicker);
 
 	fillpicker = new wxColourPickerCtrl(panel, 0, graph->fillcolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
-	paramset->AddNum("scattersize", "Scatter Size", graph->scattersize, 2, labelwidth);
+	paramset.AddNum("scattersize", "Scatter Size", graph->scattersize, 2, labelwidth);
 	wxBoxSizer *fillbox = new wxBoxSizer(wxHORIZONTAL);
-	fillbox->Add(paramset->con[paramset->GetID("scattersize")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
-	paramset->currlay++;
+	fillbox->Add(paramset.con[paramset.GetID("scattersize")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	paramset.currlay++;
 	fillbox->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	fillbox->Add(fillpicker);
 
 	// plot layer selection and synch
-	paramset->AddCon("plotlayer", "Layer", 0, 1, 0, labelwidth);
+	paramset.AddCon("plotlayer", "Layer", 0, 1, 0, labelwidth);
 	wxBoxSizer *layerbox = new wxBoxSizer(wxHORIZONTAL);
-	layerbox->Add(paramset->GetCon("plotlayer"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
-	paramset->currlay++;
+	layerbox->Add(paramset.GetCon("plotlayer"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	paramset.currlay++;
 	wxButton *syncButton = new wxButton(panel, ID_Sync, "Synch", wxDefaultPosition, wxSize(50, buttonheight));
 	layerbox->Add(syncButton, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	
@@ -236,9 +236,9 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	typebox->AddSpacer(5);
 	typebox->Add(typechoice);
 	
-	paramset->AddText("gname", "Name", graph->gname, labelwidth);
-	paramset->AddText("xtag", "X Label", graph->xtag, labelwidth);
-	paramset->AddText("ytag", "Y Label", graph->ytag, labelwidth);
+	paramset.AddText("gname", "Name", graph->gname, labelwidth);
+	paramset.AddText("xtag", "X Label", graph->xtag, labelwidth);
+	paramset.AddText("ytag", "Y Label", graph->ytag, labelwidth);
 	wxBoxSizer *labelparams = ParamLayout(1);
 
 	//wxBoxSizer *gapparams = ParamLayout(2);
@@ -305,30 +305,30 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 
 void GraphBox::SetControls()
 {
-	paramset->GetCon("gname")->SetValue(graph->gname);
-	//paramset->GetCon("gname")->SetLabel("test label");
-	paramset->GetCon("xtag")->SetValue(graph->xtag);
-	paramset->GetCon("ytag")->SetValue(graph->ytag);
+	paramset.GetCon("gname")->SetValue(graph->gname);
+	//paramset.GetCon("gname")->SetLabel("test label");
+	paramset.GetCon("xtag")->SetValue(graph->xtag);
+	paramset.GetCon("ytag")->SetValue(graph->ytag);
 
-	paramset->GetCon("xlabels")->SetValue(graph->xlabels);
-	paramset->GetCon("ylabels")->SetValue(graph->ylabels);
-	paramset->GetCon("xstep")->SetValue(graph->xstep);
-	paramset->GetCon("ystep")->SetValue(graph->ystep);
-	paramset->GetCon("xplot")->SetValue(graph->xplot);
-	paramset->GetCon("yplot")->SetValue(graph->yplot);
-	paramset->GetCon("xshift")->SetValue(graph->xshift);
-	paramset->GetCon("xsample")->SetValue(graph->xsample);
-	paramset->GetCon("xscale")->SetValue(graph->xunitscale);
-	paramset->GetCon("xdscale")->SetValue(graph->xunitdscale);
-	paramset->GetCon("xlabelgap")->SetValue(graph->xlabelgap);
-	paramset->GetCon("ylabelgap")->SetValue(graph->ylabelgap);
-	paramset->GetCon("xlabelplaces")->SetValue(graph->xlabelplaces);
-	paramset->GetCon("ylabelplaces")->SetValue(graph->ylabelplaces);
-	paramset->GetCon("plotstroke")->SetValue(graph->plotstroke);
-	paramset->GetCon("labelfontsize")->SetValue(graph->labelfontsize);
-	paramset->GetCon("scattersize")->SetValue(graph->scattersize);
-	paramset->GetCon("yscale")->SetValue(graph->yunitscale);
-	paramset->GetCon("yshift")->SetValue(graph->yshift);
+	paramset.GetCon("xlabels")->SetValue(graph->xlabels);
+	paramset.GetCon("ylabels")->SetValue(graph->ylabels);
+	paramset.GetCon("xstep")->SetValue(graph->xstep);
+	paramset.GetCon("ystep")->SetValue(graph->ystep);
+	paramset.GetCon("xplot")->SetValue(graph->xplot);
+	paramset.GetCon("yplot")->SetValue(graph->yplot);
+	paramset.GetCon("xshift")->SetValue(graph->xshift);
+	paramset.GetCon("xsample")->SetValue(graph->xsample);
+	paramset.GetCon("xscale")->SetValue(graph->xunitscale);
+	paramset.GetCon("xdscale")->SetValue(graph->xunitdscale);
+	paramset.GetCon("xlabelgap")->SetValue(graph->xlabelgap);
+	paramset.GetCon("ylabelgap")->SetValue(graph->ylabelgap);
+	paramset.GetCon("xlabelplaces")->SetValue(graph->xlabelplaces);
+	paramset.GetCon("ylabelplaces")->SetValue(graph->ylabelplaces);
+	paramset.GetCon("plotstroke")->SetValue(graph->plotstroke);
+	paramset.GetCon("labelfontsize")->SetValue(graph->labelfontsize);
+	paramset.GetCon("scattersize")->SetValue(graph->scattersize);
+	paramset.GetCon("yscale")->SetValue(graph->yunitscale);
+	paramset.GetCon("yshift")->SetValue(graph->yshift);
 
 	clipcheck->SetValue(graph->clipmode);
 	scattercheck->SetValue(graph->scattermode);
@@ -371,10 +371,10 @@ void GraphBox::OnSpin(wxSpinEvent& event)
 {
 	wxString text;
 
-	int layer = paramset->GetValue("plotlayer");
+	int layer = paramset.GetValue("plotlayer");
 
 	GraphDisp *graphdisp = graphwin->dispset[0];
-	if(layer > graphdisp->numplots-1) paramset->GetCon("plotlayer")->SetValue(graphdisp->numplots-1);
+	if(layer > graphdisp->numplots-1) paramset.GetCon("plotlayer")->SetValue(graphdisp->numplots-1);
 	else {
 		SetParams();   // read and store params for previous plot
 		graph = graphdisp->plot[layer];
@@ -482,7 +482,7 @@ void GraphBox::OnPrint(wxCommandEvent& event)
 
 void GraphBox::SetParams(GraphDat *setgraph)
 {
-	ParamStore *params = paramset->GetParamsNew(boxout);
+	ParamStore *params = paramset.GetParamsNew(boxout);
 	if(setgraph) graph = setgraph;
 
 	graph->xlabels = (*params)["xlabels"];
@@ -514,9 +514,9 @@ void GraphBox::SetParams(GraphDat *setgraph)
 	graph->fillcolour = fillpicker->GetColour();
 	graph->colour = custom;
 
-	graph->gname = paramset->GetCon("gname")->GetString();
-	graph->xtag = paramset->GetCon("xtag")->GetString();
-	graph->ytag = paramset->GetCon("ytag")->GetString();
+	graph->gname = paramset.GetCon("gname")->GetString();
+	graph->xtag = paramset.GetCon("xtag")->GetString();
+	graph->ytag = paramset.GetCon("ytag")->GetString();
 
 	graph->xlogbase = (*params)["xlogbase"];
 	graph->ylogbase = (*params)["ylogbase"];
@@ -525,7 +525,7 @@ void GraphBox::SetParams(GraphDat *setgraph)
 
 void GraphBox::SetParamsCopy(GraphDat *setgraph)
 {
-	ParamStore *params = paramset->GetParamsNew(boxout);
+	ParamStore *params = paramset.GetParamsNew(boxout);
 
 	setgraph->xlabels = (*params)["xlabels"];
 	setgraph->ylabels = (*params)["ylabels"];
@@ -551,8 +551,8 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	setgraph->clipmode = clipcheck->GetValue();
 	setgraph->scattermode = scattercheck->GetValue();
 	
-	setgraph->xtag = paramset->GetCon("xtag")->GetString();
-	setgraph->ytag = paramset->GetCon("ytag")->GetString();
+	setgraph->xtag = paramset.GetCon("xtag")->GetString();
+	setgraph->ytag = paramset.GetCon("ytag")->GetString();
 	
 	setgraph->xtickmode = graph->xtickmode;
 	setgraph->ytickmode = graph->ytickmode;	
@@ -587,16 +587,16 @@ wxBoxSizer *GraphBox::ParamLayout(int columns)
 {
 	// Only works for one or two columns currently, columns parameter bigger than two treated like one
 	//
-	// paramset->currlay allows repeated use after adding more parameters, for separate layout
+	// paramset.currlay allows repeated use after adding more parameters, for separate layout
 
 	int i;
 	int colsize = 0;
 
 	wxBoxSizer *box = new wxBoxSizer(wxHORIZONTAL);
 
-	if(columns != 2) colsize = paramset->numparams - paramset->currlay;
+	if(columns != 2) colsize = paramset.numparams - paramset.currlay;
 	if(columns == 2) {
-		if(!column) colsize = (paramset->numparams+1 - paramset->currlay) / 2;
+		if(!column) colsize = (paramset.numparams+1 - paramset.currlay) / 2;
 		else colsize = column; 
 	}
 
@@ -606,21 +606,21 @@ wxBoxSizer *GraphBox::ParamLayout(int columns)
 		vbox[i]->AddSpacer(5);
 	}
 
-	for(i=paramset->currlay; i<paramset->currlay + colsize; i++) {
-		vbox[0]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	for(i=paramset.currlay; i<paramset.currlay + colsize; i++) {
+		vbox[0]->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		vbox[0]->AddSpacer(5);
 	}
 	box->Add(vbox[0], 0);
 
 	if(columns == 2) {
-		for(i=paramset->currlay + colsize; i<paramset->numparams; i++) {
-			vbox[1]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		for(i=paramset.currlay + colsize; i<paramset.numparams; i++) {
+			vbox[1]->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 			vbox[1]->AddSpacer(5);
 		}
 		box->Add(vbox[1], 0);
 	}
 
-	paramset->currlay = paramset->numparams;
+	paramset.currlay = paramset.numparams;
 	return box;
 }
 
@@ -671,7 +671,7 @@ ParamBox::~ParamBox()
 	delete modparams;
 	delete modflags;
 	delete conflags;
-	delete paramset;
+	//delete paramset;
 	delete flagrefs;
 	delete conflagrefs;
 	delete checkrefs;
@@ -762,23 +762,23 @@ void ParamBox::ParamLayout(int columns)                   // Currently for one o
 {
 	int colsize = 0;
 
-	if(columns != 2) colsize = paramset->numparams;
+	if(columns != 2) colsize = paramset.numparams;
 	if(columns == 2) {
-		if(!column) colsize = (paramset->numparams+1) / 2;
+		if(!column) colsize = (paramset.numparams+1) / 2;
 		else colsize = column; 
 	}
 
 	SetVBox(columns);
 
 	for(i=0; i<colsize; i++) {
-		vbox[0]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		vbox[0]->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		vbox[0]->AddSpacer(5);
 	}
 	parambox->Add(vbox[0], 0);
 
 	if(columns == 2) {
-		for(i=colsize; i<paramset->numparams; i++) {
-			vbox[1]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		for(i=colsize; i<paramset.numparams; i++) {
+			vbox[1]->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 			vbox[1]->AddSpacer(5);
 		}
 		parambox->Add(vbox[1], 0);
@@ -788,10 +788,10 @@ void ParamBox::ParamLayout(int columns)                   // Currently for one o
 
 void ParamBox::PanelParamLayout(wxBoxSizer *box, int columns)
 {
-	for(i=paramindex; i<paramset->numparams; i++) {
-		box->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	for(i=paramindex; i<paramset.numparams; i++) {
+		box->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 	}
-	paramindex = paramset->numparams;
+	paramindex = paramset.numparams;
 }
 
 
@@ -1087,7 +1087,7 @@ void ParamBox::OnRun(wxCommandEvent& WXUNUSED(event))
 
 ParamCon *ParamBox::GetCon(wxString tag)
 {
-	return paramset->GetCon(tag);
+	return paramset.GetCon(tag);
 }
 
 
@@ -1145,8 +1145,8 @@ ParamStore *ParamBox::GetParams(ParamStore *pstore)
 { 
 double value;
 if(pstore == NULL) pstore = modparams;
-for(i=0; i<paramset->numparams; i++)
-paramset->con[i]->numbox->GetValue().ToDouble(&((*pstore)[paramset->con[i]->name]));
+for(i=0; i<paramset.numparams; i++)
+paramset.con[i]->numbox->GetValue().ToDouble(&((*pstore)[paramset.con[i]->name]));
 return pstore;
 }*/
 
@@ -1162,8 +1162,8 @@ ParamStore *ParamBox::GetParams(ParamStore *pstore)
 	//if(mainwin->diagnostic) mod->diagbox->textbox->AppendText(text.Format("%s get params\n", boxtag));
 
 	if(pstore == NULL) pstore = modparams;
-	for(i=0; i<paramset->numparams; i++) {
-		con = paramset->con[i];
+	for(i=0; i<paramset.numparams; i++) {
+		con = paramset.con[i];
 		value = con->GetValue();
 		if(value < con->min) {
 			//value = con->min;
@@ -1180,8 +1180,8 @@ ParamStore *ParamBox::GetParams(ParamStore *pstore)
 			con->SetValue(value);
 			if(con->label) SetStatus(text.Format("Parameter %s out of range", con->label->GetLabel()));
 		}
-		//paramset->con[i]->numbox->GetValue().ToDouble(&((*pstore)[paramset->con[i]->name]));
-		(*pstore)[paramset->con[i]->name] = value;
+		//paramset.con[i]->numbox->GetValue().ToDouble(&((*pstore)[paramset.con[i]->name]));
+		(*pstore)[paramset.con[i]->name] = value;
 		con->oldvalue = value;
 	}
 
@@ -1192,8 +1192,8 @@ ParamStore *ParamBox::GetParams(ParamStore *pstore)
 
 ParamStore *ParamBox::GetNumParams()
 { 
-	for(i=0; i<paramset->numparams; i++)
-		paramset->num[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset->num[i]->name]));
+	for(i=0; i<paramset.numparams; i++)
+		paramset.num[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset.num[i]->name]));
 	return modparams;
 }
 
@@ -1285,20 +1285,20 @@ void ParamBox::ParamLoad(wxString filetag, bool compmode)
 		//sdat = readline.BeforeFirst('k');
 		readline.Trim();
 		//storetag->SetValue(readline);
-		if(paramset->ref.check(datname)) {
-			id = paramset->ref[datname];
-			if(paramset->con[id]->type != textcon) {
+		if(paramset.ref.check(datname)) {
+			id = paramset.ref[datname];
+			if(paramset.con[id]->type != textcon) {
 				readline.ToDouble(&datval);
-				paramset->con[id]->SetPen(blackpen);
+				paramset.con[id]->SetPen(blackpen);
 				if(compmode && datval != (*oldparams)[datname]) {
-					paramset->con[id]->SetPen(greenpen);
+					paramset.con[id]->SetPen(greenpen);
 					mainwin->diagbox->Write(datname + " param change\n");
 				}
-				//paramset->con[id]->SetForegroundColour(greenpen);
-				paramset->con[id]->SetValue("");
-				paramset->con[id]->SetValue(datval);
+				//paramset.con[id]->SetForegroundColour(greenpen);
+				paramset.con[id]->SetValue("");
+				paramset.con[id]->SetValue(datval);
 			}
-			else paramset->con[id]->SetValue(readline);
+			else paramset.con[id]->SetValue(readline);
 		}
 		if(diagnostic) mainwin->diagbox->Write(text.Format("Model Param ID %d, Name %s, Value %.4f\n", id, datname, datval)); 
 		if(paramfile.Eof()) return;
@@ -1405,13 +1405,13 @@ void ParamBox::StoreParam(wxString filetag)
 	paramfile.Open();
 	paramfile.Clear();
 
-	for(i=0; i<paramset->numparams; i++) {
-		if(paramset->con[i]->type != textcon) {
-			paramset->con[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset->con[i]->name]));
-			outline.Printf("%.8f", (*modparams)[paramset->con[i]->name]);
+	for(i=0; i<paramset.numparams; i++) {
+		if(paramset.con[i]->type != textcon) {
+			paramset.con[i]->numbox->GetValue().ToDouble(&((*modparams)[paramset.con[i]->name]));
+			outline.Printf("%.8f", (*modparams)[paramset.con[i]->name]);
 		}
-		else outline = paramset->con[i]->GetString();
-		paramfile.AddLine(paramset->con[i]->name + " " + outline);
+		else outline = paramset.con[i]->GetString();
+		paramfile.AddLine(paramset.con[i]->name + " " + outline);
 	}
 	paramfile.AddLine("");
 	for(i=0; i<flagrefs->numrefs; i++) {

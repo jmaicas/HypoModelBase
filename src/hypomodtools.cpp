@@ -24,20 +24,20 @@ ModGenBox::ModGenBox(HypoMain *main, const wxString& title, const wxPoint& pos, 
 	wxString text;
 
 	toolset = main->toolset;
-	paramset = new ParamSet(panel);
+	paramset.panel = panel; // = new ParamSet(panel);
 	page = new wxRichTextCtrl*[10];
 
 	//wxTextCtrl *page1;
 
-	//paramset->AddNum("modname", "Mod Name", 10, 0, 50, 150);
-	paramset->AddText("modname", "Mod Name", "Test", 50, 150);
-	paramset->AddText("modtag", "Mod Tag", "test", 50, 150);
-	paramset->AddNum("modindex", "Index", 9, 0);
+	//paramset.AddNum("modname", "Mod Name", 10, 0, 50, 150);
+	paramset.AddText("modname", "Mod Name", "Test", 50, 150);
+	paramset.AddText("modtag", "Mod Tag", "test", 50, 150);
+	paramset.AddNum("modindex", "Index", 9, 0);
 
 	wxBoxSizer *parambox = new wxBoxSizer(wxVERTICAL);
 
-	for(i=0; i<paramset->numparams; i++) {
-		parambox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	for(i=0; i<paramset.numparams; i++) {
+		parambox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		parambox->AddSpacer(5);
 	}
 
@@ -111,9 +111,9 @@ void ModGenBox::DefGen()
 
 void ModGenBox::OnGen(wxCommandEvent& event)
 {
-	modname = paramset->GetText("modname");
-	modtag = paramset->GetText("modtag");
-	modnum = paramset->GetText("modindex");
+	modname = paramset.GetText("modname");
+	modtag = paramset.GetText("modtag");
+	modnum = paramset.GetText("modindex");
 
 	// template files
 	plate[0] = "xxxmodel.h";
@@ -282,16 +282,16 @@ InfoBox::InfoBox(HypoMain *main, const wxString& title, const wxPoint& pos, cons
 	//paramfilebox->Add(synccheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
 
 	wxBoxSizer *artspikebox = new wxBoxSizer(wxVERTICAL);
-	paramset = new ParamSet(panel);
+	paramset.panel = panel; // = new ParamSet(panel);
 	labelwidth = 50;
-	paramset->AddNum("artfreq", "Freq", 4, 0, labelwidth); 
-	paramset->AddNum("artburst", "Burst", 100, 0, labelwidth); 
-	paramset->AddNum("artsilence", "Silence", 50, 0, labelwidth); 
-	paramset->AddNum("startspike", "Start", 0, 0, labelwidth); 
-	paramset->AddNum("endspike", "End", 0, 0, labelwidth); 
+	paramset.AddNum("artfreq", "Freq", 4, 0, labelwidth); 
+	paramset.AddNum("artburst", "Burst", 100, 0, labelwidth); 
+	paramset.AddNum("artsilence", "Silence", 50, 0, labelwidth); 
+	paramset.AddNum("startspike", "Start", 0, 0, labelwidth); 
+	paramset.AddNum("endspike", "End", 0, 0, labelwidth); 
 
-	for(i=0; i<paramset->numparams; i++) {
-		artspikebox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	for(i=0; i<paramset.numparams; i++) {
+		artspikebox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 		//artspikebox->AddSpacer(2);
 	}
 
@@ -311,8 +311,8 @@ InfoBox::InfoBox(HypoMain *main, const wxString& title, const wxPoint& pos, cons
 
 void InfoBox::GetArtParams()
 {
-	for(i=0; i<paramset->numparams; i++)
-		paramset->con[i]->numbox->GetValue().ToDouble(&((*artparams)[paramset->con[i]->name]));
+	for(i=0; i<paramset.numparams; i++)
+		paramset.con[i]->numbox->GetValue().ToDouble(&((*artparams)[paramset.con[i]->name]));
 }
 
 
@@ -398,7 +398,8 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	activepanel = panel;
 	BurstPanel *burstpanset[5];
-	paramset = new ParamSet(panel);
+	//paramset = new ParamSet(panel);
+	paramset.panel = panel;
 
 	maxint = 1500;
 	minspikes = 25;
@@ -444,14 +445,14 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	// Burst Scan and Analysis
 	if(burstmode) {
-		paramset->AddNum("maxint", "Max Interval", 1500, 0); 
-		paramset->AddNum("minspikes", "Min Spikes", 25, 0); 
-		paramset->AddNum("maxspikes", "Max Spikes", 0, 0); 
-		paramset->AddNum("startspike", "Start", 0, 0); 
-		paramset->AddNum("endspike", "End", 0, 0); 
+		paramset.AddNum("maxint", "Max Interval", 1500, 0); 
+		paramset.AddNum("minspikes", "Min Spikes", 25, 0); 
+		paramset.AddNum("maxspikes", "Max Spikes", 0, 0); 
+		paramset.AddNum("startspike", "Start", 0, 0); 
+		paramset.AddNum("endspike", "End", 0, 0); 
 
-		for(i=0; i<paramset->numparams; i++) {
-			parambox->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		for(i=0; i<paramset.numparams; i++) {
+			parambox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 			parambox->AddSpacer(5);
 		}
 
@@ -572,11 +573,11 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	datbox->AddSpacer(5);
 	datbox->AddStretchSpacer();
 
-	paramset->AddNum("filterthresh", "Filter", 0, 0, 30); 
+	paramset.AddNum("filterthresh", "Filter", 0, 0, 30); 
 	filerad = new wxRadioButton(panel, ID_file, "File", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	gridrad  = new wxRadioButton(panel, ID_grid, "Grid");
 	
-	datconbox->Add(paramset->GetCon("filterthresh"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	datconbox->Add(paramset.GetCon("filterthresh"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 	//datbox->AddStretchSpacer(5);
 	
 	//datbox->Add(datcon, 0);
@@ -602,7 +603,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	if(selfstore) Load();   // load self-stored tool parameter values
 
-	//snum.Printf("con x %d", paramset->con[0]->numwidth + paramset->con[0]->labelwidth);
+	//snum.Printf("con x %d", paramset.con[0]->numwidth + paramset.con[0]->labelwidth);
 	//datstatus->SetLabel(snum);
 
 	Connect(ID_scan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(BurstBox::OnScan));
@@ -620,7 +621,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 BurstBox::~BurstBox()
 {
 	delete burstparams;
-	delete paramset;
+	//delete paramset;
 	if(burstmode) {
 		delete datburst;
 		delete modburst;
@@ -764,8 +765,8 @@ void BurstBox::BurstScan()
 
 ParamStore *BurstBox::GetParams()
 { 
-	for(i=0; i<paramset->numparams; i++)
-		paramset->con[i]->numbox->GetValue().ToDouble(&((*burstparams)[paramset->con[i]->name]));
+	for(i=0; i<paramset.numparams; i++)
+		paramset.con[i]->numbox->GetValue().ToDouble(&((*burstparams)[paramset.con[i]->name]));
 	return burstparams;
 }
 
@@ -1007,19 +1008,19 @@ SoundBox::SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	soundmutex = new wxMutex;
 	//vasomod = (VasoModel)mod;
 
-	paramset->AddNum("soundfreq", "Sound Freq", 400, 2);
-	paramset->AddNum("pulsefreq", "Pulse Freq", 10, 2);
-	paramset->AddNum("pulsedur", "Pulse Dur", 20, 2);
-	paramset->AddNum("pulseint", "Pulse Int", 500, 0);
-	paramset->AddNum("freqscale", "Freq Scale", 20, 0);
-	paramset->AddNum("playspikes", "Play Spikes", 100, 0);
-	paramset->AddNum("timerate", "Time Rate", 1, 1);
+	paramset.AddNum("soundfreq", "Sound Freq", 400, 2);
+	paramset.AddNum("pulsefreq", "Pulse Freq", 10, 2);
+	paramset.AddNum("pulsedur", "Pulse Dur", 20, 2);
+	paramset.AddNum("pulseint", "Pulse Int", 500, 0);
+	paramset.AddNum("freqscale", "Freq Scale", 20, 0);
+	paramset.AddNum("playspikes", "Play Spikes", 100, 0);
+	paramset.AddNum("timerate", "Time Rate", 1, 1);
 
 
 	SetVBox(1);
 
-	for(i=0; i<paramset->numparams; i++) {
-		vbox[0]->Add(paramset->con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);	
+	for(i=0; i<paramset.numparams; i++) {
+		vbox[0]->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);	
 	}
 
 	numspikes = NumPanel();

@@ -129,7 +129,7 @@ public:
 	wxBoxSizer *mainbox;
 	wxBoxSizer *parambox;
 	wxBoxSizer *vbox[5];
-	ParamSet *paramset;
+	ParamSet paramset;
 	GraphDat *graph;
 	BoxOut *boxout;
 	wxStaticText *status;

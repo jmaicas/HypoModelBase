@@ -108,85 +108,6 @@ public:
 };
 
 
-class ToolBox: public wxFrame
-{
-public:
-	MainFrame *mainwin;
-	//Model *mod;
-	ToolSet *toolset;
-	//ParamBox **mainlink;
-	DiagBox *diagbox;
-	
-	int i;
-	int buttonheight;
-	int labelwidth;
-	int pinmode;
-	int boxindex;
-	int ostype;
-	int boxtype;
-	bool servant;
-	bool child;
-	bool visible;
-	bool canclose;
-	bool selfstore;   // Defaults to false, if true box stores its parameter values to file on closing
-	wxPoint mpos, oldpos;
-	wxSize boxsize;
-	wxFont boxfont, confont;
-	wxString boxtag, boxlabel;
-	wxString snum, text;
-	wxCommandEvent *blankevent;
-	ToolPanel *panel;
-	ToolPanel *activepanel;
-	wxNotebook *tabpanel;
-	wxBoxSizer *mainbox;
-	wxAuiManager *winman;
-	wxStaticText *status;
-	wxTextCtrl *vdu;
-	wxGauge *gauge;
-
-	ParamSet *paramset;
-	ParamStore *toolparams;
-	wxString toolpath;
-	
-	wxPoint SetPosition();
-	void ReSize();
-	void OnMove(wxMoveEvent& event);
-	void OnSize(wxSizeEvent& event);
-	void Init();
-	virtual void OnClose(wxCloseEvent& event);
-	virtual void OnClick(wxPoint);
-	//void OnDClick(wxMouseEvent & event);
-	//void OnMouseMove(wxMouseEvent & event);
-	//void OnLeftClick(wxMouseEvent & event);
-
-	void AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad = 1, int height = 0, wxPanel *pan = NULL);
-	//void AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad = 1);
-	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10, wxPanel *pan = NULL);
-	wxStaticText *GridLabel(int, wxString label = "0");
-	wxStaticText *NumPanel(int width = 80, int align = wxALIGN_RIGHT, wxString label = "0");
-	wxStaticText *TextLabel(wxString);
-	wxStaticText *StatusBar();
-	wxTextCtrl *TextInput(int width = 80, int height = -1, wxString label = "---");
-	TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
-	
-	//ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool serve=false, bool child=false);
-	ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);
-	ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool close=true);
-
-	~ToolBox();
-
-	virtual void OnToggle(wxCommandEvent& event);
-	virtual void TextClick(wxString tag);
-	virtual void SpinClick(wxString tag);
-	virtual void BoxEnter(wxString tag);
-	virtual void Load();
-	virtual void Store();
-};
-
-
-
-
-
 class ToolSet
 {
 public:
@@ -336,14 +257,15 @@ public:
 	ParamCon *con[100];
 	ParamNum *num[100];
 	ParamStore ref;
-	ParamStore *paramstore;
+	ParamStore paramstore;
 
 	// New default width settings   Novemeber 2018
 	int num_labelwidth, num_numwidth;
 	int con_labelwidth, con_numwidth;
 	int text_labelwidth, text_textwidth;
 
-	ParamSet(ToolPanel *);
+	//ParamSet(ToolPanel *);
+	ParamSet();
 	~ParamSet();
 
 	ParamCon *AddNum(wxString name, wxString labelname, double initval, int places, int labelwidth=-1, int numwidth=-1);
@@ -357,6 +279,82 @@ public:
 	double GetValue(wxString);
 	void SetValue(wxString, double);
 	void SetMinMax(wxString tag, double, double);
+};
+
+
+class ToolBox: public wxFrame
+{
+public:
+	MainFrame *mainwin;
+	//Model *mod;
+	ToolSet *toolset;
+	//ParamBox **mainlink;
+	DiagBox *diagbox;
+
+	int i;
+	int buttonheight;
+	int labelwidth;
+	int pinmode;
+	int boxindex;
+	int ostype;
+	int boxtype;
+	bool servant;
+	bool child;
+	bool visible;
+	bool canclose;
+	bool selfstore;   // Defaults to false, if true box stores its parameter values to file on closing
+	wxPoint mpos, oldpos;
+	wxSize boxsize;
+	wxFont boxfont, confont;
+	wxString boxtag, boxlabel;
+	wxString snum, text;
+	wxCommandEvent *blankevent;
+	ToolPanel *panel;
+	ToolPanel *activepanel;
+	wxNotebook *tabpanel;
+	wxBoxSizer *mainbox;
+	wxAuiManager *winman;
+	wxStaticText *status;
+	wxTextCtrl *vdu;
+	wxGauge *gauge;
+
+	ParamSet paramset;
+	ParamStore toolparams;
+	wxString toolpath;
+
+	wxPoint SetPosition();
+	void ReSize();
+	void OnMove(wxMoveEvent& event);
+	void OnSize(wxSizeEvent& event);
+	void Init();
+	virtual void OnClose(wxCloseEvent& event);
+	virtual void OnClick(wxPoint);
+	//void OnDClick(wxMouseEvent & event);
+	//void OnMouseMove(wxMouseEvent & event);
+	//void OnLeftClick(wxMouseEvent & event);
+
+	void AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad = 1, int height = 0, wxPanel *pan = NULL);
+	//void AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad = 1);
+	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10, wxPanel *pan = NULL);
+	wxStaticText *GridLabel(int, wxString label = "0");
+	wxStaticText *NumPanel(int width = 80, int align = wxALIGN_RIGHT, wxString label = "0");
+	wxStaticText *TextLabel(wxString);
+	wxStaticText *StatusBar();
+	wxTextCtrl *TextInput(int width = 80, int height = -1, wxString label = "---");
+	TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
+
+	//ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool serve=false, bool child=false);
+	ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);
+	ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool close=true);
+
+	~ToolBox();
+
+	virtual void OnToggle(wxCommandEvent& event);
+	virtual void TextClick(wxString tag);
+	virtual void SpinClick(wxString tag);
+	virtual void BoxEnter(wxString tag);
+	virtual void Load();
+	virtual void Store();
 };
 
 
