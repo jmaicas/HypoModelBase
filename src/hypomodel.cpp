@@ -83,6 +83,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	pinmode = 0;
 	basic = 1;
 	user = 1;
+	project = 1;
 	diagnostic = 0;
 	xstretch = 50;
 	modpath = "";
@@ -196,49 +197,53 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		diagbox->Show();
 		//return;
 	}
-    else {
-    
-    if(mod->prefstore.check("numdraw")) numdraw = mod->prefstore["numdraw"];
-    else diagbox->Write("mod numdraw not found\n");
+    else {  
+		if(mod->prefstore.check("numdraw")) {
+			numdraw = mod->prefstore["numdraw"];
+			diagbox->Write(text.Format("HypoMain init, numdraw set to %d\n", numdraw));
+		}
+		else diagbox->Write("mod numdraw not found\n");
 
-	if(mod->gcount < numdraw) numdraw = mod->gcount;
+		if(mod->gcount < numdraw || numdraw < 0) {
+			diagbox->Write(text.Format("HypoMain init, out of range, numdraw set to %d\n", numdraw));
+			numdraw = mod->gcount;
+		}
 
-	for(graph = 0; graph<numdraw; graph++) {
-		//fprintf(ofp, "graph %d  numplots %d  plot0 title %s  gparam %d\n", graph,
-		//gpos[graph].numplots, gpos[graph].plot[0]->gname.mb_str(), gpos[graph].plot[0]->gparam);
-		//outline.Printf("graph %d  numplots %d  plot0 title %s  gparam %d\n",
-		//graph, gpos[graph].numplots, gpos[graph].plot[0]->gname, gpos[graph].plot[0]->gparam);
-		//wxofp->AddLine(outline);
-		//fflush(ofp);
+		for(graph = 0; graph<numdraw; graph++) {
+			//fprintf(ofp, "graph %d  numplots %d  plot0 title %s  gparam %d\n", graph,
+			//gpos[graph].numplots, gpos[graph].plot[0]->gname.mb_str(), gpos[graph].plot[0]->gparam);
+			//outline.Printf("graph %d  numplots %d  plot0 title %s  gparam %d\n",
+			//graph, gpos[graph].numplots, gpos[graph].plot[0]->gname, gpos[graph].plot[0]->gparam);
+			//wxofp->AddLine(outline);
+			//fflush(ofp);
 
-		graphwin[graph] = new GraphWindow3(this, this, mod, wxPoint(0, graph*250 + 10), wxSize(100, 255), &gpos[graph], graph);
-		graphwin[graph]->FrontGraph(&gpos[graph]);
-		graphsizer->Add(graphwin[graph], 1, wxEXPAND);
+			graphwin[graph] = new GraphWindow3(this, this, mod, wxPoint(0, graph*250 + 10), wxSize(100, 255), &gpos[graph], graph);
+			graphwin[graph]->FrontGraph(&gpos[graph]);
+			graphsizer->Add(graphwin[graph], 1, wxEXPAND);
 
-		//graphwin[graph]->Refresh();
-	}
+			//graphwin[graph]->Refresh();
+		}
 
-	//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call\n");
-	scalebox = new ScaleBox(this, this, wxDefaultSize, numdraw, gpos, mod, graphwin, 0, scaletype);
-	scalebox->GraphSwitch(0);
+		//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call\n");
+		scalebox = new ScaleBox(this, this, wxDefaultSize, numdraw, gpos, mod, graphwin, 0, scaletype);
+		scalebox->GraphSwitch(0);
 
 	
-	//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call ok\n");
-	if(mod->graphload) scalebox->GLoad("default");
+		//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call ok\n");
+		if(mod->graphload) scalebox->GLoad("default");
 
-	if (mod->gsync) {
-		scalebox->gsynch = 1;
-		if(ostype != Mac) scalebox->syncbutton->SetValue(true);
-	}
-	scalebox->xmin = mod->xmin;
+		if (mod->gsync) {
+			scalebox->gsynch = 1;
+			if(ostype != Mac) scalebox->syncbutton->SetValue(true);
+		}
+		scalebox->xmin = mod->xmin;
 
-	diagbox->Write(text.Format("mod path = %s\n", mod->GetPath()));
+		diagbox->Write(text.Format("mod path = %s\n", mod->GetPath()));
 
-	graphsizer->AddSpacer(5);
-	if(scalebox) mainsizer->Add(scalebox, 0, wxEXPAND);
-	//mainsizer->Add(scalebox, 1);
-	mainsizer->Add(graphsizer, 7, wxEXPAND);
-        
+		graphsizer->AddSpacer(5);
+		if(scalebox) mainsizer->Add(scalebox, 0, wxEXPAND);
+		//mainsizer->Add(scalebox, 1);
+		mainsizer->Add(graphsizer, 7, wxEXPAND);    
     }
     
 	SetSizer(mainsizer);
@@ -353,9 +358,9 @@ void HypoMain::CleanUp() {
 
 	//if(graphbox) graphbox->wxDialog::Destroy();
 
-	delete mod;
-	delete[] gpos;
 	//delete mod;
+
+	delete[] gpos;
 	delete flagrefs;
 	delete hypoflags;
 	delete expdata;
@@ -364,10 +369,6 @@ void HypoMain::CleanUp() {
 	delete burstdata;
 	delete filebase;
 	//delete mod;
-
-	//wxMenu *menuTools = new wxMenu;
-	//wxMenu *menuSystem = new wxMenu;
-	//wxMenu *menuDisplay = new wxMenu;
 }
 
 
@@ -732,8 +733,8 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 	wxString message;
 
 	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2013\n\nSystem: %s", wxGetOsDescription());
-	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
-	else message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2018\n\nSystem: %s", wxGetOsDescription());
+	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2020\n\nSystem: %s", wxGetOsDescription());
+	else message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2020\n\nSystem: %s", wxGetOsDescription());
 
 	wxMessageBox(message, "About Hypo Model", wxOK | wxICON_INFORMATION, this);
 }
@@ -1058,6 +1059,8 @@ void HypoMain::OptionStore()
 
 	opfile.WriteLine(outline.Format("user %d", user));
 
+	opfile.WriteLine(outline.Format("project %d", project));
+
 	opfile.WriteLine(outline.Format("diagnostic %d", diagnostic));
 
 	opfile.Close();
@@ -1092,6 +1095,7 @@ void HypoMain::OptionLoad()
 		datsample = 1;
 		basic = 0;
 		user = 0;
+		project = 0;
 	}
 	else {
 		opfile.Open();
@@ -1118,6 +1122,7 @@ void HypoMain::OptionLoad()
 		datsample = prefstore["datsample"];
 		basic = prefstore["basic"];
 		user = prefstore["user"];
+		project = prefstore["project"];
 		diagnostic = prefstore["diagnostic"];
 	}
 

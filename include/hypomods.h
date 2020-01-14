@@ -57,7 +57,7 @@ public:
 
 	ParamBox *modbox;
 	DiagBox *diagbox;
-	ModDat *moddata;
+	//ModDat *moddata;
 	HypoMain *mainwin;
 	GraphBase *graphbase;
 	ModThread *modthread;

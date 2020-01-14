@@ -476,6 +476,13 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 
 	wxMenu *menuPlot = new wxMenu;
 	if(!mainwin->basic) {
+		if(mainwin->project) {
+			menuPlot->Append(ID_GraphEPS, "Export EPS");
+			menuPlot->Append(ID_Scale, "Plot Panel");
+			menuPlot->Append(ID_UnZoom, "Zoom Undo");
+			menuPlot->AppendSeparator();
+		}
+		else {
 		//menuPlot->Append(ID_GraphRemove, "Delete Graph");
 		//menuPlot->Append(ID_GraphPrint, "Print Graph");
 		menuPlot->Append(ID_GraphEPS, "Export EPS");
@@ -484,7 +491,9 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 		menuPlot->Append(ID_Scale, "Plot Panel");
 		menuPlot->Append(ID_UnZoom, "Zoom Undo");
 		menuPlot->AppendSeparator();
+		}
 	}
+	
 	for(i=0; i<mod->graphbase->numsets; i++) {
 		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
 	}

@@ -33,12 +33,12 @@
 //#include <stdlib.h>
 //#include <crtdbg.h>
 
+#ifdef VLD
+#include <vld.h>
+#endif
+
 #ifndef OSXClip
 #ifndef TEACH
-
-#ifdef _DEBUG
-//#include <vld.h>
-#endif
 
 #endif
 #endif
@@ -394,6 +394,7 @@ public:
     
 	int basic;
 	int user;
+	int project;
 	int diagnostic;
 	int ostype;
     
