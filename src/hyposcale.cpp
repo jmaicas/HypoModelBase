@@ -203,13 +203,13 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
 					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
-					ScaleButton(ID_allburst, "All / Burst", 74, vbox);
+					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
 				}
 				else {
 					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
 					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
 					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
-					ScaleButton(ID_allburst, "All / Burst", 55, vbox);
+					//ScaleButton(ID_allburst, "All / Burst", 55, vbox);
 				}		
 				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 			}
@@ -503,7 +503,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	
 	dispmod = mod->modtype;
 	mod->GHistLoad(gstag);
-	GraphSwitch(0);
+	//GraphSwitch(0);
 
 	panel->SetSizer(vbox);
 
@@ -521,7 +521,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	//Connect(ID_net, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNetMode));
 	//Connect(ID_norm, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNorm));
 
-	Connect(ID_allburst, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnAllBurst));
+	//Connect(ID_allburst, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnAllBurst));
 	//Connect(ID_profile, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnProfMode));
 	Connect(ID_expdat, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnExpMode));
 	Connect(ID_secretion, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSecMode));
@@ -902,10 +902,10 @@ wxButton *ScaleBox::ScaleButton(int id, wxString label, int width, wxBoxSizer *b
 }
 
 
-wxButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label, int width, wxBoxSizer *box, int point)
+wxButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label, int width, wxBoxSizer *box, int type, int point)
 {
 	(*gflags)[tag] = state;
-	gflagrefs->AddRef(id, tag);
+	gflagrefs->AddRef(id, tag, type);
 	Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnGraphButton));
 
 	return ScaleButton(id, label, width, box, point);
@@ -917,11 +917,15 @@ void ScaleBox::OnGraphButton(wxCommandEvent& event)
 	wxString text;
 	int id = event.GetId();
 	wxString tag = gflagrefs->GetRef(id);
+	int type = gflagrefs->GetType(id);
 
-	if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
-	else (*gflags)[tag] = 0;
+	if((*gflags)[tag] == type) (*gflags)[tag] = 0;
+	else (*gflags)[tag]++;                          // new code for multi-state cycling buttons, i.e. all/burst/select, 'type' encodes number of states
+	
+	//if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
+	//else (*gflags)[tag] = 0;
 
-	//mainwin->diagbox->Write(text.Format("graphbutton %s %.0f", tag, (*gflags)[tag]));
+	mainwin->diagbox->Write(text.Format("\ngraphbutton %s %.0f type %d\n", tag, (*gflags)[tag], type));
 
 	GraphSwitch();
 }
@@ -1099,12 +1103,13 @@ void ScaleBox::OnNorm(wxCommandEvent& WXUNUSED(event))
 	GraphSwitch();
 }*/
 
-void ScaleBox::OnAllBurst(wxCommandEvent& WXUNUSED(event))
+
+/*void ScaleBox::OnAllBurst(wxCommandEvent& WXUNUSED(event))
 {
 	burstmode = 1 - burstmode;
 	GraphSwitch();
 	//GraphUpdate();
-}
+}*/
 
 
 void ScaleBox::OnProfMode(wxCommandEvent& WXUNUSED(event))
@@ -1252,7 +1257,7 @@ ParamStore *ScaleBox::GetFlags()
 	(*gflags)["timeres"] = timeres;
 	//(*gflags)["nettog"] = nettog;
 	(*gflags)["expdatflag"] = expdatflag;
-	(*gflags)["burstmode"] = burstmode;
+	//(*gflags)["burstmode"] = burstmode;
 	(*gflags)["ratedata"] = ratedata;
 	(*gflags)["profmode"] = profmode;
 	//(*gflags)["proftype"] = proftype;

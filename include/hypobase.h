@@ -663,6 +663,7 @@ public:
 	wxString label;
 	wxControl *box;
 	ToolBox *tool;
+	int type;
 };
 
 
@@ -671,10 +672,12 @@ class RefStore{
 	
 public:
 	int numrefs;
-	RefEntry refbase[100];
+	//RefEntry refbase[100];
+	vector <RefEntry> refbase;
 	
 	RefStore() {
 		numrefs = 0;
+		refbase.resize(100);
 	};
 	
 	wxString GetRef(int id) {
@@ -694,6 +697,12 @@ public:
 			if(refbase[i].id == id) return refbase[i].tool;
 		return NULL;
 	};
+
+	int GetType(int id) {
+		for(i=0; i<numrefs; i++)
+			if(refbase[i].id == id) return refbase[i].type;
+		return 0;
+	};
 	
 	int GetID(wxString label) {
 		for(i=0; i<numrefs; i++)
@@ -701,10 +710,11 @@ public:
 		return 0;
 	};
 	
-	void AddRef(int id, wxString label, wxControl *box = NULL) {
+	void AddRef(int id, wxString label, int type = 1, wxControl *box = NULL) {
 		refbase[numrefs].id = id;
 		refbase[numrefs].label = label;
 		refbase[numrefs].box = box;
+		refbase[numrefs].type = type;
 		numrefs++;
 	};
 

@@ -1861,6 +1861,7 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	int setindex;
 	int shift;
 	wxString text;
+	wxString stag = "Select ";
 
 	if(light) shift = 5;
 	else shift = 0;
@@ -1881,6 +1882,8 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Haz 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);
 	graphbase->Add(GraphDat(&haz5, 0, 500, 0, 0.2, tag + "Haz 5ms", 1, 5, colour + shift), reftag + "haz5ms", reftag);
 	graphbase->Add(GraphDat(&winfreq, 0, 500, 0, 20, tag + "Win Freq", 4, 1, green + shift), reftag + "winfreq", reftag);
+	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
+	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
 
 	//if(diagbox) diagbox->Write(text.Format("GraphSet burst... tag %s\n", btag));
 
@@ -1893,6 +1896,17 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 		graphbase->Add(GraphDat(&burstdata->tailprofile, 0, 250, 0, 20, tag + "Burst Tail Profile", 4, 1, colour + shift), reftag + "-burst-tailprofile", reftag);
 		graphbase->Add(GraphDat(&burstdata->profilesm, 0, 250, 0, 20, tag + "Burst Profile Smooth", 4, 1, colour + shift), reftag + "-burst-headprofilesm", reftag);
 		graphbase->Add(GraphDat(&burstdata->bursthaz, 0, 250, 0, 200, tag + "Burst Haz", 1, 1, colour + shift), reftag + "-bursthaz", reftag);
+		graphbase->Add(GraphDat(&burstdata->hist1norm, 0, 500, 0, 100, btag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "burstnormhist1ms", reftag);
+		graphbase->Add(GraphDat(&burstdata->hist5norm, 0, 500, 0, 500, btag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "burstnormhist5ms", reftag);
+	}
+
+	if(selectdata) {
+		graphbase->Add(GraphDat(&selectdata->hist1, 0, 500, 0, 100, stag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "selecthist1ms", reftag);
+		graphbase->Add(GraphDat(&selectdata->hist5, 0, 500, 0, 500, stag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "selecthist5ms", reftag);
+		graphbase->Add(GraphDat(&selectdata->haz1, 0, 500, 0, 0.04, stag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "selecthaz1ms", reftag);
+		graphbase->Add(GraphDat(&selectdata->haz5, 0, 500, 0, 0.2, stag + tag + "Haz 5ms", 1, 5, colour + shift), reftag + "selecthaz5ms", reftag);
+		graphbase->Add(GraphDat(&selectdata->hist1norm, 0, 500, 0, 100, stag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "selectnormhist1ms", reftag);
+		graphbase->Add(GraphDat(&selectdata->hist5norm, 0, 500, 0, 500, stag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "selectnormhist5ms", reftag);
 	}
 
 	//if(diagbox) diagbox->Write(text.Format("GraphSet stage 1 OK\n"));
@@ -1906,11 +1920,6 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, colour + shift), reftag + "histquadsmooth", reftag);
 	graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, colour + shift), reftag + "histquadlinear", reftag);
 	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, colour + shift), reftag + "hazquad", reftag);
-
-	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
-	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
-	graphbase->Add(GraphDat(&burstdata->hist1norm, 0, 500, 0, 100, btag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "burstnormhist1ms", reftag);
-	graphbase->Add(GraphDat(&burstdata->hist5norm, 0, 500, 0, 500, btag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "burstnormhist5ms", reftag);
 
 	graphbase->Add(GraphDat(&haz5norm, 0, 500, 0, 0.2, tag + "Norm Haz 5ms", 1, 5, colour + shift), reftag + "normhaz5ms", reftag);
 

@@ -217,6 +217,7 @@ public:
 
 	ParamStore *gflags;
 	RefStore *gflagrefs;
+	int *gflagmax;
 
 	wxComboBox *gstag;
 	wxToggleButton *syncbutton;
@@ -229,7 +230,7 @@ public:
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);
 	TextBox *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer, int);
 	wxButton *ScaleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10);
-	wxButton *GraphButton(wxString tag, int initval, int id, wxString label, int width, wxBoxSizer *box, int point = 10);
+	wxButton *GraphButton(wxString tag, int initval, int id, wxString label, int width, wxBoxSizer *box, int type = 1, int point = 10);
 	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10);
 	void OnOK(wxCommandEvent& event);
 	void OnSync(wxCommandEvent& event);

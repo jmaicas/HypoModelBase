@@ -903,7 +903,7 @@ wxCheckBox *ParamBox::SetBoxCheck(int id, wxString checktag, wxString checktext,
 	newcheck = new wxCheckBox(activepanel, id, checktext);
 	newcheck->SetFont(confont);
 	newcheck->SetValue(state);
-	checkrefs->AddRef(id, checktag, newcheck);
+	checkrefs->AddRef(id, checktag, 1, newcheck);
 	Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(ParamBox::OnBoxCheck));
 
 	return newcheck;
@@ -917,7 +917,7 @@ wxCheckBox *ParamBox::SetModCheck(int id, wxString checktag, wxString checktext,
 	newcheck = new wxCheckBox(activepanel, id, checktext);
 	newcheck->SetFont(confont);
 	newcheck->SetValue(state);
-	checkrefs->AddRef(id, checktag, newcheck);
+	checkrefs->AddRef(id, checktag, 1, newcheck);
 	Connect(id, wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(ParamBox::OnCheck));
 
 	return newcheck;

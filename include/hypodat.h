@@ -259,6 +259,7 @@ public:
 	datdouble mag;
 	datdouble isis;
 	BurstDat *burstdata;
+	BurstDat *selectdata;
 	
 	datdouble haz1;
 	datdouble haz5;
@@ -691,14 +692,15 @@ public:
 	//graphdisp *gpos;
 	int numgraphs;
 	int numflags;
-	int gindex[20];
 	int gpos;
-	int gcodes[20];
+	vector<int> gindex;
+	vector<int> gcodes;
 	int modesum;
 	bool single;
-	wxString modeflag[20];          // Set of flags is used to control the selected, displayed graph 
-	int modeweight[20];
+	vector<wxString> modeflag;          // Set of flags is used to control the selected, displayed graph 
+	vector<int> modeweight;
 	int capacity;
+	int current;
 
 	DiagBox *diagbox;
 	wxString text;
@@ -721,6 +723,7 @@ public:
 	int GetPlot(ParamStore *);
 	wxString Display();
 	void IntervalSet(wxString tag);
+	void Expand();
 };
 
 

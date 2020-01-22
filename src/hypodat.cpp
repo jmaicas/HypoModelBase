@@ -774,14 +774,28 @@ GraphSet::GraphSet(GraphBase *gbase, int gdex)
 	numflags = 0;
 	modesum = 0;
 	single = true;
-	capacity = 20;
 	diagbox = NULL;
-	if(gdex != -1) Add(gdex);
-};
+	if(gdex != -1) Add(gdex); 
+	current = 0;
+
+	modeflag.resize(10);         
+	modeweight.resize(10);
+
+	capacity = 0;
+	Expand();
+}
+
+
+void GraphSet::Expand() {
+	capacity += 10;
+	gindex.resize(capacity);
+	gcodes.resize(capacity);
+}
 
 
 void GraphSet::Add(int gdex, int gcode) 
 {
+	if(numgraphs == capacity) Expand();
 	gindex[numgraphs] = gdex;
 	gcodes[numgraphs] = gcode;
 	numgraphs++;
@@ -793,6 +807,7 @@ void GraphSet::Add(int gdex, int gcode)
 
 void GraphSet::Add(wxString tag, int gcode) 
 {
+	if(numgraphs == capacity) Expand();
 	gindex[numgraphs] = graphbase->tagindex[tag];
 	gcodes[numgraphs] = gcode;
 	numgraphs++;
@@ -816,11 +831,14 @@ int GraphSet::GetPlot(ParamStore *gflags)
 
 	modesum = 0;
 	gdex = gindex[0];
+	//gdex = current;
+
 	for(i=0; i<numflags; i++) modesum += (*gflags)[modeflag[i]] * modeweight[i];
 
 	for(i=0; i<numgraphs; i++)
 		if(gcodes[i] == modesum) gdex = gindex[i];
 
+	//current = gdex;
 	return gdex;
 }
 
@@ -844,6 +862,7 @@ void GraphSet::IntervalSet(wxString tag)
 	AddFlag("burstmode", 100);
 	AddFlag("normtog", 1000);
 	AddFlag("quadtog", 10000);
+
 	Add(tag + "hist1ms", 0);
 	Add(tag + "haz1ms", 10);
 	Add(tag + "hist5ms", 1);
@@ -866,6 +885,16 @@ void GraphSet::IntervalSet(wxString tag)
 
 	Add(tag + "histquadsmooth", 10001);
 	Add(tag + "histquadsmooth", 11001);
+
+	Add(tag + "selecthist1ms", 200);
+	Add(tag + "selecthaz1ms", 210);
+	Add(tag + "selecthist5ms", 201);
+	Add(tag + "selecthaz5ms", 211);
+
+	Add(tag + "selectnormhist1ms", 1200);
+	Add(tag + "selecthaz1ms", 1210);
+	Add(tag + "selectnormhist5ms", 1201);
+	Add(tag + "selecthaz5ms", 1211);
 }
 
 
@@ -897,9 +926,8 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 
 	if(diag) mainwin->diagbox->Write("GraphSet Add OK\n");
 
-	
 	// Expand graphbase if necessary
-	if(numgraphs == storesize) {
+	if(numgraphs+1 == storesize) {
 		storesize += 10;
 		if(diag) mainwin->diagbox->Write(text.Format("GraphBase expand %d", storesize));
 		graphstore.resize(storesize);
@@ -909,6 +937,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	
 	// Add the new graph to graphbase
 	//graphstore.push_back(newgraph);
+	numgraphs++;
 	graphstore[numgraphs] = newgraph;
 	graphstore[numgraphs].gindex = numgraphs;
 	tagindex[tag] = numgraphs;
@@ -917,11 +946,12 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 
 	//if(graphset && mainwin->diagbox) mainwin->diagbox->Write(text.Format("new graph sdex %d\n", graphset->sdex));
 	
-	numgraphs++;
+	//numgraphs++;
 
 	if(diag) mainwin->diagbox->Write("GraphBase Add OK\n");
 
-	return numgraphs-1; 
+	//return numgraphs-1; 
+	return numgraphs;
 };
 
 
