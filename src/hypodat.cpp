@@ -204,6 +204,7 @@ SpikeDat::SpikeDat()
 	fitdiag = false;
 
 	burstdata = NULL;
+	selectdata = NULL;
 }
 
 
@@ -777,6 +778,7 @@ GraphSet::GraphSet(GraphBase *gbase, int gdex)
 	diagbox = NULL;
 	if(gdex != -1) Add(gdex); 
 	current = 0;
+	submenu = 0;
 
 	modeflag.resize(10);         
 	modeweight.resize(10);
@@ -843,16 +845,30 @@ int GraphSet::GetPlot(ParamStore *gflags)
 }
 
 
+GraphDat *GraphSet::GetPlot(int index)
+{
+	int gdex;
+
+	gdex = gindex[index];
+	return graphbase->GetGraph(gdex);
+}
+
+
+// Display, generate string to display GraphSet contents for diagnostics
 wxString GraphSet::Display()
 {
 	int i;
 	wxString text, output = "";
+	GraphDat *graph;
 
 	output += text.Format("\nSet %s\n", tag);
-	for(i=0; i<numgraphs; i++) output += text.Format("setindex %d  index %d  code %d\n", i, gindex[i], gcodes[i]);  
-
+	for(i=0; i<numgraphs; i++) {
+		graph = graphbase->GetGraph(gindex[i]);
+		output += text.Format("setindex %d  index %d  code %d  name %s\n", i, gindex[i], gcodes[i], graph->gname);  
+	}
 	return output;
 }
+
 
 // IntervalSet, sets up graph switching for ISI analysis plots, currently specific to VasoModel graph button panel
 void GraphSet::IntervalSet(wxString tag)
@@ -898,36 +914,38 @@ void GraphSet::IntervalSet(wxString tag)
 }
 
 
-int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)       // default settag = "", set=true
+int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag)       // default settag = "", for no set use settag = "null"          set=true - OLD
 {
 	int sdex;
 	wxString text;
 	GraphSet *graphset = NULL;
 	bool diag = false;
 
-	if(diag) mainwin->diagbox->Write(text.Format("Graphbase Add %s to set %s, set flag %d  numgraphs %d storesize %d\n", tag, settag, set, numgraphs, storesize));
+	if(diag) mainwin->diagbox->Write(text.Format("Graphbase Add %s to set %s, set flag %d  numgraphs %d storesize %d\n", tag, settag, numgraphs, storesize));
 
 	newgraph.diagbox = mainwin->diagbox;
 	newgraph.strokecolour = mainwin->colourpen[newgraph.colour];
 	newgraph.gtag = tag;
+	numgraphs++;          // numgraphs gives the graphbase index of the new graph
 
 	// If single graph, create new single graph set, otherwise add to set 'settag'
-	if(set) {
+	if(settag != "null") { 
 		if(settag == "") graphset = NewSet(newgraph.gname, tag);
 		else graphset = GetSet(settag);
 		
-		if(graphset) {
-			graphset->diagbox = mainwin->diagbox;
+		if(graphset) {    // extra check, should only fail if 'settag' is invalid
 			graphset->Add(numgraphs);
+			graphset->diagbox = mainwin->diagbox;
+			newgraph.sdex = graphset->sdex;
 		}
 		//else mainwin->diagbox->Write("Graphset not found\n"); 
-		//newgraph.sdex = graphset->sdex;
+	
 	}
 
 	if(diag) mainwin->diagbox->Write("GraphSet Add OK\n");
 
 	// Expand graphbase if necessary
-	if(numgraphs+1 == storesize) {
+	if(numgraphs == storesize) {
 		storesize += 10;
 		if(diag) mainwin->diagbox->Write(text.Format("GraphBase expand %d", storesize));
 		graphstore.resize(storesize);
@@ -937,7 +955,6 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag, bool set)  
 	
 	// Add the new graph to graphbase
 	//graphstore.push_back(newgraph);
-	numgraphs++;
 	graphstore[numgraphs] = newgraph;
 	graphstore[numgraphs].gindex = numgraphs;
 	tagindex[tag] = numgraphs;
@@ -1005,6 +1022,12 @@ GraphDat *GraphBase::GetGraph(wxString tag)
 {
 	if(!tagindex.check(tag)) return NULL;
 	int index = tagindex[tag];
+	return &(graphstore[index]);
+}
+
+
+GraphDat *GraphBase::GetGraph(int index) 
+{
 	return &(graphstore[index]);
 }
 

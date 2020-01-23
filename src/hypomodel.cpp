@@ -908,7 +908,7 @@ void HypoMain::SpikeModule(Model *mod)
 
 	diagbox->Write("SpikeModule entered\n");
 
-	expdata->GraphSet(mod->graphbase, "Exp ", green, 1, "exp");
+	expdata->PlotSet(mod->graphbase, "Exp ", green, 1, "exp");
 
 	diagbox->Write("SpikeModule graphset ok\n");
 

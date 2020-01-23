@@ -304,7 +304,8 @@ enum {
 	ID_NeuroMode,
 	ID_file,
 	ID_grid,
-	ID_filter
+	ID_filter,
+	ID_subplot
 };
 
 

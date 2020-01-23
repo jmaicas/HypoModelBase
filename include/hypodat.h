@@ -305,7 +305,7 @@ public:
 
 	double threshrec[10000];
 	int *rate;
-	int graphindex;
+	//int graphindex;
 
 	int normscale;
 	int binsize;
@@ -370,7 +370,7 @@ public:
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);
-	int GraphSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
+	int PlotSet(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	int GraphSetLysis(GraphBase *, wxString, int, int light = 0, wxString reftag="", wxString btag="Intra-Burst ");
 	//void IoDGraph(GraphBase *, wxString, wxString, int, int barshift=0);
 	void Clear();
@@ -701,6 +701,7 @@ public:
 	vector<int> modeweight;
 	int capacity;
 	int current;
+	int submenu;
 
 	DiagBox *diagbox;
 	wxString text;
@@ -721,6 +722,7 @@ public:
 	void Add(wxString tag, int gcode=-1);
 	void AddFlag(wxString, int);
 	int GetPlot(ParamStore *);
+	GraphDat *GetPlot(int index);
 	wxString Display();
 	void IntervalSet(wxString tag);
 	void Expand();
@@ -783,13 +785,14 @@ public:
 		return setindextag[index];
 	};
 
-	int Add(GraphDat newgraph, wxString tag, wxString settag = "", bool set=true);
+	int Add(GraphDat newgraph, wxString tag, wxString settag = "");
 	GraphSet *NewSet(wxString name, wxString tag);
 	//int AddNewSet(wxString tag, int gdex);
 	GraphSet *GetSet(wxString);
 	GraphSet *GetSet(int);
 
 	GraphDat *GetGraph(wxString);
+	GraphDat *GetGraph(int);
 	GraphDat *GetGraphFromName(wxString);
 	/*
 	GraphDat &operator[](wxString tag) {
@@ -827,7 +830,7 @@ public:
 	int numplots;
 	int currentplot;
 	int spikedisp;
-	int sdex;
+	int gdex, sdex;
 	//BurstDat *burstdata;
 	PlotSet *plotset;
 	

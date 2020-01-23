@@ -1856,12 +1856,13 @@ void SpikeDat::inputsim(double halflife)
 }
 
 
-int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light, wxString reftag, wxString btag)
+int SpikeDat::PlotSet(GraphBase *graphbase, wxString tag, int colour, int light, wxString reftag, wxString btag)
 {
 	int setindex;
 	int shift;
 	wxString text;
 	wxString stag = "Select ";
+	wxString null = "null";
 
 	if(light) shift = 5;
 	else shift = 0;
@@ -1871,57 +1872,57 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 
 	if(diagbox) diagbox->Write(text.Format("GraphSet entered... tag %s\n", tag));
 
-	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", reftag);
-	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", reftag);
-	graphbase->Add(GraphDat(&srate10s, 0, 500, 0, 200, tag + "Spike Rate 10s", this, 10, red + shift), reftag + "rate10s", reftag);
-	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spike Rate 100ms", this, 0.1, red + shift), reftag + "rate100ms", reftag);
-	graphbase->Add(GraphDat(&srate10, 0, 5, 0, 20, tag + "Spike Rate 10ms", this, 0.1, red + shift), reftag + "rate10ms", reftag);
-	graphbase->Add(GraphDat(&srate1, 0, 0.5, 0, 3, tag + "Spikes 1ms", this, 0.001, red + shift), reftag + "spikes1ms", reftag);
-	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "Hist 1ms", 1, 1, colour + shift), reftag + "hist1ms", reftag);
-	graphbase->Add(GraphDat(&hist5, 0, 500, 0, 500, tag + "Hist 5ms", 1, 5, colour + shift), reftag + "hist5ms", reftag);
-	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Haz 1ms", 1, 1, colour + shift), reftag + "haz1ms", reftag);
-	graphbase->Add(GraphDat(&haz5, 0, 500, 0, 0.2, tag + "Haz 5ms", 1, 5, colour + shift), reftag + "haz5ms", reftag);
-	graphbase->Add(GraphDat(&winfreq, 0, 500, 0, 20, tag + "Win Freq", 4, 1, green + shift), reftag + "winfreq", reftag);
-	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", reftag);
-	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", reftag);
+	graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", null);
+	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", null);
+	graphbase->Add(GraphDat(&srate10s, 0, 500, 0, 200, tag + "Spike Rate 10s", this, 10, red + shift), reftag + "rate10s", null);
+	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spike Rate 100ms", this, 0.1, red + shift), reftag + "rate100ms", null);
+	graphbase->Add(GraphDat(&srate10, 0, 5, 0, 20, tag + "Spike Rate 10ms", this, 0.1, red + shift), reftag + "rate10ms", null);
+	graphbase->Add(GraphDat(&srate1, 0, 0.5, 0, 3, tag + "Spikes 1ms", this, 0.001, red + shift), reftag + "spikes1ms", null);
+	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "Hist 1ms", 1, 1, colour + shift), reftag + "hist1ms", null);
+	graphbase->Add(GraphDat(&hist5, 0, 500, 0, 500, tag + "Hist 5ms", 1, 5, colour + shift), reftag + "hist5ms", null);
+	graphbase->Add(GraphDat(&haz1, 0, 500, 0, 0.04, tag + "Haz 1ms", 1, 1, colour + shift), reftag + "haz1ms", null);
+	graphbase->Add(GraphDat(&haz5, 0, 500, 0, 0.2, tag + "Haz 5ms", 1, 5, colour + shift), reftag + "haz5ms", null);
+	graphbase->Add(GraphDat(&winfreq, 0, 500, 0, 20, tag + "Win Freq", 4, 1, green + shift), reftag + "winfreq", null);
+	graphbase->Add(GraphDat(&hist1norm, 0, 500, 0, 100, tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "normhist1ms", null);
+	graphbase->Add(GraphDat(&hist5norm, 0, 500, 0, 500, tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "normhist5ms", null);
 
 	//if(diagbox) diagbox->Write(text.Format("GraphSet burst... tag %s\n", btag));
 
 	if(burstdata) {
-		graphbase->Add(GraphDat(&burstdata->hist1, 0, 500, 0, 100, btag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "bursthist1ms", reftag);
-		graphbase->Add(GraphDat(&burstdata->hist5, 0, 500, 0, 500, btag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "bursthist5ms", reftag);
-		graphbase->Add(GraphDat(&burstdata->haz1, 0, 500, 0, 0.04, btag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "bursthaz1ms", reftag);
-		graphbase->Add(GraphDat(&burstdata->haz5, 0, 500, 0, 0.2, btag + tag + "Haz 5ms", 1, 5, colour + shift), reftag + "bursthaz5ms", reftag);
-		graphbase->Add(GraphDat(&burstdata->profile, 0, 250, 0, 20, tag + "Burst Head Profile", 4, 1, colour + shift), reftag + "-burst-headprofile", reftag);
-		graphbase->Add(GraphDat(&burstdata->tailprofile, 0, 250, 0, 20, tag + "Burst Tail Profile", 4, 1, colour + shift), reftag + "-burst-tailprofile", reftag);
-		graphbase->Add(GraphDat(&burstdata->profilesm, 0, 250, 0, 20, tag + "Burst Profile Smooth", 4, 1, colour + shift), reftag + "-burst-headprofilesm", reftag);
-		graphbase->Add(GraphDat(&burstdata->bursthaz, 0, 250, 0, 200, tag + "Burst Haz", 1, 1, colour + shift), reftag + "-bursthaz", reftag);
-		graphbase->Add(GraphDat(&burstdata->hist1norm, 0, 500, 0, 100, btag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "burstnormhist1ms", reftag);
-		graphbase->Add(GraphDat(&burstdata->hist5norm, 0, 500, 0, 500, btag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "burstnormhist5ms", reftag);
+		graphbase->Add(GraphDat(&burstdata->hist1, 0, 500, 0, 100, btag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "bursthist1ms", null);
+		graphbase->Add(GraphDat(&burstdata->hist5, 0, 500, 0, 500, btag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "bursthist5ms", null);
+		graphbase->Add(GraphDat(&burstdata->haz1, 0, 500, 0, 0.04, btag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "bursthaz1ms", null);
+		graphbase->Add(GraphDat(&burstdata->haz5, 0, 500, 0, 0.2, btag + tag + "Haz 5ms", 1, 5, colour + shift), reftag + "bursthaz5ms", null);
+		graphbase->Add(GraphDat(&burstdata->profile, 0, 250, 0, 20, tag + "Burst Head Profile", 4, 1, colour + shift), reftag + "-burst-headprofile", null);
+		graphbase->Add(GraphDat(&burstdata->tailprofile, 0, 250, 0, 20, tag + "Burst Tail Profile", 4, 1, colour + shift), reftag + "-burst-tailprofile", null);
+		graphbase->Add(GraphDat(&burstdata->profilesm, 0, 250, 0, 20, tag + "Burst Profile Smooth", 4, 1, colour + shift), reftag + "-burst-headprofilesm", null);
+		graphbase->Add(GraphDat(&burstdata->bursthaz, 0, 250, 0, 200, tag + "Burst Haz", 1, 1, colour + shift), reftag + "-bursthaz", null);
+		graphbase->Add(GraphDat(&burstdata->hist1norm, 0, 500, 0, 100, btag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "burstnormhist1ms", null);
+		graphbase->Add(GraphDat(&burstdata->hist5norm, 0, 500, 0, 500, btag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "burstnormhist5ms", null);
 	}
 
 	if(selectdata) {
-		graphbase->Add(GraphDat(&selectdata->hist1, 0, 500, 0, 100, stag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "selecthist1ms", reftag);
-		graphbase->Add(GraphDat(&selectdata->hist5, 0, 500, 0, 500, stag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "selecthist5ms", reftag);
-		graphbase->Add(GraphDat(&selectdata->haz1, 0, 500, 0, 0.04, stag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "selecthaz1ms", reftag);
-		graphbase->Add(GraphDat(&selectdata->haz5, 0, 500, 0, 0.2, stag + tag + "Haz 5ms", 1, 5, colour + shift), reftag + "selecthaz5ms", reftag);
-		graphbase->Add(GraphDat(&selectdata->hist1norm, 0, 500, 0, 100, stag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "selectnormhist1ms", reftag);
-		graphbase->Add(GraphDat(&selectdata->hist5norm, 0, 500, 0, 500, stag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "selectnormhist5ms", reftag);
+		graphbase->Add(GraphDat(&selectdata->hist1, 0, 500, 0, 100, stag + tag + "Hist 1ms", 1, 1, colour + shift), reftag + "selecthist1ms", null);
+		graphbase->Add(GraphDat(&selectdata->hist5, 0, 500, 0, 500, stag + tag + "Hist 5ms", 1, 5, colour + shift), reftag + "selecthist5ms", null);
+		graphbase->Add(GraphDat(&selectdata->haz1, 0, 500, 0, 0.04, stag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "selecthaz1ms", null);
+		graphbase->Add(GraphDat(&selectdata->haz5, 0, 500, 0, 0.2, stag + tag + "Haz 5ms", 1, 5, colour + shift), reftag + "selecthaz5ms", null);
+		graphbase->Add(GraphDat(&selectdata->hist1norm, 0, 500, 0, 100, stag + tag + "Norm Hist 1ms", 1, 1, colour + shift), reftag + "selectnormhist1ms", null);
+		graphbase->Add(GraphDat(&selectdata->hist5norm, 0, 500, 0, 500, stag + tag + "Norm Hist 5ms", 1, 5, colour + shift), reftag + "selectnormhist5ms", null);
 	}
 
 	//if(diagbox) diagbox->Write(text.Format("GraphSet stage 1 OK\n"));
 
-	//graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, green + shift), reftag + "histquad", reftag);                // old colours 9/2/17
-	//graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, blue + shift), reftag + "histquadsmooth", reftag);
-	//graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, red + shift), reftag + "histquadlinear", reftag);
-	//graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, green + shift), reftag + "hazquad", reftag);
+	//graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, green + shift), reftag + "histquad", null);                // old colours 9/2/17
+	//graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, blue + shift), reftag + "histquadsmooth", null);
+	//graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, red + shift), reftag + "histquadlinear", null);
+	//graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, green + shift), reftag + "hazquad", null);
 
-	graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, colour + shift), reftag + "histquad", reftag);
-	graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, colour + shift), reftag + "histquadsmooth", reftag);
-	graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, colour + shift), reftag + "histquadlinear", reftag);
-	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, colour + shift), reftag + "hazquad", reftag);
+	graphbase->Add(GraphDat(&histquad, 0, 125, 0, 500, tag + "ISI Histogram Quad", 1, 1, colour + shift), reftag + "histquad", null);
+	graphbase->Add(GraphDat(&histquadsm, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Smooth", 1, 1, colour + shift), reftag + "histquadsmooth", null);
+	graphbase->Add(GraphDat(&histquadlin, 0, 125, 0, 0.1, tag + "ISI Histogram Quad Linear", 1, 1, colour + shift), reftag + "histquadlinear", null);
+	graphbase->Add(GraphDat(&hazquad, 0, 125, 0, 0.1, tag + "Hazard Quad", 1, 1, colour + shift), reftag + "hazquad", null);
 
-	graphbase->Add(GraphDat(&haz5norm, 0, 500, 0, 0.2, tag + "Norm Haz 5ms", 1, 5, colour + shift), reftag + "normhaz5ms", reftag);
+	graphbase->Add(GraphDat(&haz5norm, 0, 500, 0, 0.2, tag + "Norm Haz 5ms", 1, 5, colour + shift), reftag + "normhaz5ms", null);
 
 	(*graphbase)[reftag + "rate1s"]->synchx = false;
 	(*graphbase)[reftag + "spikes1ms"]->synchx = false;
@@ -1932,13 +1933,13 @@ int SpikeDat::GraphSet(GraphBase *graphbase, wxString tag, int colour, int light
 	(*graphbase)[reftag + "normhist1ms"]->synchx = false;
 	(*graphbase)[reftag + "normhist5ms"]->synchx = false;
 
-	graphindex = setindex;
+	//graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
 	graphs = true;
 
-	if(diagbox) diagbox->Write(text.Format("GraphSet Finished\n"));
+	//if(diagbox) diagbox->Write(text.Format("GraphSet Finished\n"));
 
-	return setindex;
+	return 1;
 }
 
 
@@ -1962,7 +1963,7 @@ int SpikeDat::GraphSetLysis(GraphBase *graphbase, wxString tag, int colour, int 
 	graphbase->Add(GraphDat(&burstdata->haz1, 0, 500, 0, 0.04, btag + tag + "Haz 1ms", 1, 1, colour + shift), reftag + "bursthaz1ms");
 	graphbase->Add(GraphDat(&burstdata->haz5, 0, 500, 0, 0.2, btag + tag + "Haz 5ms", 1, 5, colour + shift), reftag + "bursthaz5ms");
 
-	graphindex = setindex;
+	//graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
 	graphs = true;
 

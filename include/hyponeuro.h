@@ -18,6 +18,6 @@ public:
 
 	//void SpikeBox(int modmode = 0);
 	void EvoGraphs();
-	void IoDGraph(datdouble *, datdouble *, wxString, wxString, int, int barshift=0);
+	void IoDGraph(datdouble *, datdouble *, wxString, wxString, int, int barshift=0, wxString settag="");
 	//virtual void DataSwitch();
 };

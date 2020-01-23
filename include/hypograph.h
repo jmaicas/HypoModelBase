@@ -38,7 +38,7 @@ public:
 	wxScrollBar *scrollbar;
 	GraphDisp *gpos;
 	GraphDat *graph;
-	//GraphBase *gbase;
+	GraphBase *graphbase;
 	Model *mod;
 	int graphindex;
 	wxString snum;
@@ -54,6 +54,7 @@ public:
 	wxColour *colourpen;
 	//wxString colourstring[10];
 	wxBufferedPaintDC *dc;
+	wxBitmap radio_on, radio_off;
 
 	//wxMenu *menuPlot;
 
@@ -95,8 +96,10 @@ public:
 	void OnMouseMove(wxMouseEvent& event);
 	void OnLeftUp(wxMouseEvent& event);
 	void OnLeftDown(wxMouseEvent& event);
+	void OnRightClickOld(wxMouseEvent& event);
 	void OnRightClick(wxMouseEvent& event);
-	void OnGraph(wxCommandEvent& event);
+	void OnGraphSelectSet(wxCommandEvent& event);
+	void OnGraphSelectPlot(wxCommandEvent& event);
 	void OnGraphRemove(wxCommandEvent& event);
 	void OnGraphPrint(wxCommandEvent& event);
 	void OnGraphEPS(wxCommandEvent& event);

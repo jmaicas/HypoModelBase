@@ -63,6 +63,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	gpos = gdisp;
 	graphindex = index;
 	mod = model;
+	graphbase = mod->graphbase;
 
 	int max, scrollxto;
 	double xdiff;
@@ -94,65 +95,9 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
 
-	/*
-	menuPlot = new wxMenu;
-	if(mainwin->diagnostic) {
-	menuPlot->Append(ID_GraphRemove, "Delete Graph");
-	//menuPlot->Append(ID_GraphPrint, "Print Graph");
-	menuPlot->Append(ID_GraphEPS, "Export EPS");
-	menuPlot->Append(ID_Scale, "Plot Panel");
-	menuPlot->AppendSeparator();
-	}
-	for(i=0; i<mod->graphbase->numsets; i++) {
-	menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
-	//if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("menu set Index %d Name %s\n", 1000+i, mod->graphbase->setstore[i].name));
-     */
-	/*graphset = mod->graphbase->GetSet(i);
-	if(graphset->single) 
-	menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
-	else {
-	newsub = new wxMenu;
-	for(j=0; j<graphset->numgraphs; j++) {
-	//newsub->Append(wxID_ANY, mod->graphbase->graphset
-	newsub->AppendRadioItem(wxID_ANY, (*mod->graphbase)[graphset->gindex[j]]->gname);
-	}
-	menuPlot->AppendSubMenu(newsub, mod->graphbase->setstore[i].name); 
-	}*/
-	//}
-
-
-
-
-	//menuPlot->Check(1000 + gpos->GetFront()->index, true);
-	//snum.Printf("plot0 = %d", gpos->plot[0]->index);
-	//gindex = gpos->plot[0]->index;
-	//graph = gpos->plot[0];
-	//gindex = graph->gindex;
-	//	//mainwin->SetStatusText(snum);
-	//parent->SetStatusText(snum);
-	//menuPlot->Check(1005, true);
-
-
-	//menuPlot->AppendRadioItem(1000 + 2, "Plot2" );
-	//menuPlot->AppendRadioItem(1000 + 3, "Plot3" );
-
-	//graph = gpos->plot[0];
-	//outline.Printf("GWin3 plot 0 title %s gparam %d", graph->gname, graph->gparam);
-	//((MainFrame *)mainwin)->wxofp->AddLine(outline);
-
-	//if(graph->gparam == -3) {
-	//graph->gdatav->max = 500;
-	//	max = graph->gdatav->max / graph->xscale;
-	//}
-	//if(graph->gparam == -4) max = graph->gdatadv->max / graph->xscale;
-
-
-	//xdiff = graph->xto - graph->xfrom;
-
-	//xdiff = 500;
-	//scrollxto = max - (int)xdiff + 100;	 
-	//outline.Printf("xdiff  %.2f  max %d  XTo %d", xdiff, max, scrollxto);
-	//((MainFrame *)mainwin)->wxofp->AddLine(outline);
+	wxImage::AddHandler(new wxPNGHandler);
+	radio_on = wxBitmap("Init/radio_on-18.png", wxBITMAP_TYPE_PNG);
+	radio_off = wxBitmap("Init/radio_off-18.png", wxBITMAP_TYPE_PNG);
 
 	SetBackgroundColour("WHITE");
 
@@ -287,13 +232,15 @@ void GraphWindow3::OnScale(wxCommandEvent& event)
 }
 
 
-void GraphWindow3::OnGraph(wxCommandEvent& event)
+void GraphWindow3::OnGraphSelectSet(wxCommandEvent& event)
 {
 	short id = event.GetId();
 	double xfrom, xto;
 	int modesum = -1;
 	GraphSet *graphset;
+	GraphDat *graph;
 	int gdex;
+	wxString text;
 
 	snum.Printf("Graph Set Select ID %d\n", id);
 	//mainwin->SetStatusText(snum);
@@ -301,17 +248,62 @@ void GraphWindow3::OnGraph(wxCommandEvent& event)
 	xfrom = gpos->GetFront()->xfrom;
 	xto = gpos->GetFront()->xto;
 
-
-	graphset = mod->graphbase->GetSet(id-1000);
+	
+	graphset = mod->graphbase->GetSet(id - 1000);
 	gdex = graphset->GetPlot(mainwin->scalebox->GetFlags());
-	gpos->Front((*mod->graphbase)[gdex]);
+	gpos->gdex = gdex;
 	gpos->sdex = graphset->sdex;
+	
+
+	gpos->Front((*mod->graphbase)[gdex]);
+	
 	//gpos->Front((*mod->graphbase)[id-1000]);
+
+	graph = (*mod->graphbase)[gdex];
+
+	mod->diagbox->Write(text.Format("OnGraph id %d set %d name %s plot %d name %s\n", id, graphset->sdex, graphset->name, gdex, graph->gname));
+	mod->diagbox->Write(graphset->Display());
 
 	gpos->GetFront()->xfrom = xfrom;
 	gpos->GetFront()->xto = xto;
 	//mod->gcodes[graphindex] = mod->graphbase->GetTag(id-1000);
 	mod->gcodes[graphindex] = mod->graphbase->GetSetTag(id-1000);
+	mainwin->scalebox->ScaleUpdate();
+	//Refresh();
+}
+
+
+void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
+{
+	short id = event.GetId();
+	double xfrom, xto;
+	int modesum = -1;
+	GraphSet *graphset;
+	GraphDat *graph;
+	int gdex;
+	wxString text;
+
+	snum.Printf("Graph Set Select ID %d\n", id);
+	//mainwin->SetStatusText(snum);
+	if(mod->diagbox) mod->diagbox->textbox->AppendText(snum);
+	xfrom = gpos->GetFront()->xfrom;
+	xto = gpos->GetFront()->xto;
+
+    gdex = id - 2000;
+	gpos->gdex = gdex;
+	gpos->sdex = mod->graphbase->GetGraph(gdex)->sdex;
+    graphset = mod->graphbase->GetSet(gpos->sdex);
+	
+	gpos->Front((*mod->graphbase)[gdex]);
+	graph = (*mod->graphbase)[gdex];
+
+	mod->diagbox->Write(text.Format("OnGraph id %d set %d name %s plot %d name %s\n", id, graphset->sdex, graphset->name, gdex, graph->gname));
+	mod->diagbox->Write(graphset->Display());
+
+	gpos->GetFront()->xfrom = xfrom;
+	gpos->GetFront()->xto = xto;
+	//mod->gcodes[graphindex] = mod->graphbase->GetTag(id-1000);
+	//mod->gcodes[graphindex] = mod->graphbase->GetSetTag(id-1000);
 	mainwin->scalebox->ScaleUpdate();
 	//Refresh();
 }
@@ -463,6 +455,70 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 
 void GraphWindow3::OnRightClick(wxMouseEvent& event)
 {
+	int i, j;
+	wxString text;
+	GraphSet *graphset;
+	wxPoint pos = event.GetPosition();
+	wxMenuItem *menuitem;
+	wxMenu *menuPlot, *subPlot;
+		
+	menuPlot = new wxMenu;
+
+	if(!mainwin->basic) {
+		if(mainwin->project) {
+			menuPlot->Append(ID_GraphEPS, "Export EPS");
+			menuPlot->Append(ID_Scale, "Plot Panel");
+			menuPlot->Append(ID_UnZoom, "Zoom Undo");
+			menuPlot->AppendSeparator();
+		}
+		else {
+		//menuPlot->Append(ID_GraphRemove, "Delete Graph");
+		menuPlot->Append(ID_GraphEPS, "Export EPS");
+		menuPlot->Append(ID_MultiEPS, "Multi EPS");
+		menuPlot->Append(ID_MultiCell, "Multi Cell");
+		menuPlot->Append(ID_Scale, "Plot Panel");
+		menuPlot->Append(ID_UnZoom, "Zoom Undo");
+		menuPlot->AppendSeparator();
+		}
+	}
+
+	for(i=0; i<mod->graphbase->numsets; i++) {
+		graphset = mod->graphbase->GetSet(i);
+		if(!graphset->submenu) {
+			menuitem = new wxMenuItem(menuPlot, 1000 + i, graphset->name, "", wxITEM_CHECK);
+			menuitem->SetBitmaps(radio_on, radio_off);
+			menuPlot->Append(menuitem);
+			menuitem->Check(false);
+			//menuPlot->AppendRadioItem(1000 + i, graphset->name);
+		}
+		else {
+			subPlot = new wxMenu;
+			for(j=0; j<graphset->numgraphs; j++) {
+				menuitem = new wxMenuItem(subPlot, 2000 + graphset->gindex[j], graphset->GetPlot(j)->gname, "", wxITEM_CHECK);
+				menuitem->SetBitmaps(radio_on, radio_off);
+				subPlot->Append(menuitem);
+				menuitem->Check(false);
+			}
+			//subPlot->AppendRadioItem(2000 + graphset->gindex[j], graphset->GetPlot(j)->gname);
+			menuPlot->Append(ID_subplot, graphset->name, subPlot);
+			//menuPlot->Check(ID_subplot, true);
+		}
+	}
+
+	Connect(1000, 1000 + mod->graphbase->numsets - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphSelectSet));
+	Connect(2000, 2000 + mod->graphbase->numgraphs, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphSelectPlot));
+
+	//menuPlot->Check(1000, false);
+	graphset = mod->graphbase->GetSet(gpos->sdex);
+	if(!graphset->submenu) menuPlot->Check(1000 + gpos->sdex, true);
+	else subPlot->Check(2000 + gpos->gdex, true);
+	mainwin->diagbox->Write(text.Format("graph menu set %d\n", gpos->sdex));
+	PopupMenu(menuPlot, pos.x + 20, pos.y);
+}
+
+
+void GraphWindow3::OnRightClickOld(wxMouseEvent& event)
+{
 	int i;
 	wxString text;
 	//int id = event.GetId();
@@ -483,22 +539,22 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 			menuPlot->AppendSeparator();
 		}
 		else {
-		//menuPlot->Append(ID_GraphRemove, "Delete Graph");
-		//menuPlot->Append(ID_GraphPrint, "Print Graph");
-		menuPlot->Append(ID_GraphEPS, "Export EPS");
-		menuPlot->Append(ID_MultiEPS, "Multi EPS");
-		menuPlot->Append(ID_MultiCell, "Multi Cell");
-		menuPlot->Append(ID_Scale, "Plot Panel");
-		menuPlot->Append(ID_UnZoom, "Zoom Undo");
-		menuPlot->AppendSeparator();
+			//menuPlot->Append(ID_GraphRemove, "Delete Graph");
+			//menuPlot->Append(ID_GraphPrint, "Print Graph");
+			menuPlot->Append(ID_GraphEPS, "Export EPS");
+			menuPlot->Append(ID_MultiEPS, "Multi EPS");
+			menuPlot->Append(ID_MultiCell, "Multi Cell");
+			menuPlot->Append(ID_Scale, "Plot Panel");
+			menuPlot->Append(ID_UnZoom, "Zoom Undo");
+			menuPlot->AppendSeparator();
 		}
 	}
-	
+
 	for(i=0; i<mod->graphbase->numsets; i++) {
 		menuPlot->AppendRadioItem(1000 + i, mod->graphbase->setstore[i].name);
 	}
 
-	Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph));
+	Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphSelectSet));
 
 	menuPlot->Check(1000 + gpos->sdex, true);
 	mainwin->diagbox->Write(text.Format("graph menu set %d\n", gpos->sdex));
@@ -540,7 +596,11 @@ void GraphWindow3::UpdateScroll(int pos)
 
 	graph = gpos->plot[0];
 	if(graph->gparam == -3) max = graph->gdatav->max / graph->xscale;
-	if(graph->gparam == -4) max = graph->gdatadv->max / graph->xscale;
+	else if(graph->gparam == -4) max = graph->gdatadv->max / graph->xscale;
+	else {
+		mod->diagbox->Write("plot " + graph->gname + " no data\n");
+		return;
+	}
 	//if(pos >= 0) graph->scrollpos = pos;
 	//graph->scrollpos = 100;
 

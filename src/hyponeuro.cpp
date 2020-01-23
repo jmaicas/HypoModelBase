@@ -19,9 +19,9 @@ NeuroMod::~NeuroMod()
 }
 
 
-void NeuroMod::IoDGraph(datdouble *IoDdata, datdouble *IoDdataX, wxString label, wxString tag, int colour, int barshift)
+void NeuroMod::IoDGraph(datdouble *IoDdata, datdouble *IoDdataX, wxString label, wxString tag, int colour, int barshift, wxString settag)
 {
-	graphbase->Add(GraphDat(IoDdata, 0, 70, 0, 2, label, 2, 1, colour), tag);
+	graphbase->Add(GraphDat(IoDdata, 0, 70, 0, 2, label, 2, 1, colour), tag, settag);
 	graphbase->GetGraph(tag)->gdatax = IoDdataX;
 	graphbase->GetGraph(tag)->xcount = 7;   // 7  // 5 for Trystan data
 	graphbase->GetGraph(tag)->synchx = false;
@@ -31,7 +31,7 @@ void NeuroMod::IoDGraph(datdouble *IoDdata, datdouble *IoDdataX, wxString label,
 
 void NeuroMod::EvoGraphs()
 {
-	evodata->GraphSet(graphbase, "Evo ", purple, 1, "evo");
+	evodata->PlotSet(graphbase, "Evo ", purple, 1, "evo");
 
 	GraphSet *graphset = graphbase->NewSet("Evo Intervals", "evointervals");
 	graphset->AddFlag("hazmode1", 10);
