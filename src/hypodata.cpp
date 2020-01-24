@@ -49,6 +49,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
 
 	ToolPanel *analysispanel = new ToolPanel(this, tabpanel);
+	//ToolPanel *analysispanel = new ToolPanel(tabpanel, this, wxPoint(-1, -1), wxSize(-1, -1));
 	analysispanel->SetFont(boxfont);
 	wxBoxSizer *analysisbox = new wxBoxSizer(wxVERTICAL);
 	analysispanel->SetSizer(analysisbox);
@@ -252,6 +253,8 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnClear));
 	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnInvert));
 
+	//Connect(wxEVT_LEFT_UP, wxMouseEventHandler(NeuroBox::OnClick));
+
 	Connect(ID_filter, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnGridFilter));
 
 	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
@@ -352,7 +355,7 @@ void NeuroBox::OnBrowse(wxCommandEvent& event)
 }
 
 
-void NeuroBox::OnToggle(wxCommandEvent& event)
+void NeuroBox::OnToggle(wxCommandEvent& event)      
 {
 	int sel, type, i;
 	wxString text;
@@ -372,25 +375,28 @@ void NeuroBox::OnToggle(wxCommandEvent& event)
 	selectmode[sel] = type;	
 	currselect = sel;
 
-	//diagbox->Write(text.Format("\nSelect Button type %d  selection %d\n", type, sel));
+	diagbox->Write(text.Format("\nSelect Button type %d  selection %d\n", type, sel));
 }
 
 
-
+//void NeuroBox::OnClick(wxMouseEvent &event)              // currently not in use - 24/1/20
 void NeuroBox::OnClick(wxPoint pos)
 {
 	wxString text;
-	int sel;
+	bool select = false;
+	//wxPoint pos = event.GetPosition();
 	
 	wxRect selrect1 = wxRect(selectbox1->GetPosition(), selectbox1->GetSize());
 	wxRect selrect2 = wxRect(selectbox2->GetPosition(), selectbox2->GetSize());
 
+	if(selrect1.Contains(pos) || selrect2.Contains(pos)) select = true;
 	if(selrect1.Contains(pos)) currselect = 0;
 	if(selrect2.Contains(pos)) currselect = 1;
 
 	currcell->burstdata->spikes = selectspikes[currselect];
 
-	mainwin->SetStatusText(text.Format("Lysis Box Click x %d y %d  Select %d", pos.x, pos.y, currselect));
+	//mainwin->SetStatusText(text.Format("Neuro Box Click x %d y %d", pos.x, pos.y));
+	if(select) diagbox->Write(text.Format("Neuro Box Click x %d y %d  Select %d\n", pos.x, pos.y, currselect));
 	mod->mainwin->scalebox->BurstDisp(1);
 }
 

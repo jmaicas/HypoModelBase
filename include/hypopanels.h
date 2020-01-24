@@ -262,6 +262,7 @@ public:
 	void AnalyseSelection();
 	void SetSelect(double, double);
 	void OnClick(wxPoint);
+	//void OnClick(wxMouseEvent &event);
 	void OnToggle(wxCommandEvent& event);
 	void SelectAdd();
 	void SelectSub();

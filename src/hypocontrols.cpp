@@ -633,6 +633,10 @@ ToolPanel::ToolPanel(ToolBox *tbox, wxWindow *parent)
 	toolbox = tbox;
 	mainwin = toolbox->mainwin;
 	controlborder = 2;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
+	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
 }
 
 
@@ -647,6 +651,19 @@ ToolPanel::ToolPanel(wxNotebook *book, const wxPoint& pos, const wxSize& size)
 	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
 	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
 }
+
+
+/*ToolPanel::ToolPanel(wxAuiNotebook *book, ToolBox *tbox, const wxPoint& pos, const wxSize& size)
+	: wxPanel(book, wxID_ANY, pos, size)
+{
+	toolbox = tbox;
+	mainwin = NULL;
+	controlborder = 2;
+
+	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
+	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
+	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+}*/
 
 
 ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
@@ -722,6 +739,8 @@ void ToolPanel::OnLeftClick(wxMouseEvent& event)
 	if(mainwin) mainwin->SetStatusText("Tool Click");
 
 	if(toolbox) toolbox->OnClick(event.GetPosition());
+
+	//mainwin->SetStatusText("Tool Panel Click");
 }
 
 
@@ -1187,7 +1206,7 @@ void ToolBox::OnClick(wxPoint pos)
 
 	//mainwin->SetStatusText(text.Format("box click x %d y d%", pos.x, pos.y));
 
-	mainwin->SetStatusText(text.Format("box click x %d y %d", pos.x, pos.y));
+	mainwin->SetStatusText(text.Format("toolbox click x %d y %d", pos.x, pos.y));
 }
 
 

@@ -396,17 +396,19 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 		ygraphFrom = (yplot - mousedown.y + ybase) * yscale + graph->yfrom;
 		ygraphTo = (yplot - pos.y + ybase) * yscale + graph->yfrom;
 		//ygraphTo = (pos.y - ybase) * yscale + graph->yfrom;
+
+		// Range check and correct
+		if(xgraphFrom > xgraphTo) std::swap(xgraphFrom, xgraphTo);        // reverse range for drag from right to left
+		if(ygraphFrom > ygraphTo) std::swap(ygraphFrom, ygraphTo);
+
+		if(xgraphFrom < graph->xfrom) xgraphFrom = graph->xfrom;          // trim range to current plot (for drag past axes)
+		if(xgraphTo > graph->xto) xgraphTo = graph->xto;
+		if(ygraphFrom < graph->yfrom) ygraphFrom = graph->yfrom;
+		if(ygraphTo > graph->yto) ygraphTo = graph->yto;
 		
 		// Zoom Select
 		if((*mainwin->hypoflags)["zoom"]) {
-			if(xgraphFrom > xgraphTo) std::swap(xgraphFrom, xgraphTo);
-			if(ygraphFrom > ygraphTo) std::swap(ygraphFrom, ygraphTo);
-		
-			if(xgraphFrom < graph->xfrom) xgraphFrom = graph->xfrom;
-			if(xgraphTo > graph->xto) xgraphTo = graph->xto;
-			if(ygraphFrom < graph->yfrom) ygraphFrom = graph->yfrom;
-			if(ygraphTo > graph->yto) ygraphTo = graph->yto;
-		
+
 			graph->oldxfrom = graph->xfrom;
 			graph->oldxto = graph->xto;
 			graph->oldyfrom = graph->yfrom;

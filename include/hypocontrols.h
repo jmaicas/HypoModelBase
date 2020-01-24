@@ -104,6 +104,7 @@ public:
 	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxNotebook *notebook, const wxPoint& pos, const wxSize& size);
+	//ToolPanel(wxAuiNotebook *notebook, ToolBox *tbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(ToolBox *tbox, wxWindow *parent);
 };
 
