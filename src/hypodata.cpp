@@ -439,6 +439,7 @@ void NeuroBox::SelectAdd()
 	}
 
 	currcell->burstdata->spikes = selectspikes[currselect];
+	currcell->selectdata->spikes = selectspikes[currselect];
 
 	//diagbox->Write(text.Format("add%d from %.2f to %.2f\n", currselect, sfrom, sto));	
 	AnalyseSelection();	
@@ -544,12 +545,12 @@ void NeuroBox::AnalyseSelection()
 	wxString text;
 	//BurstDat *burstdata;
 	
-	currcell->burstdata->IntraBurstAnalysis();
+	currcell->selectdata->IntraBurstAnalysis();
 	//mod->SelectBurst(selectdata[currselect]);
 
 	//for(i=0; i<1000; i++) currcell->burstdata->hist5[i] = 20;
 
-	diagbox->Write(text.Format("\nSelect analyse %d spikes %.2fHz test %d\n", currcell->burstdata->intraspikes, currcell->burstdata->freq, currcell->burstdata->test));
+	diagbox->Write(text.Format("\nSelect analyse %d spikes %.2fHz test %d\n", currcell->selectdata->intraspikes, currcell->selectdata->freq, currcell->selectdata->test));
 
 	//if(currselect == 0) mod->burstbox->BurstDataDisp(mod->spikedata, mod->burstbox->modburst);
 	//if(currselect == 1) mod->burstbox->BurstDataDisp(mod->spikedata, mod->burstbox->evoburst);
