@@ -211,6 +211,7 @@ SpikeDat::SpikeDat()
 SpikeDat::~SpikeDat()
 {
 	if(burstdata) delete burstdata;
+	if(selectdata) delete selectdata;
 }
 
 

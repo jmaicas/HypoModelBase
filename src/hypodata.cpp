@@ -545,6 +545,7 @@ void NeuroBox::AnalyseSelection()
 	wxString text;
 	//BurstDat *burstdata;
 	
+	currcell->selectdata->times = currcell->times.data();
 	currcell->selectdata->IntraBurstAnalysis();
 	//mod->SelectBurst(selectdata[currselect]);
 
