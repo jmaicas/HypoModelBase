@@ -21,7 +21,7 @@ NeuroMod::~NeuroMod()
 
 void NeuroMod::IoDGraph(datdouble *IoDdata, datdouble *IoDdataX, wxString label, wxString tag, int colour, int barshift, wxString settag)
 {
-	graphbase->Add(GraphDat(IoDdata, 0, 70, 0, 2, label, 2, 1, colour), tag, settag);
+	graphbase->Add(GraphDat(IoDdata, 0, 70, 0, 2, label, 9, 1, colour), tag, settag);
 	graphbase->GetGraph(tag)->gdatax = IoDdataX;
 	graphbase->GetGraph(tag)->xcount = 7;   // 7  // 5 for Trystan data
 	graphbase->GetGraph(tag)->synchx = false;

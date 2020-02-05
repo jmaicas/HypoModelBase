@@ -389,13 +389,16 @@ double BurstDat::dispcalcburst(int binsize, int maxint)
 	int burstindex;
 	//wxString text;
 	bool shiftflag = true;
-	bool filediag = false;
+	bool filediag = true;
 	bool selecton;
 	FILE *ofp;
 	char diagname[20];
 	sprintf(diagname, "burstIoD%d.txt", binsize);
+	wxString text;
 
 	if(filediag) ofp = fopen(diagname, "w");
+
+	spikedata->diagbox->Write(text.Format("dispcalcburst %d, select mode %d\n", binsize, selectmode));
 
 	//if(times[0] > 1000) timeshift = times[0] - 1000;        // for data where recording starts at non-zero time point
 
@@ -408,7 +411,7 @@ double BurstDat::dispcalcburst(int binsize, int maxint)
 	for(i=0; i<maxbin; i++) spikerate[i] = 0;
 	for(i=0; i<spikecount; i++) {
 		if(!selectmode) {
-			if(!burstspikes[i]) continue; 
+			if(!spikes[i]) continue; 
 			if(shiftflag && i == bustore[burstindex].start) burstshift += times[i] - burstend;
 			if(i == bustore[burstindex].end) {
 				burstend = times[i];
@@ -416,11 +419,11 @@ double BurstDat::dispcalcburst(int binsize, int maxint)
 			}
 		}
 		else {
-			if(!burstspikes[i] && selecton) {
+			if(!spikes[i] && selecton) {
 				selecton = false;
 				burstend = times[i-1]; 
 			}
-			if(burstspikes[i] && !selecton) {
+			if(spikes[i] && !selecton) {
 				selecton = true;
 				burstshift += times[i] - burstend;
 			}
@@ -429,8 +432,8 @@ double BurstDat::dispcalcburst(int binsize, int maxint)
 		//bindex = round((times[i] - burstshift) / binsize);
 		//if((times[i] - burstshift) / binsize < maxbin) spikerate[(int)((times[i] - burstshift) + 0.5) / binsize]++;
 		if(bindex < maxbin) spikerate[bindex]++;
-		if(i%10 == 0 && filediag) fprintf(ofp, "spike %d  spikes[i] %d  burst %d  times[i] %.2f  burstshift %.2f  index %d\n", 
-			i, burstspikes[i], burstindex, times[i], burstshift, bindex);
+		if(i%10 == 0 && filediag) fprintf(ofp, "spike %d  spikes[i] %d  selecton %d  burst %d  times[i] %.2f  burstshift %.2f  index %d\n", 
+			i, spikes[i], selecton, burstindex, times[i], burstshift, bindex);
 		//spikedata->diagbox->Write(text.Format("spike %d  spikes[i] %d  times[i] %.2f  timeshift %.2f  burstshift %.2f  index %d\n", 
 		//	i, spikes[i], times[i], timeshift, burstshift, (int)((times[i] - timeshift - burstshift) + 0.5) / binsize));
 		//fflush(ofp);

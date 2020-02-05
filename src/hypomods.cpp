@@ -71,8 +71,8 @@ void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
 			if(!graphset) continue;
 			gdex = graphset->GetPlot(gflags);
 			if(!gdex) continue;
-			//if(diagbox) diagbox->textbox->AppendText(text.Format("gpos %d   gcode %s   set %s   plot %d   modesum %d   sdex %d  sync %d  current %d\n", 
-			//	i, gcodes[i], graphset->tag, gdex, graphset->modesum, graphset->sdex, (*graphbase)[gdex]->synchx, graphset->current));
+			if(diagbox) diagbox->textbox->AppendText(text.Format("gpos %d   gcode %s   set %s   plot %d   modesum %d   sdex %d  sync %d  current %d\n", 
+				i, gcodes[i], graphset->tag, gdex, graphset->modesum, graphset->sdex, (*graphbase)[gdex]->synchx, graphset->current));
 			gpos[i].Front((*graphbase)[gdex]);
 			gpos[i].sdex = graphset->sdex;
 		}
