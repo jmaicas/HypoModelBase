@@ -427,6 +427,7 @@ double BurstDat::dispcalcburst(int binsize, int maxint)
 				selecton = true;
 				burstshift += times[i] - burstend;
 			}
+			if(!spikes[i]) continue; 
 		}
 		bindex = (int)((times[i] - burstshift + 0.5) / binsize);
 		//bindex = round((times[i] - burstshift) / binsize);

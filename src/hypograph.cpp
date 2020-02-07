@@ -796,7 +796,7 @@ void GraphWindow3::DrawLine(wxDC& dc, wxGraphicsContext *gc, int xstart, int yst
 {
 	//dc.DrawLine(xstart, ystart, xend, yend);
 
-	gc->StrokeLine(xbase, ybase, xbase, ybase + yplot);
+	gc->StrokeLine(xstart, ystart, xend, yend);
 }
 
 
@@ -1668,6 +1668,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 	int pdir, sample, xtime;
 	int xlabelgap;
 	int barwidth, bargap;
+	double textwidth, textheight;
 
 	int diag;
 	bool drawdiag;
@@ -1703,15 +1704,15 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 	xlabels = 10;
 	ylabels = mainwin->ylabels;
 
-	for (gdisp = 0; gdisp < numdisps; gdisp++)
-		for (gplot = 0; gplot < dispset[gdisp]->numplots; gplot++) {
+	for(gdisp=0; gdisp<numdisps; gdisp++)
+		for(gplot=0; gplot<dispset[gdisp]->numplots; gplot++) {
 			//graph = gpos->plot[gplot];
 			graph = dispset[gdisp]->plot[gplot];
 			gpar = graph->gparam;
-			if (gpar == -1) gdata = graph->gdata;
-			if (gpar == -2) gdatad = graph->gdatad;
-			if (gpar == -3) gdatav = graph->gdatav;
-			if (gpar == -4) gdatadv = graph->gdatadv;
+			if(gpar == -1) gdata = graph->gdata;
+			if(gpar == -2) gdatad = graph->gdatad;
+			if(gpar == -3) gdatav = graph->gdatav;
+			if(gpar == -4) gdatadv = graph->gdatadv;
 			xscale = graph->xscale;
 			yscale = 1;
 			xdis = graph->xdis;
@@ -1720,10 +1721,10 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			yto = graph->yto;
 			xfrom = graph->xfrom * xscale;
 			xto = graph->xto * xscale;
-			if (!graph->xlabels) graph->xlabels = 10;
-			if (!graph->ylabels) graph->ylabels = mainwin->ylabels;
-			if (!graph->xstep) graph->xstep = (xto - xfrom) / xlabels;
-			if (!graph->ystep) graph->ystep = (yto - yfrom) / ylabels;
+			if(!graph->xlabels) graph->xlabels = 10;
+			if(!graph->ylabels) graph->ylabels = mainwin->ylabels;
+			if(!graph->xstep) graph->xstep = (xto - xfrom) / xlabels;
+			if(!graph->ystep) graph->ystep = (yto - yfrom) / ylabels;
 			xlabels = graph->xlabels;
 			ylabels = graph->ylabels;
 			gname = graph->gname;
@@ -1732,7 +1733,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			colour = graph->colour;
 			colourpen[custom] = graph->strokecolour;
 			sample = graph->samprate;
-			if (graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
+			if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
 			else burstdata = NULL;
 			xtime = xto - xfrom;
 			barwidth = graph->barwidth;
@@ -1743,14 +1744,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			ylogbase = graph->ylogbase;
 
 			//if(gtype == 3) ofp = fopen("graph.txt", "w");
-			if (drawdiag && burstdata != NULL && burstdata->burstdisp == 1) ofp = fopen("graph.txt", "w");
+			if(drawdiag && burstdata != NULL && burstdata->burstdisp == 1) ofp = fopen("graph.txt", "w");
 
-			if (colour < 0 || colour > 9) colour = 3;
+			if(colour < 0 || colour > 9) colour = 3;
 
-			//dc.SetPen(colourpen[black]);
 			gc->SetPen(colourpen[black]);
-
-
 			DrawLine(dc, gc, xbase, ybase, xbase, ybase + yplot);
 			DrawLine(dc, gc, xbase, ybase + yplot, xbase + xplot + xstretch, ybase + yplot);
 
@@ -1759,23 +1757,22 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 			// Ticks and Labels
 
-			dc.SetFont(textfont);
-			//gc->SetFont(textfont);
+			gc->SetFont(textfont, colourpen[black]);
 
 			//int ticks;
 
 			int xcoord, ycoord;
 			double xplotstep, yplotstep;
 
-			if (graph->xtickmode) { // && graph->xstep > 0) {
+			if(graph->xtickmode) { // && graph->xstep > 0) {
 				xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
 				xplotstep = (xplot * graph->xstep) / (xto - xfrom);
 			}
 
-			if (graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(xlogbase);
+			if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(xlogbase);
 			else xlogmax = 0;
 
-			if (graph->yscalemode == 1 && yfrom > 0) ylogmax = log(yto / yfrom) / log(ylogbase);
+			if(graph->yscalemode == 1 && yfrom > 0) ylogmax = log(yto / yfrom) / log(ylogbase);
 			else ylogmax = 0;
 
 			//V = Vmin * b ** (logmax * X / Xmax)
@@ -1784,7 +1781,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			//if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * log(xval / xfrom) / xlogmax);  // log scaled x-axis  December 2017
 			//else xpos = (xval - xfrom) * xrange;
 
-			for (i = 0; i <= xlabels && xlabels > 0; i++) {
+			for(i=0; i<=xlabels && xlabels > 0; i++) {
 				xcoord = i * xplot / xlabels;
 				if (graph->xtickmode) xcoord = (int)(xplotstep * i);
 				DrawLine(dc, gc, xbase + xcoord, ybase + yplot, xbase + xcoord, ybase + yplot + 5);
@@ -1793,7 +1790,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				if (graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - graph->xshift;
 
 				// log scale mode
-				if (graph->xscalemode == 1 && xfrom > 0) xval = xfrom * pow(xlogbase, xlogmax * xval / xto);
+				if(graph->xscalemode == 1 && xfrom > 0) xval = xfrom * pow(xlogbase, xlogmax * xval / xto);
 
 				srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
 				//snum.Printf("%.0f", xval + xdis);	
@@ -1801,7 +1798,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				//if(srangex < 1) snum.Printf("%.2f", xval + xdis);
 				//if(srangex < 0.1) snum.Printf("%.3f", xval + xdis);	
 
-				if (graph->xlabelplaces == -1) {
+				if(graph->xlabelplaces == -1) {
 					if (srangex < 0.1) snum.Printf("%.3f", xval + xdis);
 					else if (srangex < 1) snum.Printf("%.2f", xval + xdis);
 					else if (srangex < 10) snum.Printf("%.1f", xval + xdis);
@@ -1809,63 +1806,71 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 				else snum = numstring(xval + xdis, graph->xlabelplaces);
 
-				textsize = dc.GetTextExtent(snum);
-				if (ostype == Mac)
+
+				if(ostype == Mac) {
+					textsize = dc.GetTextExtent(snum);
 					dc.DrawText(snum, xbase + xcoord - textsize.GetWidth() / 2, ybase + yplot + 10);
-				else
-					dc.DrawText(snum, xbase + xcoord - textsize.GetWidth() / 2, ybase + yplot + 10);
+				}
+				else {
+					gc->GetTextExtent(snum, &textwidth, &textheight);
+					gc->DrawText(snum, xbase + xcoord - textwidth / 2, ybase + yplot + 10);
+				}
 			}
 
-			if (yplot < 150 && ylabels >= 10) dc.SetFont(smallfont);
+			if(yplot < 150 && ylabels >= 10) gc->SetFont(smallfont, colourpen[black]);
 			xylab = 5;
 
-			if (graph->ytickmode && graph->ystep > 0) {                     // tick count and spacing for defined linear step size
+			if(graph->ytickmode && graph->ystep > 0) {                     // tick count and spacing for defined linear step size
 				ylabels = (int)((yto - yfrom) / (yscale * graph->ystep));
 				yplotstep = (yplot * graph->ystep) / (yto - yfrom);
 			}
 
-			if (graph->ytickmode == 1 && graph->yscalemode == 1) {          // tick count and spacing for log scale, step size specifies exponent step
+			if(graph->ytickmode == 1 && graph->yscalemode == 1) {          // tick count and spacing for log scale, step size specifies exponent step
 				ylogrange = log(yto - yfrom) / log(ylogbase);
 				ylabels = (int)(ylogrange / graph->ystep);
 				yplotstep = (yplot * graph->ystep) / ylogrange;
 				mod->diagbox->Write(text.Format("ylog tick step %.2f ylabels %d stepsize %.2f ylogrange %.4f\n", graph->ystep, ylabels, yplotstep, ylogrange));
 			}
 
-			for (i = 0; i <= ylabels && ylabels > 0; i += 1) {
+			for(i=0; i<=ylabels && ylabels>0; i+=1) {
 				ycoord = i * yplot / ylabels;
-				if (graph->ytickmode) ycoord = (int)(yplotstep * i);
+				if(graph->ytickmode) ycoord = (int)(yplotstep * i);
 				DrawLine(dc, gc, xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
-				if (!graph->ylabelmode || (graph->ylabelmode == 2 && i > 0 && i < ylabels)) continue;
-				if (graph->ytickmode == 0) yval = ((double)(yto - yfrom) / ylabels * i + yfrom) / yscale * graph->yunitscale - graph->yshift;
-				if (graph->ytickmode == 1) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+				if(!graph->ylabelmode || (graph->ylabelmode == 2 && i > 0 && i < ylabels)) continue;
+				if(graph->ytickmode == 0) yval = ((double)(yto - yfrom) / ylabels * i + yfrom) / yscale * graph->yunitscale - graph->yshift;
+				if(graph->ytickmode == 1) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
 
 				// log scale mode
-				if (graph->yscalemode == 1 && yfrom > 0) {
-					if (graph->ytickmode == 1) yval = pow(ylogbase, graph->ystep * i);
-					if (graph->ytickmode == 0) yval = yfrom * pow(ylogbase, ylogmax * yval / yto);
+				if(graph->yscalemode == 1 && yfrom > 0) {
+					if(graph->ytickmode == 1) yval = pow(ylogbase, graph->ystep * i);
+					if(graph->ytickmode == 0) yval = yfrom * pow(ylogbase, ylogmax * yval / yto);
 				}
 
 				srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
-				if (graph->ylabelplaces == -1) {
+				if(graph->ylabelplaces == -1) {
 					if (srangey < 0.1) snum.Printf("%.3f", yval);
 					else if (srangey < 1) snum.Printf("%.2f", yval);
 					else if (srangey < 10) snum.Printf("%.1f", yval);
 					else snum.Printf("%.0f", yval);
 				}
 				else snum = numstring(yval, graph->ylabelplaces);
-				textsize = dc.GetTextExtent(snum);
-				if (ostype == Mac)
+				
+				if(ostype == Mac) {
+					textsize = dc.GetTextExtent(snum);
 					dc.DrawText(snum, xbase - xylab - textsize.GetWidth(), ybase + yplot - ycoord - textsize.GetHeight() / 2);
-				else
-					dc.DrawText(snum, xbase - xylab - textsize.GetWidth(), ybase + yplot - ycoord - 7);
+				}
+				else {
+					gc->GetTextExtent(snum, &textwidth, &textheight);
+					gc->DrawText(snum, xbase - xylab - textwidth, ybase + yplot - ycoord - 7);
+				}
 			}
 			//gname.Printf("GText width %d height %d", textsize.x, textsize.y);
 
-			if (yplot < 150) dc.SetFont(textfont);
-			textsize = dc.GetTextExtent(gname);
-			dc.DrawText(gname, xplot + 50 - textsize.GetWidth(), 30 + 15 * gplot);
+			if(yplot < 150) gc->SetFont(textfont, colourpen[black]);
+			gc->GetTextExtent(gname, &textwidth, &textheight);
+			gc->DrawText(gname, xplot + 50 - textwidth, 30 + 15 * gplot);
 
-			dc.SetPen(colourpen[colour]);
+			gc->SetPen(colourpen[colour]);
 			highon = 0;
 
 			// Set drawing scales
@@ -1906,24 +1911,24 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			//mainwin->diagbox->Write(text.Format("Graph %d %s type %d\n", gdisp, gname, gtype)); 
 
 
-			if (gtype == 1) {                             // scaled width bars, Histogram    
-				for (i = 0; i < (xto - xfrom); i++) {
-					if (gpar == -1) y = (double)gdata[i + (int)xfrom];
-					if (gpar == -2) y = gdatad[i + (int)xfrom];
-					if (gpar == -3) y = (*gdatav)[i + (int)xfrom];
-					if (gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+			if(gtype == 1) {                             // scaled width bars, Histogram    
+				for (i=0; i<(xto - xfrom); i++) {
+					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
+					if(gpar == -2) y = gdatad[i + (int)xfrom];
+					if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+					if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
 					xpos = i * xrange + xbase;
 
-					if (i == graph->highstart) {					// new highlighting code  9/2/17
+					if(i == graph->highstart) {					// new highlighting code  9/2/17
 						highon = 1;
-						dc.SetPen(colourpen[graph->highcolour]);
+						gc->SetPen(colourpen[graph->highcolour]);
 					}
-					if (i == graph->highstop) {
+					if(i == graph->highstop) {
 						highon = 0;
-						dc.SetPen(colourpen[colour]);
+						gc->SetPen(colourpen[colour]);
 					}
 
-					if (xrange <= 1) {
+					if(xrange <= 1) {
 						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
 					}
 					else {
@@ -1934,14 +1939,14 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 			}
 
-			if (gtype == 7) {                             // scaled width bars    
+			if(gtype == 7) {                             // scaled width bars    
 				for (i = 0; i < (xto - xfrom); i++) {
-					if (gpar == -1) y = (double)gdata[i + (int)xfrom];
-					if (gpar == -2) y = gdatad[i + (int)xfrom];
-					if (gpar == -3) y = (*gdatav)[i + (int)xfrom];
-					if (gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
+					if(gpar == -2) y = gdatad[i + (int)xfrom];
+					if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+					if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
 					xpos = i * xrange + xbase;
-					if (xrange <= 1) {
+					if(xrange <= 1) {
 						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
 					}
 					else {
@@ -1952,7 +1957,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 			}
 
-			if (gtype == 4) {                         // normal line graph   - no longer in use, see type 5 below
+			if(gtype == 4) {                         // normal line graph   - no longer in use, see type 5 below
 				dir = 1;   // 1 for ascending, 0 for descending
 				preval = (*gdatadv)[0];
 				oldx = xbase;
@@ -1970,23 +1975,23 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				//if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(xlogbase)) / xlogmax);  // log scaled x-axis  December 2017
 				//else xpos = (xval - xfrom) * xrange;
 
-				for (i = 0; i < xplot; i++) {
-					if (xrange < 1) {
+				for(i=0; i<xplot; i++) {
+					if(xrange < 1) {
 						xindex = (int)((i * xnum) + xfrom);
 						mpoint = (*gdatadv)[xindex];
-						for (j = 1; j < xnum; j++) {
-							if (dir) {
-								if ((*gdatadv)[xindex + j] > mpoint) mpoint = (*gdatadv)[xindex + j];
+						for (j=1; j<xnum; j++) {
+							if(dir) {
+								if((*gdatadv)[xindex + j] > mpoint) mpoint = (*gdatadv)[xindex + j];
 							}
 							else {
-								if ((*gdatadv)[xindex + j] < mpoint) mpoint = (*gdatadv)[xindex + j];
+								if((*gdatadv)[xindex + j] < mpoint) mpoint = (*gdatadv)[xindex + j];
 							}
 						}
-						if (preval < mpoint) dir = 1; else dir = 0;
+						if(preval < mpoint) dir = 1; else dir = 0;
 						yval = mpoint;
 						preval = mpoint;
 
-						if (graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+						if(graph->yscalemode == 1 && yfrom > 0) ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
 						else ypos = (yval - yfrom) * yrange;
 						DrawLine(dc, gc, oldx, oldy, i + xbase, (int)(yplot + ybase - ypos));
 						oldx = i + xbase;
@@ -2007,43 +2012,43 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			int xoffset = 1;
 
 			if (gtype == 5) {                         // line graph with scaling fix
-				if (drawdiag) ofp = fopen("graph.txt", "w");
+				if(drawdiag) ofp = fopen("graph.txt", "w");
 				//mod->diagbox->Write(text.Format("line plot xrange %.4f  yscalemode %d  ylogbase %.4f  ylogmax %.4f\n", xrange, graph->yscalemode, ylogbase, ylogmax));
 
 				dir = 1;
 				pdir = 0;
 				xindex = (int)xfrom;
-				if (gpar == -3) preval = (*gdatav)[xindex];
-				if (gpar == -4) preval = (*gdatadv)[xindex];
+				if(gpar == -3) preval = (*gdatav)[xindex];
+				if(gpar == -4) preval = (*gdatadv)[xindex];
 				oldx = xbase + xoffset;
 				oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
 
-				for (i = 1; i < xplot; i++) {
-					if (xrange < 1) {
+				for(i=1; i<xplot; i++) {
+					if(xrange < 1) {
 						xindex = (int)((i * xnum) + xfrom);
 						//mpoint = (*gdatadv)[xindex];
-						if (gpar == -3) mpoint = (*gdatav)[xindex];
-						if (gpar == -4) mpoint = (*gdatadv)[xindex];
-						if (drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  dir %d\n", i, preval, dir);
-						for (j = 1; j < xnum; j++) {
+						if(gpar == -3) mpoint = (*gdatav)[xindex];
+						if(gpar == -4) mpoint = (*gdatadv)[xindex];
+						if(drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  dir %d\n", i, preval, dir);
+						for(j=1; j<xnum; j++) {
 							//data = (*gdatadv)[xindex + j];
-							if (gpar == -3) data = (*gdatav)[xindex + j];
-							if (gpar == -4) data = (*gdatadv)[xindex + j];
-							if (drawdiag) fprintf(ofp, "xdraw %d, xnum %d, data %.4f\n", i, j, data);
-							if (dir) {
-								if (data > mpoint) mpoint = data;
-								else if (data < mpoint) mpoint = data;
+							if(gpar == -3) data = (*gdatav)[xindex + j];
+							if(gpar == -4) data = (*gdatadv)[xindex + j];
+							if(drawdiag) fprintf(ofp, "xdraw %d, xnum %d, data %.4f\n", i, j, data);
+							if(dir) {
+								if(data > mpoint) mpoint = data;
+								else if(data < mpoint) mpoint = data;
 								//if(!dir && (*gdatadv)[xindex + j] < mpoint) mpoint = (*gdatadv)[xindex + j];
 							}
 						}
-						if (preval <= mpoint || preval < 0.000001) dir = 1; else dir = 0;
+						if(preval <= mpoint || preval < 0.000001) dir = 1; else dir = 0;
 						yval = mpoint;
 						preval = mpoint;
-						if (drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  mpoint %.4f  point %.4f\n", i, preval, mpoint, y);
+						if(drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  mpoint %.4f  point %.4f\n", i, preval, mpoint, y);
 
-						if (graph->yscalemode == 1 && yfrom > 0) {
+						if(graph->yscalemode == 1 && yfrom > 0) {
 							ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
-							if (yval < yfrom) {
+							if(yval < yfrom) {
 								ypos = -yfrom * yrange;
 								//mod->diagbox->Write(text.Format("line draw log low value yval %.4f ypos %d\n", yval, ypos));
 							}
@@ -2059,11 +2064,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					}
 					else {
 						//yval = (*gdatadv)[(int)(i + xfrom)];
-						if (gpar == -3) yval = (*gdatav)[(int)(i + xfrom)];
-						if (gpar == -4) yval = (*gdatadv)[(int)(i + xfrom)];
-						if (graph->yscalemode == 1 && yfrom > 0) {
+						if(gpar == -3) yval = (*gdatav)[(int)(i + xfrom)];
+						if(gpar == -4) yval = (*gdatadv)[(int)(i + xfrom)];
+						if(graph->yscalemode == 1 && yfrom > 0) {
 							ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
-							if (yval < yfrom) ypos = -yfrom * yrange;
+							if(yval < yfrom) ypos = -yfrom * yrange;
 						}
 						else ypos = yrange * (yval - yfrom);
 						DrawLine(dc, gc, oldx, oldy, (int)(i * xrange + xbase + xoffset), (int)(yplot + ybase - ypos));
@@ -2072,21 +2077,21 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					}
 					//fprintf(pofp, "xindex %d  y %.2f\n  dir %d", xindex, y, dir);
 				}
-				if (drawdiag) fclose(ofp);
+				if(drawdiag) fclose(ofp);
 			}
 
 			double prevx, xvalnext;
 			int xposnext;
 
-			if (gtype == 2 && graph->gdatax) {				                            // line graph with X data
+			if(gtype == 2 && graph->gdatax) {				                            // line graph with X data
 				//mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 				oldx = xbase + xoffset;
 				oldy = (int)(yplot + ybase - yrange * (yfrom));
 				//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
-				for (i = 0; i < graph->xcount; i++) {
+				for(i=0; i<graph->xcount; i++) {
 					xval = (*graph->gdatax)[i];
 					//if(xval <= prevx) break;
-					if (xval >= xfrom && xval <= xto) {
+					if(xval >= xfrom && xval <= xto) {
 						xpos = (int)((xval - xfrom) * xrange);
 						y = (*gdatadv)[i];
 						/*
@@ -2099,10 +2104,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						//mainwin->diagbox->Write(text.Format("\n X %d val %.2f pos %d\n", i, xval, xpos));
 						//mainwin->diagbox->Write(text.Format("XY graph line X %.4f Y %.4f\n", xval, y));
 
-						dc.SetPen(colourpen[colour]);
+						gc->SetPen(colourpen[colour]);
 						DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-						dc.SetPen(colourpen[black]);
-						if (graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+						gc->SetPen(colourpen[black]);
+						//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+						if(graph->scattermode) gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize, graph->scattersize);
 						oldx = xpos + xbase + xoffset;
 						oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 					}
@@ -2146,9 +2152,9 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 							if (ypos < ymin) ymin = ypos;
 							if (ypos > ymax) ymax = ypos;
 						}
-						dc.SetPen(colourpen[colour]);
+						gc->SetPen(colourpen[colour]);
 						//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (yval - yfrom)), graph->scattersize);	
-						dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - ypos), graph->scattersize);
+						gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - ypos), graph->scattersize, graph->scattersize);
 					}
 				}
 
@@ -2177,7 +2183,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 					gc->SetPen(colourpen[black]);
 					gc->SetBrush(*wxBLACK_BRUSH);
-					dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - ypos), 3);
+					gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - ypos), 3, 3);
 					DrawLine(dc, gc, (int)(xsdneg + xbase + xoffset), (int)(yplot + ybase - ypos), (int)(xsdpos + xbase + xoffset), (int)(yplot + ybase - ypos));
 					DrawLine(dc, gc, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - ysdneg), (int)(xpos + xbase + xoffset), (int)(yplot + ybase - ysdpos));
 				}
@@ -2189,7 +2195,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					height = (double)(ymax - ymin) * 1.5;
 					gc->SetBrush(*wxTRANSPARENT_BRUSH);
 					gc->SetPen(colourpen[colour]);
-					dc.DrawEllipse((int)(xmid + xbase + xoffset - width / 2), (int)(yplot + ybase - ymid - height / 2), width, height);
+					gc->DrawEllipse((int)(xmid + xbase + xoffset - width / 2), (int)(yplot + ybase - ymid - height / 2), width, height);
 				}
 			}
 
@@ -2212,10 +2218,10 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					//xfield = 
 				}
 				else xpos = (int)((xval - xfrom) * xrange);
-				dc.SetPen(colourpen[colour]);
-				dc.SetBrush(*wxTRANSPARENT_BRUSH);
-				dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (yval - yfrom)), 10);
-				dc.DrawEllipse((int)(xpos + xbase + xoffset - width), (int)(yplot + ybase - yrange * (yval - yfrom) - height), width * 2, height * 2);
+				gc->SetPen(colourpen[colour]);
+				gc->SetBrush(*wxTRANSPARENT_BRUSH);
+				gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (yval - yfrom)), 10, 10);
+				gc->DrawEllipse((int)(xpos + xbase + xoffset - width), (int)(yplot + ybase - yrange * (yval - yfrom) - height), width * 2, height * 2);
 			}
 
 
@@ -2235,7 +2241,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						barpos = xbase + xpos - barshift + gdisp * (barwidth + bargap);
 						y = (*gdatadv)[i];
 						//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
-						dc.SetPen(colourpen[colour]);
+						gc->SetPen(colourpen[colour]);
 						//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
 						for (k = 0; k < barwidth; k++) {
 							DrawLine(dc, gc, barpos + k, yplot + ybase, barpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
@@ -2297,7 +2303,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 			if (gtype == 8) {                         // scatter with sampling
 				wxBrush brush(wxColour(255, 255, 255));
-				dc.SetBrush(brush);
+				gc->SetBrush(brush);
 				//dc.SetPen(colourpen[black]);
 
 				oldx = xbase + xoffset;
@@ -2316,7 +2322,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 				oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
 
-				dc.SetPen(colourpen[colour]);
+				gc->SetPen(colourpen[colour]);
 				for (i = 0; i <= (xto - xfrom) / sample; i++) {
 					xindex = i + ceil(xfrom / sample);
 					xpos = (int)(xindex * sample - xfrom) * xrange;
@@ -2332,7 +2338,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				double xtodraw = xto;
 				if (graph->xstop && xto > graph->xstop) xtodraw = graph->xstop;
 
-				dc.SetPen(colourpen[black]);
+				gc->SetPen(colourpen[black]);
 				for (i = 0; i <= (xtodraw - xfrom) / sample; i++) {
 					xindex = i + ceil(xfrom / sample);
 					xpos = (int)(xindex * sample - xfrom) * xrange;
@@ -2340,7 +2346,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					y = mpoint;
 					//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
 					//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-					dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
+					gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2, 2);
 					oldx = xpos + xbase + xoffset;
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}
@@ -2370,7 +2376,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					//mainwin->SetStatusText(diag);
 
 					if (burstdata == NULL || burstdata->burstdisp == 0) {
-						dc.SetPen(colourpen[red]);
+						gc->SetPen(colourpen[red]);
 						//mainwin->SetStatusText("no colour");
 					}
 
@@ -2429,11 +2435,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						}
 						//fflush(ofp);
 						if (burstcolour == 0)
-							dc.SetPen(colourpen[red]);
+							gc->SetPen(colourpen[red]);
 						else if (burstcolour % 2 == 0)
-							dc.SetPen(colourpen[blue]);
+							gc->SetPen(colourpen[blue]);
 						else if (burstcolour % 2 == 1)
-							dc.SetPen(colourpen[green]);
+							gc->SetPen(colourpen[green]);
 					}
 
 
@@ -2463,10 +2469,10 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					*/
 
 					xpos = i * xrange + xbase;
-					if (xrange <= 1)
+					if(xrange <= 1)
 						DrawLine(dc, gc, xpos, ybase + yplot, xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
 					else {
-						for (k = 0; k < xrange - 1; k++)
+						for(k=0; k<xrange-1; k++)
 							DrawLine(dc, gc, xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom)));
 					}
 				}
@@ -2475,7 +2481,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 		}
 	//if(gtype == 3) fclose(ofp);
 	//if(gpos->spikedisp == 1) fclose(ofp);
-	if (drawdiag && burstdata != NULL && burstdata->burstdisp == 1) fclose(ofp);
+	if(drawdiag && burstdata != NULL && burstdata->burstdisp == 1) fclose(ofp);
 	//fclose(ofp);
 }
 
