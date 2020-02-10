@@ -1167,6 +1167,7 @@ void ScaleBox::OnSpikes(wxCommandEvent& WXUNUSED(event))
 void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 {
 	ratedata = 1 - ratedata;
+	(*gflags)["ratedata"] = ratedata;
 	GraphSwitch();
 }
 

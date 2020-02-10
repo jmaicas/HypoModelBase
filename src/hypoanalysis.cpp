@@ -739,6 +739,61 @@ void BurstDat::BurstScanFit()
 }
 
 
+void SpikeDat::SelectSpikes()
+{
+	int i;
+
+	int bindex = 1;
+	int selecton = 0;
+
+	for(i=0; i<spikecount; i++) selectdata->spikes[i] = 0;
+
+	for(i=0; i<spikecount; i++) {
+		if(i == neurodata->selectstore[bindex].start) selecton = 1;
+		selectdata->spikes[i] = selecton;
+		if(i == neurodata->selectstore[bindex].end) {
+			selecton = 0;
+			bindex++;
+		}
+		if(bindex > neurodata->numbursts) break;   
+	}
+}
+
+
+void SpikeDat::SelectScan()
+{
+	int i;
+	int selecton;
+	int selectstart, selectend;
+	int selectindex;
+
+	int *selectspikes = selectdata->spikes;
+
+	selecton = 0;
+	selectindex = 0;
+
+	for(i=0; i<spikecount-1; i++) {
+		if(selectspikes[i]) {
+			if(!selecton) {
+				selectstart = i;
+				selecton = 1;
+			}
+		}
+		if(!selectspikes[i]) {
+			if(selecton) {
+				selectindex++;		
+				neurodata->selectstore[selectindex].start = selectstart;
+				neurodata->selectstore[selectindex].end = i-1;
+				selecton = 0;
+			}
+		}
+	}
+	neurodata->numbursts = selectindex;
+
+	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numbursts));
+}
+
+
 void SpikeDat::BurstScan(BurstBox *burstbox)
 {
 	int i, bstart;
@@ -1315,6 +1370,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
 
+	neurodata = datneuron;
 	if(datneuron != NULL) neurodat = 1;
 
 	for(i=0; i<10000; i++) {

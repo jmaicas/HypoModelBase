@@ -1733,7 +1733,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			colour = graph->colour;
 			colourpen[custom] = graph->strokecolour;
 			sample = graph->samprate;
-			if(graph->spikedata != NULL) burstdata = graph->spikedata->burstdata;
+			if(graph->spikedata != NULL) burstdata = graph->spikedata->colourdata;
 			else burstdata = NULL;
 			xtime = xto - xfrom;
 			barwidth = graph->barwidth;

@@ -942,12 +942,12 @@ void ToolBox::Store()
 
 	if(!selfstore) return;
 
-	//mainwin->diagbox->Write(text.Format("tool store %s\n", boxtag));
+	mainwin->diagbox->Write(text.Format("tool store %s\n", boxtag));
 	
 	if(!wxDirExists(toolpath)) wxMkdir(toolpath);
 	filename = toolpath + "/" + boxtag + ".dat";
 
-	//mainwin->diagbox->Write(text.Format("tool store path %s file %s params %d\n", toolpath, filename, paramset.numparams));
+	mainwin->diagbox->Write(text.Format("tool store path %s file %s params %d\n", toolpath, filename, paramset.numparams));
 	
 	toolfile.New(filename);
 

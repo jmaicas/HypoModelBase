@@ -156,6 +156,8 @@ enum {
 	ID_filtercheck,
 	ID_netstore,
 	ID_netload,
+	ID_selectstore,
+	ID_selectload,
 	ID_output,
 	ID_memnoise,
 	ID_IGFPanel,
@@ -330,7 +332,7 @@ int numplaces(double);
 wxString numchar(int);
 wxString numtext(double number, int places);
 wxString ColourString(wxColour colour, int type=0);
-long ParseLong(wxString *, wxUniChar);
+long ParseLong(wxString *, wxUniChar = NULL);
 double ParseDouble(wxString *, wxUniChar);
 wxString ParseString(wxString *, wxUniChar);
 

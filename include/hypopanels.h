@@ -228,7 +228,7 @@ public:
 	TagBox *neurodatatag;
 	TextGrid *textgrid;
 
-	wxStaticBoxSizer *selectbox1, *selectbox2, *filterbox;
+	wxStaticBoxSizer *selectbox1, *selectbox2;  //, *filterbox;
 	wxToggleButton *addbutton[5];
 	wxToggleButton *subbutton[5];
 	int selectmode[5];
@@ -269,6 +269,8 @@ public:
 
 	void OnBoxCheck(wxCommandEvent& event);
 	void OnGridFilter(wxCommandEvent& event);
+	void OnSelectStore(wxCommandEvent& event);
+	void OnSelectLoad(wxCommandEvent& event);
 
 
 	// Functions ported from PlotModel

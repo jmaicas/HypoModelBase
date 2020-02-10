@@ -13,6 +13,9 @@ NeuroDat::NeuroDat()
 	srate.resize(maxtime);
 	srate10.resize(maxtime);
 
+	maxselect = 100;
+	selectstore.resize(maxselect);
+
 	filter = 0;
 }
 

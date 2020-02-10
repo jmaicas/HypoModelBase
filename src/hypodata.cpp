@@ -31,6 +31,8 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	paramindex = 0;
 	textgrid = NULL;
 
+	selfstore = true;
+
 	selectcount = 2;
 	//selected = new SpikeDat();
 	//selectdata[0] = new BurstDat(true);
@@ -175,17 +177,28 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	currselect = 0;
 	addbutton[currselect]->SetValue(true);
 
-	filterbox = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Filter");
+	//filterbox = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Filter");
+	wxBoxSizer *filterbox = new wxBoxSizer(wxHORIZONTAL);
 	AddButton(ID_filter, "Grid Update", 80, filterbox);
 
 
+	wxBoxSizer *selectstorebox = new wxBoxSizer(wxVERTICAL); 
+	selectstorebox->Add(paramset.AddText("selectstoretag", "", "", 0, 100), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	wxBoxSizer *selectbuttons = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_selectstore, "Store", 40, selectbuttons, 2);
+	AddButton(ID_selectload, "Load", 40, selectbuttons, 2);
+	selectstorebox->Add(selectbuttons, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	filterbox->AddSpacer(20);
+	filterbox->Add(selectstorebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
+
 	selectpanelbox->Add(fromtobox, 0, wxALIGN_CENTRE_HORIZONTAL);
-	selectpanelbox->AddSpacer(20);
+	selectpanelbox->AddSpacer(15);
 	selectpanelbox->Add(selectbox1, 0);
 	selectpanelbox->AddSpacer(10);
 	selectpanelbox->Add(selectbox2, 0);
-	selectpanelbox->AddSpacer(10);
-	selectpanelbox->Add(filterbox, 0);
+	selectpanelbox->AddSpacer(15);
+	selectpanelbox->Add(filterbox, 0, wxALIGN_CENTRE_HORIZONTAL);
 
 	wxBoxSizer *colbox2 = new wxBoxSizer(wxHORIZONTAL); 
 	colbox2->AddStretchSpacer();
@@ -243,6 +256,8 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	winman->AddPane(tabpanel, wxAuiPaneInfo().Name("tabpane").CentrePane().PaneBorder(false));
 	winman->Update();
 
+	if(selfstore) Load();   // load self-stored tool parameter values
+
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(NeuroBox::OnEnter));
 	Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(NeuroBox::OnNext));
 	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(NeuroBox::OnPrev));
@@ -259,6 +274,9 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
 	Connect(ID_FileBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
+
+	Connect(ID_selectstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSelectStore));
+	Connect(ID_selectload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSelectLoad));
 }
 
 
@@ -268,6 +286,78 @@ NeuroBox::~NeuroBox()
 		delete[] selectspikes[0];
 		delete[] selectspikes[1];
 	}
+}
+
+
+void NeuroBox::OnSelectStore(wxCommandEvent& event)
+{
+	int i;
+	wxString filetag, filename, filepath;
+	wxString text;
+	TextFile selectfile;
+
+	currcell->selectdata->spikes = selectspikes[currselect];
+	currcell->SelectScan();
+	
+	filepath = mod->GetPath() + "/Tools";
+	if(!wxDirExists(filepath)) wxMkdir(filepath);
+
+	// Select data file
+	filetag = paramset.GetText("selectstoretag");
+	filename = filepath + "/" + filetag + "-select.dat";
+
+	selectfile.New(filename);
+
+	for(i=1; i<=currcell->selectdata->numbursts; i++) {
+		text.Printf("index %d  sta %d  end %d", i, currcell->neurodata->selectstore[i].start, currcell->neurodata->selectstore[i].end);	
+		selectfile.WriteLine(text);
+	}
+
+	selectfile.Close();
+}
+
+
+void NeuroBox::OnSelectLoad(wxCommandEvent& event)
+{
+	int i;
+	wxString filetag, filename, filepath;
+	TextFile selectfile;
+	wxString readline;
+	int index, start, end;
+	bool diagnostic = true;
+
+	currcell->selectdata->spikes = selectspikes[currselect];
+
+	filepath = mod->GetPath() + "/Tools";
+	
+	// Select data file
+	filetag = paramset.GetText("selectstoretag");
+	filename = filepath + "/" + filetag + "-select.dat";
+
+	if(diagnostic) diagbox->Write("SelectLoad " + filename + "\n");
+
+	if(!selectfile.Exists(filename)) {
+		diagbox->Write("ToolLoad file not found\n");
+		return;
+	}
+
+	selectfile.Open(filename);
+	readline = selectfile.ReadLine();
+
+	while(!readline.IsEmpty()) {
+		index = ParseLong(&readline, 'x');
+		currcell->neurodata->selectstore[index].start = ParseLong(&readline, 'a');
+		currcell->neurodata->selectstore[index].end = ParseLong(&readline, 'd');
+		if(diagnostic) diagbox->Write(text.Format("SelectLoad  index %d  start %d  end %d\n", index, currcell->neurodata->selectstore[index].start, currcell->neurodata->selectstore[index].end)); 
+		if(selectfile.End()) break;
+		readline = selectfile.ReadLine();	
+	}
+	currcell->neurodata->numbursts = index;
+	currcell->SelectSpikes();
+
+	mainwin->scalebox->GraphUpdate();
+
+	selectfile.Close();	
 }
 
 
@@ -1544,7 +1634,7 @@ void OutBox::NeuroScan()
 		spikecount = 0;
 		row = 1;
 
-		// Specific to data with type text, reject non-vasopressin types
+		// Specific to data with type label, reject non-vasopressin types
 		typetext = currgrid->GetCell(3, col);
 		if(typetext.Contains("OT") || typetext.Contains("NR")) {
 			//diagbox->Write(text.Format("col %d typetext %s rejected\n", col, typetext));
