@@ -710,7 +710,8 @@ void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 {
 	BurstScan();
 	mod->BurstUpdate();
-	Store();
+	spikedata->ColourSwitch(dispburst);
+	//Store();
 }
 
 

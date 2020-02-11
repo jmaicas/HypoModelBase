@@ -291,10 +291,11 @@ NeuroBox::~NeuroBox()
 
 void NeuroBox::OnSelectStore(wxCommandEvent& event)
 {
-	int i;
+	int i, cellindex;
 	wxString filetag, filename, filepath;
 	wxString text;
 	TextFile selectfile;
+	NeuroDat *cell;
 
 	currcell->selectdata->spikes = selectspikes[currselect];
 	currcell->SelectScan();
@@ -308,9 +309,12 @@ void NeuroBox::OnSelectStore(wxCommandEvent& event)
 
 	selectfile.New(filename);
 
-	for(i=1; i<=currcell->selectdata->numbursts; i++) {
-		text.Printf("index %d  sta %d  end %d", i, currcell->neurodata->selectstore[i].start, currcell->neurodata->selectstore[i].end);	
-		selectfile.WriteLine(text);
+	for(cellindex=0; cellindex<cellcount; cellindex++) {
+		cell = &(*cells)[cellindex];
+		for(i=1; i<=cell->numbursts; i++) {
+			text.Printf("cel %d  index %d  sta %d  end %d", cellindex, i, cell->selectstore[i].start, cell->selectstore[i].end);	
+			selectfile.WriteLine(text);
+		}
 	}
 
 	selectfile.Close();
@@ -324,9 +328,13 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	TextFile selectfile;
 	wxString readline;
 	int index, start, end;
+	int cellindex;
 	bool diagnostic = true;
+	NeuroDat *cell;
 
 	currcell->selectdata->spikes = selectspikes[currselect];
+
+	for(i=0; i<cellcount; i++) (*cells)[i].numbursts = 0;
 
 	filepath = mod->GetPath() + "/Tools";
 	
@@ -345,16 +353,19 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	readline = selectfile.ReadLine();
 
 	while(!readline.IsEmpty()) {
+		cellindex = ParseLong(&readline, 'l');
+		cell = &(*cells)[cellindex];
 		index = ParseLong(&readline, 'x');
-		currcell->neurodata->selectstore[index].start = ParseLong(&readline, 'a');
-		currcell->neurodata->selectstore[index].end = ParseLong(&readline, 'd');
-		if(diagnostic) diagbox->Write(text.Format("SelectLoad  index %d  start %d  end %d\n", index, currcell->neurodata->selectstore[index].start, currcell->neurodata->selectstore[index].end)); 
+		cell->numbursts++;
+		cell->selectstore[index].start = ParseLong(&readline, 'a');
+		cell->selectstore[index].end = ParseLong(&readline, 'd');
+		if(diagnostic) diagbox->Write(text.Format("SelectLoad  cell %d  index %d  start %d  end %d\n", cellindex, index, cell->selectstore[index].start, cell->selectstore[index].end)); 
 		if(selectfile.End()) break;
 		readline = selectfile.ReadLine();	
 	}
-	currcell->neurodata->numbursts = index;
+	
 	currcell->SelectSpikes();
-
+	currcell->ColourSwitch(dispselect);
 	mainwin->scalebox->GraphUpdate();
 
 	selectfile.Close();	
@@ -528,8 +539,9 @@ void NeuroBox::SelectAdd()
 		}	
 	}
 
-	currcell->burstdata->spikes = selectspikes[currselect];
+	//currcell->burstdata->spikes = selectspikes[currselect];
 	currcell->selectdata->spikes = selectspikes[currselect];
+	currcell->ColourSwitch(2);
 
 	//diagbox->Write(text.Format("add%d from %.2f to %.2f\n", currselect, sfrom, sto));	
 	AnalyseSelection();	
@@ -556,7 +568,9 @@ void NeuroBox::SelectSub()
 		}
 	}
 
-	currcell->burstdata->spikes = selectspikes[currselect];
+	currcell->selectdata->spikes = selectspikes[currselect];
+	currcell->ColourSwitch(dispselect);
+	//currcell->burstdata->spikes = selectspikes[currselect];
 	//diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", currselect, sfrom, sto));
 
 	mainwin->scalebox->BurstDisp(1);
@@ -709,6 +723,9 @@ void NeuroBox::NeuroData(bool dispupdate)
 	burstbox->SetExpGrid();
 	mod->SpikeDataSwitch(currcell);
 
+	currcell->SelectSpikes();
+	AnalyseSelection();
+
 	if(dispupdate) {
 		PanelData(&(*cells)[neuroindex]);
 		mainwin->scalebox->GraphUpdate();	
@@ -728,6 +745,7 @@ void NeuroBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex > 0) neuroindex--;
 	else neuroindex = cellcount-1;
 
+	currcell->SelectScan();  // store current cell's select grid to NeuroDat
 	NeuroData();
 }
 
@@ -738,6 +756,7 @@ void NeuroBox::OnNext(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex < cellcount-1) neuroindex++;
 	else neuroindex = 0;
 
+	currcell->SelectScan();  // store current cell's select grid to NeuroDat
 	NeuroData();
 }
 

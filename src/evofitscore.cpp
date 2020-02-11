@@ -398,7 +398,7 @@ double BurstDat::dispcalcburst(int binsize, int maxint)
 
 	if(filediag) ofp = fopen(diagname, "w");
 
-	spikedata->diagbox->Write(text.Format("dispcalcburst %d, select mode %d\n", binsize, selectmode));
+	//spikedata->diagbox->Write(text.Format("dispcalcburst %d, select mode %d\n", binsize, selectmode));
 
 	//if(times[0] > 1000) timeshift = times[0] - 1000;        // for data where recording starts at non-zero time point
 

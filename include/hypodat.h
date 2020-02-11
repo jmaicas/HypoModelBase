@@ -362,6 +362,7 @@ public:
 	int burst_minspikes, burst_maxspikes;
 	int burst_startspike, burst_endspike;
 	int burstmode;
+	int burstdispmode, dispmodemax;
 	
 	//void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
@@ -391,6 +392,7 @@ public:
 	//void IoDGraph(GraphBase *, wxString, wxString, int, int barshift=0);
 	void Clear();
 	void ReSize(int);
+	void ColourSwitch(int mode);
 };
 
 

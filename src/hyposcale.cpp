@@ -1166,8 +1166,19 @@ void ScaleBox::OnSpikes(wxCommandEvent& WXUNUSED(event))
 
 void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 {
-	ratedata = 1 - ratedata;
+	graph = gpos[0].plot[0]; 
+
+	//if((*gflags)[tag] == type) (*gflags)[tag] = 0;
+	//else (*gflags)[tag]++;   
+
+	if(ratedata == graph->spikedata->dispmodemax) ratedata = 0;
+	else ratedata++;
+
+	//ratedata = 1 - ratedata;
 	(*gflags)["ratedata"] = ratedata;
+
+	graph->spikedata->ColourSwitch(ratedata);
+
 	GraphSwitch();
 }
 

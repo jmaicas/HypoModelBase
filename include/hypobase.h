@@ -325,6 +325,12 @@ enum {
 };
 
 
+enum {
+	dispnone = 0,
+	dispburst = 1,
+	dispselect = 2
+};
+
 
 //void quicksort(refstore *a, int low, int high)
 wxString numstring(double, int);

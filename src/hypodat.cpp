@@ -17,6 +17,7 @@ NeuroDat::NeuroDat()
 	selectstore.resize(maxselect);
 
 	filter = 0;
+	numbursts = 0;
 }
 
 
@@ -98,44 +99,6 @@ void NeuroDat::ratecalc()
 }
 
 
-
-void SpikeDat::Clear()
-{
-	int i;
-
-	for(i=0; i<10000; i++) {
-		hist1[i] = 0;
-		hist5[i] = 0;
-		haz1[i] = 0;
-		haz5[i] = 0;
-	}
-	for(i=0; i<100000; i++) {
-		srate[i] = 0;
-		times[i] = 0;
-		isis[i] = 0;
-	}
-	for(i=0; i<1000000; i++) {
-		srate1[i] = 0;
-		synsim[i] = 0;
-	}
-	spikecount = 0;
-}
-
-
-void SpikeDat::ReSize(int newsize)
-{
-	//srate.data.resize(newsize);
-	//srate.max = newsize;
-	srate.setsize(newsize);
-	times.resize(newsize);
-	//times.max = newsize;
-	isis.data.resize(newsize);
-	isis.max = newsize;
-
-	maxspikes = newsize;
-}
-
-
 SpikeDat::SpikeDat()
 {
 	diagbox = NULL;
@@ -201,6 +164,8 @@ SpikeDat::SpikeDat()
 	mainwin = NULL;
 	graphs = false;
 	burstmode = 0;
+	burstdispmode = 0;
+	dispmodemax = 1;
 
 	fitType = 0;    // 0 for basic, 1 for oxy, 2 for vaso
 	label = "";
@@ -208,6 +173,7 @@ SpikeDat::SpikeDat()
 
 	burstdata = NULL;
 	selectdata = NULL;
+	colourdata = NULL;
 }
 
 
@@ -215,6 +181,51 @@ SpikeDat::~SpikeDat()
 {
 	if(burstdata) delete burstdata;
 	if(selectdata) delete selectdata;
+}
+
+
+void SpikeDat::ColourSwitch(int mode)
+{
+	if(mode == 0) colourdata = NULL;
+	if(mode == 1) colourdata = burstdata;
+	if(mode == 2) colourdata = selectdata;
+}
+
+
+void SpikeDat::Clear()
+{
+	int i;
+
+	for(i=0; i<10000; i++) {
+		hist1[i] = 0;
+		hist5[i] = 0;
+		haz1[i] = 0;
+		haz5[i] = 0;
+	}
+	for(i=0; i<100000; i++) {
+		srate[i] = 0;
+		times[i] = 0;
+		isis[i] = 0;
+	}
+	for(i=0; i<1000000; i++) {
+		srate1[i] = 0;
+		synsim[i] = 0;
+	}
+	spikecount = 0;
+}
+
+
+void SpikeDat::ReSize(int newsize)
+{
+	//srate.data.resize(newsize);
+	//srate.max = newsize;
+	srate.setsize(newsize);
+	times.resize(newsize);
+	//times.max = newsize;
+	isis.data.resize(newsize);
+	isis.max = newsize;
+
+	maxspikes = newsize;
 }
 
 
