@@ -1039,7 +1039,7 @@ void ParamBox::InitMenu(int type)
 		//menuBar->Append(menuParamSet, "Parameters");
 	}
 
-	if (type == menu_outbox) {
+	if(type == menu_gridbox) {
 		menuMode = new wxMenu;
 		menuBar = new wxMenuBar;
 		menuBar->Append(menuMode, "Mode");

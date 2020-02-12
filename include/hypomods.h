@@ -69,7 +69,7 @@ public:
 	ScaleBox *scalebox;
 
 	DatStore *recdata;
-	OutBox *outbox;
+	GridBox *gridbox;
 
 	NeuroBox *neurobox;
 	EvoFitBox *fitbox;

@@ -220,7 +220,7 @@ public:
 	//SpikeDat *selected;
 	//NeuroDat *cells;
 	vector<NeuroDat>*cells;
-	OutBox *gridbox;
+	GridBox *gridbox;
 	BurstBox *burstbox;
 
 	wxTextCtrl *datneuron;
@@ -281,7 +281,7 @@ public:
 };
 
 
-class OutBox: public ParamBox
+class GridBox: public ParamBox
 {
 public:
 	Model *mod;
@@ -298,7 +298,7 @@ public:
 	NeuroBox *neurobox;
 	vector<NeuroDat>* celldata;
 
-	OutBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true);
+	GridBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true, bool vdumode=true);
 
 	virtual void GridDefault();
 	virtual void TestGrid();

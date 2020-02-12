@@ -94,7 +94,7 @@ enum {
 
 enum {
 	menu_model = 0,
-	menu_outbox = 1
+	menu_gridbox = 1
 };
 
 
@@ -307,7 +307,8 @@ enum {
 	ID_file,
 	ID_grid,
 	ID_filter,
-	ID_subplot
+	ID_subplot,
+	ID_GridBox
 };
 
 
@@ -359,7 +360,7 @@ class DiagBox;
 class ToolSet;
 class PlotBox;
 class NeuroBox;
-class OutBox;
+class GridBox;
 
 
 //DiagBox *gdiag;
@@ -402,7 +403,7 @@ public:
 	// Modules
 	PlotBox *plotbox;
 	NeuroBox *neurobox;
-	OutBox *gridbox;
+	GridBox *gridbox;
 
 	GraphWindow3 *graphwin[10];
     
