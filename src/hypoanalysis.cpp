@@ -27,6 +27,7 @@ void BurstDat::BurstProfileFit()
 	if (diagnostic) {
 		ofp = fopen("bprofile.txt", "w");
 		spikedata->diagbox->Write("BurstProfile call " + spikedata->label + "\n");
+
 	}
 
 	stime = 0;
@@ -1965,6 +1966,7 @@ int SpikeDat::GraphSetLysis(GraphBase *graphbase, wxString tag, int colour, int 
 
 	//graphindex = setindex;
 	//graphbase->datdex[datset] = setindex; 
+
 	graphs = true;
 
 	return setindex;
