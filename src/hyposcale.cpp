@@ -149,7 +149,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 		gsync[i] = NULL;
 
-		if(boxtype == -1) mod->ScaleCon(this, i);
+		if(boxtype == -1) mod->ScaleConsole(this, i);
 
 		if(boxtype == modVMN) {
 			//gsync[i] = new wxCheckBox(panel, i, "Sync");

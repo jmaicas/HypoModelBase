@@ -1882,6 +1882,9 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			xnum = (double)(xto - xfrom) / xplot;
 
 
+			if(gdisp == 2) mainwin->diagbox->Write(text.Format("xrange %.4f  xrange int %d  xrange fix %d\n", xrange, (int)xrange, (int)(xrange + 0.5)));
+
+
 			/* Plot Types
 
 			1 - scaled width bars, histogram
@@ -1928,11 +1931,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						gc->SetPen(colourpen[colour]);
 					}
 
-					if(xrange <= 1) {
+					if((int)xrange <= 1) {
 						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
 					}
 					else {
-						for (k = 0; k < xrange - 1; k++) {
+						for(k=0; k<(int)(xrange-0.5); k++) {
 							DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
 						}
 					}
@@ -1950,7 +1953,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
 					}
 					else {
-						for (k = 0; k < xrange; k++) {
+						for(k=0; k<xrange; k++) {
 							DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
 						}
 					}

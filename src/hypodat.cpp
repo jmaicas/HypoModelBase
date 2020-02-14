@@ -886,8 +886,13 @@ wxString GraphSet::Display()
 
 
 // IntervalSet, sets up graph switching for ISI analysis plots, currently specific to VasoModel graph button panel
-void GraphSet::IntervalSet(wxString tag)
+void GraphSet::IntervalSet(wxString tag, bool burst, bool select)
 {
+	int selectcode;
+
+	if(burst && select) selectcode = 200;
+	else selectcode = 100;
+
 	AddFlag("hazmode1", 10);
 	AddFlag("binrestog1", 1);
 	AddFlag("burstmode", 100);
@@ -899,15 +904,17 @@ void GraphSet::IntervalSet(wxString tag)
 	Add(tag + "hist5ms", 1);
 	Add(tag + "haz5ms", 11);
 
-	Add(tag + "bursthist1ms", 100);
-	Add(tag + "bursthaz1ms", 110);
-	Add(tag + "bursthist5ms", 101);
-	Add(tag + "bursthaz5ms", 111);
+	if(burst) {
+		Add(tag + "bursthist1ms", 100);
+		Add(tag + "bursthaz1ms", 110);
+		Add(tag + "bursthist5ms", 101);
+		Add(tag + "bursthaz5ms", 111);
 
-	Add(tag + "burstnormhist1ms", 1100);
-	Add(tag + "bursthaz1ms", 1110);
-	Add(tag + "burstnormhist5ms", 1101);
-	Add(tag + "bursthaz5ms", 1111);
+		Add(tag + "burstnormhist1ms", 1100);
+		Add(tag + "bursthaz1ms", 1110);
+		Add(tag + "burstnormhist5ms", 1101);
+		Add(tag + "bursthaz5ms", 1111);
+	}
 
 	Add(tag + "normhist1ms", 1000);
 	Add(tag + "haz1ms", 1010);
@@ -917,15 +924,17 @@ void GraphSet::IntervalSet(wxString tag)
 	Add(tag + "histquadsmooth", 10001);
 	Add(tag + "histquadsmooth", 11001);
 
-	Add(tag + "selecthist1ms", 200);
-	Add(tag + "selecthaz1ms", 210);
-	Add(tag + "selecthist5ms", 201);
-	Add(tag + "selecthaz5ms", 211);
+	if(select) {
+		Add(tag + "selecthist1ms", selectcode);
+		Add(tag + "selecthaz1ms", selectcode + 10);
+		Add(tag + "selecthist5ms", selectcode + 1);
+		Add(tag + "selecthaz5ms", selectcode + 11);
 
-	Add(tag + "selectnormhist1ms", 1200);
-	Add(tag + "selecthaz1ms", 1210);
-	Add(tag + "selectnormhist5ms", 1201);
-	Add(tag + "selecthaz5ms", 1211);
+		Add(tag + "selectnormhist1ms", selectcode + 1000);
+		Add(tag + "selecthaz1ms", selectcode + 1010);
+		Add(tag + "selectnormhist5ms", selectcode + 1001);
+		Add(tag + "selecthaz5ms", selectcode + 1011);
+	}
 }
 
 

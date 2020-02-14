@@ -733,11 +733,11 @@ public:
 
 	void Add(int gdex, int gcode=-1);
 	void Add(wxString tag, int gcode=-1);
-	void AddFlag(wxString, int);
+	void AddFlag(wxString, int code);
 	int GetPlot(ParamStore *);
 	GraphDat *GetPlot(int index);
 	wxString Display();
-	void IntervalSet(wxString tag);
+	void IntervalSet(wxString tag, bool burst = true, bool select = true);
 	void Expand();
 };
 

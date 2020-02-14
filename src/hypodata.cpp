@@ -1658,18 +1658,17 @@ void GridBox::NeuroScan()
 
 		// Specific to data with type label, reject non-vasopressin types
 		typetext = currgrid->GetCell(3, col);
-		if(typetext.Contains("OT") || typetext.Contains("NR")) {
+		/*if(typetext.Contains("OT") || typetext.Contains("NR")) {                           // replace with parameterised string filtering  13/2/20
 			//diagbox->Write(text.Format("col %d typetext %s rejected\n", col, typetext));
 			(*celldata)[cellcount].filter = 1;
-			//col++;
-			//celltext = currgrid->GetCell(0, col);
-			//celltext.Trim();
-			//continue;
 		}
 		else {
 			//diagbox->Write(text.Format("col %d typetext %s accepted\n", col, typetext));
 			(*celldata)[cellcount].filter = 0;
-		}
+		}*/
+
+		(*celldata)[cellcount].filter = 0;
+
 
 		// Skip non-spike time rows
 		while (!numform.FromString(celltext, &cellval)) {
