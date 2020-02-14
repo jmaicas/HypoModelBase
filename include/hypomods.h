@@ -69,7 +69,7 @@ public:
 	ScaleBox *scalebox;
 
 	DatStore *recdata;
-	OutBox *outbox;
+	GridBox *gridbox;
 
 	NeuroBox *neurobox;
 	EvoFitBox *fitbox;
@@ -98,7 +98,7 @@ public:
 	virtual void GHistLoad(wxComboBox *);
 	virtual void ModClose();
 	virtual void EvoRun();
-	virtual void ScaleCon(ScaleBox *scalebox, int condex);
+	virtual void ScaleConsole(ScaleBox *scalebox, int condex);
 	virtual void SetCell(int cellindex, GraphDat *);
 	virtual int GetCellIndex();
 	virtual void ParamScan();

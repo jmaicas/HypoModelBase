@@ -324,7 +324,7 @@ void BurstDat::IntraBurstAnalysis()
 
 	if(scandiag) outfile.New("intradat.txt");
 
-	spikedata->diagbox->Write(text.Format("Intra Burst Analysis, select mode %d\n", selectmode));
+	//spikedata->diagbox->Write(text.Format("Intra Burst Analysis, select mode %d\n", selectmode));
 
 	// Intraburst Re-Analysis  
 
@@ -388,6 +388,7 @@ void BurstDat::IntraBurstAnalysis()
 	}
 
 	burstdisp = 1;
+	//spikedata->colourdata = this;
 	maxtime = times[spikedata->spikecount-1];
 
 	if(scandiag) for(i=0; i<10; i++) outfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, times[i]));
@@ -737,6 +738,61 @@ void BurstDat::BurstScanFit()
 
 	//burstdata->maxint = maxint;
 	//burstdata->IoDrange();
+}
+
+
+void SpikeDat::SelectSpikes()
+{
+	int i;
+
+	int bindex = 1;
+	int selecton = 0;
+
+	for(i=0; i<spikecount; i++) selectdata->spikes[i] = 0;
+
+	for(i=0; i<spikecount; i++) {
+		if(bindex > neurodata->numbursts) break;  
+		if(i == neurodata->selectstore[bindex].start) selecton = 1;
+		selectdata->spikes[i] = selecton;
+		if(i == neurodata->selectstore[bindex].end) {
+			selecton = 0;
+			bindex++;
+		} 
+	}
+}
+
+
+void SpikeDat::SelectScan()
+{
+	int i;
+	int selecton;
+	int selectstart, selectend;
+	int selectindex;
+
+	int *selectspikes = selectdata->spikes;
+
+	selecton = 0;
+	selectindex = 0;
+
+	for(i=0; i<spikecount-1; i++) {
+		if(selectspikes[i]) {
+			if(!selecton) {
+				selectstart = i;
+				selecton = 1;
+			}
+		}
+		if(!selectspikes[i]) {
+			if(selecton) {
+				selectindex++;		
+				neurodata->selectstore[selectindex].start = selectstart;
+				neurodata->selectstore[selectindex].end = i-1;
+				selecton = 0;
+			}
+		}
+	}
+	neurodata->numbursts = selectindex;
+
+	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numbursts));
 }
 
 
@@ -1316,6 +1372,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	if(calcdiag) ofp = fopen("neurocalc.txt", "w");
 
+	neurodata = datneuron;
 	if(datneuron != NULL) neurodat = 1;
 
 	for(i=0; i<10000; i++) {

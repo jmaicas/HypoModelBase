@@ -41,7 +41,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 
 	undogrid = new wxGridStringTable(size.x, size.y);
 	vdu = NULL;
-	outbox = NULL;
+	gridbox = NULL;
 	diagbox = NULL;
 
 	rightmenu = new wxMenu;
@@ -404,7 +404,7 @@ void TextGrid::OnLabelClick(wxGridEvent& event)
 	//if(vdu) vdu->AppendText("Label Click\n");
 	c = event.GetCol();
 
-	if(outbox && c >= 0) outbox->ColumnSelect(event.GetCol());
+	if(gridbox && c >= 0) gridbox->ColumnSelect(event.GetCol());
 
 	GoToCell(0, c);
 

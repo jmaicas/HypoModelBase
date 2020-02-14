@@ -31,7 +31,7 @@ void GraphWindow3::MultiCell()
 	mod->diagbox->Write("MultiCell\n");
 
 	// Read panel data from OutBox
-	textgrid = mod->outbox->currgrid;
+	textgrid = mod->gridbox->currgrid;
 	cellcount = (int)textgrid->ReadDouble(0, 1);
 	if(!cellcount) {
 		mod->diagbox->Write("ERROR parameters zero cellcount\n");
@@ -126,7 +126,7 @@ void GraphWindow3::MultiEPS()
 
 
 	// Read panel data from OutBox
-	textgrid = mod->outbox->currgrid;
+	textgrid = mod->gridbox->currgrid;
 
 	//celltext = textgrid->GetCell(0, 0);
 	//celltext.Trim(); 

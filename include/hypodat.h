@@ -129,15 +129,26 @@ public:
 };
 
 
+class burst{
+public:
+	int start;
+	int end;
+	int count;
+	double time;
+	int numpulse;
+	double pmax;
+	int length;
+};
+
+
 class NeuroDat{
 public:
-	//double *times;
-	//int *srate;
-	//int *srate10;
-
 	std::vector<double> times;
 	std::vector<int> srate;
 	std::vector<int> srate10;
+
+	int numbursts, maxselect;
+	std::vector <burst> selectstore;  // selection store using burst type
 
 	int srate100[10000];
 	int count;
@@ -146,7 +157,7 @@ public:
 	int netflag;
 	int type;
 	wxString name;
-
+	 
 	int filter;
 	int gridcol;
 
@@ -260,6 +271,9 @@ public:
 	datdouble isis;
 	BurstDat *burstdata;
 	BurstDat *selectdata;
+	BurstDat *colourdata;
+
+	NeuroDat *neurodata;
 	
 	datdouble haz1;
 	datdouble haz5;
@@ -348,6 +362,7 @@ public:
 	int burst_minspikes, burst_maxspikes;
 	int burst_startspike, burst_endspike;
 	int burstmode;
+	int burstdispmode, dispmodemax;
 	
 	//void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
@@ -360,6 +375,8 @@ public:
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
+	void SelectScan();
+	void SelectSpikes();
 	//void BurstScanFit();     // moved to BurstDat to reduce pointer dereferencing
 	void IntraSelectAnalysis();
 	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *burstparams = NULL);
@@ -375,6 +392,7 @@ public:
 	//void IoDGraph(GraphBase *, wxString, wxString, int, int barshift=0);
 	void Clear();
 	void ReSize(int);
+	void ColourSwitch(int mode);
 };
 
 
@@ -414,16 +432,11 @@ public:
 };
 
 
-
-class burst{
+// SelectDat, development idea, not currently in use, 10/2/20
+class SelectDat{
 public:
-	int start;
-	int end;
-	int count;
-	double time;
-	int numpulse;
-	double pmax;
-	int length;
+	SpikeDat *spikedata;
+	int *spikes;
 };
 
 
@@ -720,11 +733,11 @@ public:
 
 	void Add(int gdex, int gcode=-1);
 	void Add(wxString tag, int gcode=-1);
-	void AddFlag(wxString, int);
+	void AddFlag(wxString, int code);
 	int GetPlot(ParamStore *);
 	GraphDat *GetPlot(int index);
 	wxString Display();
-	void IntervalSet(wxString tag);
+	void IntervalSet(wxString tag, bool burst = true, bool select = true);
 	void Expand();
 };
 

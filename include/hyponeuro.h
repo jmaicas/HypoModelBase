@@ -11,6 +11,11 @@ public:
 	// Data
 	SpikeDat *evodata, *evodata2;
 
+	// Cell grid data - November 2019
+	vector<SpikeDat> viewcell;
+	vector<NeuroDat> celldata;
+	int cellcount;
+
 	// Boxes
 
 	NeuroMod(int, wxString, HypoMain *);

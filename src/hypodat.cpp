@@ -13,7 +13,11 @@ NeuroDat::NeuroDat()
 	srate.resize(maxtime);
 	srate10.resize(maxtime);
 
+	maxselect = 100;
+	selectstore.resize(maxselect);
+
 	filter = 0;
+	numbursts = 0;
 }
 
 
@@ -95,44 +99,6 @@ void NeuroDat::ratecalc()
 }
 
 
-
-void SpikeDat::Clear()
-{
-	int i;
-
-	for(i=0; i<10000; i++) {
-		hist1[i] = 0;
-		hist5[i] = 0;
-		haz1[i] = 0;
-		haz5[i] = 0;
-	}
-	for(i=0; i<100000; i++) {
-		srate[i] = 0;
-		times[i] = 0;
-		isis[i] = 0;
-	}
-	for(i=0; i<1000000; i++) {
-		srate1[i] = 0;
-		synsim[i] = 0;
-	}
-	spikecount = 0;
-}
-
-
-void SpikeDat::ReSize(int newsize)
-{
-	//srate.data.resize(newsize);
-	//srate.max = newsize;
-	srate.setsize(newsize);
-	times.resize(newsize);
-	//times.max = newsize;
-	isis.data.resize(newsize);
-	isis.max = newsize;
-
-	maxspikes = newsize;
-}
-
-
 SpikeDat::SpikeDat()
 {
 	diagbox = NULL;
@@ -198,6 +164,8 @@ SpikeDat::SpikeDat()
 	mainwin = NULL;
 	graphs = false;
 	burstmode = 0;
+	burstdispmode = 0;
+	dispmodemax = 1;
 
 	fitType = 0;    // 0 for basic, 1 for oxy, 2 for vaso
 	label = "";
@@ -205,6 +173,7 @@ SpikeDat::SpikeDat()
 
 	burstdata = NULL;
 	selectdata = NULL;
+	colourdata = NULL;
 }
 
 
@@ -212,6 +181,51 @@ SpikeDat::~SpikeDat()
 {
 	if(burstdata) delete burstdata;
 	if(selectdata) delete selectdata;
+}
+
+
+void SpikeDat::ColourSwitch(int mode)
+{
+	if(mode == 0) colourdata = NULL;
+	if(mode == 1) colourdata = burstdata;
+	if(mode == 2) colourdata = selectdata;
+}
+
+
+void SpikeDat::Clear()
+{
+	int i;
+
+	for(i=0; i<10000; i++) {
+		hist1[i] = 0;
+		hist5[i] = 0;
+		haz1[i] = 0;
+		haz5[i] = 0;
+	}
+	for(i=0; i<100000; i++) {
+		srate[i] = 0;
+		times[i] = 0;
+		isis[i] = 0;
+	}
+	for(i=0; i<1000000; i++) {
+		srate1[i] = 0;
+		synsim[i] = 0;
+	}
+	spikecount = 0;
+}
+
+
+void SpikeDat::ReSize(int newsize)
+{
+	//srate.data.resize(newsize);
+	//srate.max = newsize;
+	srate.setsize(newsize);
+	times.resize(newsize);
+	//times.max = newsize;
+	isis.data.resize(newsize);
+	isis.max = newsize;
+
+	maxspikes = newsize;
 }
 
 
@@ -872,8 +886,13 @@ wxString GraphSet::Display()
 
 
 // IntervalSet, sets up graph switching for ISI analysis plots, currently specific to VasoModel graph button panel
-void GraphSet::IntervalSet(wxString tag)
+void GraphSet::IntervalSet(wxString tag, bool burst, bool select)
 {
+	int selectcode;
+
+	if(burst && select) selectcode = 200;
+	else selectcode = 100;
+
 	AddFlag("hazmode1", 10);
 	AddFlag("binrestog1", 1);
 	AddFlag("burstmode", 100);
@@ -885,15 +904,17 @@ void GraphSet::IntervalSet(wxString tag)
 	Add(tag + "hist5ms", 1);
 	Add(tag + "haz5ms", 11);
 
-	Add(tag + "bursthist1ms", 100);
-	Add(tag + "bursthaz1ms", 110);
-	Add(tag + "bursthist5ms", 101);
-	Add(tag + "bursthaz5ms", 111);
+	if(burst) {
+		Add(tag + "bursthist1ms", 100);
+		Add(tag + "bursthaz1ms", 110);
+		Add(tag + "bursthist5ms", 101);
+		Add(tag + "bursthaz5ms", 111);
 
-	Add(tag + "burstnormhist1ms", 1100);
-	Add(tag + "bursthaz1ms", 1110);
-	Add(tag + "burstnormhist5ms", 1101);
-	Add(tag + "bursthaz5ms", 1111);
+		Add(tag + "burstnormhist1ms", 1100);
+		Add(tag + "bursthaz1ms", 1110);
+		Add(tag + "burstnormhist5ms", 1101);
+		Add(tag + "bursthaz5ms", 1111);
+	}
 
 	Add(tag + "normhist1ms", 1000);
 	Add(tag + "haz1ms", 1010);
@@ -903,15 +924,17 @@ void GraphSet::IntervalSet(wxString tag)
 	Add(tag + "histquadsmooth", 10001);
 	Add(tag + "histquadsmooth", 11001);
 
-	Add(tag + "selecthist1ms", 200);
-	Add(tag + "selecthaz1ms", 210);
-	Add(tag + "selecthist5ms", 201);
-	Add(tag + "selecthaz5ms", 211);
+	if(select) {
+		Add(tag + "selecthist1ms", selectcode);
+		Add(tag + "selecthaz1ms", selectcode + 10);
+		Add(tag + "selecthist5ms", selectcode + 1);
+		Add(tag + "selecthaz5ms", selectcode + 11);
 
-	Add(tag + "selectnormhist1ms", 1200);
-	Add(tag + "selecthaz1ms", 1210);
-	Add(tag + "selectnormhist5ms", 1201);
-	Add(tag + "selecthaz5ms", 1211);
+		Add(tag + "selectnormhist1ms", selectcode + 1000);
+		Add(tag + "selecthaz1ms", selectcode + 1010);
+		Add(tag + "selectnormhist5ms", selectcode + 1001);
+		Add(tag + "selecthaz5ms", selectcode + 1011);
+	}
 }
 
 

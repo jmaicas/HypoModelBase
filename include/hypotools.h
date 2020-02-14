@@ -13,7 +13,7 @@
 #include <wx/grid.h>
 
 
-class OutBox;
+class GridBox;
 
 
 class DiagBox: public ToolBox
@@ -37,7 +37,7 @@ public:
 
 	wxGridStringTable *undogrid;
 	wxTextCtrl *vdu;
-	OutBox *outbox;
+	GridBox *gridbox;
 	wxGauge *gauge;
 
 	void OnRightClick(wxGridEvent& event);
