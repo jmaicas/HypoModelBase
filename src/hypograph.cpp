@@ -1627,9 +1627,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	//fclose(ofp);
 }
 
-<<<<<<< HEAD
 
-=======
 void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 {
 	wxBufferedPaintDC dc(this);
@@ -2745,7 +2743,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent &WXUNUSED(event))
 				}
 
 
-				/*
+				
 				if(spikedisp == 2) {                      // hazard filter
 				if(res < 3) {
 				if(hfdata[res][(i + (int)xfrom)] == 0)
@@ -2768,7 +2766,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent &WXUNUSED(event))
 				dc.SelectObject(greenpen);
 				}		
 				}
-				*/
+				
 
 
 				xpos = i * xrange + xbase;
