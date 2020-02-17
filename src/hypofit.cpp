@@ -18,7 +18,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 }
 
 
-void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset)
+void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, int burstmode, int IoDmode)
 {
 	int i;
 	int histmax = 512;
@@ -26,8 +26,10 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 	//TextFile ofp;
 	//bool burstmode = true;
-	bool IoDmode = false;
-	bool IoDburstmode = true;
+	//bool IoDmode = false;
+	bool IoDburstmode;
+
+	if(burstmode == 1) IoDburstmode = true;
 
 
 	//if(fitdiag) ofp.New("fitscorevaso-diag.txt");

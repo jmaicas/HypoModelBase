@@ -644,12 +644,21 @@ void EvoFitBox::CreatePanels()
 }
 
 
+void EvoFitBox::SetToggle(bool state, int ID)
+{
+	if(ID == ID_Burst) burstToggle->SetValue(state);
+}
+
+
 void EvoFitBox::OnToggle(wxCommandEvent& event)
 {
 	if(event.GetId() == ID_Burst) {
 		burstfitmode = 1 - burstfitmode;
 		diagbox->Write("burst fit toggle\n");
 	}
+
+	expdata->burstfitmode = burstfitmode;
+	if(expdata->neurodata) expdata->neurodata->burstfitmode = burstfitmode;
 }
 
 

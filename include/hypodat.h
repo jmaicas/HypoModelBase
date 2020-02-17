@@ -149,6 +149,7 @@ public:
 
 	int numbursts, maxselect;
 	std::vector <burst> selectstore;  // selection store using burst type
+	int burstfitmode;
 
 	int srate100[10000];
 	int count;
@@ -363,6 +364,7 @@ public:
 	int burst_startspike, burst_endspike;
 	int burstmode;
 	int burstdispmode, dispmodemax;
+	int burstfitmode;
 	
 	//void datacalc();
 	void neurocalc(NeuroDat *datneuron = NULL, ParamStore *calcparams = NULL);
@@ -383,7 +385,7 @@ public:
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *);
-	void FitScoreVasoFast(SpikeDat *, FitDat *, FitSet *);
+	void FitScoreVasoFast(SpikeDat *, FitDat *, FitSet *, int burstmode=1, int iodmode=0);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);

@@ -230,6 +230,7 @@ public:
 	void FitDispNew(FitDat *data = NULL, DatPanel *fitpanel = NULL);
 	void ModFitScore();
 	void ExpDataDisp();
+	void SetToggle(bool state, int ID=ID_Burst);
 
 
 	void OnSpinNext(wxSpinEvent& event);

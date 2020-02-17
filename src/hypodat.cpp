@@ -18,6 +18,7 @@ NeuroDat::NeuroDat()
 
 	filter = 0;
 	numbursts = 0;
+	burstfitmode = 0;
 }
 
 
@@ -150,7 +151,6 @@ SpikeDat::SpikeDat()
 
 	meanV.setsize(5000);
 
-	burstdata = NULL;
 	vasomean.data.resize(250);
 	vasomean.max = 200;
 
@@ -166,6 +166,7 @@ SpikeDat::SpikeDat()
 	burstmode = 0;
 	burstdispmode = 0;
 	dispmodemax = 1;
+	burstfitmode = 0;
 
 	fitType = 0;    // 0 for basic, 1 for oxy, 2 for vaso
 	label = "";
@@ -174,6 +175,7 @@ SpikeDat::SpikeDat()
 	burstdata = NULL;
 	selectdata = NULL;
 	colourdata = NULL;
+	neurodata = NULL;
 }
 
 
