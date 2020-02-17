@@ -154,7 +154,7 @@ int Model::GetCellIndex()
 }
 
 
-void Model::ScaleCon(ScaleBox *scalebox, int condex)
+void Model::ScaleConsole(ScaleBox *scalebox, int condex)
 {
 }
 

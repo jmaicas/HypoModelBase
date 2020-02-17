@@ -94,7 +94,7 @@ enum {
 
 enum {
 	menu_model = 0,
-	menu_outbox = 1
+	menu_gridbox = 1
 };
 
 
@@ -156,6 +156,8 @@ enum {
 	ID_filtercheck,
 	ID_netstore,
 	ID_netload,
+	ID_selectstore,
+	ID_selectload,
 	ID_output,
 	ID_memnoise,
 	ID_IGFPanel,
@@ -305,7 +307,8 @@ enum {
 	ID_file,
 	ID_grid,
 	ID_filter,
-	ID_subplot
+	ID_subplot,
+	ID_GridBox
 };
 
 
@@ -323,6 +326,12 @@ enum {
 };
 
 
+enum {
+	dispnone = 0,
+	dispburst = 1,
+	dispselect = 2
+};
+
 
 //void quicksort(refstore *a, int low, int high)
 wxString numstring(double, int);
@@ -330,7 +339,7 @@ int numplaces(double);
 wxString numchar(int);
 wxString numtext(double number, int places);
 wxString ColourString(wxColour colour, int type=0);
-long ParseLong(wxString *, wxUniChar);
+long ParseLong(wxString *, wxUniChar = NULL);
 double ParseDouble(wxString *, wxUniChar);
 wxString ParseString(wxString *, wxUniChar);
 
@@ -351,7 +360,7 @@ class DiagBox;
 class ToolSet;
 class PlotBox;
 class NeuroBox;
-class OutBox;
+class GridBox;
 
 
 //DiagBox *gdiag;
@@ -394,7 +403,7 @@ public:
 	// Modules
 	PlotBox *plotbox;
 	NeuroBox *neurobox;
-	OutBox *gridbox;
+	GridBox *gridbox;
 
 	GraphWindow3 *graphwin[10];
     

@@ -149,7 +149,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 		gsync[i] = NULL;
 
-		if(boxtype == -1) mod->ScaleCon(this, i);
+		if(boxtype == -1) mod->ScaleConsole(this, i);
 
 		if(boxtype == modVMN) {
 			//gsync[i] = new wxCheckBox(panel, i, "Sync");
@@ -1166,7 +1166,19 @@ void ScaleBox::OnSpikes(wxCommandEvent& WXUNUSED(event))
 
 void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 {
-	ratedata = 1 - ratedata;
+	graph = gpos[0].plot[0]; 
+
+	//if((*gflags)[tag] == type) (*gflags)[tag] = 0;
+	//else (*gflags)[tag]++;   
+
+	if(ratedata == graph->spikedata->dispmodemax) ratedata = 0;
+	else ratedata++;
+
+	//ratedata = 1 - ratedata;
+	(*gflags)["ratedata"] = ratedata;
+
+	graph->spikedata->ColourSwitch(ratedata);
+
 	GraphSwitch();
 }
 

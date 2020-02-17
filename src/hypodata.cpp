@@ -30,6 +30,9 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	cellcount = 0;
 	paramindex = 0;
 	textgrid = NULL;
+	burstbox = NULL;
+
+	selfstore = true;
 
 	selectcount = 2;
 	//selected = new SpikeDat();
@@ -175,17 +178,28 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	currselect = 0;
 	addbutton[currselect]->SetValue(true);
 
-	filterbox = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Filter");
+	//filterbox = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Filter");
+	wxBoxSizer *filterbox = new wxBoxSizer(wxHORIZONTAL);
 	AddButton(ID_filter, "Grid Update", 80, filterbox);
 
 
+	wxBoxSizer *selectstorebox = new wxBoxSizer(wxVERTICAL); 
+	selectstorebox->Add(paramset.AddText("selectstoretag", "", "", 0, 100), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	wxBoxSizer *selectbuttons = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_selectstore, "Store", 40, selectbuttons, 2);
+	AddButton(ID_selectload, "Load", 40, selectbuttons, 2);
+	selectstorebox->Add(selectbuttons, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	filterbox->AddSpacer(20);
+	filterbox->Add(selectstorebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
+
 	selectpanelbox->Add(fromtobox, 0, wxALIGN_CENTRE_HORIZONTAL);
-	selectpanelbox->AddSpacer(20);
+	selectpanelbox->AddSpacer(15);
 	selectpanelbox->Add(selectbox1, 0);
 	selectpanelbox->AddSpacer(10);
 	selectpanelbox->Add(selectbox2, 0);
-	selectpanelbox->AddSpacer(10);
-	selectpanelbox->Add(filterbox, 0);
+	selectpanelbox->AddSpacer(15);
+	selectpanelbox->Add(filterbox, 0, wxALIGN_CENTRE_HORIZONTAL);
 
 	wxBoxSizer *colbox2 = new wxBoxSizer(wxHORIZONTAL); 
 	colbox2->AddStretchSpacer();
@@ -243,6 +257,8 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	winman->AddPane(tabpanel, wxAuiPaneInfo().Name("tabpane").CentrePane().PaneBorder(false));
 	winman->Update();
 
+	if(selfstore) Load();   // load self-stored tool parameter values
+
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(NeuroBox::OnEnter));
 	Connect(wxEVT_SCROLL_LINEUP, wxSpinEventHandler(NeuroBox::OnNext));
 	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(NeuroBox::OnPrev));
@@ -259,6 +275,9 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
 	Connect(ID_FileBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
+
+	Connect(ID_selectstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSelectStore));
+	Connect(ID_selectload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSelectLoad));
 }
 
 
@@ -268,6 +287,89 @@ NeuroBox::~NeuroBox()
 		delete[] selectspikes[0];
 		delete[] selectspikes[1];
 	}
+}
+
+
+void NeuroBox::OnSelectStore(wxCommandEvent& event)
+{
+	int i, cellindex;
+	wxString filetag, filename, filepath;
+	wxString text;
+	TextFile selectfile;
+	NeuroDat *cell;
+
+	currcell->selectdata->spikes = selectspikes[currselect];
+	currcell->SelectScan();
+	
+	filepath = mod->GetPath() + "/Tools";
+	if(!wxDirExists(filepath)) wxMkdir(filepath);
+
+	// Select data file
+	filetag = paramset.GetText("selectstoretag");
+	filename = filepath + "/" + filetag + "-select.dat";
+
+	selectfile.New(filename);
+
+	for(cellindex=0; cellindex<cellcount; cellindex++) {
+		cell = &(*cells)[cellindex];
+		for(i=1; i<=cell->numbursts; i++) {
+			text.Printf("cel %d  index %d  sta %d  end %d", cellindex, i, cell->selectstore[i].start, cell->selectstore[i].end);	
+			selectfile.WriteLine(text);
+		}
+	}
+
+	selectfile.Close();
+}
+
+
+void NeuroBox::OnSelectLoad(wxCommandEvent& event)
+{
+	int i;
+	wxString filetag, filename, filepath;
+	TextFile selectfile;
+	wxString readline;
+	int index, start, end;
+	int cellindex;
+	bool diagnostic = true;
+	NeuroDat *cell;
+
+	currcell->selectdata->spikes = selectspikes[currselect];
+
+	for(i=0; i<cellcount; i++) (*cells)[i].numbursts = 0;
+
+	filepath = mod->GetPath() + "/Tools";
+	
+	// Select data file
+	filetag = paramset.GetText("selectstoretag");
+	filename = filepath + "/" + filetag + "-select.dat";
+
+	if(diagnostic) diagbox->Write("SelectLoad " + filename + "\n");
+
+	if(!selectfile.Exists(filename)) {
+		diagbox->Write("ToolLoad file not found\n");
+		return;
+	}
+
+	selectfile.Open(filename);
+	readline = selectfile.ReadLine();
+
+	while(!readline.IsEmpty()) {
+		cellindex = ParseLong(&readline, 'l');
+		cell = &(*cells)[cellindex];
+		index = ParseLong(&readline, 'x');
+		cell->numbursts++;
+		cell->selectstore[index].start = ParseLong(&readline, 'a');
+		cell->selectstore[index].end = ParseLong(&readline, 'd');
+		if(diagnostic) diagbox->Write(text.Format("SelectLoad  cell %d  index %d  start %d  end %d\n", cellindex, index, cell->selectstore[index].start, cell->selectstore[index].end)); 
+		if(selectfile.End()) break;
+		readline = selectfile.ReadLine();	
+	}
+	
+	currcell->SelectSpikes();
+	currcell->ColourSwitch(dispselect);
+	mainwin->scalebox->GraphUpdate();
+
+	selectfile.Close();	
 }
 
 
@@ -438,8 +540,9 @@ void NeuroBox::SelectAdd()
 		}	
 	}
 
-	currcell->burstdata->spikes = selectspikes[currselect];
+	//currcell->burstdata->spikes = selectspikes[currselect];
 	currcell->selectdata->spikes = selectspikes[currselect];
+	currcell->ColourSwitch(2);
 
 	//diagbox->Write(text.Format("add%d from %.2f to %.2f\n", currselect, sfrom, sto));	
 	AnalyseSelection();	
@@ -466,7 +569,9 @@ void NeuroBox::SelectSub()
 		}
 	}
 
-	currcell->burstdata->spikes = selectspikes[currselect];
+	currcell->selectdata->spikes = selectspikes[currselect];
+	currcell->ColourSwitch(dispselect);
+	//currcell->burstdata->spikes = selectspikes[currselect];
 	//diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", currselect, sfrom, sto));
 
 	mainwin->scalebox->BurstDisp(1);
@@ -615,9 +720,14 @@ void NeuroBox::NeuroData(bool dispupdate)
 	currcell->neurocalc(&(*cells)[neuroindex]);
 	currcell->id = neuroindex;
 
-	burstbox->ExpDataScan(currcell);
-	burstbox->SetExpGrid();
+	if(burstbox) {
+		burstbox->ExpDataScan(currcell);
+		burstbox->SetExpGrid();
+	}
 	mod->SpikeDataSwitch(currcell);
+
+	currcell->SelectSpikes();
+	AnalyseSelection();
 
 	if(dispupdate) {
 		PanelData(&(*cells)[neuroindex]);
@@ -638,6 +748,7 @@ void NeuroBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex > 0) neuroindex--;
 	else neuroindex = cellcount-1;
 
+	currcell->SelectScan();  // store current cell's select grid to NeuroDat
 	NeuroData();
 }
 
@@ -648,6 +759,7 @@ void NeuroBox::OnNext(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex < cellcount-1) neuroindex++;
 	else neuroindex = 0;
 
+	currcell->SelectScan();  // store current cell's select grid to NeuroDat
 	NeuroData();
 }
 
@@ -853,8 +965,8 @@ void NeuroBox::DataSelect(double from, double to)
 
 
 
-OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols, bool bmode)
-	: ParamBox(model, title, pos, size, "outbox", 0, 1)
+GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, int rows, int cols, bool bmode, bool vmode)
+	: ParamBox(model, title, pos, size, "gridbox", 0, 1)
 {
 	int gridrows, gridcols;
 	wxBoxSizer *vdubox;
@@ -866,7 +978,7 @@ OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wx
 	gridrows = rows;
 	gridcols = cols;
 	bookmode = bmode;
-	vdumode = bookmode;
+	vdumode = vmode;
 	delete parambox;
 
 	//InitMenu();
@@ -951,44 +1063,44 @@ OutBox::OutBox(Model *model, const wxString& title, const wxPoint& pos, const wx
 
 	textgrid->vdu = vdu;
 	textgrid->gauge = gauge;
-	textgrid->outbox = this;
+	textgrid->gridbox = this;
 
-	Connect(ID_paramstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnGridStore));
-	Connect(ID_paramload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnGridLoad));
-	Connect(ID_Undo, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnUndo));
-	Connect(ID_Copy, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnCopy));
-	Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(OutBox::OnRightClick));
-	Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(OutBox::OnCellChange));
+	Connect(ID_paramstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnGridStore));
+	Connect(ID_paramload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnGridLoad));
+	Connect(ID_Undo, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnUndo));
+	Connect(ID_Copy, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnCopy));
+	Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(GridBox::OnRightClick));
+	Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(GridBox::OnCellChange));
 };
 
 
 
-void OutBox::ParamButton()
+void GridBox::ParamButton()
 {
 	buttonbox->AddSpacer(2);
 	AddButton(ID_ParamScan, "Param", 40, buttonbox);
-	Connect(ID_ParamScan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnParamScan));
+	Connect(ID_ParamScan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnParamScan));
 }
 
 
-void OutBox::NeuroButton()
+void GridBox::NeuroButton()
 {
 	buttonbox->AddSpacer(2);
 	AddButton(ID_Neuron, "Neuro", 40, buttonbox);
-	Connect(ID_Neuron, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnNeuroScan));
+	Connect(ID_Neuron, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnNeuroScan));
 }
 
 
-void OutBox::OnParamMode(wxCommandEvent& event)
+void GridBox::OnParamMode(wxCommandEvent& event)
 {
 	WriteVDU("param mode");
 	buttonbox->AddSpacer(2);
 	AddButton(ID_ParamScan, "Params", 40, buttonbox);
-	Connect(ID_ParamScan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OutBox::OnParamScan));
+	Connect(ID_ParamScan, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnParamScan));
 }
 
 
-void OutBox::OnParamScan(wxCommandEvent& event)
+void GridBox::OnParamScan(wxCommandEvent& event)
 {
 	mod->ParamScan();
 	WriteVDU("Param Scan\n");
@@ -996,13 +1108,13 @@ void OutBox::OnParamScan(wxCommandEvent& event)
 }
 
 
-void OutBox::OnUndo(wxCommandEvent& event)
+void GridBox::OnUndo(wxCommandEvent& event)
 {
 	textgrid->Undo();
 }
 
 
-void OutBox::OnButton(wxCommandEvent& event)
+void GridBox::OnButton(wxCommandEvent& event)
 {
 	wxString text;
 
@@ -1010,13 +1122,13 @@ void OutBox::OnButton(wxCommandEvent& event)
 }
 
 
-void OutBox::OnCopy(wxCommandEvent& event)
+void GridBox::OnCopy(wxCommandEvent& event)
 {
 	textgrid->Copy();
 }
 
 
-void OutBox::OnCellChange(wxGridEvent& event)
+void GridBox::OnCellChange(wxGridEvent& event)
 {
 	int col = event.GetCol();
 
@@ -1025,7 +1137,7 @@ void OutBox::OnCellChange(wxGridEvent& event)
 
 
 
-void OutBox::OnRightClick(wxMouseEvent& event)
+void GridBox::OnRightClick(wxMouseEvent& event)
 {
 	//int id = event.GetId();
 	//wxWindow *pos = FindWindowById(id, toolpanel);
@@ -1039,7 +1151,7 @@ void OutBox::OnRightClick(wxMouseEvent& event)
 }
 
 
-void OutBox::HistLoad()
+void GridBox::HistLoad()
 {
 	wxString filename, readline;
 	TextFile infile;
@@ -1064,7 +1176,7 @@ void OutBox::HistLoad()
 
 
 
-void OutBox::TestGrid()
+void GridBox::TestGrid()
 {
 	int i;
 	wxString text;
@@ -1073,7 +1185,7 @@ void OutBox::TestGrid()
 }
 
 
-void OutBox::GridDefault()
+void GridBox::GridDefault()
 {
 	textgrid->SetCellValue(0, 0, "date");
 	textgrid->SetCellValue(1, 0, "breath rhy");
@@ -1096,13 +1208,13 @@ void OutBox::GridDefault()
 }
 
 
-void OutBox::OnGridStore(wxCommandEvent& event)
+void GridBox::OnGridStore(wxCommandEvent& event)
 {
 	GridStore();
 }
 
 
-void OutBox::OnGridLoad(wxCommandEvent& event)
+void GridBox::OnGridLoad(wxCommandEvent& event)
 {
 	if(undomode) textgrid->CopyUndo();
 	//GridLoad();
@@ -1115,7 +1227,7 @@ void OutBox::OnGridLoad(wxCommandEvent& event)
 }
 
 
-void OutBox::ColumnSelect(int col)
+void GridBox::ColumnSelect(int col)
 {
 	wxString text;
 
@@ -1123,7 +1235,7 @@ void OutBox::ColumnSelect(int col)
 }
 
 
-int OutBox::ColumnData(int col, datdouble *data)
+int GridBox::ColumnData(int col, datdouble *data)
 {
 	int row, count;
 	double value;
@@ -1143,7 +1255,7 @@ int OutBox::ColumnData(int col, datdouble *data)
 }
 
 
-void OutBox::GridStore()
+void GridBox::GridStore()
 {
 	TextFile ofp;
 	int row, col;
@@ -1225,7 +1337,7 @@ void OutBox::GridStore()
 }
 
 
-void OutBox::GridLoad()            // Replaced by GridLoadFast()
+void GridBox::GridLoad()            // Replaced by GridLoadFast()
 {
 	TextFile ifp;
 	int row, col;
@@ -1307,7 +1419,7 @@ void OutBox::GridLoad()            // Replaced by GridLoadFast()
 }
 
 
-void OutBox::GridLoadFast()
+void GridBox::GridLoadFast()
 {
 	TextFile ifp;
 	int row, col, width;
@@ -1450,7 +1562,7 @@ void OutBox::GridLoadFast()
 }
 
 /*
-void OutBox::OnCellChange(wxGridEvent& event)
+void GridBox::OnCellChange(wxGridEvent& event)
 {
 	int col = event.GetCol();
 
@@ -1460,16 +1572,16 @@ void OutBox::OnCellChange(wxGridEvent& event)
 }
 
 
-void OutBox::ColumnSelect(int col)
+void GridBox::ColumnSelect(int col)
 {
-	OutBox::ColumnSelect(col);
+	GridBox::ColumnSelect(col);
 
 	plotbox->SetColumn(col);
 }*/
 
 
 
-void OutBox::NeuroGridFilter()
+void GridBox::NeuroGridFilter()
 {
 	int i;
 	int col;
@@ -1503,13 +1615,13 @@ void OutBox::NeuroGridFilter()
 }
 
 
-void OutBox::OnNeuroScan(wxCommandEvent& event)
+void GridBox::OnNeuroScan(wxCommandEvent& event)
 {
 	NeuroScan();
 }
 
 
-void OutBox::NeuroScan()
+void GridBox::NeuroScan()
 {
 	int col, row;
 	int spikecount, cellcount;
@@ -1544,20 +1656,19 @@ void OutBox::NeuroScan()
 		spikecount = 0;
 		row = 1;
 
-		// Specific to data with type text, reject non-vasopressin types
+		// Specific to data with type label, reject non-vasopressin types
 		typetext = currgrid->GetCell(3, col);
-		if(typetext.Contains("OT") || typetext.Contains("NR")) {
+		/*if(typetext.Contains("OT") || typetext.Contains("NR")) {                           // replace with parameterised string filtering  13/2/20
 			//diagbox->Write(text.Format("col %d typetext %s rejected\n", col, typetext));
 			(*celldata)[cellcount].filter = 1;
-			//col++;
-			//celltext = currgrid->GetCell(0, col);
-			//celltext.Trim();
-			//continue;
 		}
 		else {
 			//diagbox->Write(text.Format("col %d typetext %s accepted\n", col, typetext));
 			(*celldata)[cellcount].filter = 0;
-		}
+		}*/
+
+		(*celldata)[cellcount].filter = 0;
+
 
 		// Skip non-spike time rows
 		while (!numform.FromString(celltext, &cellval)) {

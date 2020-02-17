@@ -1039,7 +1039,7 @@ void ParamBox::InitMenu(int type)
 		//menuBar->Append(menuParamSet, "Parameters");
 	}
 
-	if (type == menu_outbox) {
+	if(type == menu_gridbox) {
 		menuMode = new wxMenu;
 		menuBar = new wxMenuBar;
 		menuBar->Append(menuMode, "Mode");
@@ -1239,7 +1239,7 @@ void ParamBox::ParamLoad(wxString filetag, bool compmode)
 	//if(diagnostic) ofp.WriteLine(text.Format("tag %s", tag));
 	if(paramstoretag) {
 		if(filetag == "") filetag = paramstoretag->GetValue();
-		else paramstoretag->SetValue(filetag);
+		else if(filetag != "default") paramstoretag->SetValue(filetag);
 	}
 
 	filename = filepath + "/" + filetag + "-" + boxtag + "param.dat";
