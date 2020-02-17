@@ -93,6 +93,15 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 
 	//overlay = new wxOverlay();
 
+	//dc(this);
+	//wxDCOverlay odc(overlay, &dc);
+	//wxGraphicsContext* ctx = wxGraphicsContext::Create(dc);
+	////ctx->SetPen(*wxGREY_PEN);
+	//ctx->SetBrush(wxBrush(wxColour(192, 192, 255, 64)));
+	//wxRect newrect(anchorpos, currentpos);
+	//ctx->DrawRectangle(newrect.x, newrect.y, newrect.width, newrect.height);
+
+
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
 
 	wxImage::AddHandler(new wxPNGHandler);
@@ -133,8 +142,8 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	//wxBufferedPaintDC dc(this);
 	//dc = new wxBufferedPaintDC(this);
 
-	Connect(wxEVT_PAINT, wxPaintEventHandler(GraphWindow3::OnPaint));
-	//Connect(wxEVT_PAINT, wxPaintEventHandler(GraphWindow3::OnPaintGC));
+	//Connect(wxEVT_PAINT, wxPaintEventHandler(GraphWindow3::OnPaint));
+	Connect(wxEVT_PAINT, wxPaintEventHandler(GraphWindow3::OnPaintGC));
 	Connect(wxEVT_ERASE_BACKGROUND, wxEraseEventHandler(GraphWindow3::OnEraseBackground));
 
 	Connect(wxEVT_SCROLL_LINEUP, wxScrollEventHandler(GraphWindow3::OnScroll)); 
@@ -661,10 +670,12 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 	//anchorpos.y = ybase + 1; // - 10;
 	//currentpos.y = ybase + yplot - 1;
 
+	//wxBufferedPaintDC dc(this);
 	wxClientDC dc(this);
-	wxDCOverlay odc(overlay, &dc);
-	odc.Clear();
-	wxGraphicsContext* ctx = wxGraphicsContext::Create(dc);
+	wxDCOverlay overlaydc(overlay, &dc);
+	overlaydc.Clear();
+
+	wxGraphicsContext *ctx = wxGraphicsContext::Create(dc);
     //ctx->SetPen(*wxGREY_PEN);
 	ctx->SetBrush(wxBrush(wxColour(192,192,255,64)));
 	wxRect newrect(anchorpos, currentpos);
@@ -784,6 +795,7 @@ void GraphWindow3::OnEraseBackground(wxEraseEvent& event)
 void GraphWindow3::DrawLine(wxDC& dc, wxGraphicsContext *gc, int xstart, int ystart, int xend, int yend)
 {
 	//dc.DrawLine(xstart, ystart, xend, yend);
+
 	gc->StrokeLine(xstart, ystart, xend, yend);
 }
 
@@ -1627,7 +1639,6 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 	//fclose(ofp);
 }
 
-
 void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 {
 	wxBufferedPaintDC dc(this);
@@ -1871,9 +1882,6 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			xnum = (double)(xto - xfrom) / xplot;
 
 
-			if(gdisp == 2) mainwin->diagbox->Write(text.Format("xrange %.4f  xrange int %d  xrange fix %d\n", xrange, (int)xrange, (int)(xrange + 0.5)));
-
-
 			/* Plot Types
 
 			1 - scaled width bars, histogram
@@ -1901,6 +1909,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			*/
 
 			//mainwin->diagbox->Write(text.Format("Graph %d %s type %d\n", gdisp, gname, gtype)); 
+
+			//if(gdisp == 2) mainwin->diagbox->Write(text.Format("xrange %.4f  xrange int %d  xrange fix %d\n", xrange, (int)xrange, (int)(xrange + 0.5)));
 
 
 			if(gtype == 1) {                             // scaled width bars, Histogram    
@@ -2479,7 +2489,6 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 
 /*
->>>>>>> 2889ff35960039ed4055c58787ed9ed776e1e0bf
 void GraphWindow3::OnPaintGC(wxPaintEvent &WXUNUSED(event))
 {
 	wxBufferedPaintDC dc(this);
@@ -2744,28 +2753,28 @@ void GraphWindow3::OnPaintGC(wxPaintEvent &WXUNUSED(event))
 
 
 				
-				if(spikedisp == 2) {                      // hazard filter
-				if(res < 3) {
-				if(hfdata[res][(i + (int)xfrom)] == 0)
-				dc.SelectObject(redpen);
-				else dc.SelectObject(greenpen);
-				}
+				//if(spikedisp == 2) {                      // hazard filter
+				//if(res < 3) {
+				//if(hfdata[res][(i + (int)xfrom)] == 0)
+				//dc.SelectObject(redpen);
+				//else dc.SelectObject(greenpen);
+				//}
 
-				if(res == 3) {
-				//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d ", i, (i+xfrom)*binsize, spikestep);
-				while(graphdata[18][spikestep] < (i+xfrom)*binsize+0.0005) {
-				burstcolour = filterflag[spikestep];
-				spikestep++;
-				}
-				//fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);	
-				if(burstcolour == 0) 
-				dc.SelectObject(redpen);
-				else if(burstcolour % 2 == 0) 
-				dc.SelectObject(bluepen);
-				else if(burstcolour % 2 == 1) 
-				dc.SelectObject(greenpen);
-				}		
-				}
+				//if(res == 3) {
+				////fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d ", i, (i+xfrom)*binsize, spikestep);
+				//while(graphdata[18][spikestep] < (i+xfrom)*binsize+0.0005) {
+				//burstcolour = filterflag[spikestep];
+				//spikestep++;
+				//}
+				////fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);	
+				//if(burstcolour == 0) 
+				//dc.SelectObject(redpen);
+				//else if(burstcolour % 2 == 0) 
+				//dc.SelectObject(bluepen);
+				//else if(burstcolour % 2 == 1) 
+				//dc.SelectObject(greenpen);
+				//}		
+				//}
 				
 
 
@@ -2782,6 +2791,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent &WXUNUSED(event))
 	}
 	if(gtype == 3) fclose(ofp);
 }
+*/
 
 /*
 // Conversion form HSV to RGB (obtained from http://alvyray.com/Papers/hsv2rgb.htm)
