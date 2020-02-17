@@ -62,9 +62,6 @@ public:
 	bool selectband;
 	wxPoint anchorpos, currentpos;
 	wxOverlay overlay;
-	//wxClientDC dc;
-	//wxDCOverlay odc;
-	//wxGraphicsContext *ctx;
 
 	wxTextCtrl *yf;
 	wxTextCtrl *yt;

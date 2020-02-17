@@ -1699,7 +1699,7 @@ bool HypoApp::OnInit()
 	//MainFrame *mainwin = new MainFrame("Hypo Net Model", wxPoint(50, 10), wxSize(700, y));   // 850   // 920
 	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y));   // 850   // 920
 	//HypoMain *mainwin = new HypoMain("HypoMod", wxDefaultPosition, wxSize(400, 500));
-	//mainwin->SetTransparent(254);
+	mainwin->SetTransparent(254);
 	mainwin->Show();
 	SetTopWindow(mainwin);
 	//mainwin->SetDoubleBuffered(true);
