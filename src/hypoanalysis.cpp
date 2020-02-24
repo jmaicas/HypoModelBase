@@ -348,8 +348,8 @@ void BurstDat::IntraBurstAnalysis()
 
 	//mod->diagbox->Write(text.Format("selectmode %d\n", burstdata->selectmode));
 
-	for(i=0; i<spikedata->spikecount-1; i++) {
-		if(spikes[i] > 0 && spikedata->isis[i] < spikedata->maxspikes) {
+	for(i=0; i<spikedata->spikecount-1; i++) {                                  // loop through intervals rather than spikes
+		if(spikes[i] > 0 && spikedata->isis[i] < spikedata->maxspikes) {        // is this right?  24/2/20
 			if(!selectmode && i == bustore[bindex].end) {
 				//fprintf(ofp, "New burst %d, time total %.2f\n", bindex, inttime);
 				bindex++;
@@ -376,6 +376,8 @@ void BurstDat::IntraBurstAnalysis()
 	variance = variance / intcount;
 
 	intraspikes = intcount + numbursts;
+	if(selectmode && spikes[spikedata->spikecount-1]) intraspikes = intraspikes + 1;
+
 	if(intcount > 0) {
 		isisd = sqrt(variance - mean * mean);
 		freq = 1000/mean;
@@ -428,25 +430,7 @@ void BurstDat::IntraBurstAnalysis()
 
 
 	// Index of Dispersion
-
 	IoDrange();
-
-	/*
-	IoDdata[0] = IoDcalc(500, intraspikes, &times);
-	IoDdata[1] = IoDcalc(1000, intraspikes, &times);
-	IoDdata[2] = IoDcalc(2000, intraspikes, &times);
-	IoDdata[3] = IoDcalc(4000, intraspikes, &times);
-	IoDdata[4] = IoDcalc(6000, intraspikes, &times);
-	IoDdata[5] = IoDcalc(8000, intraspikes, &times);
-	IoDdata[6] = IoDcalc(10000, intraspikes, &times);
-
-	IoDdataX[0] = 5;            // x positions for displaying IoD range as bar chart
-	IoDdataX[1] = 15;
-	IoDdataX[2] = 25;
-	IoDdataX[3] = 35;
-	IoDdataX[4] = 45;
-	IoDdataX[5] = 55;
-	IoDdataX[6] = 65;*/
 
 	if(scandiag) outfile.Close();
 }
@@ -774,7 +758,7 @@ void SpikeDat::SelectScan()
 	selecton = 0;
 	selectindex = 0;
 
-	for(i=0; i<spikecount-1; i++) {
+	for(i=0; i<=spikecount; i++) {                // runs one beyond spikes to catch selection that includes last spike
 		if(selectspikes[i]) {
 			if(!selecton) {
 				selectstart = i;
@@ -790,6 +774,7 @@ void SpikeDat::SelectScan()
 			}
 		}
 	}
+	
 	neurodata->numbursts = selectindex;
 
 	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numbursts));

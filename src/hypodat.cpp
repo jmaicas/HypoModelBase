@@ -1082,11 +1082,13 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 
 	//outfile.New(initpath + "/Graphs/" + filename);
 	outfile.New(path + "/" + filename);
-	for(i=0; i<numgraphs; i++) {
+	for(i=0; i<=numgraphs; i++) {
 		outfile.WriteLine(graphstore[i].StoreDat(GetTag(i)));
 		//outfile.WriteLine(text.Format
 	}
 	outfile.Close();
+
+	mainwin->diagbox->Write(text.Format("BaseStore %d graphs\n", numgraphs));
 }
 
 

@@ -111,6 +111,9 @@ public:
 	wxStaticText *sd;
 	wxStaticText *runcount;
 	wxStaticText *label;
+	wxStaticText *selspikes;
+	wxStaticText *selfreq;
+
 
 	wxMenu *menuControls;
 	wxMenu *menuModel;
@@ -246,7 +249,7 @@ public:
 	~NeuroBox();
 	void NeuroData(bool dispupdate = true);
 	//void NeuroAnalysis();
-	void PanelData(NeuroDat *);
+	void PanelData(NeuroDat *data = NULL);
 	void OnNext(wxSpinEvent& event);
 	void OnPrev(wxSpinEvent& event);
 	void OnEnter(wxCommandEvent& event);

@@ -95,9 +95,11 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	labelwidth = 70;
 	label = NumPanel(labelwidth, wxALIGN_CENTRE);
 	spikes = NumPanel(datwidth, wxALIGN_RIGHT);
-	mean = NumPanel(datwidth, wxALIGN_RIGHT);
 	freq = NumPanel(datwidth, wxALIGN_RIGHT);
-	sd = NumPanel(datwidth, wxALIGN_RIGHT);
+	//mean = NumPanel(datwidth, wxALIGN_RIGHT);
+	//sd = NumPanel(datwidth, wxALIGN_RIGHT);
+	selspikes = NumPanel(datwidth, wxALIGN_RIGHT);
+	selfreq = NumPanel(datwidth, wxALIGN_RIGHT);
 
 	wxGridSizer *datagrid = new wxGridSizer(2, 5, 5);
 	datagrid->Add(new wxStaticText(activepanel, -1, "Name"), 0, wxALIGN_CENTRE);
@@ -106,10 +108,10 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	datagrid->Add(spikes);
 	datagrid->Add(new wxStaticText(activepanel, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	datagrid->Add(freq);
-	datagrid->Add(new wxStaticText(activepanel, -1, "Mean"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
-	datagrid->Add(mean);
-	datagrid->Add(new wxStaticText(activepanel, -1, "Std Dev"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
-	datagrid->Add(sd);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Select Spikes"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(selspikes);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Select Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(selfreq);
 	//datagrid->Add(new wxStaticText(activepanel, -1, "Filter"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
 	//datagrid->Add(filtercheck);
 
@@ -534,7 +536,7 @@ void NeuroBox::SelectAdd()
 	//diagbox->Write(text.Format("spike count %d\n", numspikes));
 
 	for(i=0; i<currcell->spikecount; i++) {
-		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {
+		if(currcell->times[i] > sfrom && currcell->times[i] < sto) {               // should this be <= and >= ?
 			//selectdata[currselect]->spikes[i] = currselect + 1;
 			selectspikes[currselect][i] = currselect + 1;		
 		}	
@@ -654,7 +656,7 @@ void NeuroBox::AnalyseSelection()
 	currcell->selectdata->IntraBurstAnalysis();
 	//mod->SelectBurst(selectdata[currselect]);
 
-	//for(i=0; i<1000; i++) currcell->burstdata->hist5[i] = 20;
+	PanelData();
 
 	diagbox->Write(text.Format("\nSelect analyse %d spikes %.2fHz test %d\n", currcell->selectdata->intraspikes, currcell->selectdata->freq, currcell->selectdata->test));
 
@@ -699,6 +701,7 @@ void NeuroBox::OnLoadData(wxCommandEvent& event)
 
 void NeuroBox::PanelData(NeuroDat *data)
 {
+	if(!data) data = &(*cells)[neuroindex];
 	if(data->netflag) snum = "sum";
 	else snum = numstring(neuroindex, 0);
 	datneuron->SetLabel(snum);
@@ -706,8 +709,10 @@ void NeuroBox::PanelData(NeuroDat *data)
 	label->SetLabel(data->name);
 	spikes->SetLabel(snum.Format("%d", data->spikecount));
 	freq->SetLabel(snum.Format("%.2f", data->freq));
-	mean->SetLabel(snum.Format("%.1f", data->meanisi));
-	sd->SetLabel(snum.Format("%.2f", data->isivar));
+	//mean->SetLabel(snum.Format("%.1f", data->meanisi));
+	//sd->SetLabel(snum.Format("%.2f", data->isivar));
+	selspikes->SetLabel(snum.Format("%d", currcell->selectdata->intraspikes));
+	selfreq->SetLabel(snum.Format("%.2f", currcell->selectdata->freq));
 }
 
 
@@ -730,7 +735,7 @@ void NeuroBox::NeuroData(bool dispupdate)
 	AnalyseSelection();
 
 	if(dispupdate) {
-		PanelData(&(*cells)[neuroindex]);
+		PanelData();
 		mainwin->scalebox->GraphUpdate();	
 	}
 

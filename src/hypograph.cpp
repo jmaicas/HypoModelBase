@@ -1913,6 +1913,18 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			//if(gdisp == 2) mainwin->diagbox->Write(text.Format("xrange %.4f  xrange int %d  xrange fix %d\n", xrange, (int)xrange, (int)(xrange + 0.5)));
 
 
+			double prevx, xvalnext;
+			int xposnext;
+
+			double xmin, xmax, ymin, ymax, xmid, ymid;
+			int scatterfield = graph->scatterfield;
+			int scattermean = graph->scattermean;
+			int width, height;
+			double xmean, ymean, xvar, yvar, xsd, ysd;
+			double xsdneg, xsdpos, ysdneg, ysdpos;
+			int xoffset = 1;
+
+
 			if(gtype == 1) {                             // scaled width bars, Histogram    
 				for (i=0; i<(xto - xfrom); i++) {
 					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
@@ -1941,23 +1953,167 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 			}
 
-			if(gtype == 7) {                             // scaled width bars    
-				for (i = 0; i < (xto - xfrom); i++) {
+
+			if(gtype == 2 && graph->gdatax) {				                            // line graph with X data
+		   																		//mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
+				oldx = xbase + xoffset;
+				oldy = (int)(yplot + ybase - yrange * (yfrom));
+				//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+				for(i=0; i<graph->xcount; i++) {
+					xval = (*graph->gdatax)[i];
+					//if(xval <= prevx) break;
+					if(xval >= xfrom && xval <= xto) {
+						xpos = (int)((xval - xfrom) * xrange);
+						y = (*gdatadv)[i];
+						/*
+						xposnext = (int)((*graph->gdatax)[i+1] - xfrom) * xrange;                  // proto code for scaling dense data for screen display 25/5/16
+						while(xposnext == xpos) {
+						i++;
+						xposnext = (int)((*graph->gdatax)[i+1] - xfrom) * xrange;
+						}*/
+
+						//mainwin->diagbox->Write(text.Format("\n X %d val %.2f pos %d\n", i, xval, xpos));
+						//mainwin->diagbox->Write(text.Format("XY graph line X %.4f Y %.4f\n", xval, y));
+
+						gc->SetPen(colourpen[colour]);
+						DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+						gc->SetPen(colourpen[black]);
+						//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+						if(graph->scattermode) gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize, graph->scattersize);
+						oldx = xpos + xbase + xoffset;
+						oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+					}
+					prevx = xval;
+				}
+			}
+
+
+			if(gtype == 3) {                             // spike rate data with optional burst colouring
+				int spikestep = 0;
+				int burstcolour = 0;
+				//opfile.New("spikegraph.txt");
+				//for(i=0; i<10; i++) opfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
+
+				for(i=0; i<(xto-xfrom); i++) {
 					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
 					if(gpar == -2) y = gdatad[i + (int)xfrom];
 					if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
 					if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
-					xpos = i * xrange + xbase;
-					if(xrange <= 1) {
-						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
+
+					res = 0;
+					if(binsize == 1) res = 0;
+					if(binsize == 0.1) res = 1;
+					if(binsize == 0.01) res = 2;
+					if(binsize == 0.001) res = 3;
+
+					//wxString diag;
+					//diag.Printf("spikedisp %d  res %d ", gpos->spikedisp, res);
+					//mainwin->SetStatusText(diag);
+
+					if(burstdata == NULL || burstdata->burstdisp == 0) {
+						gc->SetPen(colourpen[red]);
+						//mainwin->SetStatusText("no colour");
 					}
-					else {
-						for(k=0; k<xrange; k++) {
-							DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
+
+					else {                  // burst colouring
+						burstcolour = 0;
+						//fprintf(ofp, "spikedisp 1\n");
+						if(binsize == 0.1 || binsize == 0.01) {
+							burstcolour = 0;
+							//opfile.WriteLine("sub res");
+							//if(burstdata[res][(i + (int)xfrom)] == 0) dc.SetPen(colourpen[red]);
+							//else if(burstdata[res][(i + (int)xfrom)] % 2 == 0) dc.SetPen(colourpen[blue]);		
+							//else if(burstdata[res][(i + (int)xfrom)] % 2 == 1) dc.SetPen(colourpen[green]);
 						}
+
+						if(binsize == 10 || binsize == 100) {
+							timepoint = (xfrom + i + 1) * binsize * 1000;
+							while (timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+								//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
+								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
+								if (!burstcolour) burstcolour = burstdata->spikes[spikestep];
+								spikestep++;
+							}
+						}
+
+						if(binsize == 1) {
+							//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
+							timepoint = (xfrom + i + 1) * binsize * 1000;
+							while (timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+								//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
+								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
+								if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
+								spikestep++;
+							}
+							//fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);
+							//opfile.WriteLine(text.Format("spike %d time %.2f\n", spikestep, burstdata->times[spikestep]));
+							//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
+							//fprintf(ofp, "Burst time %.2f\n", burstdata->times[100]);
+							//opfile.WriteLine(text.Format("i %d  spike %d  burstcolour %d\n", i, spikestep, burstcolour));
+						}
+
+						if(binsize == 0.001) {
+							//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
+							timepoint = (xfrom + i) * binsize * 1000;
+							while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+								//fprintf(ofp, "spike %d time %.10f comp %.10f y %.2f\n", 
+								//	spikestep, burstdata->spikedata->times[spikestep], (i + xfrom) * binsize + 0.0005, y);
+								burstcolour = burstdata->spikes[spikestep];
+								spikestep++;
+							}
+							//fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);
+
+
+							//if(i*binsize+0.0005 > graphdata[18][spikestep]) {
+							//	burstcolour = graphdata[16][spikestep];
+							//	spikestep++;
+						}
+						//fflush(ofp);
+						if(burstcolour == 0)
+							gc->SetPen(colourpen[red]);
+						else if(burstcolour % 2 == 0)
+							gc->SetPen(colourpen[blue]);
+						else if(burstcolour % 2 == 1)
+							gc->SetPen(colourpen[green]);
+					}
+
+
+					/*
+					if(spikedisp == 2) {                      // hazard filter
+					if(res < 3) {
+					if(hfdata[res][(i + (int)xfrom)] == 0)
+					dc.SelectObject(redpen);
+					else dc.SelectObject(greenpen);
+					}
+
+					if(res == 3) {
+					//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d ", i, (i+xfrom)*binsize, spikestep);
+					while(graphdata[18][spikestep] < (i+xfrom)*binsize+0.0005) {
+					burstcolour = filterflag[spikestep];
+					spikestep++;
+					}
+					//fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);
+					if(burstcolour == 0)
+					dc.SelectObject(redpen);
+					else if(burstcolour % 2 == 0)
+					dc.SelectObject(bluepen);
+					else if(burstcolour % 2 == 1)
+					dc.SelectObject(greenpen);
+					}
+					}
+					*/
+
+					xpos = i * xrange + xbase;
+					if(xrange <= 1)
+						DrawLine(dc, gc, xpos, ybase + yplot, xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
+					else {
+						for(k=0; k<xrange-1; k++)
+							DrawLine(dc, gc, xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom)));
 					}
 				}
+				//opfile.Close();
 			}
+
 
 			if(gtype == 4) {                         // normal line graph   - no longer in use, see type 5 below
 				dir = 1;   // 1 for ascending, 0 for descending
@@ -2011,9 +2167,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 			}
 
-			int xoffset = 1;
 
-			if (gtype == 5) {                         // line graph with scaling fix
+			if(gtype == 5) {                         // line graph with scaling fix
 				if(drawdiag) ofp = fopen("graph.txt", "w");
 				//mod->diagbox->Write(text.Format("line plot xrange %.4f  yscalemode %d  ylogbase %.4f  ylogmax %.4f\n", xrange, graph->yscalemode, ylogbase, ylogmax));
 
@@ -2082,67 +2237,43 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				if(drawdiag) fclose(ofp);
 			}
 
-			double prevx, xvalnext;
-			int xposnext;
 
-			if(gtype == 2 && graph->gdatax) {				                            // line graph with X data
-				//mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
-				oldx = xbase + xoffset;
-				oldy = (int)(yplot + ybase - yrange * (yfrom));
-				//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
-				for(i=0; i<graph->xcount; i++) {
-					xval = (*graph->gdatax)[i];
-					//if(xval <= prevx) break;
-					if(xval >= xfrom && xval <= xto) {
-						xpos = (int)((xval - xfrom) * xrange);
-						y = (*gdatadv)[i];
-						/*
-						xposnext = (int)((*graph->gdatax)[i+1] - xfrom) * xrange;                  // proto code for scaling dense data for screen display 25/5/16
-						while(xposnext == xpos) {
-							i++;
-							xposnext = (int)((*graph->gdatax)[i+1] - xfrom) * xrange;
-						}*/
-
-						//mainwin->diagbox->Write(text.Format("\n X %d val %.2f pos %d\n", i, xval, xpos));
-						//mainwin->diagbox->Write(text.Format("XY graph line X %.4f Y %.4f\n", xval, y));
-
-						gc->SetPen(colourpen[colour]);
-						DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-						gc->SetPen(colourpen[black]);
-						//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
-						if(graph->scattermode) gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize, graph->scattersize);
-						oldx = xpos + xbase + xoffset;
-						oldy = (int)(yplot + ybase - yrange * (y - yfrom));
+			if(gtype == 7) {                             // scaled width bars    
+				for (i = 0; i < (xto - xfrom); i++) {
+					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
+					if(gpar == -2) y = gdatad[i + (int)xfrom];
+					if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+					if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+					xpos = i * xrange + xbase;
+					if(xrange <= 1) {
+						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
 					}
-					prevx = xval;
+					else {
+						for(k=0; k<xrange; k++) {
+							DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
+						}
+					}
 				}
 			}
 
-			double xmin, xmax, ymin, ymax, xmid, ymid;
-			int scatterfield = graph->scatterfield;
-			int scattermean = graph->scattermean;;
-			int width, height;
-			double xmean, ymean, xvar, yvar, xsd, ysd;
-			double xsdneg, xsdpos, ysdneg, ysdpos;
 
-
-			if (gtype == 10 && graph->gdatax) {	           // scatter graph with X data and optional range fields
+			if(gtype == 10 && graph->gdatax) {	           // scatter graph with X data and optional range fields
 				//mainwin->diagbox->Write(text.Format("Graph Type 10  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 				//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 
 				//if(graph->xscalemode == 1 && xfrom > 0) xlogmax = log(xto / xfrom) / log(logbase);
 				xmean = 0;
 				ymean = 0;
-				for (i = 0; i < graph->xcount; i++) {
+				for(i=0; i<graph->xcount; i++) {
 					xval = (*graph->gdatax)[i];
 					xmean += xval / graph->xcount;
 					yval = (*gdatadv)[i];
 					ymean += yval / graph->xcount;
-					if (xval >= xfrom && xval <= xto) {
-						if (graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(xlogbase)) / xlogmax);  // log scaled x-axis  December 2017
+					if(xval >= xfrom && xval <= xto) {
+						if(graph->xscalemode == 1 && xfrom > 0) xpos = (int)((double)xplot * (log(xval / xfrom) / log(xlogbase)) / xlogmax);  // log scaled x-axis  December 2017
 						else xpos = (xval - xfrom) * xrange;
 						ypos = (yval - yfrom) * yrange;
-						if (i == 0) {
+						if(i == 0) {
 							xmin = xpos;
 							xmax = xpos;
 							ymin = ypos;
@@ -2160,7 +2291,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					}
 				}
 
-				if (graph->xcount > 0 && scattermean) {
+				if(graph->xcount > 0 && scattermean) {
 					xvar = 0;
 					yvar = 0;
 					for (i = 0; i < graph->xcount; i++) {
@@ -2190,7 +2321,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					DrawLine(dc, gc, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - ysdneg), (int)(xpos + xbase + xoffset), (int)(yplot + ybase - ysdpos));
 				}
 
-				if (graph->xcount > 0 && scatterfield) {
+				if(graph->xcount > 0 && scatterfield) {
 					xmid = (xmin + xmax) / 2;
 					ymid = (ymin + ymax) / 2;
 					width = (double)(xmax - xmin) * 1.5;
@@ -2203,7 +2334,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 			double xfield, yfield;
 
-			if (gtype == 11 && graph->gdatax && graph->xcount > 1) {         // mean field plot - oval with centre at xy mean and xy StdDev dimensions      December 2017
+			if(gtype == 11 && graph->gdatax && graph->xcount > 1) {         // mean field plot - oval with centre at xy mean and xy StdDev dimensions      December 2017
 				//mainwin->diagbox->Write(text.Format("Graph Type 11  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
 				//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
 
@@ -2215,7 +2346,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				width = xfield * xrange * 2;
 				height = yfield * yrange * 2;
 
-				if (graph->xscalemode == 1 && xfrom > 0) {
+				if(graph->xscalemode == 1 && xfrom > 0) {
 					xpos = (int)((double)xplot * log(xval / xfrom) / xlogmax);
 					//xfield = 
 				}
@@ -2232,12 +2363,12 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			int barshift = graph->barshift;
 			int barpos;
 
-			if (gtype == 9 && graph->gdatax) {				                            // bar chart with X data
+			if(gtype == 9 && graph->gdatax) {				                            // bar chart with X data
 				//mainwin->diagbox->Write(text.Format("\n XY bar graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
-				for (i = 0; i < graph->xcount; i++) {
+				for(i=0; i<graph->xcount; i++) {
 					xval = (*graph->gdatax)[i];
 					//if(xval <= prevx) break;
-					if (xval >= xfrom && xval <= xto) {
+					if(xval >= xfrom && xval <= xto) {
 						xpos = (int)(xval - xfrom) * xrange;
 						barshift = (barwidth * numdisps + (numdisps - 1) * bargap) / 2;
 						barpos = xbase + xpos - barshift + gdisp * (barwidth + bargap);
@@ -2274,11 +2405,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			}*/
 
 
-			if (gtype == 6) {                         // line graph with sampling
+			if(gtype == 6) {                         // line graph with sampling
 				oldx = xbase + xoffset;
 				xindex = (int)xfrom / sample;
-				if (xfrom > 0) {
-					if ((int)xfrom % sample != 0) {
+				if(xfrom > 0) {
+					if((int)xfrom % sample != 0) {
 						double sydiff = (*gdatadv)[xindex] - (*gdatadv)[xindex - 1];
 						double sxdiff = (xfrom - xindex * sample) / sample;
 						preval = sydiff * sxdiff + (*gdatadv)[xindex - 1];
@@ -2291,7 +2422,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 				oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
 
-				for (i = 0; i <= (xto - xfrom) / sample; i++) {
+				for(i=0; i<=(xto-xfrom)/sample; i++) {
 					xindex = i + ceil(xfrom / sample);
 					xpos = (int)(xindex * sample - xfrom) * xrange;
 					mpoint = (*gdatadv)[xindex];
@@ -2303,7 +2434,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 			}
 
-			if (gtype == 8) {                         // scatter with sampling
+			if(gtype == 8) {                         // scatter with sampling
 				wxBrush brush(wxColour(255, 255, 255));
 				gc->SetBrush(brush);
 				//dc.SetPen(colourpen[black]);
@@ -2325,7 +2456,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
 
 				gc->SetPen(colourpen[colour]);
-				for (i = 0; i <= (xto - xfrom) / sample; i++) {
+				for(i=0; i<=(xto-xfrom)/sample; i++) {
 					xindex = i + ceil(xfrom / sample);
 					xpos = (int)(xindex * sample - xfrom) * xrange;
 					mpoint = (*gdatadv)[xindex];
@@ -2338,10 +2469,10 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 
 				double xtodraw = xto;
-				if (graph->xstop && xto > graph->xstop) xtodraw = graph->xstop;
+				if(graph->xstop && xto > graph->xstop) xtodraw = graph->xstop;
 
 				gc->SetPen(colourpen[black]);
-				for (i = 0; i <= (xtodraw - xfrom) / sample; i++) {
+				for(i=0; i<=(xtodraw-xfrom)/sample; i++) {
 					xindex = i + ceil(xfrom / sample);
 					xpos = (int)(xindex * sample - xfrom) * xrange;
 					mpoint = (*gdatadv)[xindex];
@@ -2354,132 +2485,6 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				}
 			}
 
-
-			if (gtype == 3) {                             // spike rate data with optional burst colouring
-				int spikestep = 0;
-				int burstcolour = 0;
-				//opfile.New("spikegraph.txt");
-				//for(i=0; i<10; i++) opfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
-
-				for (i = 0; i < (xto - xfrom); i++) {
-					if (gpar == -1) y = (double)gdata[i + (int)xfrom];
-					if (gpar == -2) y = gdatad[i + (int)xfrom];
-					if (gpar == -3) y = (*gdatav)[i + (int)xfrom];
-					if (gpar == -4) y = (*gdatadv)[i + (int)xfrom];
-
-					res = 0;
-					if (binsize == 1) res = 0;
-					if (binsize == 0.1) res = 1;
-					if (binsize == 0.01) res = 2;
-					if (binsize == 0.001) res = 3;
-
-					//wxString diag;
-					//diag.Printf("spikedisp %d  res %d ", gpos->spikedisp, res);
-					//mainwin->SetStatusText(diag);
-
-					if (burstdata == NULL || burstdata->burstdisp == 0) {
-						gc->SetPen(colourpen[red]);
-						//mainwin->SetStatusText("no colour");
-					}
-
-					else {                  // burst colouring
-						burstcolour = 0;
-						//fprintf(ofp, "spikedisp 1\n");
-						if (binsize == 0.1 || binsize == 0.01) {
-							burstcolour = 0;
-							//opfile.WriteLine("sub res");
-							//if(burstdata[res][(i + (int)xfrom)] == 0) dc.SetPen(colourpen[red]);
-							//else if(burstdata[res][(i + (int)xfrom)] % 2 == 0) dc.SetPen(colourpen[blue]);		
-							//else if(burstdata[res][(i + (int)xfrom)] % 2 == 1) dc.SetPen(colourpen[green]);
-						}
-
-						if (binsize == 10 || binsize == 100) {
-							timepoint = (xfrom + i + 1) * binsize * 1000;
-							while (timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
-								//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
-								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
-								if (!burstcolour) burstcolour = burstdata->spikes[spikestep];
-								spikestep++;
-							}
-						}
-
-						if (binsize == 1) {
-							//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
-							timepoint = (xfrom + i + 1) * binsize * 1000;
-							while (timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
-								//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
-								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
-								if (!burstcolour) burstcolour = burstdata->spikes[spikestep];
-								spikestep++;
-							}
-							//fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);
-							//opfile.WriteLine(text.Format("spike %d time %.2f\n", spikestep, burstdata->times[spikestep]));
-							//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
-							//fprintf(ofp, "Burst time %.2f\n", burstdata->times[100]);
-							//opfile.WriteLine(text.Format("i %d  spike %d  burstcolour %d\n", i, spikestep, burstcolour));
-						}
-
-						if (binsize == 0.001) {
-							//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
-							timepoint = (xfrom + i) * binsize * 1000;
-							while (timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
-								//fprintf(ofp, "spike %d time %.10f comp %.10f y %.2f\n", 
-								//	spikestep, burstdata->spikedata->times[spikestep], (i + xfrom) * binsize + 0.0005, y);
-								burstcolour = burstdata->spikes[spikestep];
-								spikestep++;
-							}
-							//fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);
-
-
-							//if(i*binsize+0.0005 > graphdata[18][spikestep]) {
-							//	burstcolour = graphdata[16][spikestep];
-							//	spikestep++;
-						}
-						//fflush(ofp);
-						if (burstcolour == 0)
-							gc->SetPen(colourpen[red]);
-						else if (burstcolour % 2 == 0)
-							gc->SetPen(colourpen[blue]);
-						else if (burstcolour % 2 == 1)
-							gc->SetPen(colourpen[green]);
-					}
-
-
-					/*
-					if(spikedisp == 2) {                      // hazard filter
-					if(res < 3) {
-					if(hfdata[res][(i + (int)xfrom)] == 0)
-					dc.SelectObject(redpen);
-					else dc.SelectObject(greenpen);
-					}
-
-					if(res == 3) {
-					//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d ", i, (i+xfrom)*binsize, spikestep);
-					while(graphdata[18][spikestep] < (i+xfrom)*binsize+0.0005) {
-					burstcolour = filterflag[spikestep];
-					spikestep++;
-					}
-					//fprintf(ofp, "spikestep after = %d burstcolour = %d y = %.2f\n", spikestep, burstcolour, y);
-					if(burstcolour == 0)
-					dc.SelectObject(redpen);
-					else if(burstcolour % 2 == 0)
-					dc.SelectObject(bluepen);
-					else if(burstcolour % 2 == 1)
-					dc.SelectObject(greenpen);
-					}
-					}
-					*/
-
-					xpos = i * xrange + xbase;
-					if(xrange <= 1)
-						DrawLine(dc, gc, xpos, ybase + yplot, xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
-					else {
-						for(k=0; k<xrange-1; k++)
-							DrawLine(dc, gc, xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom)));
-					}
-				}
-				//opfile.Close();
-			}
 		}
 	//if(gtype == 3) fclose(ofp);
 	//if(gpos->spikedisp == 1) fclose(ofp);
