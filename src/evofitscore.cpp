@@ -389,7 +389,7 @@ double BurstDat::dispcalcburst(int binsize, int maxint)
 	int burstindex;
 	//wxString text;
 	bool shiftflag = true;
-	bool filediag = true;
+	bool filediag = false;
 	bool selecton;
 	FILE *ofp;
 	char diagname[20];

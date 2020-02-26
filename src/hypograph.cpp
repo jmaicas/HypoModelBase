@@ -1558,7 +1558,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					if(binsize == 1) {
 						//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
 						timepoint = (xfrom + i + 1) * binsize * 1000;
-						while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+						while((timepoint - binsize) < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
 							//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
 							//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
 							if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
@@ -1924,6 +1924,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			double xsdneg, xsdpos, ysdneg, ysdpos;
 			int xoffset = 1;
 
+			bool filediag = false;
+
 
 			if(gtype == 1) {                             // scaled width bars, Histogram    
 				for (i=0; i<(xto - xfrom); i++) {
@@ -1991,8 +1993,9 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			if(gtype == 3) {                             // spike rate data with optional burst colouring
 				int spikestep = 0;
 				int burstcolour = 0;
-				//opfile.New("spikegraph.txt");
+				if(filediag) opfile.New("spikegraph.txt");
 				//for(i=0; i<10; i++) opfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
+				if(filediag) opfile.WriteLine(text.Format("plot %s  binsize %.4f  xrange %.4f  gpar %d\n\n", graph->gname, binsize, xrange, gpar));
 
 				for(i=0; i<(xto-xfrom); i++) {
 					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
@@ -2039,9 +2042,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						if(binsize == 1) {
 							//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
 							timepoint = (xfrom + i + 1) * binsize * 1000;
-							while (timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							//opfile.WriteLine(text.Format("i %d  timepoint %.4f  maxtime %.4f  time %.4f", i, timepoint, burstdata->maxtime, burstdata->times[spikestep]));
+							//while ((timepoint - binsize) < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							while(spikestep < burstdata->spikedata->spikecount && burstdata->times[spikestep] < timepoint + 0.0005) {
 								//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
-								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
+								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f", i, spikestep, burstdata->times[spikestep]));
 								if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
 								spikestep++;
 							}
@@ -2049,15 +2054,19 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 							//opfile.WriteLine(text.Format("spike %d time %.2f\n", spikestep, burstdata->times[spikestep]));
 							//for(i=0; i<10; i++) fprintf(ofp, "Burst time %.2f\n", burstdata->times[i]);
 							//fprintf(ofp, "Burst time %.2f\n", burstdata->times[100]);
-							//opfile.WriteLine(text.Format("i %d  spike %d  burstcolour %d\n", i, spikestep, burstcolour));
+							//opfile.WriteLine(text.Format("i %d  spike %d  burstcolour %d", i, spikestep, burstcolour));
 						}
 
 						if(binsize == 0.001) {
 							//fprintf(ofp, "i = %d, time = %.3f, spikestep before = %d\n", i, (i+xfrom)*binsize, spikestep);
-							timepoint = (xfrom + i) * binsize * 1000;
-							while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							//timepoint = (xfrom + i) * binsize * 1000;
+							timepoint = (xfrom + i + 0.5) * binsize * 1000;
+							if(filediag) opfile.WriteLine(text.Format("i %d  timepoint %.4f  maxtime %.2f  time %.4f", i, timepoint, burstdata->maxtime, burstdata->times[spikestep]));
+							//while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							while(spikestep < burstdata->spikedata->spikecount && burstdata->times[spikestep] < timepoint - 0.0005) {
 								//fprintf(ofp, "spike %d time %.10f comp %.10f y %.2f\n", 
 								//	spikestep, burstdata->spikedata->times[spikestep], (i + xfrom) * binsize + 0.0005, y);
+								if(filediag) opfile.WriteLine(text.Format("while  i %d  spike %d  time %.4f  timepoint %.4f", i, spikestep, burstdata->times[spikestep], timepoint+0.0005));
 								burstcolour = burstdata->spikes[spikestep];
 								spikestep++;
 							}
@@ -2110,8 +2119,10 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						for(k=0; k<xrange-1; k++)
 							DrawLine(dc, gc, xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom)));
 					}
+
+					if(filediag && y > 0) opfile.WriteLine(text.Format("xpos %d  y %.2f  spike %d  burstcolour %d", xpos, y, spikestep, burstcolour));
 				}
-				//opfile.Close();
+				if(filediag) opfile.Close();
 			}
 
 
