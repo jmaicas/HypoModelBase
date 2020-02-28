@@ -978,6 +978,7 @@ TextBox *ScaleBox::AddScaleParam(wxString name, double initval, wxBoxSizer *pset
 {
     int boxwidth = 45;
     int boxheight = -1;
+	int boxgap = 2;
     
 	snum.Printf("%.1f", initval);
     confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
@@ -998,7 +999,7 @@ TextBox *ScaleBox::AddScaleParam(wxString name, double initval, wxBoxSizer *pset
 	pbox->Add(label, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT, 2);
 	pbox->Add(numbox, 0, wxALIGN_CENTER_VERTICAL, 0);
 	if(ostype == Mac) psetbox->Add(pbox, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-	else psetbox->Add(pbox, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+	else psetbox->Add(pbox, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, boxgap);
 
 	numbox->Bind(wxEVT_SET_FOCUS, &ScaleBox::OnConFocus, this);
 	numbox->val = gpos;
