@@ -943,7 +943,7 @@ void EvoFitBox::ChromeData()
 	//silencemean->SetLabel(numtext(vasomod->fitdata->SilenceMean[chromeindex], 4));
 	//intrafreq->SetLabel(numtext(vasomod->fitdata->IntraFreq[chromeindex], 4));
 
-	if(spikefitdata->ExtraFreq) evodata->spikecount = spikefitdata->ExtraFreq[chromepop[chromeindex].dataindex];
+	if(spikefitdata->extracount) evodata->spikecount = spikefitdata->ExtraFreq[chromepop[chromeindex].dataindex];
 	else evodata->spikecount = spikefitdata->spikecounts[chromepop[chromeindex].dataindex];
 	if(evodata->spikecount > 16384) evodata->spikecount = 16384;
 	// d_oInts[i + tid*16384 + bid*num_threads*16384]

@@ -111,8 +111,8 @@ void EvoFit::Evaluate(int start, int popcount, double dualfit)
 	diagbox->Write("Evaluate, Chrome Array OK\n");
 	diagbox->Write("Running GPU Fit " + text.Format("%.0f steps\n", runtime));
 
-	EvoFitGPU(chromearray, gpuparams, popcount, blocksize, runtime*1000, fitbox->spikefitdata->Ints.data(), fitbox->spikefitdata->ISIs, 
-		fitbox->spikefitdata->IntraFreq, fitbox->spikefitdata->ExtraFreq, threaddata);
+	EvoFitGPU(chromearray, gpuparams, popcount, blocksize, runtime*1000, fitbox->spikefitdata->Ints.data(), fitbox->spikefitdata->ISIs.data(), 
+		fitbox->spikefitdata->IntraFreq.data(), fitbox->spikefitdata->ExtraFreq.data(), threaddata);
 
 	diagbox->Write(text.Format("GPU Fit OK, POP %d to %d\n", start, popcount + start));
 
@@ -251,11 +251,13 @@ void *EvoFit::Entry()
 	if(fitbox->spikefitdata->chromecount < popsize) {
 		//fitbox->spikefitdata->Ints = new float[popsize * 512 * 32];
 		fitbox->spikefitdata->Ints.resize(popsize * 512 * 32);
-		fitbox->spikefitdata->ISIs = new float[popsize * 512];
-		fitbox->spikefitdata->IntraFreq = new float[popsize];
-		fitbox->spikefitdata->ExtraFreq = new float[popsize];
+		fitbox->spikefitdata->ISIs.resize(popsize * 512);
+		fitbox->spikefitdata->IntraFreq.resize(popsize);
+		fitbox->spikefitdata->ExtraFreq.resize(popsize);
 		fitbox->spikefitdata->chromecount = popsize;
 	}
+
+	fitbox->spikefitdata->extracount = true;
 
 	threaddata = new int[popsize * 4];
 
@@ -426,7 +428,7 @@ void SpikeFitDat::Select(int index)
 	int i;
 
 	for(i=0; i<512; i++) {
-		ISIhist[i] = ISIs[i + index * 512];
+		//ISIhist[i] = ISIs[i + index * 512];
 		//ISIhist[i] = 0.5;
 		//burstprof[i] = Bursts[i + index * 512];
 	}
@@ -436,15 +438,15 @@ void SpikeFitDat::Select(int index)
 void SpikeFitDat::DeAllocate()
 {
 	//if(Ints) delete[] Ints;
-	if(ISIs) delete[] ISIs;
-	if(ExtraFreq) delete[] ExtraFreq;
-	if(IntraFreq) delete[] IntraFreq;
-	if(Bursts) delete[] Bursts;
-	if(BurstMean) delete[] BurstMean;
-	if(BurstSD) delete[] BurstSD;
-	if(SilenceMean) delete[] SilenceMean;
-	if(SilenceSD) delete[] SilenceSD;
-	if(SpikeCounts) delete[] SpikeCounts;
+	//if(ISIs) delete[] ISIs;
+	//if(ExtraFreq) delete[] ExtraFreq;
+	//if(IntraFreq) delete[] IntraFreq;
+	//if(Bursts) delete[] Bursts;
+	//if(BurstMean) delete[] BurstMean;
+	//if(BurstSD) delete[] BurstSD;
+	//if(SilenceMean) delete[] SilenceMean;
+	//if(SilenceSD) delete[] SilenceSD;
+	//if(SpikeCounts) delete[] SpikeCounts;
 }
 
 

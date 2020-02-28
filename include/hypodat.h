@@ -147,7 +147,7 @@ public:
 	std::vector<int> srate;
 	std::vector<int> srate10;
 
-	int numbursts, maxselect;
+	int numselects, maxselect;
 	std::vector <burst> selectstore;  // selection store using burst type
 	int burstfitmode;
 
@@ -312,6 +312,8 @@ public:
 	datdouble IoDdata;
 	datdouble IoDdataX;
 
+	double *IoDfit;  // pointer for switching IoD data between full cell and selected, used in evo fit scoring 
+
 	datdouble meanV;
 
 	// BurstProfile arrays
@@ -381,6 +383,7 @@ public:
 	void SelectSpikes();
 	//void BurstScanFit();     // moved to BurstDat to reduce pointer dereferencing
 	void IntraSelectAnalysis();
+	void SelectFitAnalysis();
 	void FitScore(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *burstparams = NULL);
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);

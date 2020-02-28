@@ -436,7 +436,111 @@ void BurstDat::IntraBurstAnalysis()
 }
 
 
-void SpikeDat::IntraSelectAnalysis()
+
+void SpikeDat::SelectFitAnalysis()             // neurocalc quad hist and quad haz for selected data
+{
+	int i, j; 
+	int iBinNo;
+	float fBinNo;
+
+	// Quad Binned Histogram and Hazard                    
+	double initbinwidth = 1;
+	double bininc = 0.05;
+	double d_fInitBinWidth = 0.001;
+	double d_fBinIncrAmount = 0.00005;
+	double b = initbinwidth - bininc / 2;
+	double BSquared = b*b;
+	double FourA = 2*bininc;
+	double TwoA = bininc;
+
+	for(i=0; i<10000; i++) {
+		histquad[i] = 0;
+		hazquad[i] = 0;
+	}
+
+	//This equation defines an ever increasing bin width                        Comment from Tom's code, SimulateIGF2.cs
+	//Even though it is quantised, it will increase by BinSpacing               BinSpacing likely equals bininc
+	//every bin.
+
+	for(i=1; i<spikecount; i++) {
+		if(selectdata->spikes[i]) {
+			fBinNo = (-b + sqrt(BSquared + FourA * isis[i]))/TwoA;
+			iBinNo = fBinNo;
+			histquad[iBinNo]++;
+			if(iBinNo > histquad.max) histquad.max = iBinNo;
+		}
+	}
+
+	//Smooth and Scale ISI Histogram
+
+	double NumBinnedEvents = 0;
+	double Div;
+	int histmax = 512;
+	double htemp[1000];
+	double maxcount = 0;
+	double width, histsum, hazremain;
+	double hazmin = 0.01;
+
+	histquadsm.max = histmax;
+
+	for(i=0; i<histmax; i++) {
+		Div = 0;
+		histquadsm[i] = 0;
+		for(j=i-2; j<i+3; j++) {
+			if((j > -1) & (j < 1000)) {
+				histquadsm[i] += histquad[j];
+				Div++;
+			}
+		}
+		histquadsm[i] /= Div;
+		NumBinnedEvents += histquadsm[i];
+	}
+
+	// normalise
+	for(i=0; i<histmax; i++) histquadsm[i] = histquadsm[i] / NumBinnedEvents;
+
+
+	// Mode for fitness
+	maxcount = 0;
+	for(i=0; i<histmax; i++) {
+		if(histquadsm[i] > maxcount) {
+			maxcount = histquadsm[i];
+			histquadmode = i;
+		}
+	}
+
+
+	// quad bin x
+	for (i=0; i<histmax; i++) histquadx[i] = i * initbinwidth + (i * (i - 1) / 2) * bininc;
+
+
+	// linearise
+	histsum = 0;
+	for(i=0; i<histmax-1; i++) {
+		width = (histquadx[i+1] - histquadx[i]);        
+		histquadlin[i] = histquadsm[i] / width;
+		histsum += histquadlin[i];
+	}
+	for(i=0; i<histmax; i++) histquadlin[i] = histquadlin[i] / histsum;
+
+
+	// Quad Hazard
+
+	hazremain = 1;
+	for(i=0; i<histmax; i++) {
+		hazquad[i] = histquadlin[i] / hazremain;
+		if(hazremain < hazmin) {
+			hazquad[i] = 0;
+			hazquadbins = i;
+			break;
+		}
+		hazremain -= histquadlin[i];
+	}
+
+}
+
+
+void SpikeDat::IntraSelectAnalysis()            // currently out of use 27/2/20 - using BurstDat::IntraBurstAnalysis()
 {
 	int i;
 	//int numspikes, 
@@ -735,7 +839,7 @@ void SpikeDat::SelectSpikes()
 	for(i=0; i<spikecount; i++) selectdata->spikes[i] = 0;
 
 	for(i=0; i<spikecount; i++) {
-		if(bindex > neurodata->numbursts) break;  
+		if(bindex > neurodata->numselects) break;  
 		if(i == neurodata->selectstore[bindex].start) selecton = 1;
 		selectdata->spikes[i] = selecton;
 		if(i == neurodata->selectstore[bindex].end) {
@@ -775,9 +879,9 @@ void SpikeDat::SelectScan()
 		}
 	}
 	
-	neurodata->numbursts = selectindex;
+	neurodata->numselects = selectindex;
 
-	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numbursts));
+	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numselects));
 }
 
 
@@ -1452,6 +1556,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	//if(diagbox) diagbox->Write(text.Format("spikecount %d freq %.2f\n", spikecount, freq)); 
 
 
+	
 	// Quad Binned Histogram                      24th November 2012
 
 	double initbinwidth = 1;

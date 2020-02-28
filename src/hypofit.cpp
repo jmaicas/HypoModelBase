@@ -30,6 +30,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	bool IoDburstmode;
 
 	if(burstmode == 1) IoDburstmode = true;
+	else IoDburstmode = false;
 
 
 	//if(fitdiag) ofp.New("fitscorevaso-diag.txt");
@@ -295,15 +296,15 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 		for(i=0; i<IoDcount; i++) {
 
-			//if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDdata[i], IoDdata[i])); 
+			//if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDfit[i], IoDdata[i])); 
 
-			if(testdata->IoDdata[i] > IoDdata[i]) {
-				Big = testdata->IoDdata[i];
+			if(testdata->IoDfit[i] > IoDdata[i]) {
+				Big = testdata->IoDfit[i];
 				Small = IoDdata[i];
 			}
 			else {
 				Big = IoDdata[i];
-				Small = testdata->IoDdata[i];
+				Small = testdata->IoDfit[i];
 			}
 
 			Error = (Big - Small) / Big * 100;
@@ -767,15 +768,15 @@ void SpikeDat::FitScoreVaso(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, 
 
 		for(i=0; i<IoDcount; i++) {
 
-			if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDdata[i], IoDdata[i])); 
+			if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDfit[i], IoDdata[i])); 
 
-			if(testdata->IoDdata[i] > IoDdata[i]) {
-				Big = testdata->IoDdata[i];
+			if(testdata->IoDfit[i] > IoDdata[i]) {
+				Big = testdata->IoDfit[i];
 				Small = IoDdata[i];
 			}
 			else {
 				Big = IoDdata[i];
-				Small = testdata->IoDdata[i];
+				Small = testdata->IoDfit[i];
 			}
 
 			Error = (Big - Small) / Big * 100;
@@ -1252,15 +1253,15 @@ void SpikeDat::FitScoreBasic(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset,
 
 		for(i=0; i<IoDcount; i++) {
 
-			if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDdata[i], IoDdata[i])); 
+			if(fitdiag) ofp.WriteLine(text.Format("IoD %d  Exp %.6f  Mod %.6f\n", i, testdata->IoDfit[i], IoDdata[i])); 
 
-			if(testdata->IoDdata[i] > IoDdata[i]) {
-				Big = testdata->IoDdata[i];
+			if(testdata->IoDfit[i] > IoDdata[i]) {
+				Big = testdata->IoDfit[i];
 				Small = IoDdata[i];
 			}
 			else {
 				Big = IoDdata[i];
-				Small = testdata->IoDdata[i];
+				Small = testdata->IoDfit[i];
 			}
 
 			Error = (Big - Small) / Big * 100;

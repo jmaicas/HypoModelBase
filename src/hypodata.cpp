@@ -314,7 +314,7 @@ void NeuroBox::OnSelectStore(wxCommandEvent& event)
 
 	for(cellindex=0; cellindex<cellcount; cellindex++) {
 		cell = &(*cells)[cellindex];
-		for(i=1; i<=cell->numbursts; i++) {
+		for(i=1; i<=cell->numselects; i++) {
 			text.Printf("cel %d  index %d  sta %d  end %d", cellindex, i, cell->selectstore[i].start, cell->selectstore[i].end);	
 			selectfile.WriteLine(text);
 		}
@@ -337,7 +337,7 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 
 	currcell->selectdata->spikes = selectspikes[currselect];
 
-	for(i=0; i<cellcount; i++) (*cells)[i].numbursts = 0;
+	for(i=0; i<cellcount; i++) (*cells)[i].numselects = 0;
 
 	filepath = mod->GetPath() + "/Tools";
 	
@@ -359,7 +359,7 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 		cellindex = ParseLong(&readline, 'l');
 		cell = &(*cells)[cellindex];
 		index = ParseLong(&readline, 'x');
-		cell->numbursts++;
+		cell->numselects++;
 		cell->selectstore[index].start = ParseLong(&readline, 'a');
 		cell->selectstore[index].end = ParseLong(&readline, 'd');
 		if(diagnostic) diagbox->Write(text.Format("SelectLoad  cell %d  index %d  start %d  end %d\n", cellindex, index, cell->selectstore[index].start, cell->selectstore[index].end)); 
@@ -652,8 +652,22 @@ void NeuroBox::AnalyseSelection()
 	wxString text;
 	//BurstDat *burstdata;
 	
+	if(!currcell->selectdata) currcell->selectdata = new BurstDat();
 	currcell->selectdata->times = currcell->times.data();
+
+	currcell->SelectScan();
+
 	currcell->selectdata->IntraBurstAnalysis();
+	if(currcell->neurodata->numselects) {
+		currcell->SelectFitAnalysis();
+		currcell->IoDfit = currcell->selectdata->IoDdata.data.data();
+		diagbox->Write("NeuroBox select fit mode\n");
+	}
+	else {
+		currcell->IoDfit = currcell->IoDdata.data.data();
+		diagbox->Write("NeuroBox basic fit mode\n");
+	}
+
 	//mod->SelectBurst(selectdata[currselect]);
 
 	PanelData();

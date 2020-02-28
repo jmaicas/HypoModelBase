@@ -51,43 +51,44 @@ public:
 	int chromecount;
 	//float *Ints;
 	vector<float> Ints;
-	float *ISIs;
-	float *Bursts;
-	float *BurstMean;
-	float *BurstSD;
-	float *SilenceMean;
-	float *SilenceSD;
-	float *IntraFreq;
-	float *ExtraFreq;
-	float *SpikeCounts;
+	vector<float> ISIs;
+	vector<float> Bursts;
+	vector<float> BurstMean;
+	vector<float> BurstSD;
+	vector<float> SilenceMean;
+	vector<float> SilenceSD;
+	vector<float> IntraFreq;
+	vector<float> ExtraFreq;
+	vector<float> SpikeCounts;
 
+	bool extracount;
 	int spikecounts[200];
 
-	datdouble ISIhist;
-	datdouble burstprof;
+	//datdouble ISIhist;
+	//datdouble burstprof;
 
 	SpikeFitDat() { 
 		chromecount = 0;
 		allocated = false;
-		ISIhist.setsize(1000);
-		burstprof.setsize(1000);
+		//ISIhist.setsize(1000);
+		//burstprof.setsize(1000);
+		extracount = false;
 		//spikecounts = new int[200];
 		//Ints = NULL;
-		ISIs = NULL;
-		Bursts = NULL;
-		BurstMean = NULL;
-		BurstSD = NULL;
-		SilenceMean = NULL;
-		SilenceSD = NULL;
-		IntraFreq = NULL;
-		ExtraFreq = NULL;
-		SpikeCounts = NULL;
+		//ISIs = NULL;
+		//Bursts = NULL;
+		//BurstMean = NULL;
+		//BurstSD = NULL;
+		//SilenceMean = NULL;
+		//SilenceSD = NULL;
+		//IntraFreq = NULL;
+		//ExtraFreq = NULL;
+		//SpikeCounts = NULL;
 	};
 
 	~SpikeFitDat();
+
 	void DeAllocate();
-
-
 	void Select(int);
 };
 

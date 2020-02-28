@@ -17,7 +17,7 @@ NeuroDat::NeuroDat()
 	selectstore.resize(maxselect);
 
 	filter = 0;
-	numbursts = 0;
+	numselects = 0;
 	burstfitmode = 0;
 }
 
@@ -171,6 +171,8 @@ SpikeDat::SpikeDat()
 	fitType = 0;    // 0 for basic, 1 for oxy, 2 for vaso
 	label = "";
 	fitdiag = false;
+
+	IoDfit = IoDdata.data.data();
 
 	burstdata = NULL;
 	selectdata = NULL;
@@ -892,8 +894,9 @@ void GraphSet::IntervalSet(wxString tag, bool burst, bool select)
 {
 	int selectcode;
 
-	if(burst && select) selectcode = 200;
-	else selectcode = 100;
+	//if(burst && select) selectcode = 200;
+	//else selectcode = 100;
+	selectcode = 200;
 
 	AddFlag("hazmode1", 10);
 	AddFlag("binrestog1", 1);
@@ -905,38 +908,45 @@ void GraphSet::IntervalSet(wxString tag, bool burst, bool select)
 	Add(tag + "haz1ms", 10);
 	Add(tag + "hist5ms", 1);
 	Add(tag + "haz5ms", 11);
+	Add(tag + "normhist1ms", 1000);
+	Add(tag + "haz1ms", 1010);
+	Add(tag + "normhist5ms", 1001);
+	Add(tag + "haz5ms", 1011);
 
 	if(burst) {
 		Add(tag + "bursthist1ms", 100);
 		Add(tag + "bursthaz1ms", 110);
 		Add(tag + "bursthist5ms", 101);
 		Add(tag + "bursthaz5ms", 111);
-
 		Add(tag + "burstnormhist1ms", 1100);
 		Add(tag + "bursthaz1ms", 1110);
 		Add(tag + "burstnormhist5ms", 1101);
 		Add(tag + "bursthaz5ms", 1111);
 	}
 
-	Add(tag + "normhist1ms", 1000);
-	Add(tag + "haz1ms", 1010);
-	Add(tag + "normhist5ms", 1001);
-	Add(tag + "haz5ms", 1011);
-
-	Add(tag + "histquadsmooth", 10001);
-	Add(tag + "histquadsmooth", 11001);
-
 	if(select) {
 		Add(tag + "selecthist1ms", selectcode);
 		Add(tag + "selecthaz1ms", selectcode + 10);
 		Add(tag + "selecthist5ms", selectcode + 1);
 		Add(tag + "selecthaz5ms", selectcode + 11);
-
 		Add(tag + "selectnormhist1ms", selectcode + 1000);
 		Add(tag + "selecthaz1ms", selectcode + 1010);
 		Add(tag + "selectnormhist5ms", selectcode + 1001);
 		Add(tag + "selecthaz5ms", selectcode + 1011);
 	}
+	else {
+		Add(tag + "hist1ms", selectcode);
+		Add(tag + "haz1ms", selectcode + 10);
+		Add(tag + "hist5ms", selectcode + 1);
+		Add(tag + "haz5ms", selectcode + 11);
+		Add(tag + "normhist1ms", selectcode + 1000);
+		Add(tag + "haz1ms", selectcode + 1010);
+		Add(tag + "normhist5ms", selectcode + 1001);
+		Add(tag + "haz5ms", selectcode + 1011);
+	}
+
+	Add(tag + "histquadsmooth", 10001);
+	Add(tag + "histquadsmooth", 11001);
 }
 
 
