@@ -653,7 +653,7 @@ void ScaleBox::GLoad(wxString tag)
 	short check;
 	int gindex;
 	wxString filename, filetag, filepath;
-	wxString readline, numstring, glabel;
+	wxString readline, numstring, gtag;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	TextFile infile;
 
@@ -690,8 +690,8 @@ void ScaleBox::GLoad(wxString tag)
 		numstring = readline.BeforeFirst(' ');
 		numstring.ToLong(&numdat);
 		gindex = (int)numdat;
-		glabel = readline.AfterFirst(' ');
-		gmod->gcodes[gindex] = glabel;
+		gtag = readline.AfterFirst(' ');
+		if(gmod->graphbase->GraphExists(gtag)) gmod->gcodes[gindex] = gtag;
 		readline = infile.ReadLine();
 	}
 

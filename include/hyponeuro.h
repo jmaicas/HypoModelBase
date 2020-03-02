@@ -4,6 +4,11 @@
 #include "hypomods.h"
 
 
+enum {
+	ID_epspsynch = 10000
+};
+
+
 
 class NeuroMod : public Model
 {

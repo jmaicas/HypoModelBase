@@ -812,6 +812,7 @@ public:
 	GraphDat *GetGraph(wxString);
 	GraphDat *GetGraph(int);
 	GraphDat *GetGraphFromName(wxString);
+	bool GraphExists(wxString);
 	/*
 	GraphDat &operator[](wxString tag) {
 		for(unsigned long i=0; i<store.size(); i++) 

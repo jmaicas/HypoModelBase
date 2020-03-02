@@ -1054,6 +1054,12 @@ GraphSet *GraphBase::GetSet(wxString tag)
 }
 
 
+GraphSet *GraphBase::GetSet(int index) 
+{
+	return &(setstore[index]);
+}
+
+
 GraphDat *GraphBase::GetGraph(wxString tag) 
 {
 	if(!tagindex.check(tag)) return NULL;
@@ -1076,9 +1082,10 @@ GraphDat *GraphBase::GetGraphFromName(wxString name)
 }
 
 
-GraphSet *GraphBase::GetSet(int index) 
+bool GraphBase::GraphExists(wxString tag)
 {
-	return &(setstore[index]);
+	if(!tagindex.check(tag)) return false;
+	else return true;
 }
 
 
