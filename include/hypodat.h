@@ -112,6 +112,7 @@ public:
 	double RMSIoD;
 	double RMSBurstHead;
 	double RMSBurstIoD;
+	double RMSHazHead;
 	
 	double burstmode;
 	double burstlengthmean;
@@ -359,6 +360,7 @@ public:
 	double RMSHeadStart, RMSHeadStop;
 	double RMSBinRangeStart, RMSBinRangeFinish;
 	double RMSBurstHeadBins;
+	double RMSHazStart, RMSHazStop;
 
 	// Burst Scan Params
 	int burst_maxint;
@@ -813,6 +815,7 @@ public:
 	GraphDat *GetGraph(int);
 	GraphDat *GetGraphFromName(wxString);
 	bool GraphExists(wxString);
+	bool SetExists(wxString);
 	/*
 	GraphDat &operator[](wxString tag) {
 		for(unsigned long i=0; i<store.size(); i++) 

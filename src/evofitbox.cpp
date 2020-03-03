@@ -56,6 +56,7 @@ EvoFitBox::EvoFitBox(Model *model, EvoChrome *chrome, const wxString& title, con
 	fitset->AddMeasure("RMSFirstNBins", "RMSHistHead", 100);
 	fitset->AddMeasure("RMSBinRange", "RMSBinRange", 100);
 	fitset->AddMeasure("RMSHaz", "RMSHaz", 60);
+	fitset->AddMeasure("RMSHazHead", "RMSHazHead", 60);
 	fitset->AddMeasure("RMSIoD", "RMSIoD", 20);
 
 	if(burstmode) {
@@ -791,6 +792,7 @@ void EvoFitBox::FitDisp(FitDat *data, FitPanel *datpanel)       // out of use si
 	datpanel->histfirstrms->SetLabel(numtext(data->RMSFirstNBins, places));
 	datpanel->histrangerms->SetLabel(numtext(data->RMSBinRange, places));
 	datpanel->hazrms->SetLabel(numtext(data->RMSHaz, places));
+	datpanel->hazheadrms->SetLabel(numtext(data->RMSHazHead, places));
 	datpanel->iodrms->SetLabel(numtext(data->RMSIoD, places));
 	//datpanel->iodrms->SetLabel(numtext(100, places));
 

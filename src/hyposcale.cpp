@@ -691,7 +691,8 @@ void ScaleBox::GLoad(wxString tag)
 		numstring.ToLong(&numdat);
 		gindex = (int)numdat;
 		gtag = readline.AfterFirst(' ');
-		if(gmod->graphbase->GraphExists(gtag)) gmod->gcodes[gindex] = gtag;
+		if(gbase->GraphExists(gtag) || gbase->SetExists(gtag)) gmod->gcodes[gindex] = gtag;
+		else gmod->diagbox->Write(text.Format("GLoad graph/set %s not found\n", gtag));
 		readline = infile.ReadLine();
 	}
 

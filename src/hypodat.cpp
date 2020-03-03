@@ -1089,6 +1089,13 @@ bool GraphBase::GraphExists(wxString tag)
 }
 
 
+bool GraphBase::SetExists(wxString tag)
+{
+	if(!settagindex.check(tag)) return false;
+	else return true;
+}
+
+
 void GraphBase::BaseStore(wxString path, wxString tag)
 {
 	int i;

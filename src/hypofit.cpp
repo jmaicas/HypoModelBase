@@ -124,9 +124,8 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	RMSError = sqrt(RMSError);
 
 	fitdat->RMSFirstNBins = RMSError;
-	//fitdat->scores["RMSFirstNBins"] = RMSError;
 	
-
+	
 	// ISI Histogram Bin Range RMS
 	RMSError = 0;
 	for(i=RMSBinRangeStart; i<RMSBinRangeFinish; i++) {
@@ -147,12 +146,34 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 	RMSError /= (RMSBinRangeFinish - RMSBinRangeStart);
 	RMSError = sqrt(RMSError);
-
 	fitdat->RMSBinRange = RMSError;
-	//fitdat->scores["RMSBinRange"] = RMSError;
 
 
-	double errcalc;
+	// Hazard Head RMS         new March 2020
+
+	RMSError = 0;
+	CutOff = 0.01;
+
+	for(i=RMSHazStart; i<RMSHazStop; i++) {
+		if(testdata->hazquadfit[i] > hazquadfit[i]) {
+			Big = testdata->hazquadfit[i];
+			Small = hazquadfit[i];
+		}
+		else {
+			Big = hazquadfit[i];
+			Small = testdata->hazquadfit[i];
+		}
+
+		//If both are less than the cutoff then use alternate rules
+		if (Big < CutOff) Error = (Big - Small) * 100.0;
+		else Error = (Big - Small) / Big * 100.0;
+		RMSError += Error * Error;
+	}
+
+	RMSError /= (RMSHazStop - RMSHazStart);
+	RMSError = sqrt(RMSError);
+	fitdat->RMSHazHead = RMSError;
+	
 
 	// Hazard RMS
 
@@ -186,7 +207,6 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		RMSError += Error * Error;
 	}
 
-	errcalc = RMSError;
 	RMSError /= MinHazSize;
 	RMSError = sqrt(RMSError);
 
@@ -194,7 +214,6 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	RMSError += ((double)(MaxHazSize - MinHazSize)) / ((double)MinHazSize)*100;
 
 	fitdat->RMSHaz = RMSError;
-	//fitdat->scores["RMSHaz"] = RMSError; 
 
 
 	//// Burst Profile Analysis
@@ -358,21 +377,25 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 	//diagbox->Write(text.Format("score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[0].weight, fitdat->RMSFirstNBins));
 
+	
 	score += fitset->measures[0].weight * fitdat->RMSFirstNBins;
 	score += fitset->measures[1].weight * fitdat->RMSBinRange;
 	score += fitset->measures[2].weight * fitdat->RMSHaz;
-	score += fitset->measures[3].weight * fitdat->RMSIoD;
-	score += fitset->measures[4].weight * fitdat->RMSBurstHead;
-	score += fitset->measures[5].weight * fitdat->burstmode;
-	score += fitset->measures[6].weight * fitdat->burstlengthmean;
+	score += fitset->measures[3].weight * fitdat->RMSHazHead;
+	score += fitset->measures[4].weight * fitdat->RMSIoD;
+	score += fitset->measures[5].weight * fitdat->RMSBurstHead;
+	score += fitset->measures[6].weight * fitdat->burstmode;
+	score += fitset->measures[7].weight * fitdat->burstlengthmean;
 
 	//diagbox->Write(text.Format("score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[6].weight, fitdat->burstlengthmean));
 
-	score += fitset->measures[7].weight * fitdat->burstlengthsd;
-	score += fitset->measures[8].weight * fitdat->burstsilencemean;
-	score += fitset->measures[9].weight * fitdat->burstsilencesd;
-	score += fitset->measures[10].weight * fitdat->burstintrafreq;
-	score += fitset->measures[11].weight * fitdat->RMSBurstIoD;
+	score += fitset->measures[8].weight * fitdat->burstlengthsd;
+	score += fitset->measures[9].weight * fitdat->burstsilencemean;
+	score += fitset->measures[10].weight * fitdat->burstsilencesd;
+	score += fitset->measures[11].weight * fitdat->burstintrafreq;
+	score += fitset->measures[12].weight * fitdat->RMSBurstIoD;
+	
+	
 
 	for(i=0; i<fitset->measureCount; i++) {	
 		//tag = fitset->tags[i];

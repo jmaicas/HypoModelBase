@@ -102,6 +102,7 @@ public:
 	wxStaticText *histfirstrms, *histfirstrmsWeight;
 	wxStaticText *histrangerms;
 	wxStaticText *hazrms;
+	wxStaticText *hazheadrms;
 	wxStaticText *iodrms;
 
 	wxStaticText *burstfirstrms;

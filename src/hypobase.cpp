@@ -241,7 +241,6 @@ long ParseLong(wxString *readline, wxUniChar tag)
 wxString ParseString(wxString *readline, wxUniChar tag)
 {
 	wxString string;
-	long numdat;
 
 	*readline = readline->AfterFirst(tag);
 	readline->Trim(false);
