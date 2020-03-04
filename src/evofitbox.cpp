@@ -23,6 +23,8 @@ EvoFitBox::EvoFitBox(Model *model, EvoChrome *chrome, const wxString& title, con
 	loadfitdata = new FitDat();
 	fitset = new FitSet(20);
 	fitconset = new FitConSet(20);
+	//spikefitdata = new SpikeFitDat();
+
 	//vasomod = mod;
 	//chromepop = mod->chromepop;
 	chromepopinit = false;
@@ -31,6 +33,7 @@ EvoFitBox::EvoFitBox(Model *model, EvoChrome *chrome, const wxString& title, con
 	moddata = NULL;
 	expdata = NULL;
 	loaddata = NULL;
+	evothread = NULL;
 
 	evodataset.resize(maxfit);
 
@@ -95,6 +98,9 @@ EvoFitBox::~EvoFitBox()
 	delete fitset;
 	//delete fitchrome;
 	delete fitconset;
+	//delete spikefitdata;
+
+	if(evothread) delete evothread;
 }
 
 
@@ -688,7 +694,7 @@ void EvoFitBox::FitControlUpdate()
 	for(i=0; i<fitconset->count; i++) {
 		tag = fitconset->tags[i];	
 		fitconset->cons[i].value = paramset.GetValue(tag); 
-		mod->diagbox->Write(text.Format("Get fit control param tag %s value %.0f\n", tag, fitconset->cons[i].value)); 
+		//mod->diagbox->Write(text.Format("Get fit control param tag %s value %.0f\n", tag, fitconset->cons[i].value)); 
 	}
 }
 
@@ -727,7 +733,7 @@ void EvoFitBox::ModFitScore()
 
 void EvoFitBox::OnFitScore(wxCommandEvent& event)
 {
-	int id;
+	int i, id;
 	int highstart, highstop;
 
 	FitWeightUpdate();
@@ -742,9 +748,16 @@ void EvoFitBox::OnFitScore(wxCommandEvent& event)
 	mod->mainwin->GraphUpdate();
 
 	if(event.GetId() == ID_fitscore) {
-		moddata->FitScore(expdata, fitdata, fitset, fitconset, burstbox->GetParams());
+		//moddata->FitScore(expdata, fitdata, fitset, fitconset, burstbox->GetParams());
 		//FitDisp();
-		FitDispNew();
+
+		//evodata->spikecount = spikefitdata->spikecounts[chromeindex];
+		//if(evodata->spikecount > 16384) evodata->spikecount = 16384;
+		//for(i=0; i<evodata->spikecount; i++) evodata->times[i] = spikefitdata->Ints[i + 32 * 512 * chromeindex];
+
+		evodata->FitScoreVasoFast(expdata, fitdata, fitset, 0, 1, true);
+		fitdata->ScoreConvert();
+		FitDispNew(fitdata);
 	}
 
 	if(event.GetId() == ID_evofitscore) {

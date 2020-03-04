@@ -18,7 +18,7 @@ void SpikeDat::FitScore(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, FitC
 }
 
 
-void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, int burstmode, int IoDmode)
+void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fitset, int burstmode, int IoDmode, bool diagmode)
 {
 	int i;
 	int histmax = 512;
@@ -56,6 +56,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 	// Mode for fitness
 	maxcount = 0;
+	histquadmode = 0;
 	for(i=0; i<histmax; i++) {	
 		if(histquadsmfit[i] > maxcount) {
 			maxcount = histquadsmfit[i];
@@ -299,6 +300,15 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		fitdat->burstintrafreq = (abs(testdata->burstdata->freq - burstdata->freq) / testdata->burstdata->freq) * 100.0;
 		//fitdat->scores["BurstIntraFreq"] = fitdat->burstintrafreq;
 	}
+	else {
+		fitdat->RMSBurstHead = 0;
+		fitdat->burstmode = 0;
+		fitdat->burstlengthmean = 0;
+		fitdat->burstlengthsd = 0;
+		fitdat->burstsilencemean = 0;
+		fitdat->burstsilencesd = 0;
+		fitdat->burstintrafreq = 0;
+	}
 
 	int IoDcount = 7;
 
@@ -336,6 +346,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 		//if(fitdiag) ofp.WriteLine(text.Format("IoD %.6f\n", fitdat->RMSIoD)); 
 	}
+	else fitdat->RMSIoD = 0;
 
 
 	//if(fitset->GetMeasure("RMSBurstIoD").weight > 0) {
@@ -366,6 +377,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 
 		//if(fitdiag) ofp.WriteLine(text.Format("Burst IoD %.6f\n", fitdat->RMSBurstIoD)); 
 	}
+	else fitdat->RMSBurstIoD = 0;
 
 
 	// Weighted Sum
@@ -374,35 +386,44 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	//wxString tag;
 
 	double score = 0;
-
-	//diagbox->Write(text.Format("score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[0].weight, fitdat->RMSFirstNBins));
-
 	
 	score += fitset->measures[0].weight * fitdat->RMSFirstNBins;
+	if(diagmode) diagbox->Write(text.Format("\nRMSFirstNBins score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[0].weight, fitdat->RMSFirstNBins));
+
 	score += fitset->measures[1].weight * fitdat->RMSBinRange;
+	if(diagmode) diagbox->Write(text.Format("RMSBinRange score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[1].weight, fitdat->RMSBinRange));
+
 	score += fitset->measures[2].weight * fitdat->RMSHaz;
+	if(diagmode) diagbox->Write(text.Format("RMSHaz score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[2].weight, fitdat->RMSHaz));
+
 	score += fitset->measures[3].weight * fitdat->RMSHazHead;
+	if(diagmode) diagbox->Write(text.Format("RMSHazHead score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[3].weight, fitdat->RMSHazHead));
+
 	score += fitset->measures[4].weight * fitdat->RMSIoD;
-	score += fitset->measures[5].weight * fitdat->RMSBurstHead;
-	score += fitset->measures[6].weight * fitdat->burstmode;
-	score += fitset->measures[7].weight * fitdat->burstlengthmean;
+	if(diagmode) diagbox->Write(text.Format("RMSIoD score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[4].weight, fitdat->RMSIoD));
 
-	//diagbox->Write(text.Format("score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[6].weight, fitdat->burstlengthmean));
+	if(burstmode) {
+		score += fitset->measures[5].weight * fitdat->RMSBurstHead;
+		score += fitset->measures[6].weight * fitdat->burstmode;
+		score += fitset->measures[7].weight * fitdat->burstlengthmean;
 
-	score += fitset->measures[8].weight * fitdat->burstlengthsd;
-	score += fitset->measures[9].weight * fitdat->burstsilencemean;
-	score += fitset->measures[10].weight * fitdat->burstsilencesd;
-	score += fitset->measures[11].weight * fitdat->burstintrafreq;
-	score += fitset->measures[12].weight * fitdat->RMSBurstIoD;
+		if(diagmode) diagbox->Write(text.Format("burstmode score %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[6].weight, fitdat->burstmode));
+
+		score += fitset->measures[8].weight * fitdat->burstlengthsd;
+		score += fitset->measures[9].weight * fitdat->burstsilencemean;
+		score += fitset->measures[10].weight * fitdat->burstsilencesd;
+		score += fitset->measures[11].weight * fitdat->burstintrafreq;
+		score += fitset->measures[12].weight * fitdat->RMSBurstIoD;
+	}
 	
-	
+	int measureCount = fitset->measureCount;
+	if(!burstmode) measureCount = 5;
 
-	for(i=0; i<fitset->measureCount; i++) {	
+	for(i=0; i<measureCount; i++) {	
 		//tag = fitset->tags[i];
 		//fitdat->score += fitset->measures[i].weight * fitdat->scores[fitset->tags[i]];      // check score tag and weight ordering   27/9/19
 		fitdat->weightsum += fitset->measures[i].weight;
 	}
-
 
 	//diagbox->Write(text.Format("score sum %.2f  weight %.2f  fit %.2f\n", score, fitset->measures[6].weight, fitdat->burstlengthmean));
 	

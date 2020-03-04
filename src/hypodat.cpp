@@ -933,6 +933,14 @@ void GraphSet::IntervalSet(wxString tag, bool burst, bool select)
 		Add(tag + "selecthaz1ms", selectcode + 1010);
 		Add(tag + "selectnormhist5ms", selectcode + 1001);
 		Add(tag + "selecthaz5ms", selectcode + 1011);
+		Add(tag + "histquadsmooth", selectcode + 10000);
+		Add(tag + "histquadsmooth", selectcode + 10001);
+		Add(tag + "hazquad", selectcode + 10010);
+		Add(tag + "hazquad", selectcode + 10011);
+		Add(tag + "histquadsmooth", selectcode + 11000);
+		Add(tag + "histquadsmooth", selectcode + 11001);
+		Add(tag + "hazquad", selectcode + 11010);
+		Add(tag + "hazquad", selectcode + 11011);
 	}
 	else {
 		Add(tag + "hist1ms", selectcode);
@@ -943,10 +951,24 @@ void GraphSet::IntervalSet(wxString tag, bool burst, bool select)
 		Add(tag + "haz1ms", selectcode + 1010);
 		Add(tag + "normhist5ms", selectcode + 1001);
 		Add(tag + "haz5ms", selectcode + 1011);
+		Add(tag + "histquadsmooth", selectcode + 10000);
+		Add(tag + "histquadsmooth", selectcode + 10001);
+		Add(tag + "hazquad", selectcode + 10010);
+		Add(tag + "hazquad", selectcode + 10011);
+		Add(tag + "histquadsmooth", selectcode + 11000);
+		Add(tag + "histquadsmooth", selectcode + 11001);
+		Add(tag + "hazquad", selectcode + 11010);
+		Add(tag + "hazquad", selectcode + 11011);
 	}
 
+	Add(tag + "histquadsmooth", 10000);
+	Add(tag + "histquadsmooth", 11000);
+	Add(tag + "hazquad", 10010);
+	Add(tag + "hazquad", 11010);
 	Add(tag + "histquadsmooth", 10001);
 	Add(tag + "histquadsmooth", 11001);
+	Add(tag + "hazquad", 10011);
+	Add(tag + "hazquad", 11011);
 }
 
 
@@ -1272,6 +1294,7 @@ void FitDat::ScoreConvert()
 	scores["RMSFirstNBins"] = RMSFirstNBins;
 	scores["RMSBinRange"] = RMSBinRange;
 	scores["RMSHaz"] = RMSHaz;
+	scores["RMSHazHead"] = RMSHazHead;
 	scores["RMSIoD"] = RMSIoD;
 
 	scores["RMSBurstHead"] = RMSBurstHead;

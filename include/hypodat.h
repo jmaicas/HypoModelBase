@@ -390,7 +390,7 @@ public:
 	void FitScoreBasic(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreOxy(SpikeDat *, FitDat *, FitSet *, FitConSet *);
 	void FitScoreVaso(SpikeDat *, FitDat *, FitSet *, FitConSet *, ParamStore *);
-	void FitScoreVasoFast(SpikeDat *, FitDat *, FitSet *, int burstmode=1, int iodmode=0);
+	void FitScoreVasoFast(SpikeDat *, FitDat *, FitSet *, int burstmode=1, int iodmode=0, bool diagmode=false);
 	//void FitScoreOxy(SpikeDat *, FitDat *);
 	void BurstProfile();
 	void MeanSpikeForm(datdouble V, int timerange, int filter = false, int substeps = 1);
