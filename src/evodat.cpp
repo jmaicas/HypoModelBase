@@ -143,8 +143,8 @@ void EvoChrome::Output(TextFile *ofp, int mode)
 		outline = "";
 		for(i=0; i<numparams; i++) if(params[i].adapt) outline += text.Format("%.2f\t", params[i].value);
 		outline += text.Format("%.2f\t", fitness);
-		outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f\t", fithead, fittail, fithaz, fitIoD);
-		//outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f\t", fitdata->RMSFirstNBins, fitdata->RMSBinRange, fitdata->RMSHaz, fitdata->RMSIoD);
+		//outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f\t", fithead, fittail, fithaz, fithazhead, fitIoD);
+		outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t", fitdata.RMSFirstNBins, fitdata.RMSBinRange, fitdata.RMSHaz, fitdata.RMSHazHead, fitdata.RMSIoD);
 		//outline += text.Format(" %d", index);
 		ofp->WriteLine(outline);
 	}
