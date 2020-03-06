@@ -308,7 +308,8 @@ enum {
 	ID_grid,
 	ID_filter,
 	ID_subplot,
-	ID_GridBox
+	ID_GridBox,
+	ID_Gavage
 };
 
 
