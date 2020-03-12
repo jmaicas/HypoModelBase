@@ -890,13 +890,11 @@ wxString GraphSet::Display()
 
 
 // IntervalSet, sets up graph switching for ISI analysis plots, currently specific to VasoModel graph button panel
-void GraphSet::IntervalSet(wxString tag, bool burst, bool select)
+void GraphSet::IntervalSet(wxString tag, bool burst, bool select, int selectcode)
 {
-	int selectcode;
-
 	//if(burst && select) selectcode = 200;
 	//else selectcode = 100;
-	selectcode = 200;
+	//selectcode = 200;
 
 	AddFlag("hazmode1", 10);
 	AddFlag("binrestog1", 1);

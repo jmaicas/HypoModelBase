@@ -744,7 +744,7 @@ public:
 	int GetPlot(ParamStore *);
 	GraphDat *GetPlot(int index);
 	wxString Display();
-	void IntervalSet(wxString tag, bool burst = true, bool select = true);
+	void IntervalSet(wxString tag, bool burst = true, bool select = true, int selectcode = 200);
 	void Expand();
 };
 
