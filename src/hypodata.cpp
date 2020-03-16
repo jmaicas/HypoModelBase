@@ -19,6 +19,7 @@ using namespace std;
 #include <wx/numformatter.h>
 
 
+
 NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size)
 	: ParamBox(model, title, pos, size, "cellbox", 1, false)
 	//ParamBox(model, title, pos, size, "outbox", 0, 1)
@@ -1251,6 +1252,8 @@ void GridBox::ColumnSelect(int col)
 	wxString text;
 
 	WriteVDU(text.Format("Column Select %d\n", col));
+
+	mod->GridColumn(col);
 }
 
 

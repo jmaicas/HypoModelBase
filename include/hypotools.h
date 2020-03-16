@@ -9,6 +9,7 @@
 //#include "hypobase.h"
 #include "hypocontrols.h"
 #include "hypopanels.h"
+//#include "hypomodel.h"
 #include <wx/clipbrd.h>
 #include <wx/grid.h>
 
@@ -34,6 +35,7 @@ public:
 	~TextGrid();
 	int ostype;
 	DiagBox *diagbox;
+	Model *mod;
 
 	wxGridStringTable *undogrid;
 	wxTextCtrl *vdu;

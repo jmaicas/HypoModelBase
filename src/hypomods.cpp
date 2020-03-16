@@ -57,6 +57,11 @@ void Model::BurstUpdate()
 {}
 
 
+void Model::GridColumn(int col)
+{}
+
+
+
 void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
 {
 	int i, gdex;

@@ -43,6 +43,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	vdu = NULL;
 	gridbox = NULL;
 	diagbox = NULL;
+	mod = NULL;
 
 	rightmenu = new wxMenu;
 	rightmenu->Append(ID_SelectAll, "Select All", "Grid Select", wxITEM_NORMAL);
@@ -405,6 +406,8 @@ void TextGrid::OnLabelClick(wxGridEvent& event)
 	c = event.GetCol();
 
 	if(gridbox && c >= 0) gridbox->ColumnSelect(event.GetCol());
+
+	//if(mod) mod->GridColumn(c);
 
 	GoToCell(0, c);
 

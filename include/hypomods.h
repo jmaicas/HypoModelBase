@@ -28,6 +28,15 @@ public:
 };
 
 
+class TextGridMod : public TextGrid
+{
+public:
+	Model *mod;
+
+	TextGridMod(Model *mod, wxWindow *parent, wxSize size);
+};
+
+
 class Model : public wxEvtHandler
 {
 public:
@@ -104,6 +113,7 @@ public:
 	virtual void ParamScan();
 	virtual void SpikeDataSwitch(SpikeDat *);
 	virtual void BurstUpdate();
+	virtual void GridColumn(int col);
 };
 
 

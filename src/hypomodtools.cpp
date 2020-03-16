@@ -16,6 +16,14 @@ using namespace stk;
 #endif
 
 
+
+TextGridMod::TextGridMod(Model *model, wxWindow *parent, wxSize size)
+	: TextGrid(parent, size)
+{
+	mod = model;
+}
+
+
 ModGenBox::ModGenBox(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size)
 	: ToolBox(main, "ModGen", title, pos, size)
 {
