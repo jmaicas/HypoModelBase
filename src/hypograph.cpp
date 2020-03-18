@@ -497,7 +497,9 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 		graphset = mod->graphbase->GetSet(i);
 		if(!graphset->submenu) {
 			menuitem = new wxMenuItem(menuPlot, 1000 + i, graphset->name, "", wxITEM_CHECK);
-			menuitem->SetBitmaps(radio_on, radio_off);
+#ifndef OSX
+			//menuitem->SetBitmaps(radio_on, radio_off);
+#endif
 			menuPlot->Append(menuitem);
 			menuitem->Check(false);
 			//menuPlot->AppendRadioItem(1000 + i, graphset->name);
@@ -506,7 +508,9 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 			subPlot = new wxMenu;
 			for(j=0; j<graphset->numgraphs; j++) {
 				menuitem = new wxMenuItem(subPlot, 2000 + graphset->gindex[j], graphset->GetPlot(j)->gname, "", wxITEM_CHECK);
-				menuitem->SetBitmaps(radio_on, radio_off);
+#ifndef OSX
+				//menuitem->SetBitmaps(radio_on, radio_off);
+#endif
 				subPlot->Append(menuitem);
 				menuitem->Check(false);
 			}
