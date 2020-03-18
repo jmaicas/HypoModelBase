@@ -817,7 +817,7 @@ void BurstDat::BurstScanFit()
 	sdlength = sqrt(intravar);
 	sdsilence = sqrt(silencevar);
 
-	times = times;
+	//times = times;
 
 	maxint = maxint;
 	IoDrange();
