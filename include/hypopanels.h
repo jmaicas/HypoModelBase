@@ -167,6 +167,7 @@ public:
 	void SetPanel(int, ToolBox *);
 	void OnFocus(wxFocusEvent& event);
 	void SetCount(double);
+	void SetCount(int);
 	void SetStatus(wxString);
 	void WriteVDU(wxString);
 	void InitMenu(int type = 0);

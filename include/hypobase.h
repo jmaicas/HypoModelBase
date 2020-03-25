@@ -309,7 +309,9 @@ enum {
 	ID_filter,
 	ID_subplot,
 	ID_GridBox,
-	ID_Gavage
+	ID_Gavage,
+	ID_Progress,
+	ID_EndRun
 };
 
 

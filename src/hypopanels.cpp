@@ -1062,6 +1062,16 @@ void ParamBox::SetCount(double count)
 	//runcount->SetLabel("test");
 }
 
+
+void ParamBox::SetCount(int count)
+{
+	wxString text; 
+
+	runcount->SetLabel(text.Format("%d %%", count));
+
+	//if(mainwin->diagnostic) mod->diagbox->textbox->AppendText(text.Format("Count call, count %.2f, countmark %.2f\n", count, countmark));
+}
+
 /*
 void ParamBox::OnRun(wxCommandEvent& WXUNUSED(event))
 {
