@@ -17,9 +17,9 @@ public:
 };
 
 
-class EvoDat{
+/*class EvoDat{
 	float *params;
-};
+};*/
 
 
 class FitMeasure{
