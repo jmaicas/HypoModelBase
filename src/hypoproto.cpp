@@ -2,7 +2,7 @@
 
 
 #include "vasomod.h"
-#include <wx/notebook.h>
+#include "wx/notebook.h"
 
 
 ProtocolBox::ProtocolBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size)

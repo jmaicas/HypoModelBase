@@ -8,7 +8,7 @@
 //#define CUDA 1 
 
 
-#include <wx/wx.h>
+#include "wx/wx.h"
 #include "hypograph.h"
 #include "hypoplot.h"
 #include "hypopanels.h"

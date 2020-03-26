@@ -1,6 +1,6 @@
 
 
-#include <hypomodel.h>
+#include "hypomodel.h"
 #include <time.h>
 
 DEFINE_EVENT_TYPE(wxEVT_SPIKE)

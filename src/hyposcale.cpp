@@ -1,6 +1,6 @@
 
-#include <hypomodel.h>
-#include <hypograph.h>
+#include "hypomodel.h"
+#include "hypograph.h"
 #include "hypodef.h"
 
 

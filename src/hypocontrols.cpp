@@ -1,8 +1,8 @@
 
 //#include "hypomodel.h"
-#include <hypocontrols.h>
+#include "hypocontrols.h"
 //#include "hypomain.h"
-#include <hypotools.h>
+#include "hypotools.h"
 
 
 

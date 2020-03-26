@@ -1,7 +1,7 @@
 
 
-#include <hypodat.h>
-#include <hypotools.h>
+#include "hypodat.h"
+#include "hypotools.h"
 
 
 NeuroDat::NeuroDat()

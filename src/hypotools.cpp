@@ -2,7 +2,7 @@
 
 
 #include "wx/wx.h"
-#include <hypotools.h>
+#include "hypotools.h"
 
 #include "hypodef.h"
 

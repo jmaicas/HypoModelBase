@@ -4,8 +4,8 @@
 #define HYPOPANELS_H
 
 #include "wx/wx.h"
-#include <wx/richtext/richtextctrl.h>
-#include <wx/grid.h>
+#include "wx/richtext/richtextctrl.h"
+#include "wx/grid.h"
 #include "hypocontrols.h"
 #include "hypotools.h"
 #include "hypodat.h"

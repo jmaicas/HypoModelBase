@@ -3,8 +3,8 @@
 //#include "hypomodel.h"
 //#include "hypopanels.h"
 #include "wx/graphics.h"
-#include <hypoprint.h>
-#include <hypomodel.h>
+#include "hypoprint.h"
+#include "hypomodel.h"
 #include <math.h>
 
 

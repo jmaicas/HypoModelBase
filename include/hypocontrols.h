@@ -7,11 +7,11 @@
 #include "wx/wx.h"
 #include "wx/spinbutt.h"
 //#include "hypomodel.h"
-#include <hypodat.h>
+#include "hypodat.h"
 //#include "hypomods.h"
-#include <wx/notebook.h>
+#include "wx/notebook.h"
 #include "wx/aui/aui.h"
-#include <wx/tglbtn.h>
+#include "wx/tglbtn.h"
 
 
 
