@@ -14,6 +14,10 @@ class HypoMain;
 class EvoFitBox;
 class EvoChrome;
 
+//wxDECLARE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
+
+//wxDEFINE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
+
 
 class ModThread : public wxThread
 {
