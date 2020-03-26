@@ -12,7 +12,7 @@ DispWin::DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, cons
 	: wxFrame(main, wxID_ANY, title, pos, size,
 	wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
-	int graph;
+	//int graph;
 
 	i = 0;
 	mainwin = main;
@@ -66,11 +66,11 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	graphbase = mod->graphbase;
 
 	int max, scrollxto;
-	double xdiff;
+	//double xdiff;
 	wxString snum, outline, text;
 	int i, j, gindex;
-	GraphSet *graphset;
-	wxMenu *newsub;
+	//GraphSet *graphset;
+	//wxMenu *newsub;
 
 	ostype = GetSystem();
 
@@ -245,7 +245,7 @@ void GraphWindow3::OnGraphSelectSet(wxCommandEvent& event)
 {
 	short id = event.GetId();
 	double xfrom, xto;
-	int modesum = -1;
+	//int modesum = -1;
 	GraphSet *graphset;
 	GraphDat *graph;
 	int gdex;
@@ -286,7 +286,7 @@ void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
 {
 	short id = event.GetId();
 	double xfrom, xto;
-	int modesum = -1;
+	//int modesum = -1;
 	GraphSet *graphset;
 	GraphDat *graph;
 	int gdex;
@@ -320,8 +320,6 @@ void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
 
 wxRealPoint GraphWindow3::GraphPos(wxPoint)
 {
-	int i;
-
 	return wxRealPoint(0, 0);
 }
 
@@ -449,7 +447,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 
 	if(!HasCapture()) return;
 	ReleaseMouse();
-	wxRect permRect = wxRect(anchorpos, pos);
+	//wxRect permRect = wxRect(anchorpos, pos);
 	overlay.Reset();
 	Refresh();
 
