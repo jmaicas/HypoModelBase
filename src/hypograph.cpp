@@ -2492,7 +2492,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					y = mpoint;
 					//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
 					//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-					gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2, 2);
+					gc->DrawEllipse((int)(xpos + xbase - 2), (int)(yplot + ybase - yrange * (y - yfrom) - 2), 4, 4);
+					//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
 					oldx = xpos + xbase + xoffset;
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}
