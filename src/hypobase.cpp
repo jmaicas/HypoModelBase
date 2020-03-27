@@ -9,17 +9,9 @@
 #include <hypotools.h>
 
 
-#ifdef OSX
-#include <CoreFoundation/CoreFoundation.h>
-#include <CoreFoundation/CFString.h>
-#endif // OSX
-
-
-
-
 // Main window base class
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
 	ostype = GetSystem();
@@ -31,6 +23,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
     diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
+    
+    mainpath = path;  // defaults to "" for Windows, bundle resource path for OSX
+    diagbox->Write("mainpath " + mainpath + "\n");
 
 	graphbox = NULL;
 	plotbox = NULL;
@@ -47,22 +42,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	colourpen[9].Set("#FFFF80");       // 9 light yellow
 	colourpen[10].Set("#FF80FF");      // 10 light purple
 	colourpen[11].Set("#000000");      // 11 custom
-
-
-	mainpath = "";
-
-#ifdef OSX
-	CFBundleRef mainBundle;
-	char *path = new char[100];
-	mainBundle = CFBundleGetMainBundle();
-	CFURLRef main_bundle_URL = CFBundleCopyBundleURL(mainBundle);
-	CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, kCFURLPOSIXPathStyle);
-	CFStringGetCString(cf_string_ref, path, 100, kCFStringEncodingUTF8);
-	CFRelease(main_bundle_URL);
-	CFRelease(cf_string_ref);
-	mainpath = path + string("/Contents/Resources/");
-	diagbox->Write("mainpath " + mainpath + "\n");
-#endif // OSX
 
 	toolset = new ToolSet();
 	toolset->AddBox(diagbox, true);

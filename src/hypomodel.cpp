@@ -3,33 +3,20 @@
 #include <hypomodel.h>
 #include <wx/print.h>
 #include "hypodef.h"
-//#include "hypomods.h"
-//#include "hypopanels.h"
-//#include "cortmod.h"
 
 
-/*
-#include "osmomod.h"
-#include "igfmod.h"
-#include "vasomod.h"
-#include "heatmod.h"
-#include "ghmod.h"
-#include "lysismod.h"
-#include "vmnmodel.h"
-#include "agentmodel.h"*/
-
-
-//class CortModel;
-
+#ifdef OSX
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreFoundation/CFString.h>
+#endif // OSX
 
 IMPLEMENT_APP(HypoApp)
-
 
 MainFrame *mainframe;
 
 
-HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size)
-	: MainFrame(title, pos, size)
+HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path)
+	: MainFrame(title, pos, size, path)
 {
 	wxIcon icon;
 	wxColour backcolour, panelcolour;
@@ -40,41 +27,21 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//panelcolour.Set("#ccffcc");       // pale green
 	//panelcolour.Set("#ece9d8");     // xp default
 	//panelcolour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
-	//ostype = GetSystem();
-	//mainwin = this;
+	
 	SetMinSize(wxSize(200, 670));
-	//mainwing = this;
-	//CreateStatusBar();
 
 	// Flicker Protection
-
 
 	// Check System
 	wxString oslabel = wxGetOsDescription();
 	SetStatusText(oslabel);
 	mainframe = this;
 
-
 	// Menu Flag System
 	flagrefs = new RefStore();
 	hypoflags = new ParamStore;
-
-	//blankevent = new wxCommandEvent();
-
-	/*
-	screensize = wxGetDisplaySize();
-	printdata = new wxPrintData;
-	pageSetupData = new wxPageSetupDialogData;
-	printdata->SetPaperId(wxPAPER_A5);
-	printdata->SetOrientation(wxLANDSCAPE);
-
-	// copy over initial paper size from print record
-	*pageSetupData = *printdata;
-
-	// Set some initial page margins in mm.
-	pageSetupData->SetMarginTopLeft(wxPoint(15, 15));
-	pageSetupData->SetMarginBottomRight(wxPoint(15, 15));*/
-
+    
+    // Default Prefs
 	numgraphs = 8;
 	numdraw = 3;
 	numdraw2 = 3;
@@ -88,10 +55,10 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	xstretch = 50;
 	modpath = "";
    
-
 	OptionLoad();
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
+    
 	toolpath = mainpath + "Tools";
     if(ostype == Mac) modpath = mainpath;
     //diagbox->Write("modpath " + modpath + "\n");
@@ -100,14 +67,9 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
 	spikedisp = 0;   // spike display mode   0 = plain   1 = burst   2 = hazard filter
 
-	//diagbox->Show(true);
-
 	diagbox->Write("HypoMain initialisation\n\n");
 
 	gpos = new GraphDisp[numgraphs];
-	//greg = new GraphDat[100];
-	//graphbase = new GraphBase(200);
-	//greg = graphbase->graphstore;
 
 	filebase = new FileBase(100);
 
@@ -122,7 +84,6 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//expdata->burstdata->spikedata = expdata;
 
 	// Spike Analysis Module                  July 2015
-
 	expdata = new SpikeDat();
 	expdata->burstdata = new BurstDat();
 	expdata->burstdata->spikedata = expdata;
@@ -984,7 +945,7 @@ void HypoMain::ViewStore()
 	wxString filename;
 	wxString outline;
 
-	filename = "Init/hypoview.ini";
+	filename = mainpath + "Init/hypoview.ini";
 
 	wxTextFile opfile(filename);
 	if(!opfile.Exists()) opfile.Create();
@@ -1008,7 +969,7 @@ void HypoMain::ViewLoad()
 	wxString filename;
 	wxString readline, numstring;
 
-	filename = "Init/hypoprefs.ini";
+	filename = mainpath + "Init/hypoprefs.ini";
 
 	wxTextFile opfile(filename);
 
@@ -1040,7 +1001,7 @@ void HypoMain::OptionStore()
 	wxString filename;
 	wxString outline;
 
-	filename = "Init/hypoprefs.ini";
+	filename = mainpath + "Init/hypoprefs.ini";
 
 	TextFile opfile;
 	opfile.New(filename);
@@ -1153,527 +1114,6 @@ void HypoMain::OptionLoad()
 }
 
 
-void HypoMain::GraphData()
-{
-	//gpos[0].data = 0;
-	gpos[0].Add(&greg[0]);
-
-	//gpos[1].data = 1;
-	gpos[1].Add(&greg[1]);
-
-	//gpos[2].data = 2;
-	gpos[2].Add(&greg[45]);
-
-	//gpos[3].data = 3;
-	gpos[3].Add(&greg[45]);
-
-	//gpos[4].data = 4;
-	gpos[4].Add(&greg[39]);
-
-	//gpos[5].data = 5;
-	gpos[5].Add(&greg[40]);
-
-	//gpos[6].data = 5;
-	gpos[6].Add(&greg[41]);
-
-	//gpos[7].data = 5;
-	gpos[7].Add(&greg[42]);
-
-	int datsample = 10;
-
-	/*
-	greg[0].gparam = -3;
-	greg[0].gdatav = &igfdata->srate;
-	greg[0].yfrom = 0;
-	greg[0].yto = 20;
-	greg[0].xfrom = 0;
-	greg[0].xto = 500;
-	greg[0].samprate = 0;
-	greg[0].gname = "Spike Rate 1s";
-	greg[0].type = 3;
-	greg[0].binsize = 1;
-	greg[0].spikedata = igfdata;*/
-	//greg[0].spikedata = NULL;
-
-	//graphbase->graphstore[0].gparam = -3;
-	//(*graphbase)[0].gparam = -3;
-	//graphbase->Add(GraphDat(&igfdata->srate, 0, 500, 0, 20, "Spike Rate 1s", igfdata));
-	//(*graphbase)[0].spikedata = igfdata;
-
-
-	greg[1].gparam = -4;
-	greg[1].gdatadv = &realdata->hist1;
-	greg[1].yfrom = 0;
-	greg[1].yto = 1000;
-	greg[1].xfrom = 0;
-	greg[1].xto = 500;
-	greg[1].gname = "Real ISI Histogram 1ms";
-	greg[1].type = 1;
-	greg[1].binsize = 1;
-	greg[1].colour = 2;
-
-	/*
-	greg[2].gparam = -4;
-	greg[2].gdatadv = &igfdata->hist1;
-	greg[2].yfrom = 0;
-	greg[2].yto = 100;
-	greg[2].xfrom = 0;
-	greg[2].xto = 500;
-	greg[2].gname = "Model ISI Histogram 1ms";
-	greg[2].type = 1;
-	greg[2].binsize = 1;
-	greg[2].colour = 3;
-
-	greg[3].gparam = -4;
-	greg[3].gdatadv = &igfdata->hist5;
-	greg[3].yfrom = 0;
-	greg[3].yto = 500;
-	greg[3].xfrom = 0;
-	greg[3].xto = 500;
-	greg[3].gname = "Model ISI Histogram 5ms";
-	greg[3].type = 1;
-	greg[3].binsize = 5;
-	greg[3].colour = 3;
-
-	greg[4].gparam = -4;
-	greg[4].gdatadv = &igfdata->haz1;
-	greg[4].yfrom = 0;
-	greg[4].yto = 0.04;
-	greg[4].xfrom = 0;
-	greg[4].xto = 500;
-	greg[4].gname = "Model Hazard 1ms";
-	greg[4].type = 1;
-	greg[4].binsize = 1;
-	greg[4].colour = 3;
-
-	greg[5].gparam = -4;
-	greg[5].gdatadv = &igfdata->haz5;
-	greg[5].yfrom = 0;
-	greg[5].yto = 0.2;
-	greg[5].xfrom = 0;
-	greg[5].xto = 500;
-	greg[5].gname = "Model Hazard 5ms";
-	greg[5].type = 1;
-	greg[5].binsize = 5;
-	greg[5].colour = 3;
-
-
-	greg[22].gparam = -3;
-	greg[22].gdatav = &igfdata->srate1;
-	greg[22].yfrom = 0;
-	greg[22].yto = 3;
-	greg[22].xfrom = 0;
-	greg[22].xto = 0.5;
-	greg[22].samprate = 0;
-	greg[22].gname = "Spikes 1ms";
-	greg[22].type = 3;
-	greg[22].binsize = 0.001;
-	greg[22].spikedata = igfdata;
-	*/
-
-	/*
-	greg[29].gparam = -4;
-	greg[29].gdatadv = &cortdata->V;
-	greg[29].yfrom = -100;
-	greg[29].yto = 20;
-	greg[29].xfrom = 0;
-	greg[29].xto = 2000;
-	greg[29].samprate = 0;
-	greg[29].gname = "Corticotroph mV";
-	greg[29].type = 4;
-	greg[29].binsize = 1;
-	greg[29].colour = 3;
-	greg[29].xscale = 8;
-
-	greg[30].gparam = -4;
-	greg[30].gdatadv = &cortdata->Ca;
-	greg[30].yfrom = -10;
-	greg[30].yto = 10;
-	greg[30].xfrom = 0;
-	greg[30].xto = 2000;
-	greg[30].samprate = 0;
-	greg[30].gname = "Corticotroph Ca2+";
-	greg[30].type = 4;
-	greg[30].binsize = 1;
-	greg[30].colour = 7;
-	greg[30].xscale = 8;
-	*/
-
-	greg[34].gparam = -4;
-	greg[34].gdatadv = &burstdata->hist1;
-	greg[34].yfrom = 0;
-	greg[34].yto = 100;
-	greg[34].xfrom = 0;
-	greg[34].xto = 500;
-	greg[34].gname = "Intra-Burst Histogram 1ms";
-	greg[34].type = 1;
-	greg[34].binsize = 1;
-	greg[34].colour = 3;
-
-	greg[35].gparam = -4;
-	greg[35].gdatadv = &burstdata->hist5;
-	greg[35].yfrom = 0;
-	greg[35].yto = 500;
-	greg[35].xfrom = 0;
-	greg[35].xto = 500;
-	greg[35].gname = "Intra-Burst Histogram 5ms";
-	greg[35].type = 1;
-	greg[35].binsize = 5;
-	greg[35].colour = 35;
-
-	greg[36].gparam = -4;
-	greg[36].gdatadv = &burstdata->haz1;
-	greg[36].yfrom = 0;
-	greg[36].yto = 0.04;
-	greg[36].xfrom = 0;
-	greg[36].xto = 500;
-	greg[36].gname = "Intra-Burst Hazard 1ms";
-	greg[36].type = 1;
-	greg[36].binsize = 1;
-	greg[36].colour = 3;
-
-	greg[37].gparam = -4;
-	greg[37].gdatadv = &burstdata->haz5;
-	greg[37].yfrom = 0;
-	greg[37].yto = 0.2;
-	greg[37].xfrom = 0;
-	greg[37].xto = 500;
-	greg[37].gname = "Intra-Burst Hazard 5ms";
-	greg[37].type = 1;
-	greg[37].binsize = 5;
-	greg[37].colour = 3;
-
-	/*
-	greg[52].gparam = -4;
-	greg[52].gdatadv = &cortdata->ICaL;
-	greg[52].yfrom = -20;
-	greg[52].yto = 80;
-	greg[52].xfrom = 0;
-	greg[52].xto = 2000;
-	greg[52].samprate = 0;
-	greg[52].gname = "Corticotroph ICaL";
-	greg[52].type = 4;
-	greg[52].binsize = 1;
-	greg[52].colour = 7;
-	greg[52].xscale = 8;
-
-	greg[53].gparam = -4;
-	greg[53].gdatadv = &cortdata->ICaT;
-	greg[53].yfrom = -20;
-	greg[53].yto = 80;
-	greg[53].xfrom = 0;
-	greg[53].xto = 2000;
-	greg[53].samprate = 0;
-	greg[53].gname = "Corticotroph ICaT";
-	greg[53].type = 4;
-	greg[53].binsize = 1;
-	greg[53].colour = 7;
-	greg[53].xscale = 8;
-
-	greg[54].gparam = -4;
-	greg[54].gdatadv = &cortdata->IKDR;
-	greg[54].yfrom = -100;
-	greg[54].yto = 100;
-	greg[54].xfrom = 0;
-	greg[54].xto = 2000;
-	greg[54].samprate = 0;
-	greg[54].gname = "Corticotroph IKDR";
-	greg[54].type = 4;
-	greg[54].binsize = 1;
-	greg[54].colour = 7;
-	greg[54].xscale = 8;
-
-	greg[55].gparam = -4;
-	greg[55].gdatadv = &cortdata->IKCa;
-	greg[55].yfrom = -100;
-	greg[55].yto = 100;
-	greg[55].xfrom = 0;
-	greg[55].xto = 2000;
-	greg[55].samprate = 0;
-	greg[55].gname = "Corticotroph IKCa";
-	greg[55].type = 4;
-	greg[55].binsize = 1;
-	greg[55].colour = 7;
-	greg[55].xscale = 8;
-
-	greg[56].gparam = -4;
-	greg[56].gdatadv = &cortdata->noise;
-	greg[56].yfrom = -10;
-	greg[56].yto = 10;
-	greg[56].xfrom = 0;
-	greg[56].xto = 2000;
-	greg[56].samprate = 0;
-	greg[56].gname = "Corticotroph noise";
-	greg[56].type = 4;
-	greg[56].binsize = 1;
-	greg[56].colour = 7;
-	greg[56].xscale = 8;
-	*/
-
-
-	greg[59].gparam = -3;
-	greg[59].gdatav = &analysisdata->autocorr;
-	greg[59].yfrom = 0;
-	greg[59].yto = 1000;
-	greg[59].xfrom = 0;
-	greg[59].xto = 1000;
-	greg[59].gname = "Auto Correlation";
-	greg[59].type = 1;
-	greg[59].binsize = 10;
-	greg[59].colour = 2;
-
-	greg[60].gparam = -3;
-	greg[60].gdatav = &expdata->srate;
-	greg[60].yfrom = 0;
-	greg[60].yto = 20;
-	greg[60].xfrom = 0;
-	greg[60].xto = 500;
-	greg[60].samprate = 0;
-	greg[60].gname = "Exp Spike Rate 1s";
-	greg[60].type = 3;
-	greg[60].binsize = 1;
-	greg[60].spikedata = expdata;
-
-	greg[61].gparam = -3;
-	greg[61].gdatav = &expdata->srate1;
-	greg[61].yfrom = 0;
-	greg[61].yto = 3;
-	greg[61].xfrom = 0;
-	greg[61].xto = 0.5;
-	greg[61].samprate = 0;
-	greg[61].gname = "Exp Spikes 1ms";
-	greg[61].type = 3;
-	greg[61].binsize = 0.001;
-	greg[61].spikedata = expdata;
-
-	greg[62].gparam = -4;
-	greg[62].gdatadv = &expdata->hist1;
-	greg[62].yfrom = 0;
-	greg[62].yto = 100;
-	greg[62].xfrom = 0;
-	greg[62].xto = 500;
-	greg[62].gname = "Exp ISI Histogram 1ms";
-	greg[62].type = 1;
-	greg[62].binsize = 1;
-	greg[62].colour = green;
-
-	greg[63].gparam = -4;
-	greg[63].gdatadv = &expdata->hist5;
-	greg[63].yfrom = 0;
-	greg[63].yto = 500;
-	greg[63].xfrom = 0;
-	greg[63].xto = 500;
-	greg[63].gname = "Exp ISI Histogram 5ms";
-	greg[63].type = 1;
-	greg[63].binsize = 5;
-	greg[63].colour = green;
-
-	greg[64].gparam = -4;
-	greg[64].gdatadv = &expdata->haz1;
-	greg[64].yfrom = 0;
-	greg[64].yto = 0.04;
-	greg[64].xfrom = 0;
-	greg[64].xto = 500;
-	greg[64].gname = "Exp Hazard 1ms";
-	greg[64].type = 1;
-	greg[64].binsize = 1;
-	greg[64].colour = green;
-
-	greg[65].gparam = -4;
-	greg[65].gdatadv = &expdata->haz5;
-	greg[65].yfrom = 0;
-	greg[65].yto = 0.2;
-	greg[65].xfrom = 0;
-	greg[65].xto = 500;
-	greg[65].gname = "Exp Hazard 5ms";
-	greg[65].type = 1;
-	greg[65].binsize = 5;
-	greg[65].colour = green;
-
-	greg[76].gparam = -4;
-	greg[76].gdatadv = &expdata->burstdata->hist1;
-	greg[76].yfrom = 0;
-	greg[76].yto = 100;
-	greg[76].xfrom = 0;
-	greg[76].xto = 500;
-	greg[76].gname = "Intra-Burst Exp Hist 1ms";
-	greg[76].type = 1;
-	greg[76].binsize = 1;
-	greg[76].colour = green;
-
-	greg[77].gparam = -4;
-	greg[77].gdatadv = &expdata->burstdata->hist5;
-	greg[77].yfrom = 0;
-	greg[77].yto = 500;
-	greg[77].xfrom = 0;
-	greg[77].xto = 500;
-	greg[77].gname = "Intra-Burst Exp Hist 5ms";
-	greg[77].type = 1;
-	greg[77].binsize = 5;
-	greg[77].colour = green;
-
-	greg[78].gparam = -4;
-	greg[78].gdatadv = &expdata->burstdata->haz1;
-	greg[78].yfrom = 0;
-	greg[78].yto = 0.04;
-	greg[78].xfrom = 0;
-	greg[78].xto = 500;
-	greg[78].gname = "Intra-Burst Exp Haz 1ms";
-	greg[78].type = 1;
-	greg[78].binsize = 1;
-	greg[78].colour = green;
-
-	greg[79].gparam = -4;
-	greg[79].gdatadv = &expdata->burstdata->haz5;
-	greg[79].yfrom = 0;
-	greg[79].yto = 0.2;
-	greg[79].xfrom = 0;
-	greg[79].xto = 500;
-	greg[79].gname = "Intra-Burst Exp Haz 5ms";
-	greg[79].type = 1;
-	greg[79].binsize = 5;
-	greg[79].colour = green;
-
-	/*
-	greg[80].gparam = -4;
-	greg[80].gdatadv = &igfdata->burstdata->hist1;
-	greg[80].yfrom = 0;
-	greg[80].yto = 100;
-	greg[80].xfrom = 0;
-	greg[80].xto = 500;
-	greg[80].gname = "Intra-Burst Mod Hist 1ms";
-	greg[80].type = 1;
-	greg[80].binsize = 1;
-	greg[80].colour = 3;
-
-	greg[81].gparam = -4;
-	greg[81].gdatadv = &igfdata->burstdata->hist5;
-	greg[81].yfrom = 0;
-	greg[81].yto = 500;
-	greg[81].xfrom = 0;
-	greg[81].xto = 500;
-	greg[81].gname = "Intra-Burst Mod Hist 5ms";
-	greg[81].type = 1;
-	greg[81].binsize = 5;
-	greg[81].colour = 3;
-
-	greg[82].gparam = -4;
-	greg[82].gdatadv = &igfdata->burstdata->haz1;
-	greg[82].yfrom = 0;
-	greg[82].yto = 0.04;
-	greg[82].xfrom = 0;
-	greg[82].xto = 500;
-	greg[82].gname = "Intra-Burst Mod Haz 1ms";
-	greg[82].type = 1;
-	greg[82].binsize = 1;
-	greg[82].colour = 3;
-
-	greg[83].gparam = -4;
-	greg[83].gdatadv = &igfdata->burstdata->haz5;
-	greg[83].yfrom = 0;
-	greg[83].yto = 0.2;
-	greg[83].xfrom = 0;
-	greg[83].xto = 500;
-	greg[83].gname = "Intra-Burst Mod Haz 5ms";
-	greg[83].type = 1;
-	greg[83].binsize = 5;
-	greg[83].colour = 3;
-	*/
-
-	greg[84].gparam = -4;
-	greg[84].gdatadv = &expdata->burstdata->profile;
-	greg[84].yfrom = 0;
-	greg[84].yto = 20;
-	greg[84].xfrom = 0;
-	greg[84].xto = 250;
-	greg[84].samprate = 0;
-	greg[84].gname = "Exp Burst Profile";
-	greg[84].type = 4;
-	greg[84].binsize = 1;
-	greg[84].colour = green;
-
-	/*
-	greg[85].gparam = -4;
-	greg[85].gdatadv = &igfdata->burstdata->profile;
-	greg[85].yfrom = 0;
-	greg[85].yto = 20;
-	greg[85].xfrom = 0;
-	greg[85].xto = 250;
-	greg[85].samprate = 0;
-	greg[85].gname = "Mod Burst Profile";
-	greg[85].type = 4;
-	greg[85].binsize = 1;
-	greg[85].colour = blue;*/
-
-	greg[86].gparam = -4;
-	greg[86].gdatadv = &expdata->burstdata->tailprofile;
-	greg[86].yfrom = 0;
-	greg[86].yto = 20;
-	greg[86].xfrom = 0;
-	greg[86].xto = 250;
-	greg[86].samprate = 0;
-	greg[86].gname = "Exp Burst Tail Profile";
-	greg[86].type = 4;
-	greg[86].binsize = 1;
-	greg[86].colour = green;
-
-	/*
-	greg[87].gparam = -4;
-	greg[87].gdatadv = &igfdata->burstdata->tailprofile;
-	greg[87].yfrom = 0;
-	greg[87].yto = 20;
-	greg[87].xfrom = 0;
-	greg[87].xto = 250;
-	greg[87].samprate = 0;
-	greg[87].gname = "Mod Burst Tail Profile";
-	greg[87].type = 4;
-	greg[87].binsize = 1;
-	greg[87].colour = blue;*/
-
-	greg[88].gparam = -4;
-	greg[88].gdatadv = &expdata->burstdata->bursthaz;
-	greg[88].yfrom = 0;
-	greg[88].yto = 200;
-	greg[88].xfrom = 0;
-	greg[88].xto = 250;
-	greg[88].samprate = 0;
-	greg[88].gname = "Exp Burst Haz";
-	greg[88].type = 1;
-	greg[88].binsize = 1;
-	greg[88].colour = green;
-
-	/*
-	greg[89].gparam = -4;
-	greg[89].gdatadv = &igfdata->burstdata->bursthaz;
-	greg[89].yfrom = 0;
-	greg[89].yto = 200;
-	greg[89].xfrom = 0;
-	greg[89].xto = 250;
-	greg[89].samprate = 0;
-	greg[89].gname = "Mod Burst Haz";
-	greg[89].type = 1;
-	greg[89].binsize = 1;
-	greg[89].colour = blue;*/
-
-	graphbase->numgraphs = 90;
-
-	graphbase->Add(GraphDat(&expdata->burstdata->tailmean, 0, 100, 0, 2, "Burst Tail Mean logint", 4, 1, green), "exptailmean");
-
-	/*
-	graphbase->Add(GraphDat(&vasodata->Dyno, 0, 500, 0, 300, "Vaso Net Dyno", 4, gbin, 7, 1000), "vasonetDyno");
-	graphbase->Add(GraphDat(&vasodata->KLact, 0, 500, -1, 1, "Vaso Net KL act", 4, gbin, 7, 1000), "vasonetKLact");
-	graphbase->Add(GraphDat(&vasodata->CaDyno, 0, 500, 0, 500, "Vaso Net Ca-Dyno", 4, gbin, 7, 1000), "vasonetCaDyno");
-	graphbase->Add(GraphDat(&vasodata->Ca, 0, 500, 0, 500, "Vaso Net Ca", 4, gbin, 7, 1000), "vasonetCa");
-
-	graphbase->Add(GraphDat(&vasodata->dend, 0, 500, 0, 500, "Vaso Net Dend", 4, gbin, 7, 1000), "vasonetdend");
-	graphbase->Add(GraphDat(&vasodata->dendstore, 0, 500, 0, 50, "Vaso Net Dend Store", 4, gbin, 7, 1000), "vasonetdendstore");
-	//graphbase->Add(GraphDat(&vasodata->global, 0, 500, 0, 50, "Vaso Net Global", 4, 1000, 7, 1000), "vasonetglobal");
-	graphbase->Add(GraphDat(&vasodata->global, 0, 500, 0, 50, "Vaso Net Global", 4, 1, 7, 1), "vasonetglobal");
-	graphbase->Add(GraphDat(&currvaso->burstdata->length, 0, 100, 0, 1000, "Response Range", 4, 1, 7, 1), "vasoresponserange");
-	graphbase->Add(GraphDat(&currvaso->vasomean, 0, 100, 0, 1000, "Vaso Mean", 4, 10, 7, 1, 200), "vasomean");*/
-}
-
-
 bool HypoApp::OnInit()
 {
 	int x = 700;
@@ -1686,6 +1126,19 @@ bool HypoApp::OnInit()
 		pos.y = 23;    // 0;
 	}
 	else pos = wxDefaultPosition;
+    
+    mainpath = "";
+#ifdef OSX
+    CFBundleRef mainBundle;
+    char *path = new char[1024];
+    mainBundle = CFBundleGetMainBundle();
+    CFURLRef main_bundle_URL = CFBundleCopyBundleURL(mainBundle);
+    CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, kCFURLPOSIXPathStyle);
+    CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingUTF8);
+    CFRelease(main_bundle_URL);
+    CFRelease(cf_string_ref);
+    mainpath = path + string("/Contents/Resources/");
+#endif // OSX
 
 	LoadPrefs();
 	if(viewwidth < 400) viewwidth = 400;
@@ -1696,9 +1149,7 @@ bool HypoApp::OnInit()
 	if(x > screensize.GetX()) x = screensize.GetX() - 50;
 	if(y > screensize.GetY()) y = screensize.GetY() - 50;
 
-	//MainFrame *mainwin = new MainFrame("Hypo Net Model", wxPoint(50, 10), wxSize(700, y));   // 850   // 920
-	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y));   // 850   // 920
-	//HypoMain *mainwin = new HypoMain("HypoMod", wxDefaultPosition, wxSize(400, 500));
+	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y), mainpath);   // 850   // 920
 	mainwin->SetTransparent(254);
 	mainwin->Show();
 	SetTopWindow(mainwin);
@@ -1710,11 +1161,10 @@ bool HypoApp::OnInit()
 void HypoApp::LoadPrefs()
 {
 	long numdat;
-
 	wxString filename;
 	wxString readline, numstring;
 
-	filename = "Init/hypoprefs.ini";
+	filename = mainpath + "Init/hypoprefs.ini";
 
 	wxTextFile opfile(filename);
 

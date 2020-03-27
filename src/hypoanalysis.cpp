@@ -818,8 +818,8 @@ void BurstDat::BurstScanFit()
 	sdsilence = sqrt(silencevar);
 
 	//times = times;
-
-	maxint = maxint;
+	//maxint = maxint;
+    
 	IoDrange();
 
 	// Index of Dispersion

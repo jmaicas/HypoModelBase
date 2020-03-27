@@ -432,6 +432,7 @@ wxString GraphDat::StoreDat(wxString tag)
 {
 	wxString gtext1, gtext2;
 	wxString storegname, storextag, storeytag;
+    wxString colourtext;
 
 	if(!gname.IsEmpty()) storegname = gname;                       // replace spaces with underscores for textfile storing
 	else storegname = " ";
@@ -444,10 +445,11 @@ wxString GraphDat::StoreDat(wxString tag)
 	if(!ytag.IsEmpty()) storeytag = ytag;
 	else storeytag = " ";
 	storeytag.Replace(" ", "_");
+    
+    colourtext = ColourString(strokecolour, 1);
 
 	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
-		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, ColourString(strokecolour, 1), 
-		xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
+		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, colourtext, xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
 		
 	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d", 
 		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode);

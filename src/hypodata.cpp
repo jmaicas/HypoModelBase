@@ -1350,7 +1350,8 @@ void GridBox::GridStore()
 	if(gauge) gauge->SetValue(0);
 	WriteVDU("OK\n");
 
-	ofp.New(filetag + "-gridsize.txt");
+    filename = filepath + "/" + filetag + "-gridsize.txt";
+	ofp.New(filename);
 	for(i=0; i<columnindex.count; i++) {
 		col = columnindex.list[i];
 		ofp.WriteLine(text.Format("col %d %d", col, textgrid->GetColSize(col)));

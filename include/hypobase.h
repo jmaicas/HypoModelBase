@@ -13,7 +13,7 @@
 #include "wx/dcbuffer.h"
 #include "wx/msgqueue.h"
 #include "wx/textfile.h"
-//#include <hypodef.h>
+#include <hypodef.h>
 
 
 //#include "hypocontrols.h"
@@ -397,7 +397,7 @@ public:
 	ToolSet *toolset;
 	DiagBox *diagbox;
 	wxColour colourpen[20];
-	wxString toolpath, mainpath;
+    wxString toolpath, mainpath;
 
 	// Display
 	ScaleBox *scalebox;
@@ -416,7 +416,7 @@ public:
 	int diagnostic;
 	int ostype;
     
-	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path);
 	~MainFrame();
 	virtual void MainLoad();
 	virtual void MainStore();

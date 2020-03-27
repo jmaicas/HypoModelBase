@@ -21,6 +21,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	startgraph = start; 
 	gmod = model;
 	mod = model;
+    
+    wxString initpath = main->mainpath + "Init/";
 
 	SetDoubleBuffered(true);
 
@@ -93,18 +95,16 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	//wxBitmap downarrow(down_xpm);
 	//wxBitmap uparrow(up_xpm);
 	wxImage::AddHandler(new wxPNGHandler);
-	rightarrow = wxBitmap("Init/rightarrow.png", wxBITMAP_TYPE_PNG);
-	leftarrow = wxBitmap("Init/leftarrow.png", wxBITMAP_TYPE_PNG);
-	uparrow = wxBitmap("Init/uparrow.png", wxBITMAP_TYPE_PNG);
+	rightarrow = wxBitmap(initpath + "rightarrow.png", wxBITMAP_TYPE_PNG);
+	leftarrow = wxBitmap(initpath + "leftarrow.png", wxBITMAP_TYPE_PNG);
+	uparrow = wxBitmap(initpath + "uparrow.png", wxBITMAP_TYPE_PNG);
+    downarrow = wxBitmap(initpath + "downarrow.png", wxBITMAP_TYPE_PNG);
 	if(ostype == Mac) {
 		//downarrow = wxBitmap("Init/arrow-down-15.png", wxBITMAP_TYPE_PNG);
-        uparrow = wxBitmap("Init/uparrow12.png", wxBITMAP_TYPE_PNG);
-		downarrow = wxBitmap("Init/downarrow12.png", wxBITMAP_TYPE_PNG);
-        rightarrow = wxBitmap("Init/rightarrow12.png", wxBITMAP_TYPE_PNG);
-        leftarrow = wxBitmap("Init/leftarrow12.png", wxBITMAP_TYPE_PNG);
-	}
-	else {
-		downarrow = wxBitmap("Init/downarrow.png", wxBITMAP_TYPE_PNG);
+        uparrow = wxBitmap(initpath + "uparrow12.png", wxBITMAP_TYPE_PNG);
+		downarrow = wxBitmap(initpath + "downarrow12.png", wxBITMAP_TYPE_PNG);
+        rightarrow = wxBitmap(initpath + "rightarrow12.png", wxBITMAP_TYPE_PNG);
+        leftarrow = wxBitmap(initpath + "leftarrow12.png", wxBITMAP_TYPE_PNG);
 	}
     
     int zbheight = 16;
