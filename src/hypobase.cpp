@@ -9,10 +9,11 @@
 #include <hypotools.h>
 
 
+#ifdef OSX
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreFoundation/CFString.h>
+#endif // OSX
 
-//IMPLEMENT_APP(HypoApp)
-
-//wxCommandEvent *blankevent;
 
 
 
@@ -47,6 +48,22 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	colourpen[10].Set("#FF80FF");      // 10 light purple
 	colourpen[11].Set("#000000");      // 11 custom
 
+
+	mainpath = "";
+
+#ifdef OSX
+	CFBundleRef mainBundle;
+	char *path = new char[100];
+	mainBundle = CFBundleGetMainBundle();
+	CFURLRef main_bundle_URL = CFBundleCopyBundleURL(mainBundle);
+	CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, kCFURLPOSIXPathStyle);
+	CFStringGetCString(cf_string_ref, path, 100, kCFStringEncodingUTF8);
+	CFRelease(main_bundle_URL);
+	CFRelease(cf_string_ref);
+	mainpath = path + string("/Contents/Resources/");
+	diagbox->Write("mainpath " + mainpath + "\n");
+#endif // OSX
+
 	toolset = new ToolSet();
 	toolset->AddBox(diagbox, true);
 }
@@ -71,7 +88,7 @@ void MainFrame::MainLoad()
     wxSize size;
 
 	//filepath = GetPath();
-	filepath = "Init//";
+	filepath = mainpath + "Init/";
 
 	// Box Load
 	filename = "mainbox.ini";
@@ -111,18 +128,18 @@ void MainFrame::MainLoad()
 void MainFrame::MainStore()
 {
 	int i;
-	wxString filename, mainpath;
+	wxString filename, initpath;
 	wxString outline, text;
 
 	TextFile outfile, opfile;
 
 	//filepath = GetPath();
-	mainpath = "Init/";
-    if(!wxDirExists(mainpath)) wxMkdir(mainpath);
+	initpath = mainpath + "Init/";
+    if(!wxDirExists(initpath)) wxMkdir(initpath);
 
 	// box store
 	filename = "mainbox.ini";
-	outfile.New(mainpath + filename);
+	outfile.New(initpath + filename);
 	
 	for(i=0; i<toolset->numtools; i++)
 		if(toolset->box[i]) {

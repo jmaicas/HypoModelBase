@@ -7,10 +7,6 @@
 //#include "hypopanels.h"
 //#include "cortmod.h"
 
-#include <CoreFoundation/CoreFoundation.h>
-#include <CoreFoundation/CFString.h>
-//#include <Cocoa/Cocoa.h>
-
 
 /*
 #include "osmomod.h"
@@ -91,32 +87,12 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	diagnostic = 0;
 	xstretch = 50;
 	modpath = "";
-    mainpath = "";
-
-	//toolset = new ToolSet();
-	//toolset->AddBox(diagbox);
-    
-    char *path = new char[100];
-    
-    if(ostype == Mac) {
-        CFBundleRef mainBundle;
-        mainBundle = CFBundleGetMainBundle();
-        //mainpath =
-        //mainpath = mainBundle.GetPath();
-        CFURLRef main_bundle_URL = CFBundleCopyBundleURL(mainBundle);
-        CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, kCFURLPOSIXPathStyle);
-        CFStringGetCString(cf_string_ref, path, 100, kCFStringEncodingUTF8);
-        CFRelease(main_bundle_URL);
-        CFRelease(cf_string_ref);
-        string resources = path + string("/Contents/Resources/");
-        mainpath = resources;
-        diagbox->Write("mainpath " + mainpath + "\n");
-    }
+   
 
 	OptionLoad();
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
-	toolpath = "Tools";
+	toolpath = mainpath + "Tools";
     if(ostype == Mac) modpath = mainpath;
     //diagbox->Write("modpath " + modpath + "\n");
 
@@ -1091,7 +1067,7 @@ void HypoMain::OptionStore()
 
 	opfile.Close();
 
-	filename = "Init/hypopaths.ini";
+	filename = mainpath + "Init/hypopaths.ini";
 	opfile.New(filename);
 	opfile.WriteLine(datapath);
 	opfile.WriteLine(parampath);
@@ -1152,7 +1128,7 @@ void HypoMain::OptionLoad()
 		diagnostic = prefstore["diagnostic"];
 	}
 
-	filename = "Init/hypopaths.ini";
+	filename = mainpath + "Init/hypopaths.ini";
 	TextFile infile;
 	check = infile.Open(filename);
 

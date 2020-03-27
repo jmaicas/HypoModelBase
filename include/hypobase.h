@@ -397,7 +397,7 @@ public:
 	ToolSet *toolset;
 	DiagBox *diagbox;
 	wxColour colourpen[20];
-	wxString toolpath;
+	wxString toolpath, mainpath;
 
 	// Display
 	ScaleBox *scalebox;
