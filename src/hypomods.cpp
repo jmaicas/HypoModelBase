@@ -94,7 +94,7 @@ wxString Model::GetPath()
 		else fullpath = "Init";
 	}
 	else {
-		if(path != "") fullpath = mainwin->modpath + "\\" + path;
+		if(path != "") fullpath = mainwin->modpath + "/" + path;
 		else fullpath = mainwin->modpath;
 	}
 

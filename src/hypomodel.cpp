@@ -7,6 +7,10 @@
 //#include "hypopanels.h"
 //#include "cortmod.h"
 
+#include <CoreFoundation/CoreFoundation.h>
+#include <CoreFoundation/CFString.h>
+//#include <Cocoa/Cocoa.h>
+
 
 /*
 #include "osmomod.h"
@@ -87,14 +91,34 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	diagnostic = 0;
 	xstretch = 50;
 	modpath = "";
+    mainpath = "";
 
 	//toolset = new ToolSet();
 	//toolset->AddBox(diagbox);
+    
+    char *path = new char[100];
+    
+    if(ostype == Mac) {
+        CFBundleRef mainBundle;
+        mainBundle = CFBundleGetMainBundle();
+        //mainpath =
+        //mainpath = mainBundle.GetPath();
+        CFURLRef main_bundle_URL = CFBundleCopyBundleURL(mainBundle);
+        CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL, kCFURLPOSIXPathStyle);
+        CFStringGetCString(cf_string_ref, path, 100, kCFStringEncodingUTF8);
+        CFRelease(main_bundle_URL);
+        CFRelease(cf_string_ref);
+        string resources = path + string("/Contents/Resources/");
+        mainpath = resources;
+        diagbox->Write("mainpath " + mainpath + "\n");
+    }
 
 	OptionLoad();
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
 	toolpath = "Tools";
+    if(ostype == Mac) modpath = mainpath;
+    //diagbox->Write("modpath " + modpath + "\n");
 
 	MainLoad();
 
@@ -734,7 +758,7 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
 	wxString message;
 
-	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2013\n\nSystem: %s", wxGetOsDescription());
+	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2020\n\nSystem: %s", wxGetOsDescription());
 	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2020\n\nSystem: %s", wxGetOsDescription());
 	else message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2020\n\nSystem: %s", wxGetOsDescription());
 
@@ -1085,7 +1109,7 @@ void HypoMain::OptionLoad()
 	wxString filename;
 	wxString readline, numstring, tag;
 
-	filename = "Init/hypoprefs.ini";
+	filename = mainpath + "Init/hypoprefs.ini";
 
 	wxTextFile opfile(filename);
 
