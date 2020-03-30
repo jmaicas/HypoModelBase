@@ -723,7 +723,7 @@ void ParamBox::Initialise()
 	paramstoretag = NULL;
 	if(storemode) {
 		mainwin->diagbox->Write("Store Box initialise " + boxtag + "\n");
-		paramstoretag = TextInputCombo(120, 20, "", boxtag, mod->GetPath());
+		paramstoretag = TextInputCombo(120, 20, "", boxtag, mod->path);
 		paramstoretag->Show(false);
 	}
 

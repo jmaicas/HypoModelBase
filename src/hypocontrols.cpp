@@ -1044,7 +1044,7 @@ wxStaticText *ToolBox::TextLabel(wxString label)
 TagBox *ToolBox::TextInputCombo(int width, int height, wxString label, wxString name, wxString path)
 {
 	//wxComboBox *text = new (_NORMAL_BLOCK, __FILE__, __LINE__) wxComboBox(activepanel, wxID_ANY, label, wxDefaultPosition, wxSize(width, height));
-	TagBox *text = new TagBox(activepanel, wxID_ANY, label, wxDefaultPosition, wxSize(width, height), name, path);
+	TagBox *text = new TagBox(mainwin, activepanel, wxID_ANY, label, wxDefaultPosition, wxSize(width, height), name, path);
 	text->diagbox = mainwin->diagbox;
 	text->SetFont(confont);
 	return text;
@@ -1154,8 +1154,8 @@ void ToolSet::AddBox(ToolBox *newbox, bool serve, bool child) {
 			return;
 		}
 
-		newbox->boxindex = numtools;
-		box[numtools++] = newbox; 
+    newbox->boxindex = numtools;
+    box[numtools++] = newbox;
 
 		//ofp.Close();
 };
@@ -1271,11 +1271,32 @@ void ToolBox::OnClose(wxCloseEvent& event)
 }
 
 
-TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxtag, wxString path)
+void TagSet::AddTag(TagBox *newbox) {
+    if(!newbox) return;
+    box[numtags++] = newbox;
+}
+
+
+void TagSet::UpdatePath() {
+    int i;
+    
+    for(i=0; i<numtags; i++) box[i]->PathUpdate();
+}
+
+
+TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxtag, wxString path)
 	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
-	tagpath = path + "/Tags/";
-	modpath = path;
+    mainwin = main;
+    modpath = path;
+    
+    mainwin->tagset->AddTag(this);
+    
+    if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
+    else tagpath = mainwin->modpath + modpath + "/Tags/";
+    
+    mainwin->diagbox->Write(text.Format("TagBox tagpath %s\n", tagpath));
+	
 	name = boxtag;
 	diagbox = NULL;
 	labelset = false;
@@ -1318,11 +1339,27 @@ TagBox::TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxP
 }
 
 
+void TagBox::PathUpdate()
+{
+    if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
+    else tagpath = mainwin->modpath + modpath + "/Tags/";
+    
+    mainwin->diagbox->Write(text.Format("TagBox tagpath %s\n", tagpath));
+       
+    //if(!wxDirExists(tagpath)) wxMkdir(tagpath);
+}
+
+
 TagBox::~TagBox()
 {
 	int i;
 	wxString filename, filepath, outline, text;
 	TextFile opfile, tagfile;
+    
+    //if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
+    //else tagpath = mainwin->modpath + modpath + "/Tags/";
+    
+    if(!wxDirExists(tagpath)) wxMkdir(tagpath);
 
 	//if(diagbox) diagbox->Write(text.Format("closing tag box %s\n", name)); 
 

@@ -39,12 +39,13 @@ public:
 class TagBox: public wxComboBox
 {
 public:
-	wxString name, modpath, tagpath, tagfilepath, tagfilename;
+	wxString name, tagpath, tagfilepath, tagfilename;
+    wxString modpath, text;
 	bool labelset, histmode;
 	DiagBox *diagbox;
-	//HypoMain *mainwin;
+	MainFrame *mainwin;
 
-	TagBox(ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
+	TagBox(MainFrame *mainwin, ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
 	~TagBox();
 
 	void HistLoad();
@@ -53,6 +54,7 @@ public:
 	void SetFile();
 	void OnDClick(wxMouseEvent & event);
 	void OnRClick(wxMouseEvent & event);
+    void PathUpdate();
 };
 
 
@@ -130,6 +132,21 @@ public:
 
 	//void RemoveBox(wxString tag) {
 
+};
+
+
+class TagSet
+{
+public:
+    int numtags;
+    TagBox *box[100];
+    
+    TagSet() {
+        numtags = 0;
+    }
+    
+    void AddTag(TagBox *newbox);
+    void UpdatePath();
 };
 
 

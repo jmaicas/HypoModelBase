@@ -361,6 +361,7 @@ class GraphBase;
 class ModGenBox;
 class DiagBox;
 class ToolSet;
+class TagSet;
 class PlotBox;
 class NeuroBox;
 class GridBox;
@@ -381,7 +382,6 @@ public:
 };
 
 
-
 class MainFrame: public wxFrame
 {
 public:
@@ -395,9 +395,12 @@ public:
 	wxStatusBar *statusbar;
 	//ToolSet toolset;
 	ToolSet *toolset;
+    TagSet *tagset;
 	DiagBox *diagbox;
 	wxColour colourpen[20];
-    wxString toolpath, mainpath;
+    wxString toolpath, initpath, mainpath;
+    wxString homepath, hypopath, respath;
+    wxString modpath;
 
 	// Display
 	ScaleBox *scalebox;

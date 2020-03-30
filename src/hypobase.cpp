@@ -24,8 +24,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
     
-    mainpath = path;  // defaults to "" for Windows, bundle resource path for OSX
-    diagbox->Write("mainpath " + mainpath + "\n");
+    respath = path;  // defaults to "" for Windows, bundle resource path for OSX
+    diagbox->Write("respath " + respath + "\n");
+    mainpath = respath;
+    modpath = "";
 
 	graphbox = NULL;
 	plotbox = NULL;
@@ -45,12 +47,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	toolset = new ToolSet();
 	toolset->AddBox(diagbox, true);
+    
+    tagset = new TagSet();   // TagBox list for OSX mod path update
 }
 
 
 MainFrame::~MainFrame()
 {
 	delete toolset;
+    delete tagset;
 }
 
 
@@ -107,12 +112,10 @@ void MainFrame::MainLoad()
 void MainFrame::MainStore()
 {
 	int i;
-	wxString filename, initpath;
+	wxString filename;
 	wxString outline, text;
-
 	TextFile outfile, opfile;
 
-	//filepath = GetPath();
 	initpath = mainpath + "Init/";
     if(!wxDirExists(initpath)) wxMkdir(initpath);
 

@@ -54,14 +54,33 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	diagnostic = 0;
 	xstretch = 50;
 	modpath = "";
-   
+    
+    
+    // OSX Path Check
+    if(ostype == Mac) {
+        homepath = getenv("HOME");
+        diagbox->Write(text.Format("homepath %s\n", homepath));
+        hypopath = homepath + "/Library/Application Support/HypoMod/";
+        diagbox->Write(text.Format("hypopath %s\n", hypopath));
+        
+        if(wxDirExists(hypopath)) {
+            diagbox->Write("HypoMod directory found\n");
+            mainpath = hypopath;
+        }
+        else {
+            diagbox->Write("HypoMod directory not found, using default resources\n");
+            mainpath = respath;
+        }
+        diagbox->Write(text.Format("mainpath %s\n", mainpath));
+    }
+    
 	OptionLoad();
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
     
 	toolpath = mainpath + "Tools";
-    if(ostype == Mac) modpath = mainpath;
-    //diagbox->Write("modpath " + modpath + "\n");
+    //if(modpath == "") modpath = mainpath;
+    diagbox->Write("modpath " + modpath + "\n");
 
 	MainLoad();
 
@@ -207,8 +226,26 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		mainsizer->Add(graphsizer, 7, wxEXPAND);    
     }
     
+    if(ostype == Mac && !wxDirExists(hypopath)) {
+        diagbox->Write("No HypoMod directory, creating\n");
+        wxMkdir(hypopath);
+        mainpath = hypopath;
+        tagset->UpdatePath();
+        if(mod) {
+            wxMkdir(hypopath + mod->path);
+            mod->DataCopy(respath, hypopath);
+        }
+    }
+    diagbox->Write(text.Format("mainpath %s\n", mainpath));
+    
+    //if(modpath == "") modpath = mainpath;
+    //diagbox->Write("modpath " + modpath + "\n");
+    
 	SetSizer(mainsizer);
 	Layout();
+    
+    this->Restore();
+    this->Raise();
 
 
 	//long valmax;
@@ -286,7 +323,6 @@ void HypoMain::OnGraphAdd(wxCommandEvent& WXUNUSED(event))
 
 void HypoMain::AddGraph()
 {
-	int i;
 	graph = numdraw;
 
 	graphwin[graph] = new GraphWindow3(this, this, mod, wxPoint(0, graph*250 + 10), wxSize(100, 255), &gpos[graph], graph);
@@ -313,7 +349,6 @@ void HypoMain::RemoveGraph(int gindex)
 
 
 void HypoMain::CleanUp() {
-	int i;
 
 	//for(i=0; i<numdraw; i++) delete graphwin[i];
 
@@ -507,7 +542,6 @@ void HypoMain::SetStatus(wxString message)
 
 void HypoMain::GraphOut()
 {
-	int i;
 	FILE *ofp;
 
 	ofp = fopen("graphout.txt", "w");
@@ -905,7 +939,6 @@ void HypoMain::SpikeModule(Model *mod)
 
 void HypoMain::OnOutput(wxCommandEvent& WXUNUSED(event))
 {
-	char filetag[100];
 	wxString wxfiletag;
 	SetStatusText("Output Data");
 
@@ -1000,8 +1033,11 @@ void HypoMain::OptionStore()
 {
 	wxString filename;
 	wxString outline;
+    
+    initpath = mainpath + "Init/";
+    if(!wxDirExists(initpath)) wxMkdir(initpath);
 
-	filename = mainpath + "Init/hypoprefs.ini";
+	filename = initpath + "hypoprefs.ini";
 
 	TextFile opfile;
 	opfile.New(filename);
@@ -1028,7 +1064,7 @@ void HypoMain::OptionStore()
 
 	opfile.Close();
 
-	filename = mainpath + "Init/hypopaths.ini";
+	filename = initpath + "hypopaths.ini";
 	opfile.New(filename);
 	opfile.WriteLine(datapath);
 	opfile.WriteLine(parampath);
@@ -1042,11 +1078,15 @@ void HypoMain::OptionLoad()
 {
 	long numdat;
 	int check;
-
 	wxString filename;
 	wxString readline, numstring, tag;
+    
+    initpath = mainpath + "Init/";
+    if(!wxDirExists(initpath)) {
+        diagbox->Write("Init not found, no option load fail\n");
+    };
 
-	filename = mainpath + "Init/hypoprefs.ini";
+	filename = initpath + "hypoprefs.ini";
 
 	wxTextFile opfile(filename);
 
@@ -1089,7 +1129,7 @@ void HypoMain::OptionLoad()
 		diagnostic = prefstore["diagnostic"];
 	}
 
-	filename = mainpath + "Init/hypopaths.ini";
+	filename = initpath + "hypopaths.ini";
 	TextFile infile;
 	check = infile.Open(filename);
 
@@ -1119,6 +1159,7 @@ bool HypoApp::OnInit()
 	int x = 700;
 	int y = 920; // 1100   // 850
 	wxPoint pos;
+    wxString homepath, hypopath, respath;
 
 	if(GetSystem() == Mac) {
 		x = 685;
@@ -1137,7 +1178,12 @@ bool HypoApp::OnInit()
     CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingUTF8);
     CFRelease(main_bundle_URL);
     CFRelease(cf_string_ref);
-    mainpath = path + string("/Contents/Resources/");
+    respath = path + string("/Contents/Resources/");
+    
+    homepath = getenv("HOME");
+    hypopath = homepath + "/Library/Application Support/HypoMod/";
+    if(wxDirExists(hypopath)) mainpath = hypopath;
+    else mainpath = respath;
 #endif // OSX
 
 	LoadPrefs();
@@ -1149,7 +1195,7 @@ bool HypoApp::OnInit()
 	if(x > screensize.GetX()) x = screensize.GetX() - 50;
 	if(y > screensize.GetY()) y = screensize.GetY() - 50;
 
-	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y), mainpath);   // 850   // 920
+	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y), respath);   // 850   // 920
 	mainwin->SetTransparent(254);
 	mainwin->Show();
 	SetTopWindow(mainwin);
