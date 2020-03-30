@@ -446,7 +446,11 @@ wxString GraphDat::StoreDat(wxString tag)
 	else storeytag = " ";
 	storeytag.Replace(" ", "_");
     
-    colourtext = ColourString(strokecolour, 1);
+    //if(mainwin->ostype == Mac)
+    //colourtext = ColourString(strokecolour, 1);
+    colourtext = strokecolour.GetAsString(wxC2S_CSS_SYNTAX);
+    
+    diagbox->Write("colourtext: " + colourtext);
 
 	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, colourtext, xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
@@ -975,17 +979,23 @@ void GraphSet::IntervalSet(wxString tag, bool burst, bool select, int selectcode
 
 int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag)       // default settag = "", for no set use settag = "null"          set=true - OLD
 {
-	int sdex;
+	//int sdex;
 	wxString text;
 	GraphSet *graphset = NULL;
 	bool diag = false;
 
 	if(diag) mainwin->diagbox->Write(text.Format("Graphbase Add %s to set %s, set flag %d  numgraphs %d storesize %d\n", tag, settag, numgraphs, storesize));
+    
+    
+    // colour setting is done here since GraphDat doesn't have access to mainwin colour chart
 
 	newgraph.diagbox = mainwin->diagbox;
 	newgraph.strokecolour = mainwin->colourpen[newgraph.colour];
+    newgraph.fillcolour = newgraph.strokecolour;
 	newgraph.gtag = tag;
 	numgraphs++;          // numgraphs gives the graphbase index of the new graph
+    
+    mainwin->diagbox->Write(text.Format("GraphBase Add colour index %d string %s\n", newgraph.colour, ColourString(newgraph.strokecolour, 1)));
 
 	// If single graph, create new single graph set, otherwise add to set 'settag'
 	if(settag != "null") { 
@@ -1129,7 +1139,7 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 
 	//outfile.New(initpath + "/Graphs/" + filename);
 	outfile.New(path + "/" + filename);
-	for(i=0; i<=numgraphs; i++) {
+	for(i=1; i<=numgraphs; i++) {
 		outfile.WriteLine(graphstore[i].StoreDat(GetTag(i)));
 		//outfile.WriteLine(text.Format
 	}
@@ -1141,12 +1151,12 @@ void GraphBase::BaseStore(wxString path, wxString tag)
 
 void GraphBase::BaseLoad(wxString path, wxString tag, wxTextCtrl *textbox)
 {
-	int i, index;
+	int i;
 	TextFile infile;
 	wxString readline, filename, filetag;
 	wxString text, numstring, namestring, basestring;
 	wxString gtag, gname;
-	double numdat;
+	//double numdat;
 	GraphDat *graph;
 	int version;
 

@@ -9,6 +9,9 @@
 #include <hypotools.h>
 
 
+ //[[NSApplication sharedApplication] activateIgnoringOtherApps : YES];
+
+
 // Main window base class
 
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path)
@@ -44,7 +47,14 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	colourpen[9].Set("#FFFF80");       // 9 light yellow
 	colourpen[10].Set("#FF80FF");      // 10 light purple
 	colourpen[11].Set("#000000");      // 11 custom
-
+    
+    wxString text, colourtext;
+    colourtext = colourpen[0].GetAsString();
+    diagbox->Write(text.Format("colourtext 1 : %s %s\n", colourtext, ColourString(colourpen[0])));
+    
+    colourtext = colourpen[5].GetAsString();
+    diagbox->Write(text.Format("colourtext 5 : %s\n", colourtext));
+    
 	toolset = new ToolSet();
 	toolset->AddBox(diagbox, true);
     
@@ -203,9 +213,16 @@ wxString numstring(double number, int places=0)
 wxString ColourString(wxColour col, int type)
 {
 	wxString colstring;
-
+    
+#ifdef OSX
+    //return col.GetAsString(wxC2S_CSS_SYNTAX);
+#endif
+    
 	if(type == 0) return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
-	else return colstring.Format("%d %d %d", col.Red(), col.Green(), col.Blue());
+	if(type == 1) return colstring.Format("%d %d %d", col.Red(), col.Green(), col.Blue());
+    if(type == 2) return col.GetAsString();
+    
+    return "";
 }
 
 
