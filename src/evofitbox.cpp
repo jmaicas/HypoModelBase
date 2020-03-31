@@ -323,7 +323,7 @@ void EvoFitBox::CreatePanels()
 	wxBoxSizer *datbox = new wxBoxSizer(wxVERTICAL);
 
 	//datfiletag = TextInput(100, 20, "n0");
-	datfiletag = TextInputCombo(100, 20, "", "fitload", mod->GetPath());
+	datfiletag = TextInputCombo(100, 20, "", "fitload", mod->path);
 	datstatus = NumPanel(100, wxALIGN_RIGHT, "");
 
 	if(ostype == Mac) {

@@ -244,8 +244,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	SetSizer(mainsizer);
 	Layout();
     
-    this->Restore();
-    this->Raise();
+    //this->Restore();
+    //this->Raise();
 
 
 	//long valmax;
