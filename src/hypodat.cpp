@@ -674,7 +674,7 @@ void GraphDat::Init()
 {
 	diagbox = NULL;
 	plotdata = NULL;
-    spikedata = NULL;
+    //spikedata = NULL;
 
 	scrollpos = 0;
 	negscale = 0;
