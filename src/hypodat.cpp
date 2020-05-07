@@ -450,7 +450,7 @@ wxString GraphDat::StoreDat(wxString tag)
     //colourtext = ColourString(strokecolour, 1);
     colourtext = strokecolour.GetAsString(wxC2S_CSS_SYNTAX);
     
-    diagbox->Write("colourtext: " + colourtext);
+    //diagbox->Write("colourtext: " + colourtext);
 
 	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, colourtext, xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
@@ -995,7 +995,7 @@ int GraphBase::Add(GraphDat newgraph, wxString tag, wxString settag)       // de
 	newgraph.gtag = tag;
 	numgraphs++;          // numgraphs gives the graphbase index of the new graph
     
-    mainwin->diagbox->Write(text.Format("GraphBase Add colour index %d string %s\n", newgraph.colour, ColourString(newgraph.strokecolour, 1)));
+    //mainwin->diagbox->Write(text.Format("GraphBase Add colour index %d string %s\n", newgraph.colour, ColourString(newgraph.strokecolour, 1)));
 
 	// If single graph, create new single graph set, otherwise add to set 'settag'
 	if(settag != "null") { 
