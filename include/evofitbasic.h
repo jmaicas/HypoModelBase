@@ -49,7 +49,18 @@ class SpikeFitDat{
 public:
 	bool allocated;
 	int chromecount;
-	//float *Ints;
+    
+	/*float *Ints;
+    float *ISIs;
+    float *Bursts;
+    float *BurstMean;
+    float *BurstSD;
+    float *SilenceMean;
+    float *SilenceSD;
+    float *IntraFreq;
+    float *ExtraFreq;
+    float *SpikeCounts;*/
+    
 	vector<float> Ints;
 	vector<float> ISIs;
 	vector<float> Bursts;
@@ -74,16 +85,16 @@ public:
 		//burstprof.setsize(1000);
 		extracount = false;
 		//spikecounts = new int[200];
-		//Ints = NULL;
-		//ISIs = NULL;
-		//Bursts = NULL;
-		//BurstMean = NULL;
-		//BurstSD = NULL;
-		//SilenceMean = NULL;
-		//SilenceSD = NULL;
-		//IntraFreq = NULL;
-		//ExtraFreq = NULL;
-		//SpikeCounts = NULL;
+		/*Ints = NULL;
+		ISIs = NULL;
+		Bursts = NULL;
+		BurstMean = NULL;
+		BurstSD = NULL;
+		SilenceMean = NULL;
+		SilenceSD = NULL;
+		IntraFreq = NULL;
+		ExtraFreq = NULL;
+		SpikeCounts = NULL;*/
 	};
 
 	~SpikeFitDat();

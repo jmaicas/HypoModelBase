@@ -106,6 +106,7 @@ void ModGenBox::DefGen()
 	wxString inpath, outpath;
 	TextFile infile;
 
+    i = 0;  // placeholder fix
 	inpath = "src\\";
 	outpath = "Newcode\\";
 

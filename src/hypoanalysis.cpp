@@ -819,7 +819,7 @@ void BurstDat::BurstScanFit()
 
 	//times = times;
 
-	maxint = maxint;
+	//maxint = maxint;
 	IoDrange();
 
 	// Index of Dispersion
