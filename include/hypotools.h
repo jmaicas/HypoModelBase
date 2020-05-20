@@ -10,8 +10,8 @@
 #include "hypocontrols.h"
 #include "hypopanels.h"
 //#include "hypomodel.h"
-#include <wx/clipbrd.h>
-#include <wx/grid.h>
+#include "wx/clipbrd.h"
+#include "wx/grid.h"
 
 
 class GridBox;

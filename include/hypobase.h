@@ -9,11 +9,11 @@
 #include "wx/scrolwin.h"
 #include <vector>
 #include <list>
-#include <mersenne.h>
+#include "mersenne.h"
 #include "wx/dcbuffer.h"
 #include "wx/msgqueue.h"
-#include <wx/textfile.h>
-//#include <hypodef.h>
+#include "wx/textfile.h"
+#include <hypodef.h>
 
 
 //#include "hypocontrols.h"
@@ -309,7 +309,9 @@ enum {
 	ID_filter,
 	ID_subplot,
 	ID_GridBox,
-	ID_Gavage
+	ID_Gavage,
+	ID_Progress,
+	ID_EndRun
 };
 
 
@@ -359,6 +361,7 @@ class GraphBase;
 class ModGenBox;
 class DiagBox;
 class ToolSet;
+class TagSet;
 class PlotBox;
 class NeuroBox;
 class GridBox;
@@ -379,7 +382,6 @@ public:
 };
 
 
-
 class MainFrame: public wxFrame
 {
 public:
@@ -393,9 +395,12 @@ public:
 	wxStatusBar *statusbar;
 	//ToolSet toolset;
 	ToolSet *toolset;
+    TagSet *tagset;
 	DiagBox *diagbox;
 	wxColour colourpen[20];
-	wxString toolpath;
+    wxString toolpath, initpath, mainpath;
+    wxString homepath, hypopath, respath;
+    wxString modpath;
 
 	// Display
 	ScaleBox *scalebox;
@@ -414,7 +419,7 @@ public:
 	int diagnostic;
 	int ostype;
     
-	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
+	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path);
 	~MainFrame();
 	virtual void MainLoad();
 	virtual void MainStore();

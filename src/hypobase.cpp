@@ -9,16 +9,12 @@
 #include <hypotools.h>
 
 
-
-//IMPLEMENT_APP(HypoApp)
-
-//wxCommandEvent *blankevent;
-
+ //[[NSApplication sharedApplication] activateIgnoringOtherApps : YES];
 
 
 // Main window base class
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
 	ostype = GetSystem();
@@ -30,6 +26,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
     diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
+    
+    respath = path;  // defaults to "" for Windows, bundle resource path for OSX
+    diagbox->Write("respath " + respath + "\n");
+    mainpath = respath;
+    modpath = "";
 
 	graphbox = NULL;
 	plotbox = NULL;
@@ -46,15 +47,25 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	colourpen[9].Set("#FFFF80");       // 9 light yellow
 	colourpen[10].Set("#FF80FF");      // 10 light purple
 	colourpen[11].Set("#000000");      // 11 custom
-
+    
+    wxString text, colourtext;
+    colourtext = colourpen[0].GetAsString();
+    diagbox->Write(text.Format("colourtext 1 : %s %s\n", colourtext, ColourString(colourpen[0])));
+    
+    colourtext = colourpen[5].GetAsString();
+    diagbox->Write(text.Format("colourtext 5 : %s\n", colourtext));
+    
 	toolset = new ToolSet();
 	toolset->AddBox(diagbox, true);
+    
+    tagset = new TagSet();   // TagBox list for OSX mod path update
 }
 
 
 MainFrame::~MainFrame()
 {
 	delete toolset;
+    delete tagset;
 }
 
 
@@ -71,7 +82,7 @@ void MainFrame::MainLoad()
     wxSize size;
 
 	//filepath = GetPath();
-	filepath = "Init//";
+	filepath = mainpath + "Init/";
 
 	// Box Load
 	filename = "mainbox.ini";
@@ -111,18 +122,16 @@ void MainFrame::MainLoad()
 void MainFrame::MainStore()
 {
 	int i;
-	wxString filename, mainpath;
+	wxString filename;
 	wxString outline, text;
-
 	TextFile outfile, opfile;
 
-	//filepath = GetPath();
-	mainpath = "Init/";
-    if(!wxDirExists(mainpath)) wxMkdir(mainpath);
+	initpath = mainpath + "Init/";
+    if(!wxDirExists(initpath)) wxMkdir(initpath);
 
 	// box store
 	filename = "mainbox.ini";
-	outfile.New(mainpath + filename);
+	outfile.New(initpath + filename);
 	
 	for(i=0; i<toolset->numtools; i++)
 		if(toolset->box[i]) {
@@ -204,9 +213,16 @@ wxString numstring(double number, int places=0)
 wxString ColourString(wxColour col, int type)
 {
 	wxString colstring;
-
+    
+#ifdef OSX
+    //return col.GetAsString(wxC2S_CSS_SYNTAX);
+#endif
+    
 	if(type == 0) return colstring.Format("%.4f %.4f %.4f", (double)col.Red()/255, (double)col.Green()/255, (double)col.Blue()/255);
-	else return colstring.Format("%d %d %d", col.Red(), col.Green(), col.Blue());
+	if(type == 1) return colstring.Format("%d %d %d", col.Red(), col.Green(), col.Blue());
+    if(type == 2) return col.GetAsString();
+    
+    return "";
 }
 
 

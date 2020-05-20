@@ -1,7 +1,9 @@
 
 
-#include <hypomodel.h>
+#include "hypomodel.h"
 #include <time.h>
+#include <wx/dir.h>
+#include <wx/filename.h>
 
 DEFINE_EVENT_TYPE(wxEVT_SPIKE)
 DEFINE_EVENT_TYPE(wxEVT_SYNCH)
@@ -49,6 +51,48 @@ Model::~Model()
 }
 
 
+void Model::DataCopy(wxString oldpath, wxString newpath)
+{
+    wxString oldparampath, parampath;
+    wxString oldgraphpath, graphpath;
+    wxString oldgridpath, gridpath;
+    wxString filepath;
+    wxFileName filename;
+    
+    oldparampath = oldpath + path + "/Params/";
+    parampath = newpath + path + "/Params/";
+    wxMkdir(parampath);
+    filepath = wxFindFirstFile(oldparampath + "*.*");
+    while(!filepath.empty()) {
+        filename.Assign(filepath);
+        wxCopyFile(filepath, parampath + filename.GetFullName());
+        //diagbox->Write("filepath " + filepath + "\n");
+        //diagbox->Write("filename " + filename.GetFullName() + "\n");
+        filepath = wxFindNextFile();
+    }
+    
+    oldgraphpath = oldpath + path + "/Graphs/";
+    graphpath = newpath + path + "/Graphs/";
+    wxMkdir(graphpath);
+    filepath = wxFindFirstFile(oldgraphpath + "*.*");
+    while(!filepath.empty()) {
+        filename.Assign(filepath);
+        wxCopyFile(filepath, graphpath + filename.GetFullName());
+        filepath = wxFindNextFile();
+    }
+    
+    oldgridpath = oldpath + path + "/Grids/";
+    gridpath = newpath + path + "/Grids/";
+    wxMkdir(gridpath);
+    filepath = wxFindFirstFile(oldgridpath + "*.*");
+    while(!filepath.empty()) {
+        filename.Assign(filepath);
+        wxCopyFile(filepath, gridpath + filename.GetFullName());
+        filepath = wxFindNextFile();
+    }
+}
+
+
 void Model::SpikeDataSwitch(SpikeDat *data)
 {}
 
@@ -59,7 +103,6 @@ void Model::BurstUpdate()
 
 void Model::GridColumn(int col)
 {}
-
 
 
 void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
@@ -87,18 +130,19 @@ void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
 
 wxString Model::GetPath()
 {
-	wxString fullpath;
+	wxString fullpath, text;
 
 	if(mainwin->modpath == "") {
-		if(path != "") fullpath = path;
-		else fullpath = "Init";
+		if(path != "") fullpath = mainwin->mainpath + path;
+		else fullpath = mainwin->mainpath + "Init";
 	}
 	else {
-		if(path != "") fullpath = mainwin->modpath + "\\" + path;
+		if(path != "") fullpath = mainwin->modpath + "/" + path;
 		else fullpath = mainwin->modpath;
 	}
 
 	if(!wxDirExists(fullpath)) wxMkdir(fullpath);
+    mainwin->diagbox->Write(text.Format("Model GetPath %s\n", fullpath));
 
 	return fullpath;
 }
@@ -114,43 +158,31 @@ void Model::RunModel()
 
 
 void Model::ModClose()
-{
-}
+{}
 
 
 void Model::Output()
-{
-	int i;
-}
+{}
 
 
 void Model::ScaleSwitch(double newxscale)
-{
-	int i;
-}
+{}
 
 
 void Model::DataSelect(double x, double y)
-{
-	int i;
-}
+{}
 
 
 void Model::EvoRun()
-{
-}
+{}
 
 
 void Model::ParamScan()
-{
-}
+{}
 
 
 void Model::SetCell(int cellindex, GraphDat *graph)
-{
-}
-
-
+{}
 
 
 int Model::GetCellIndex()
@@ -160,8 +192,7 @@ int Model::GetCellIndex()
 
 
 void Model::ScaleConsole(ScaleBox *scalebox, int condex)
-{
-}
+{}
 
 
 long Model::ReadNextData(wxString *readline)

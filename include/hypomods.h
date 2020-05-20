@@ -14,6 +14,10 @@ class HypoMain;
 class EvoFitBox;
 class EvoChrome;
 
+//wxDECLARE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
+
+//wxDEFINE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
+
 
 class ModThread : public wxThread
 {
@@ -114,6 +118,7 @@ public:
 	virtual void SpikeDataSwitch(SpikeDat *);
 	virtual void BurstUpdate();
 	virtual void GridColumn(int col);
+    virtual void DataCopy(wxString oldpath, wxString newpath);
 };
 
 

@@ -3,8 +3,8 @@
 //#include "hypomodel.h"
 //#include "hypopanels.h"
 #include "wx/graphics.h"
-#include <hypoprint.h>
-#include <hypomodel.h>
+#include "hypoprint.h"
+#include "hypomodel.h"
 #include <math.h>
 
 
@@ -12,7 +12,7 @@ DispWin::DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, cons
 	: wxFrame(main, wxID_ANY, title, pos, size,
 	wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
-	int graph;
+	//int graph;
 
 	i = 0;
 	mainwin = main;
@@ -66,11 +66,11 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	graphbase = mod->graphbase;
 
 	int max, scrollxto;
-	double xdiff;
+	//double xdiff;
 	wxString snum, outline, text;
 	int i, j, gindex;
-	GraphSet *graphset;
-	wxMenu *newsub;
+	//GraphSet *graphset;
+	//wxMenu *newsub;
 
 	ostype = GetSystem();
 
@@ -105,8 +105,8 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
 
 	wxImage::AddHandler(new wxPNGHandler);
-	radio_on = wxBitmap("Init/radio_on-18.png", wxBITMAP_TYPE_PNG);
-	radio_off = wxBitmap("Init/radio_off-18.png", wxBITMAP_TYPE_PNG);
+	radio_on = wxBitmap(mainwin->respath + "Init/radio_on-18.png", wxBITMAP_TYPE_PNG);
+	radio_off = wxBitmap(mainwin->respath + "Init/radio_off-18.png", wxBITMAP_TYPE_PNG);
 
 	SetBackgroundColour("WHITE");
 
@@ -245,7 +245,7 @@ void GraphWindow3::OnGraphSelectSet(wxCommandEvent& event)
 {
 	short id = event.GetId();
 	double xfrom, xto;
-	int modesum = -1;
+	//int modesum = -1;
 	GraphSet *graphset;
 	GraphDat *graph;
 	int gdex;
@@ -286,7 +286,7 @@ void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
 {
 	short id = event.GetId();
 	double xfrom, xto;
-	int modesum = -1;
+	//int modesum = -1;
 	GraphSet *graphset;
 	GraphDat *graph;
 	int gdex;
@@ -320,8 +320,6 @@ void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
 
 wxRealPoint GraphWindow3::GraphPos(wxPoint)
 {
-	int i;
-
 	return wxRealPoint(0, 0);
 }
 
@@ -449,7 +447,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 
 	if(!HasCapture()) return;
 	ReleaseMouse();
-	wxRect permRect = wxRect(anchorpos, pos);
+	//wxRect permRect = wxRect(anchorpos, pos);
 	overlay.Reset();
 	Refresh();
 
@@ -2494,7 +2492,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					y = mpoint;
 					//dc.LineTo(xindex + 100 + xmove, (int)(ymove + 130.0 - yrange * (y - yfrom)));
 					//DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-					gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2, 2);
+					gc->DrawEllipse((int)(xpos + xbase - 2), (int)(yplot + ybase - yrange * (y - yfrom) - 2), 4, 4);
+					//dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), 2);
 					oldx = xpos + xbase + xoffset;
 					oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 				}

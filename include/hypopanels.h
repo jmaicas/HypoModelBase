@@ -4,8 +4,8 @@
 #define HYPOPANELS_H
 
 #include "wx/wx.h"
-#include <wx/richtext/richtextctrl.h>
-#include <wx/grid.h>
+#include "wx/richtext/richtextctrl.h"
+#include "wx/grid.h"
 #include "hypocontrols.h"
 #include "hypotools.h"
 #include "hypodat.h"
@@ -167,6 +167,7 @@ public:
 	void SetPanel(int, ToolBox *);
 	void OnFocus(wxFocusEvent& event);
 	void SetCount(double);
+	void SetCount(int);
 	void SetStatus(wxString);
 	void WriteVDU(wxString);
 	void InitMenu(int type = 0);

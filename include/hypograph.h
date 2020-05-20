@@ -5,12 +5,12 @@
 
 
 #include "wx/wx.h"
-#include <wx/tglbtn.h>
-#include <wx/overlay.h>
+#include "wx/tglbtn.h"
+#include "wx/overlay.h"
 #include "hypobase.h"
 #include "hypodat.h"
 #include "hypomods.h"
-#include <wx/clrpicker.h>
+#include "wx/clrpicker.h"
 
 
 

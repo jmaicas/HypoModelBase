@@ -723,7 +723,7 @@ void ParamBox::Initialise()
 	paramstoretag = NULL;
 	if(storemode) {
 		mainwin->diagbox->Write("Store Box initialise " + boxtag + "\n");
-		paramstoretag = TextInputCombo(120, 20, "", boxtag, mod->GetPath());
+		paramstoretag = TextInputCombo(120, 20, "", boxtag, mod->path);
 		paramstoretag->Show(false);
 	}
 
@@ -1060,6 +1060,16 @@ void ParamBox::SetCount(double count)
 		runcount->SetLabel(snum);
 	}
 	//runcount->SetLabel("test");
+}
+
+
+void ParamBox::SetCount(int count)
+{
+	wxString text; 
+
+	runcount->SetLabel(text.Format("%d %%", count));
+
+	//if(mainwin->diagnostic) mod->diagbox->textbox->AppendText(text.Format("Count call, count %.2f, countmark %.2f\n", count, countmark));
 }
 
 /*

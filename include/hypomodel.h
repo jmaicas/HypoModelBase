@@ -8,7 +8,7 @@
 //#define CUDA 1 
 
 
-#include <wx/wx.h>
+#include "wx/wx.h"
 #include "hypograph.h"
 #include "hypoplot.h"
 #include "hypopanels.h"
@@ -29,6 +29,7 @@ class HypoApp: public wxApp
 {
 public:
 	int viewheight, viewwidth;
+     wxString mainpath;
 
 	virtual bool OnInit();
 	void LoadPrefs();
@@ -70,8 +71,6 @@ public:
 };
 
 
-
-
 class HypoMain: public MainFrame
 {
 public:
@@ -102,7 +101,7 @@ public:
 	wxTextFile *wxofp;
 	wxString outline; 
 	wxString datapath, outpath, parampath;
-	wxString modpath;
+    //wxString modpath; // mainpath;
 	wxBoxSizer *graphsizer;
 	ParamStore prefstore;
 	wxPrintData *printdata;
@@ -160,7 +159,7 @@ public:
 	// New Model Modules
 	Model *mod;
 
-	HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size);
+	HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path="");
 	~HypoMain();
 
 	void OnPaint2(wxPaintEvent& event);

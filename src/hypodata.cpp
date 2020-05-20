@@ -231,7 +231,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	AddButton(ID_PathBrowse, "Browse", 60, datapathbox);
 
 	wxBoxSizer *datatagbox = new wxBoxSizer(wxHORIZONTAL);
-	neurodatatag = new TagBox(activepanel, ID_Select, "", wxDefaultPosition, wxSize(150, -1), "neurodatatag", mod->GetPath());
+	neurodatatag = new TagBox(mainwin, activepanel, ID_Select, "", wxDefaultPosition, wxSize(150, -1), "neurodatatag", mod->path);
 	datatagbox->Add(neurodatatag, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
 	if(ostype == Mac) {
 		AddButton(ID_Load, "Load", 60, datatagbox);
@@ -1350,7 +1350,8 @@ void GridBox::GridStore()
 	if(gauge) gauge->SetValue(0);
 	WriteVDU("OK\n");
 
-	ofp.New(filetag + "-gridsize.txt");
+    filename = filepath + "/" + filetag + "-gridsize.txt";
+	ofp.New(filename);
 	for(i=0; i<columnindex.count; i++) {
 		col = columnindex.list[i];
 		ofp.WriteLine(text.Format("col %d %d", col, textgrid->GetColSize(col)));
