@@ -644,6 +644,7 @@ ParamBox::ParamBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	mainwin = mod->mainwin;
 	column = 0;
 	buttonwidth = 50;
+	modmode = 0;
 
 	model->mainwin->diagbox->Write("ParamBox init\n");
 

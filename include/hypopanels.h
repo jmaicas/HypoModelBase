@@ -83,6 +83,7 @@ public:
 	bool defstore;
 	int diagmode;
 	int storemode;
+	int modmode;
 
 	HypoMain *mainwin;
 	Model *mod;
