@@ -1983,7 +1983,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
 						gc->SetPen(colourpen[black]);
 						//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
-						if(graph->scattermode) gc->DrawEllipse((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize, graph->scattersize);
+						if(graph->scattermode) 
+							gc->DrawEllipse((int)(xpos + xbase + xoffset - graph->scattersize/2), (int)(yplot + ybase - graph->scattersize/2 - yrange * (y - yfrom)), graph->scattersize, graph->scattersize);
 						oldx = xpos + xbase + xoffset;
 						oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 					}

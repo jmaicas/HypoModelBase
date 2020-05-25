@@ -45,7 +45,7 @@ EvoFitBox::EvoFitBox(Model *model, EvoChrome *chrome, const wxString& title, con
 	}
 
 	//InitMenu();
-	autoscore = true;
+	autoscore = false;   // true;    temp fix 25/5/20
 	burstmode = burstmode_set;
 
 	// ParentData
