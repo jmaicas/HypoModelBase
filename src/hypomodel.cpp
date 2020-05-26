@@ -467,6 +467,7 @@ void HypoMain::UserMenu()
 	menuTools->Append(ID_Grid, "Data Grid");
 	menuTools->Append(ID_Neuro, "Neuro Box");
 	menuTools->Append(ID_Plot, "Plot Box");
+	menuTools->Append(ID_Sound, "Sound Box");
 
 	menuSystem->Append(ID_Options, "Options");
 
@@ -514,7 +515,7 @@ void HypoMain::OnSound(wxCommandEvent& WXUNUSED(event))
 
 	mainpos = GetPosition();
 	soundbox = new SoundBox(mod, "Sonic Spike Analysis", wxPoint(320, 455), boxsize);
-	toolset.AddBox(soundbox);
+	toolset->AddBox(soundbox);
 	soundbox->Show(true);
 #endif
 }

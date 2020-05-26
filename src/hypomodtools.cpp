@@ -1193,8 +1193,9 @@ void SoundBox::SoundTest()
 	Noise noise;
 	RtWvOut *dac = 0;
 
-	dac = new RtWvOut(1);
-
+	
+	dac = new RtWvOut();
+	/*
 	sine.setFrequency((*modparams)["soundfreq"]);
 	sine2.setFrequency(541.0);
 	sine3.setFrequency(641.0);
@@ -1210,9 +1211,11 @@ void SoundBox::SoundTest()
 		for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
 	}
 
+	*/
 cleanup:
 	delete dac;
 }
+
 
 
 #endif

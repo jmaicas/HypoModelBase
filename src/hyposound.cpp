@@ -39,7 +39,7 @@ void *SoundGen::Entry()
 	dac = new RtWvOut(1);
 	//outspikes.openFile( "vspikes.wav", 1, FileWrite::FILE_WAV, Stk::STK_SINT16 );
 	
-  soundbox->numspikes->SetLabel("playing");
+	soundbox->numspikes->SetLabel("playing");
 	msamp = 96;
 	pulseint = (*params)["pulseint"];
 	freqscale = (*params)["freqscale"];

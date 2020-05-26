@@ -311,7 +311,10 @@ enum {
 	ID_GridBox,
 	ID_Gavage,
 	ID_Progress,
-	ID_EndRun
+	ID_EndRun,
+	ID_Dend,
+	ID_realtime,
+	ID_realupdate
 };
 
 
