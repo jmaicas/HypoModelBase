@@ -149,6 +149,8 @@ void SoundGen::PlaySpikes()
 	//	for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
 	//}
 
+	soundbox->mod->SoundOn();
+
 	if(spikemode == 1) {
 		for(s=0; s<playspikes; s++) {
 			fsamp = spikedata->isis[s];

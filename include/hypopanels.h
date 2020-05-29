@@ -9,14 +9,15 @@
 #include "hypocontrols.h"
 #include "hypotools.h"
 #include "hypodat.h"
-//#include "hypomods.h"
+#include "hypomods.h"
 
 using namespace std;
 
-class Model;
+//class Model;
 class HypoMain;
 class TextGrid;
 class NeuroMod;
+
 
 class OptionPanel : public wxDialog
 {

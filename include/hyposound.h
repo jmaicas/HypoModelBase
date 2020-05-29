@@ -22,7 +22,7 @@ public:
 	unsigned int soundon;
 	Model *mod;
 
-	SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat=NULL);
+	SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat=NULL);
 	void SoundTest();
 	void SpikeSonic();
 	void OnGo(wxCommandEvent& event);

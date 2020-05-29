@@ -3,7 +3,7 @@
 
 #include "wx/wx.h"
 #include "hypotools.h"
-
+#include <hypopanels.h>
 #include "hypodef.h"
 
 

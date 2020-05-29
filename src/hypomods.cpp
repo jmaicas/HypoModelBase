@@ -94,6 +94,10 @@ void Model::DataCopy(wxString oldpath, wxString newpath)
 }
 
 
+//void Model::SoundOn()
+//{}
+
+
 void Model::SpikeDataSwitch(SpikeDat *data)
 {}
 

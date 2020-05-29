@@ -5,7 +5,8 @@
 
 #include "wx/wx.h"
 #include "hypodat.h"
-#include "hypopanels.h"
+#include <hypotools.h>
+//#include "hypopanels.h"
 //#include "hypograph.h"
 //#include "evofitbasic.h"
 
@@ -13,6 +14,7 @@
 class HypoMain;
 class EvoFitBox;
 class EvoChrome;
+class ParamBox;
 
 //wxDECLARE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
 
@@ -80,7 +82,7 @@ public:
 	ToolSet modtools;
 	wxString gcodes[10];
 	ScaleBox *scalebox;
-	GraphWindow3 *graphwin;
+	GraphWindow3 **graphwin;
 
 	DatStore *recdata;
 	GridBox *gridbox;
@@ -103,6 +105,7 @@ public:
 	virtual void ScaleSwitch(double xscale = 0);
 	virtual int ModeSum(ParamStore *gflags);
 	virtual int SoundLink(SpikeDat **, datdouble **);
+	virtual void SoundOn() {}; 
 	virtual void ModStore();
 	virtual void ModLoad();
 	virtual void DataSelect(double, double);

@@ -18,6 +18,7 @@
 //#include "vasodat.h"
 #include "evodat.h"
 #include "hypomods.h"
+#include <hypopanels.h>
 
 
 enum {

@@ -17,6 +17,8 @@
 #include "hypodat.h"
 #include "hypotools.h"
 
+class ParamBox;
+
 
 class EvoParam
 {
