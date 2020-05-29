@@ -631,6 +631,27 @@ void GraphWindow3::UpdateScroll(int pos)
 }
 
 
+void GraphWindow3::Highlight(int xpos)
+{
+	double xdiff, xscale, xgraph, xplot;
+
+	xdiff = graph->xto - graph->xfrom;
+	xscale = xdiff / xplot;
+	//xgraph = (xpos - xbase) * xscale + graph->xfrom;
+	//xplaces = numplaces(xdiff);
+	xplot = (xpos - graph->xfrom) * xscale + xbase;
+
+	wxClientDC dc(this);
+	wxDCOverlay overlaydc(overlay, &dc);
+	overlaydc.Clear();
+	wxGraphicsContext *ctx = wxGraphicsContext::Create(dc);
+	//ctx->SetPen(*wxGREY_PEN);
+	ctx->SetBrush(wxBrush(wxColour(192,192,255,64)));
+	wxRect newrect(anchorpos, currentpos);
+	ctx->DrawRectangle(xplot, ybase, 10, 100);
+}
+
+
 void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 {
 	double xdiff, xscale, xgraph;

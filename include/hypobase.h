@@ -368,6 +368,7 @@ class TagSet;
 class PlotBox;
 class NeuroBox;
 class GridBox;
+class SoundBox;
 
 
 //DiagBox *gdiag;
@@ -413,6 +414,9 @@ public:
 	PlotBox *plotbox;
 	NeuroBox *neurobox;
 	GridBox *gridbox;
+#ifdef HYPOSOUND
+	SoundBox *soundbox;
+#endif
 
 	GraphWindow3 *graphwin[10];
     

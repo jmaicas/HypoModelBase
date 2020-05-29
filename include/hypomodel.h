@@ -137,9 +137,7 @@ public:
 	RefStore *flagrefs;
 
 	ProtocolBox *protocolbox;
-#ifdef HYPOSOUND
-	SoundBox *soundbox;
-#endif
+
 
 	//DiagBox *diagbox;
 

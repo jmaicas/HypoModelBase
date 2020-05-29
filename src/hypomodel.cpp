@@ -93,15 +93,6 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	filebase = new FileBase(100);
 
 
-	//currdata = new CurrentDat();
-	//realdata = new SpikeDat();
-	//burstdata = new BurstDat();
-	//burstdata->spikedata = vasodata->spikedat;
-	//analysisdata = new AnaDat();
-	//expdata = new SpikeDat();
-	//expdata->burstdata = new BurstDat();
-	//expdata->burstdata->spikedata = expdata;
-
 	// Spike Analysis Module                  July 2015
 	expdata = new SpikeDat();
 	expdata->burstdata = new BurstDat();
@@ -123,14 +114,12 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	focusdata = NULL;
 	dispwin = NULL;
 	scalebox = NULL;
-	//diagbox->Show();
 
 	SetBackgroundColour(backcolour);
 	SetIcon(icon);
 	//Centre();
 
 	mainsizer = new wxBoxSizer(wxHORIZONTAL);
-	//wxBoxSizer *graphsizer = new wxBoxSizer(wxVERTICAL);
 	graphsizer = new wxBoxSizer(wxVERTICAL);
 	mainpos = GetPosition();
 
@@ -139,11 +128,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//toolset.AddBox(infobox);
 
 	//scalebox->SetBackgroundColour(panelcolour);
-
-
 	//scalebox = new ScaleBox(this, wxSize(80, 775), numdraw, gpos, greg, graphwin);
 	//scalebox = new ScaleBox(this, wxDefaultSize, numdraw, gpos, graphbase, graphwin);
-
 
 	if(basic) BasicMenu();
 	else if(user) UserMenu();

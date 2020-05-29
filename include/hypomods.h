@@ -80,6 +80,7 @@ public:
 	ToolSet modtools;
 	wxString gcodes[10];
 	ScaleBox *scalebox;
+	GraphWindow3 *graphwin;
 
 	DatStore *recdata;
 	GridBox *gridbox;

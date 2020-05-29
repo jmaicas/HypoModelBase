@@ -2,7 +2,6 @@
 
 
 #include "wx/wx.h"
-//#include "hypomodel.h"
 #include "hypodat.h"
 #include "hypopanels.h"
 
@@ -10,7 +9,6 @@
 #include "FileWvOut.h"
 
 using namespace stk;
-
 
 
 class SoundBox : public ParamBox
@@ -22,6 +20,7 @@ public:
 	wxStaticText *numspikes;
 	wxMutex *soundmutex;
 	unsigned int soundon;
+	Model *mod;
 
 	SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat=NULL);
 	void SoundTest();
@@ -30,7 +29,7 @@ public:
 	void OnSpikes(wxCommandEvent& event);
 	void OnWave(wxCommandEvent& event);
 	void OnStop(wxCommandEvent& event);
-	//void SoundLink(SpikeDat *spikedata, datdouble *wavedata);
+	void DataLink(SpikeDat *spikedata, datdouble *wavedata=NULL);
 };
 
 
@@ -44,6 +43,7 @@ public:
 	RtWvOut *dac;
 	FileWvOut outfile;
 	int spikemode;
+	int selectmode;
 
 	int msamp;
 	int pulseint;

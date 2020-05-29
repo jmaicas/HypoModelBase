@@ -740,6 +740,8 @@ void NeuroBox::NeuroData(bool dispupdate)
 	currcell->neurocalc(&(*cells)[neuroindex]);
 	currcell->id = neuroindex;
 
+	if(mainwin->soundbox) mainwin->soundbox->DataLink(currcell);
+
 	if(burstbox) {
 		burstbox->ExpDataScan(currcell);
 		burstbox->SetExpGrid();

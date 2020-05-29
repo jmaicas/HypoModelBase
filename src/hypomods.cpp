@@ -26,6 +26,7 @@ Model::Model(int type, wxString name, HypoMain *main)
 	//prefstore = new ParamStore();
 	scalebox = mainwin->scalebox;
 	diagbox = mainwin->diagbox;
+	graphwin = mainwin->graphwin;
 
 	ostype = GetSystem();
 	graphload = true;

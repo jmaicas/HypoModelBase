@@ -48,6 +48,12 @@ void *SoundGen::Entry()
 	pulsedur = (*params)["pulsedur"];
 	playspikes = (*params)["playspikes"];
 	timerate = (*params)["timerate"];
+
+	if(spikedata->neurodata->numselects) {
+		selectmode = 1;
+		playspikes = spikedata->spikecount;
+	}
+	else selectmode = 0;
 	
 	//spikemode = 1;
 	if(spikemode) PlaySpikes();
@@ -142,8 +148,8 @@ void SoundGen::PlaySpikes()
 	//	for(i=0; i<(fsamp-pulsedur)*msamp; i++) dac->tick(0);
 	//	for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
 	//}
+
 	if(spikemode == 1) {
-        
 		for(s=0; s<playspikes; s++) {
 			fsamp = spikedata->isis[s];
 			//sine.setFrequency(freqscale*1000/fsamp);
@@ -152,6 +158,10 @@ void SoundGen::PlaySpikes()
 		}
 
 		outfile.closeFile();
+
+		// msamp = samples per ms
+		// pulsedur = spike sound duration in ms
+		// fsamp = sound interval (inter-spike interval)
         
         // Live Output
 		for(s=0; s<playspikes; s++) {
@@ -163,11 +173,15 @@ void SoundGen::PlaySpikes()
 					return;
 				}
 				soundbox->soundmutex->Unlock();
-			}	
-			fsamp = spikedata->isis[s];
+			}
+			if(selectmode) {
+				if(spikedata->selectdata->spikes[s]) fsamp = spikedata->isis[s];
+				else continue;
+			}
+			else fsamp = spikedata->isis[s];
 			//sine.setFrequency(freqscale*1000/fsamp);
-			for(i=0; i<(fsamp-pulsedur)*msamp; i++) dac->tick(0);
-			for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
+			for(i=0; i<(fsamp - pulsedur) * msamp; i++) dac->tick(0);
+			for(i=0; i<pulsedur * msamp; i++) dac->tick(sine.tick());
 		}
 	}
 	

@@ -1008,7 +1008,7 @@ Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(OnClose));
 
 #ifdef HYPOSOUND
 
-SoundBox::SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat)
+SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat)
 	: ParamBox(mod, title, pos, size)
 {
 	int i;
@@ -1016,8 +1016,9 @@ SoundBox::SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	spikedata = sdat;
 	soundon = 0;
 	soundmutex = new wxMutex;
-	//vasomod = (VasoModel)mod;
+    mod = model;
 
+	paramset.num_numwidth = 50;
 	paramset.AddNum("soundfreq", "Sound Freq", 400, 2);
 	paramset.AddNum("pulsefreq", "Pulse Freq", 10, 2);
 	paramset.AddNum("pulsedur", "Pulse Dur", 20, 2);
@@ -1026,12 +1027,7 @@ SoundBox::SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	paramset.AddNum("playspikes", "Play Spikes", 100, 0);
 	paramset.AddNum("timerate", "Time Rate", 1, 1);
 
-
-	SetVBox(1);
-
-	for(i=0; i<paramset.numparams; i++) {
-		vbox[0]->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);	
-	}
+	ParamLayout(1);
 
 	numspikes = NumPanel();
 
@@ -1044,9 +1040,9 @@ SoundBox::SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	buttonbox->AddSpacer(10);
 	AddButton(ID_Stop, "Stop", 60, buttonbox);
 
-	parambox->Add(vbox[0], 0);
 	mainbox->AddSpacer(5);
 	mainbox->Add(parambox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddSpacer(5);
 	mainbox->Add(numspikes, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->Add(buttonbox, 1,  wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	panel->Layout();
@@ -1059,6 +1055,13 @@ SoundBox::SoundBox(Model *mod, const wxString& title, const wxPoint& pos, const 
 	Connect(ID_Stop, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnStop));
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnSpikes));
 	Connect(ID_Wave, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnWave));
+}
+
+
+void SoundBox::DataLink(SpikeDat *sdata, datdouble *wdata)
+{
+	if(sdata) spikedata = sdata;
+	if(wdata) wavedata = wdata;
 }
 
 
@@ -1194,8 +1197,8 @@ void SoundBox::SoundTest()
 	RtWvOut *dac = 0;
 
 	
-	dac = new RtWvOut();
-	/*
+	dac = new RtWvOut(1);
+	
 	sine.setFrequency((*modparams)["soundfreq"]);
 	sine2.setFrequency(541.0);
 	sine3.setFrequency(641.0);
@@ -1211,7 +1214,7 @@ void SoundBox::SoundTest()
 		for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
 	}
 
-	*/
+	
 cleanup:
 	delete dac;
 }

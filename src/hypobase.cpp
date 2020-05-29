@@ -23,6 +23,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	diagbox = NULL;                // Protect diagbox self reference for toolpanel
 	gridbox = NULL;
 	neurobox = NULL;
+#ifdef HYPOSOUND
+	soundbox = NULL;
+#endif
+	
+
 
     diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
