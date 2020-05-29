@@ -1009,7 +1009,7 @@ Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(OnClose));
 #ifdef HYPOSOUND
 
 SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat)
-	: ParamBox(mod, title, pos, size)
+	: ParamBox(model, title, pos, size)
 {
 	int i;
 	short stype;

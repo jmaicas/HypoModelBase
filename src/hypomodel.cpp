@@ -296,6 +296,8 @@ void HypoMain::ToolLoad()
 	if((*mod->toolflags)["burstbox"]) SpikeBox(2); 
 
 	if((*mod->toolflags)["spikebox"]) SpikeBox(1); 
+
+	if((*mod->toolflags)["soundbox"]) SoundModule(); 
 }
 
 
@@ -490,19 +492,29 @@ void HypoMain::OnEnter(wxCommandEvent& WXUNUSED(event))
 }
 
 
+void HypoMain::SoundModule()
+{
+	wxSize boxsize;
+
+	if(ostype == Mac) boxsize = wxSize(285, 380);
+	else boxsize = wxSize(320, 430);
+
+#ifdef HYPOSOUND
+	soundbox = new SoundBox(mod, "Sonic Spike Analysis", wxPoint(320, 455), boxsize);
+	toolset->AddBox(soundbox);
+	soundbox->Show(true);
+#endif
+}
+
+
 void HypoMain::OnSound(wxCommandEvent& WXUNUSED(event))
 {
 #ifdef HYPOSOUND
 	wxSize boxsize;
 
 	SetStatusText("Sound Box");
-	if(ostype == Mac) boxsize = wxSize(285, 380);
-	else boxsize = wxSize(320, 430);
-
-	mainpos = GetPosition();
-	soundbox = new SoundBox(mod, "Sonic Spike Analysis", wxPoint(320, 455), boxsize);
-	toolset->AddBox(soundbox);
-	soundbox->Show(true);
+	if(soundbox) soundbox->Show(true);
+	else SoundModule();
 #endif
 }
 
@@ -631,7 +643,7 @@ void HypoMain::OnSize(wxSizeEvent& event)
 	if(gspace / numdraw < 150) yplot = 100;
 	yplot = gspace/numdraw;
 
-	snum.Printf("Size X %d Y %d, Graph X %d Y %d, yplot %d", newsize.x, newsize.y, graphsize.x, graphsize.y, yplot);
+	snum.Printf("Size X %d Y %d, Graph X %d Y %d, xplot %d yplot %d", newsize.x, newsize.y, graphsize.x, graphsize.y, xplot, yplot);
 	SetStatusText(snum);
 
 	viewwidth = newsize.x;

@@ -160,17 +160,17 @@ public:
 	HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path="");
 	~HypoMain();
 
-	void OnPaint2(wxPaintEvent& event);
+	//void OnPaint2(wxPaintEvent& event);
 	void SetStatus(wxString);
     void DiagText(wxString);
 	void DispParam(ParamStore *, wxString);
-	void GraphData();
+	//void GraphData();
 	void RunModel(ParamBox *);
 	//void RunCortModel(CortBox *);
 	void GraphUpdate();
 	void GraphOut();
-	void CortOutput();
-	void VMHOutput();
+	//void CortOutput();
+	//void VMHOutput();
 	void OptionStore();
 	void OptionLoad();
 	void ViewLoad();
@@ -179,7 +179,8 @@ public:
 	void ToolLoad();
 	void SpikeModule(Model *);
 	void SpikeBox(int modmode = 0);
-	void EvoSpikeModule(Model *);
+	//void EvoSpikeModule(Model *);
+	void SoundModule();
 
 	void BasicMenu();
 	void FullMenu();
@@ -208,7 +209,7 @@ public:
 	void OnOutput(wxCommandEvent& event);
 	void OnInfo(wxCommandEvent& event);
 	void OnBurst(wxCommandEvent& event);
-	void OnNeuroGen(wxCommandEvent& event);
+	//void OnNeuroGen(wxCommandEvent& event);
 	void OnOptionPanel(wxCommandEvent& event);
 	void OnNewDisp(wxCommandEvent& event);
 	void OnProtocol(wxCommandEvent& event);

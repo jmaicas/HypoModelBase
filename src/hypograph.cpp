@@ -633,22 +633,29 @@ void GraphWindow3::UpdateScroll(int pos)
 
 void GraphWindow3::Highlight(int xpos)
 {
-	double xdiff, xscale, xgraph, xplot;
+	double xdiff, xscale, xgraph;
+	double xposplot, yposplot;
+	wxString text;
 
 	xdiff = graph->xto - graph->xfrom;
-	xscale = xdiff / xplot;
+	xscale = xplot / xdiff;
 	//xgraph = (xpos - xbase) * xscale + graph->xfrom;
 	//xplaces = numplaces(xdiff);
-	xplot = (xpos - graph->xfrom) * xscale + xbase;
+	xposplot = (xpos - graph->xfrom) * xscale + xbase;
+
+	yposplot = ybase + yplot;
 
 	wxClientDC dc(this);
 	wxDCOverlay overlaydc(overlay, &dc);
 	overlaydc.Clear();
 	wxGraphicsContext *ctx = wxGraphicsContext::Create(dc);
 	//ctx->SetPen(*wxGREY_PEN);
-	ctx->SetBrush(wxBrush(wxColour(192,192,255,64)));
-	wxRect newrect(anchorpos, currentpos);
-	ctx->DrawRectangle(xplot, ybase, 10, 100);
+	ctx->SetBrush(wxBrush(wxColour(192,192,255,128)));
+	//wxRect newrect(anchorpos, currentpos);
+	ctx->DrawRectangle(xposplot, yposplot, xscale, -yplot);
+	 
+	mod->diagbox->Write(text.Format("Highlight xplot %d  yplot %d  xbase %d  ybase %d\n", xplot, yplot, xbase, ybase));
+	//ctx->DrawRectangle(xposplot, ybase-yplot, 10, ybase-100);
 }
 
 

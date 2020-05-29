@@ -1,6 +1,7 @@
 
 //#include "hypomodel.h"
 #include "hyposound.h"
+#include "hypograph.h"
 
 #include "SineWave.h"
 #include "Noise.h"
@@ -49,7 +50,7 @@ void *SoundGen::Entry()
 	playspikes = (*params)["playspikes"];
 	timerate = (*params)["timerate"];
 
-	if(spikedata->neurodata->numselects) {
+	if(spikedata->neurodata && spikedata->neurodata->numselects) {
 		selectmode = 1;
 		playspikes = spikedata->spikecount;
 	}
@@ -139,6 +140,8 @@ void SoundGen::PlayWave()
 void SoundGen::PlaySpikes()
 {
 	int i, s;
+	double stime;
+	int sbin;
 	SineWave sine;
 	
 	outfile.openFile("vspikes.wav", 1, FileWrite::FILE_WAV, Stk::STK_SINT16);	
@@ -149,7 +152,8 @@ void SoundGen::PlaySpikes()
 	//	for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
 	//}
 
-	soundbox->mod->SoundOn();
+	//soundbox->mod->SoundOn();
+	//(*soundbox->mod->graphwin)[0].Highlight();
 
 	if(spikemode == 1) {
 		for(s=0; s<playspikes; s++) {
@@ -178,9 +182,13 @@ void SoundGen::PlaySpikes()
 			}
 			if(selectmode) {
 				if(spikedata->selectdata->spikes[s]) fsamp = spikedata->isis[s];
+				//(*soundbox->mod->graphwin)[0].Highlight();
 				else continue;
 			}
 			else fsamp = spikedata->isis[s];
+			stime = spikedata->times[s];
+			sbin = floor(stime / 1000);
+			(*soundbox->mod->graphwin)[0].Highlight(sbin);
 			//sine.setFrequency(freqscale*1000/fsamp);
 			for(i=0; i<(fsamp - pulsedur) * msamp; i++) dac->tick(0);
 			for(i=0; i<pulsedur * msamp; i++) dac->tick(sine.tick());
