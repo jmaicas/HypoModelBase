@@ -6,6 +6,8 @@
 #include "hypoprint.h"
 #include "hypomodel.h"
 #include <math.h>
+#include <chrono>
+#include <thread>
 
 
 DispWin::DispWin(HypoMain *main, const wxString& title, const wxPoint& pos, const wxSize& size, int start, int numgraphs)
@@ -628,10 +630,11 @@ void GraphWindow3::UpdateScroll(int pos)
 	scrollbar->SetScrollbar(graph->scrollpos, section, scrollxto + section + xdiff/5, section);
 
 	Refresh();
+	overlay.Reset();
 }
 
 
-void GraphWindow3::Highlight(int xpos)
+void GraphWindow3::Highlight(double xpos)
 {
 	double xdiff, xscale, xgraph;
 	double xposplot, yposplot;
@@ -641,21 +644,54 @@ void GraphWindow3::Highlight(int xpos)
 	xscale = xplot / xdiff;
 	//xgraph = (xpos - xbase) * xscale + graph->xfrom;
 	//xplaces = numplaces(xdiff);
-	xposplot = (xpos - graph->xfrom) * xscale + xbase;
+	xposplot = (xpos - graph->xfrom) * xscale + xbase - 1;
 
 	yposplot = ybase + yplot;
 
+	//Refresh();
+	
+	
 	wxClientDC dc(this);
 	wxDCOverlay overlaydc(overlay, &dc);
 	overlaydc.Clear();
 	wxGraphicsContext *ctx = wxGraphicsContext::Create(dc);
 	//ctx->SetPen(*wxGREY_PEN);
-	ctx->SetBrush(wxBrush(wxColour(192,192,255,128)));
+	ctx->SetBrush(wxBrush(wxColour(64,64,255,128)));
 	//wxRect newrect(anchorpos, currentpos);
 	ctx->DrawRectangle(xposplot, yposplot, xscale, -yplot);
+
+	//overlay.Reset();
 	 
-	mod->diagbox->Write(text.Format("Highlight xplot %d  yplot %d  xbase %d  ybase %d\n", xplot, yplot, xbase, ybase));
+	mod->diagbox->Write(text.Format("Highlight xpos %.2f  xplot %d  yplot %d  xbase %d  ybase %d\n", xpos, xplot, yplot, xbase, ybase));
 	//ctx->DrawRectangle(xposplot, ybase-yplot, 10, ybase-100);
+}
+
+
+void GraphWindow3::HighlightTime(double tstart, double tstop)
+{
+	int i, t;
+
+	//(*soundbox->mod->graphwin)[0].Highlight(sbin + i/samprate);
+
+	using namespace std::chrono;
+	//using namespace date;
+	auto next = steady_clock::now();
+	auto prev = next - 1000ms;
+
+	//for(t=tstart; t<tstop; t++) {
+	for(i=tstart/1000; i<tstop/1000; i++) {
+		//if(t%1000 == 0) Highlight(t/1000);
+
+		Highlight(i);
+		
+		auto now = steady_clock::now();
+		//std::cout << round<milliseconds>(now - prev) << '\n';
+		prev = now;
+
+		// delay until time to iterate again
+		next += 1000ms;
+		std::this_thread::sleep_until(next);
+	}
 }
 
 
@@ -769,6 +805,8 @@ void GraphWindow3::ReSize(int newxplot, int newyplot)
 	scrollbar->SetScrollbar(0, 40, xplot, 40);
 	scrollbar->Move(30, yplot + 35);
 	//Layout();
+
+	overlay.Reset();
 	Refresh();
 }
 

@@ -1055,6 +1055,15 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(ID_Stop, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnStop));
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnSpikes));
 	Connect(ID_Wave, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnWave));
+	Connect(ID_Highlight, wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(SoundBox::OnHighlight));
+}
+
+
+void SoundBox::OnHighlight(wxCommandEvent& event)
+{
+	int bin = event.GetInt();
+	
+	(*mod->graphwin)[0].Highlight(bin);
 }
 
 
@@ -1081,18 +1090,14 @@ void SoundBox::OnStop(wxCommandEvent& event)
 
 void SoundBox::OnWave(wxCommandEvent& event)
 {
-	if(soundon) return;
 
-	//if(spikedata == NULL && mainwin->focusdata != NULL) spikedata = mainwin->focusdata;
-	//spikedata = mainwin->currvaso;
-	//snum.Printf("%d", spikedata->spikecount);
-	//numspikes->SetLabel(snum);
-	//datdouble wavedata = (VasoModel)mod->vasodata->Ca;
+	(*mod->graphwin)[0].HighlightTime(0, 500000);
 
+	/*if(soundon) return;
 	SoundGen *soundgen = new SoundGen(wavedata, GetParams(), this);
 	soundgen->Create();
 	soundon = 1;
-	soundgen->Run(); 
+	soundgen->Run();*/ 
 }
 
 

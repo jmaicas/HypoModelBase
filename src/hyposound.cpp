@@ -57,7 +57,7 @@ void *SoundGen::Entry()
 	else selectmode = 0;
 	
 	//spikemode = 1;
-	if(spikemode) PlaySpikes();
+	if(spikemode) PlaySpikesTrace();   // PlaySpikes();
 	else PlayWave();
 	
 	//cleanup:
@@ -207,3 +207,73 @@ void SoundGen::PlaySpikes()
 	outfile.closeFile();
 }
 
+
+void SoundGen::PlaySpikesTrace()
+{
+	int i, s, t=-1;
+	double stime;
+	int sbin;
+	int samprate = msamp * 1000;
+
+	SineWave sine;
+
+	wxCommandEvent highevent(wxEVT_COMMAND_TEXT_UPDATED, ID_Highlight);
+
+	sine.setFrequency((*params)["soundfreq"]);
+
+	// msamp = samples per ms
+	// pulsedur = spike sound duration in ms
+	// fsamp = sound interval (inter-spike interval)
+
+	// Live Output
+
+	for(s=0; s<playspikes; s++) {
+
+		soundbox->soundmutex->Lock();          // check for Stop flag
+		if(!soundbox->soundon) {
+			soundbox->soundmutex->Unlock();
+			return;
+		}
+		soundbox->soundmutex->Unlock();
+		
+		if(selectmode) {
+			if(spikedata->selectdata->spikes[s]) fsamp = spikedata->isis[s];
+			else continue;
+		}
+		else fsamp = spikedata->isis[s];
+		stime = spikedata->times[s];
+		sbin = floor(stime / 1000);
+		if(t < 0) {
+			t = stime - 1;   // initialise t on first loop
+			highevent.SetInt(sbin);
+			soundbox->GetEventHandler()->AddPendingEvent(highevent);
+		}
+		
+		//sine.setFrequency(freqscale*1000/fsamp);
+
+		for(i=0; i<pulsedur * msamp; i+=timerate) {      // spike sound
+			dac->tick(sine.tick());
+			if(i % msamp == 0) {
+				t++;
+				if(t % 1000 == 0) {
+					highevent.SetInt(t/1000);
+					soundbox->GetEventHandler()->AddPendingEvent(highevent);
+				}
+			}
+		}
+
+		for(i=0; i<(fsamp - pulsedur) * msamp; i+=timerate) {     // interspike silence
+			dac->tick(0);
+			if(i % msamp == 0) {
+				t++;
+				if(t % 1000 == 0) {
+					highevent.SetInt(t/1000);
+					soundbox->GetEventHandler()->AddPendingEvent(highevent);
+				}
+			}
+		}
+		
+	}
+
+	(*soundbox->mod->graphwin)[0].Refresh();
+}

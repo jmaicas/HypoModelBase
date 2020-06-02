@@ -30,6 +30,7 @@ public:
 	void OnWave(wxCommandEvent& event);
 	void OnStop(wxCommandEvent& event);
 	void DataLink(SpikeDat *spikedata, datdouble *wavedata=NULL);
+	void OnHighlight(wxCommandEvent& event);
 };
 
 
@@ -57,7 +58,9 @@ public:
 
 	SoundGen(SpikeDat *, ParamStore *, SoundBox *);
 	SoundGen(datdouble *, ParamStore *, SoundBox *);
+	virtual void *Entry();
 	void PlaySpikes();
 	void PlayWave();
-	virtual void *Entry();
+	void PlaySpikesTrace();
+	
 };

@@ -180,7 +180,7 @@ public:
 	void SpikeModule(Model *);
 	void SpikeBox(int modmode = 0);
 	//void EvoSpikeModule(Model *);
-	void SoundModule();
+	void SoundModule(Model *);
 
 	void BasicMenu();
 	void FullMenu();

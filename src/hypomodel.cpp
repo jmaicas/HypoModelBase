@@ -297,7 +297,7 @@ void HypoMain::ToolLoad()
 
 	if((*mod->toolflags)["spikebox"]) SpikeBox(1); 
 
-	if((*mod->toolflags)["soundbox"]) SoundModule(); 
+	if((*mod->toolflags)["soundbox"]) SoundModule(mod); 
 }
 
 
@@ -492,7 +492,7 @@ void HypoMain::OnEnter(wxCommandEvent& WXUNUSED(event))
 }
 
 
-void HypoMain::SoundModule()
+void HypoMain::SoundModule(Model *model)
 {
 	wxSize boxsize;
 
@@ -500,8 +500,10 @@ void HypoMain::SoundModule()
 	else boxsize = wxSize(320, 430);
 
 #ifdef HYPOSOUND
-	soundbox = new SoundBox(mod, "Sonic Spike Analysis", wxPoint(320, 455), boxsize);
-	toolset->AddBox(soundbox);
+	if(!soundbox) {
+		soundbox = new SoundBox(model, "Sonic Spike Analysis", wxPoint(320, 455), boxsize);
+		toolset->AddBox(soundbox);
+	}
 	soundbox->Show(true);
 #endif
 }
@@ -514,7 +516,7 @@ void HypoMain::OnSound(wxCommandEvent& WXUNUSED(event))
 
 	SetStatusText("Sound Box");
 	if(soundbox) soundbox->Show(true);
-	else SoundModule();
+	else SoundModule(mod);
 #endif
 }
 

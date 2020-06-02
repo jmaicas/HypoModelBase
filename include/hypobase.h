@@ -314,7 +314,9 @@ enum {
 	ID_EndRun,
 	ID_Dend,
 	ID_realtime,
-	ID_realupdate
+	ID_realupdate,
+	ID_Disp,
+	ID_Highlight
 };
 
 
