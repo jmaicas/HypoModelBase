@@ -12,6 +12,234 @@
 using namespace stk;
 
 
+
+#ifdef HYPOSOUND
+
+SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat)
+	: ParamBox(model, title, pos, size)
+{
+	int i;
+	short stype;
+	spikedata = sdat;
+	soundon = 0;
+	soundmutex = new wxMutex;
+	mod = model;
+
+	paramset.num_numwidth = 50;
+	paramset.AddNum("soundfreq", "Sound Freq", 400, 2);
+	paramset.AddNum("pulsefreq", "Pulse Freq", 10, 2);
+	paramset.AddNum("pulsedur", "Pulse Dur", 20, 2);
+	paramset.AddNum("pulseint", "Pulse Int", 500, 0);
+	paramset.AddNum("freqscale", "Freq Scale", 20, 0);
+	paramset.AddNum("playspikes", "Play Spikes", 100, 0);
+	paramset.AddNum("timerate", "Time Rate", 1, 1);
+
+	ParamLayout(1);
+
+	numspikes = NumPanel();
+
+	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_Go, "Test", 60, buttonbox);
+	buttonbox->AddSpacer(10);
+	AddButton(ID_spikes, "Spikes", 60, buttonbox);
+	buttonbox->AddSpacer(10);
+	AddButton(ID_Wave, "Wave", 60, buttonbox);
+	buttonbox->AddSpacer(10);
+	AddButton(ID_Stop, "Stop", 60, buttonbox);
+
+	mainbox->AddSpacer(5);
+	mainbox->Add(parambox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddSpacer(5);
+	mainbox->Add(numspikes, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->Add(buttonbox, 1,  wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	panel->Layout();
+
+	stype = mod->SoundLink(&spikedata, &wavedata);
+	if(spikedata != NULL) snum.Printf("%d", spikedata->spikecount); else snum.Printf("bad %d", stype);
+	numspikes->SetLabel(snum);
+
+	Connect(ID_Go, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnGo));
+	Connect(ID_Stop, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnStop));
+	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnSpikes));
+	Connect(ID_Wave, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnWave));
+	Connect(ID_Highlight, wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(SoundBox::OnHighlight));
+}
+
+
+void SoundBox::OnHighlight(wxCommandEvent& event)
+{
+	int bin = event.GetInt();
+
+	if(tracemode == 1) (*mod->graphwin)[0].Highlight(bin);
+	if(tracemode == 2) (*mod->graphwin)[0].Highlight(bin/1000);
+}
+
+
+void SoundBox::DataLink(SpikeDat *sdata, datdouble *wdata)
+{
+	if(sdata) spikedata = sdata;
+	if(wdata) wavedata = wdata;
+}
+
+
+void SoundBox::OnGo(wxCommandEvent& event)
+{
+	SoundTest();
+}
+
+
+void SoundBox::OnStop(wxCommandEvent& event)
+{
+	soundmutex->Lock();
+	soundon = 0;
+	soundmutex->Unlock();
+}
+
+
+void SoundBox::OnWave(wxCommandEvent& event)
+{
+
+	(*mod->graphwin)[0].HighlightTime(0, 500000);
+
+	/*if(soundon) return;
+	SoundGen *soundgen = new SoundGen(wavedata, GetParams(), this);
+	soundgen->Create();
+	soundon = 1;
+	soundgen->Run();*/ 
+}
+
+
+
+void SoundBox::OnSpikes(wxCommandEvent& event)
+{
+
+	if(soundon) return;
+
+	tracemode = 2;
+
+	SoundGen *soundgen = new SoundGen(spikedata, GetParams(), this);
+	soundgen->Create();
+	soundon = 1;
+	soundgen->Run(); 
+
+	//if(spikedata == NULL && mainwin->focusdata != NULL) spikedata = mainwin->focusdata;
+	//spikedata = mod->mainwin->mod->currvaso;
+	/*
+	if(spikedata != NULL) {
+	snum.Printf("%d", spikedata->spikecount);
+	numspikes->SetLabel(snum);
+	SoundGen *soundgen = new SoundGen(spikedata, GetParams(), this);
+	soundgen->Create();
+	soundon = 1;
+	soundgen->Run(); 
+	}
+	else {
+	snum.Printf("no data");
+	numspikes->SetLabel(snum);
+	}
+	*/
+
+	//SpikeSonic();
+}
+
+
+void SoundBox::SpikeSonic()
+{
+	int i, s;
+	int mode = 1;
+	SineWave sine;
+	RtWvOut *dac = NULL;
+
+	Stk::setSampleRate(96000.0);
+	Stk::showWarnings(true);
+	GetParams();
+	snum.Printf("%d", spikedata->spikecount);
+
+	//snum.Printf("%d", 100);
+	numspikes->SetLabel(snum);
+
+	dac = new RtWvOut(1);
+	sine.setFrequency((*modparams)["soundfreq"]);
+
+	int msamp = 96;
+	int pulseint = (*modparams)["pulseint"];
+	int freqscale = (*modparams)["freqscale"];
+	int freq = (*modparams)["pulsefreq"];
+	int fsamp = 1000/freq;
+	int pulsedur = (*modparams)["pulsedur"];
+	double sdur;
+	int playspikes = (*modparams)["playspikes"];
+
+	//for(s=0; s<freq*2; s++) {
+	//	for(i=0; i<(fsamp-pulsedur)*msamp; i++) dac->tick(0);
+	//	for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
+	//}
+	if(mode == 1) {
+		for(s=0; s<playspikes; s++) {
+			fsamp = spikedata->isis[s];
+			//sine.setFrequency(freqscale*1000/fsamp);
+			for(i=0; i<(fsamp-pulsedur)*msamp; i++) dac->tick(0);
+			for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
+		}
+	}
+
+	if(mode == 2) {
+		for(s=0; s<playspikes; s++) {
+			fsamp = spikedata->isis[s];
+			sine.setFrequency(freqscale*1000/fsamp);
+			for(i=0; i<(pulseint-pulsedur)*msamp; i++) dac->tick(0);
+			for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
+		}
+	}
+
+cleanup:
+	delete dac;
+}
+
+
+void SoundBox::SoundTest()
+{
+	int i;
+
+	Stk::setSampleRate(96000.0);
+	Stk::showWarnings(true);
+
+	GetParams();
+
+	int nFrames = 10000;
+	SineWave sine, sine2, sine3;
+	Noise noise;
+	RtWvOut *dac = 0;
+
+
+	dac = new RtWvOut(1);
+
+	sine.setFrequency((*modparams)["soundfreq"]);
+	sine2.setFrequency(541.0);
+	sine3.setFrequency(641.0);
+
+	int s;
+	int msamp = 96;
+	int freq = (*modparams)["pulsefreq"];
+	int fsamp = 1000/freq;
+	int pulsedur = (*modparams)["pulsedur"];
+
+	for(s=0; s<freq*2; s++) {
+		for(i=0; i<(fsamp-pulsedur)*msamp; i++) dac->tick(0);
+		for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
+	}
+
+
+cleanup:
+	delete dac;
+}
+
+
+
+#endif
+
+
+
 SoundGen::SoundGen(SpikeDat *data, ParamStore *p, SoundBox *box)
 : wxThread(wxTHREAD_JOINABLE)
 {
@@ -38,7 +266,6 @@ void *SoundGen::Entry()
 	Stk::setSampleRate(96000.0);
 	Stk::showWarnings(true);
 	dac = new RtWvOut(1);
-	//outspikes.openFile( "vspikes.wav", 1, FileWrite::FILE_WAV, Stk::STK_SINT16 );
 	
 	soundbox->numspikes->SetLabel("playing");
 	msamp = 96;
@@ -49,6 +276,7 @@ void *SoundGen::Entry()
 	pulsedur = (*params)["pulsedur"];
 	playspikes = (*params)["playspikes"];
 	timerate = (*params)["timerate"];
+	tracemode = 2;
 
 	if(spikedata->neurodata && spikedata->neurodata->numselects) {
 		selectmode = 1;
@@ -57,12 +285,13 @@ void *SoundGen::Entry()
 	else selectmode = 0;
 	
 	//spikemode = 1;
-	if(spikemode) PlaySpikesTrace();   // PlaySpikes();
+	if(spikemode && tracemode == 1) PlaySpikesBinTrace();   // PlaySpikes();
+	if(spikemode && tracemode == 2) PlaySpikesTrace();   // PlaySpikes();
 	else PlayWave();
 	
 	//cleanup:
 	delete dac;
-	//outfile.closeFile();
+
 	soundbox->soundmutex->Lock();
 	soundbox->soundon = 0;
 	soundbox->soundmutex->Unlock();
@@ -208,7 +437,7 @@ void SoundGen::PlaySpikes()
 }
 
 
-void SoundGen::PlaySpikesTrace()
+void SoundGen::PlaySpikesBinTrace()
 {
 	int i, s, t=-1;
 	double stime;
@@ -273,6 +502,61 @@ void SoundGen::PlaySpikesTrace()
 			}
 		}
 		
+	}
+
+	(*soundbox->mod->graphwin)[0].Refresh();
+}
+
+
+void SoundGen::PlaySpikesTrace()
+{
+	int i, s, t=-1;
+	double stime;
+	int sbin;
+	int samprate = msamp * 1000;
+
+	SineWave sine;
+
+	wxCommandEvent highevent(wxEVT_COMMAND_TEXT_UPDATED, ID_Highlight);
+
+	sine.setFrequency((*params)["soundfreq"]);
+
+	// msamp = samples per ms
+	// pulsedur = spike sound duration in ms
+	// fsamp = sound interval (inter-spike interval)
+
+	// Live Output
+
+	for(s=0; s<playspikes; s++) {
+
+		soundbox->soundmutex->Lock();          // check for Stop flag
+		if(!soundbox->soundon) {
+			soundbox->soundmutex->Unlock();
+			return;
+		}
+		soundbox->soundmutex->Unlock();
+
+		if(selectmode) {
+			if(spikedata->selectdata->spikes[s]) fsamp = spikedata->isis[s];
+			else continue;
+		}
+		else fsamp = spikedata->isis[s];
+		stime = spikedata->times[s];
+		sbin = floor(stime / 1000);
+		
+		//sine.setFrequency(freqscale*1000/fsamp);
+
+		highevent.SetInt(stime);
+		soundbox->GetEventHandler()->AddPendingEvent(highevent);
+
+		for(i=0; i<pulsedur * msamp; i+=timerate) {      // spike sound
+			dac->tick(sine.tick());
+		}
+
+		for(i=0; i<(fsamp - pulsedur) * msamp; i+=timerate) {     // interspike silence
+			dac->tick(0);
+		}
+
 	}
 
 	(*soundbox->mod->graphwin)[0].Refresh();

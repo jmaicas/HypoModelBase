@@ -316,7 +316,9 @@ enum {
 	ID_realtime,
 	ID_realupdate,
 	ID_Disp,
-	ID_Highlight
+	ID_Highlight,
+	ID_Mod,
+	ID_Net
 };
 
 

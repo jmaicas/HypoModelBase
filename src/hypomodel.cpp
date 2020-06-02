@@ -273,6 +273,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	Connect(ID_Grid, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnGridBox));
 	Connect(ID_Neuro, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnNeuroBox));
 	Connect(ID_Plot, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnPlotBox));
+	Connect(ID_Mod, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnModBox));
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(HypoMain::OnEnter));
 }
 
@@ -456,6 +457,8 @@ void HypoMain::UserMenu()
 	menuTools->Append(ID_Neuro, "Neuro Box");
 	menuTools->Append(ID_Plot, "Plot Box");
 	menuTools->Append(ID_Sound, "Sound Box");
+	menuTools->Append(ID_Mod, "Mod Box");
+
 
 	menuSystem->Append(ID_Options, "Options");
 
@@ -777,6 +780,12 @@ void HypoMain::OnNeuroBox(wxCommandEvent& WXUNUSED(event))
 void HypoMain::OnPlotBox(wxCommandEvent& WXUNUSED(event))
 {
 	if(plotbox) plotbox->Show(true);
+}
+
+
+void HypoMain::OnModBox(wxCommandEvent& WXUNUSED(event))
+{
+	if(mod) mod->modbox->Show(true);
 }
 
 

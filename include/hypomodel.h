@@ -221,6 +221,7 @@ public:
 	void OnGridBox(wxCommandEvent& event);
 	void OnNeuroBox(wxCommandEvent& event);
 	void OnPlotBox(wxCommandEvent& event);
+	void OnModBox(wxCommandEvent& event);
 };
 
 

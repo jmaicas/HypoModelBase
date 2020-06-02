@@ -20,6 +20,7 @@ public:
 	wxStaticText *numspikes;
 	wxMutex *soundmutex;
 	unsigned int soundon;
+	int tracemode;
 	Model *mod;
 
 	SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat=NULL);
@@ -45,6 +46,7 @@ public:
 	FileWvOut outfile;
 	int spikemode;
 	int selectmode;
+	int tracemode;
 
 	int msamp;
 	int pulseint;
@@ -61,6 +63,7 @@ public:
 	virtual void *Entry();
 	void PlaySpikes();
 	void PlayWave();
+	void PlaySpikesBinTrace();
 	void PlaySpikesTrace();
 	
 };
