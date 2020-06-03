@@ -318,7 +318,8 @@ enum {
 	ID_Disp,
 	ID_Highlight,
 	ID_Mod,
-	ID_Net
+	ID_Net,
+	ID_Data
 };
 
 

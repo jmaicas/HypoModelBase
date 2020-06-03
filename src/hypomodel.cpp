@@ -28,7 +28,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//panelcolour.Set("#ece9d8");     // xp default
 	//panelcolour = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
 	
-	SetMinSize(wxSize(200, 670));
+	//SetMinSize(wxSize(200, 670));
+	SetMinSize(wxSize(200, 00));
 
 	// Flicker Protection
 
@@ -649,7 +650,8 @@ void HypoMain::OnSize(wxSizeEvent& event)
 	yplot = gspace/numdraw;
 
 	snum.Printf("Size X %d Y %d, Graph X %d Y %d, xplot %d yplot %d", newsize.x, newsize.y, graphsize.x, graphsize.y, xplot, yplot);
-	SetStatusText(snum);
+	//SetStatusText(snum);
+	diagbox->Write(snum + "\n");
 
 	viewwidth = newsize.x;
 	viewheight = newsize.y;

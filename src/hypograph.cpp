@@ -662,7 +662,7 @@ void GraphWindow3::Highlight(double xpos)
 
 	//overlay.Reset();
 	 
-	mod->diagbox->Write(text.Format("Highlight xpos %.2f  xscale %.3f  xplot %d  yplot %d  xbase %d  ybase %d\n", xpos, xplot, xscale, yplot, xbase, ybase));
+	//mod->diagbox->Write(text.Format("Highlight xpos %.2f  xscale %.3f  xplot %d  yplot %d  xbase %d  ybase %d\n", xpos, xscale, xplot, yplot, xbase, ybase));
 	//ctx->DrawRectangle(xposplot, ybase-yplot, 10, ybase-100);
 }
 

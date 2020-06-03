@@ -22,6 +22,7 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	short stype;
 	spikedata = sdat;
 	soundon = 0;
+	soundgen = NULL;
 	soundmutex = new wxMutex;
 	mod = model;
 
@@ -47,11 +48,22 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	buttonbox->AddSpacer(10);
 	AddButton(ID_Stop, "Stop", 60, buttonbox);
 
+	wxBoxSizer *buttonbox2 = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_Data, "Data", 60, buttonbox2);
+
+	SetPanel(ID_Data, mod->gridbox);
+
 	mainbox->AddSpacer(5);
 	mainbox->Add(parambox, 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->AddSpacer(5);
 	mainbox->Add(numspikes, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-	mainbox->Add(buttonbox, 1,  wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddSpacer(5);
+	mainbox->AddStretchSpacer();
+	mainbox->Add(buttonbox, 0,  wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	//mainbox->AddStretchSpacer();
+	mainbox->AddSpacer(5);
+	mainbox->Add(buttonbox2, 0,  wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddSpacer(5);
 	panel->Layout();
 
 	stype = mod->SoundLink(&spikedata, &wavedata);
@@ -63,6 +75,7 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnSpikes));
 	Connect(ID_Wave, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnWave));
 	Connect(ID_Highlight, wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(SoundBox::OnHighlight));
+	//Connect(ID_Data, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnData));
 }
 
 
@@ -93,13 +106,17 @@ void SoundBox::OnStop(wxCommandEvent& event)
 	soundmutex->Lock();
 	soundon = 0;
 	soundmutex->Unlock();
+
+	//soundgen = NULL;
+
+	(*mod->graphwin)[0].Refresh();
 }
 
 
 void SoundBox::OnWave(wxCommandEvent& event)
 {
 
-	(*mod->graphwin)[0].HighlightTime(0, 500000);
+	//(*mod->graphwin)[0].HighlightTime(0, 500000);
 
 	/*if(soundon) return;
 	SoundGen *soundgen = new SoundGen(wavedata, GetParams(), this);
@@ -112,14 +129,20 @@ void SoundBox::OnWave(wxCommandEvent& event)
 
 void SoundBox::OnSpikes(wxCommandEvent& event)
 {
-
-	if(soundon) return;
-
+	soundmutex->Lock();
+	if(soundon) {
+		soundmutex->Unlock();
+		return;
+	}
+	soundmutex->Unlock();
+	
 	tracemode = 2;
 
-	SoundGen *soundgen = new SoundGen(spikedata, GetParams(), this);
+	soundgen = new SoundGen(spikedata, GetParams(), this);
 	soundgen->Create();
+	soundmutex->Lock();
 	soundon = 1;
+	soundmutex->Unlock();
 	soundgen->Run(); 
 
 	//if(spikedata == NULL && mainwin->focusdata != NULL) spikedata = mainwin->focusdata;
@@ -276,7 +299,7 @@ void *SoundGen::Entry()
 	pulsedur = (*params)["pulsedur"];
 	playspikes = (*params)["playspikes"];
 	timerate = (*params)["timerate"];
-	tracemode = 2;
+	
 
 	if(spikedata->neurodata && spikedata->neurodata->numselects) {
 		selectmode = 1;
@@ -285,8 +308,8 @@ void *SoundGen::Entry()
 	else selectmode = 0;
 	
 	//spikemode = 1;
-	if(spikemode && tracemode == 1) PlaySpikesBinTrace();   // PlaySpikes();
-	if(spikemode && tracemode == 2) PlaySpikesTrace();   // PlaySpikes();
+	if(spikemode && soundbox->tracemode == 1) PlaySpikesBinTrace();   // PlaySpikes();
+	if(spikemode && soundbox->tracemode == 2) PlaySpikesTrace();   // PlaySpikes();
 	else PlayWave();
 	
 	//cleanup:

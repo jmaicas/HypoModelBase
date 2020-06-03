@@ -11,30 +11,6 @@
 using namespace stk;
 
 
-class SoundBox : public ParamBox
-{
-public:
-	SpikeDat *spikedata;
-	datdouble *wavedata;
-	//VasoModel *vasomod;
-	wxStaticText *numspikes;
-	wxMutex *soundmutex;
-	unsigned int soundon;
-	int tracemode;
-	Model *mod;
-
-	SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat=NULL);
-	void SoundTest();
-	void SpikeSonic();
-	void OnGo(wxCommandEvent& event);
-	void OnSpikes(wxCommandEvent& event);
-	void OnWave(wxCommandEvent& event);
-	void OnStop(wxCommandEvent& event);
-	void DataLink(SpikeDat *spikedata, datdouble *wavedata=NULL);
-	void OnHighlight(wxCommandEvent& event);
-};
-
-
 class SoundGen : public wxThread
 {
 public:
@@ -46,7 +22,6 @@ public:
 	FileWvOut outfile;
 	int spikemode;
 	int selectmode;
-	int tracemode;
 
 	int msamp;
 	int pulseint;
@@ -65,5 +40,30 @@ public:
 	void PlayWave();
 	void PlaySpikesBinTrace();
 	void PlaySpikesTrace();
-	
+};
+
+
+class SoundBox : public ParamBox
+{
+public:
+	SpikeDat *spikedata;
+	datdouble *wavedata;
+	//VasoModel *vasomod;
+	wxStaticText *numspikes;
+	wxMutex *soundmutex;
+	unsigned int soundon;
+	int tracemode;
+	Model *mod;
+	SoundGen *soundgen;
+
+	SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat=NULL);
+	void SoundTest();
+	void SpikeSonic();
+	void OnGo(wxCommandEvent& event);
+	void OnSpikes(wxCommandEvent& event);
+	void OnWave(wxCommandEvent& event);
+	void OnStop(wxCommandEvent& event);
+	void DataLink(SpikeDat *spikedata, datdouble *wavedata=NULL);
+	void OnHighlight(wxCommandEvent& event);
+	void OnData(wxCommandEvent& event);
 };

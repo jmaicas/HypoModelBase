@@ -88,6 +88,7 @@ public:
 	GridBox *gridbox;
 
 	NeuroBox *neurobox;
+	SoundBox *soundbox;
 	EvoFitBox *fitbox;
 	EvoChrome *fitchrome;
 
