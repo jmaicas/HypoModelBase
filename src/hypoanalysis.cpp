@@ -763,7 +763,7 @@ void BurstDat::BurstScanFit()
 		sdlength = 0;
 		sdsilence = 0;
 		burstdisp = 0;
-		maxint = maxint;
+		//maxint = maxint;
 		IoDrange();
 		return;
 	}

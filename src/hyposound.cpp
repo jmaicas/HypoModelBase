@@ -582,5 +582,5 @@ void SoundGen::PlaySpikesTrace()
 
 	}
 
-	(*soundbox->mod->graphwin)[0].Refresh();
+	//(*soundbox->mod->graphwin)[0].Refresh();
 }
