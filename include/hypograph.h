@@ -113,7 +113,7 @@ public:
 	void MultiCell();
 	void XYSynch();
 	wxRealPoint GraphPos(wxPoint);
-	void Highlight(double xpos);              // new 28/5/20
+	void Highlight(double xpos, double width=0);              // new 28/5/20
 	void HighlightTime(double start, double stop);
 };
 

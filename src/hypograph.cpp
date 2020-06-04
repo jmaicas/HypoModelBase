@@ -634,7 +634,7 @@ void GraphWindow3::UpdateScroll(int pos)
 }
 
 
-void GraphWindow3::Highlight(double xpos)
+void GraphWindow3::Highlight(double xpos, double width)
 {
 	double xdiff, xscale, xgraph;
 	double xposplot, yposplot;
@@ -648,6 +648,8 @@ void GraphWindow3::Highlight(double xpos)
 
 	yposplot = ybase + yplot;
 
+	if(!width) width = xscale;
+
 	//Refresh();
 	
 	
@@ -658,7 +660,7 @@ void GraphWindow3::Highlight(double xpos)
 	//ctx->SetPen(*wxGREY_PEN);
 	ctx->SetBrush(wxBrush(wxColour(64,64,255,128)));
 	//wxRect newrect(anchorpos, currentpos);
-	ctx->DrawRectangle(xposplot, yposplot, xscale, -yplot);
+	ctx->DrawRectangle(xposplot, yposplot, width, -yplot);
 
 	//overlay.Reset();
 	 

@@ -27,13 +27,16 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	mod = model;
 
 	paramset.num_numwidth = 50;
-	paramset.AddNum("soundfreq", "Sound Freq", 400, 2);
+	paramset.AddNum("soundfreq", "Sound Freq", 300, 2);
 	paramset.AddNum("pulsefreq", "Pulse Freq", 10, 2);
 	paramset.AddNum("pulsedur", "Pulse Dur", 20, 2);
 	paramset.AddNum("pulseint", "Pulse Int", 500, 0);
 	paramset.AddNum("freqscale", "Freq Scale", 20, 0);
 	paramset.AddNum("playspikes", "Play Spikes", 100, 0);
+	paramset.AddNum("volume", "Volume", 20, 1);
 	paramset.AddNum("timerate", "Time Rate", 1, 1);
+
+	tracemode = 1;
 
 	ParamLayout(1);
 
@@ -84,7 +87,7 @@ void SoundBox::OnHighlight(wxCommandEvent& event)
 	int bin = event.GetInt();
 
 	if(tracemode == 1) (*mod->graphwin)[0].Highlight(bin);
-	if(tracemode == 2) (*mod->graphwin)[0].Highlight(bin/1000);
+	if(tracemode == 2) (*mod->graphwin)[0].Highlight(bin/1000, 5);
 }
 
 
@@ -243,13 +246,14 @@ void SoundBox::SoundTest()
 
 	int s;
 	int msamp = 96;
-	int freq = (*modparams)["pulsefreq"];
+	double freq = (*modparams)["pulsefreq"];
 	int fsamp = 1000/freq;
 	int pulsedur = (*modparams)["pulsedur"];
+	double volume = (*modparams)["volume"];
 
 	for(s=0; s<freq*2; s++) {
 		for(i=0; i<(fsamp-pulsedur)*msamp; i++) dac->tick(0);
-		for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick());
+		for(i=0; i<pulsedur*msamp; i++) dac->tick(sine.tick() * volume);
 	}
 
 
@@ -299,6 +303,7 @@ void *SoundGen::Entry()
 	pulsedur = (*params)["pulsedur"];
 	playspikes = (*params)["playspikes"];
 	timerate = (*params)["timerate"];
+	volume = (*params)["volume"];
 	
 
 	if(spikedata->neurodata && spikedata->neurodata->numselects) {
@@ -573,7 +578,7 @@ void SoundGen::PlaySpikesTrace()
 		soundbox->GetEventHandler()->AddPendingEvent(highevent);
 
 		for(i=0; i<pulsedur * msamp; i+=timerate) {      // spike sound
-			dac->tick(sine.tick());
+			dac->tick(sine.tick() * volume);
 		}
 
 		for(i=0; i<(fsamp - pulsedur) * msamp; i+=timerate) {     // interspike silence

@@ -32,6 +32,7 @@ public:
 	double sdur;
 	int playspikes;
     int timerate;
+	double volume;
 
 	SoundGen(SpikeDat *, ParamStore *, SoundBox *);
 	SoundGen(datdouble *, ParamStore *, SoundBox *);
