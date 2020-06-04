@@ -45,11 +45,11 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	AddButton(ID_spikes, "Spikes", 60, buttonbox);
 	buttonbox->AddSpacer(10);
 	AddButton(ID_Wave, "Wave", 60, buttonbox);
-	buttonbox->AddSpacer(10);
-	AddButton(ID_Stop, "Stop", 60, buttonbox);
 
 	wxBoxSizer *buttonbox2 = new wxBoxSizer(wxHORIZONTAL);
 	AddButton(ID_Data, "Data", 60, buttonbox2);
+	buttonbox2->AddSpacer(10);
+	AddButton(ID_Stop, "Stop", 60, buttonbox2);
 
 	SetPanel(ID_Data, mod->gridbox);
 
@@ -582,5 +582,5 @@ void SoundGen::PlaySpikesTrace()
 
 	}
 
-	//(*soundbox->mod->graphwin)[0].Refresh();
+	if(soundbox->mod->ostype != Mac) (*soundbox->mod->graphwin)[0].Refresh();
 }
