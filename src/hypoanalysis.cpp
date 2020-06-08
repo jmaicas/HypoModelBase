@@ -1712,7 +1712,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d \n", i, times[i], (int)(times[i]+0.5)));
 	//if(mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
 
-	if(times[spikecount] > 1000) srate1.max = srate1.data.size();
+	if(times[spikecount-1] > 1000) srate1.max = srate1.data.size();
 
 
 	// Freq Window                                        new 23/11/11

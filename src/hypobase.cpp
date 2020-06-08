@@ -499,6 +499,17 @@ float fast_tanh(float x) {
 }
 
 
+inline double vox_tanh( const double x )
+{
+	const double ax = fabs( x );
+	const double x2 = x * x;
+	const double z = x * ( 1.0 + ax +
+		( 1.05622909486427 + 0.215166815390934 * x2 * ax ) * x2 );
+
+	return( z / ( 1.02718982441289 + fabs( z )));
+}
+
+
 double kapow(double base, int power) {
 	int i;
 	double num;
