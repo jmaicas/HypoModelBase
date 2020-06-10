@@ -649,6 +649,7 @@ void GraphWindow3::Highlight(double xpos, double width)
 	yposplot = ybase + yplot;
 
 	if(!width) width = xscale;
+	if(width < xscale) width = xscale;
 
 	//Refresh();
 	

@@ -196,8 +196,8 @@ int Model::GetCellIndex()
 }
 
 
-void Model::ScaleConsole(ScaleBox *scalebox, int condex)
-{}
+//void Model::ScaleConsoleBelow(ScaleBox *scalebox, int condex)
+//{}
 
 
 long Model::ReadNextData(wxString *readline)

@@ -27,15 +27,16 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	mod = model;
 
 	paramset.num_numwidth = 50;
-	paramset.AddNum("soundfreq", "Sound Freq", 300, 2);
+	paramset.AddNum("soundfreq", "Sound Freq", 200, 2);
 	paramset.AddNum("pulsefreq", "Pulse Freq", 10, 2);
-	paramset.AddNum("pulsedur", "Pulse Dur", 20, 2);
+	paramset.AddNum("pulsedur", "Pulse Dur", 5, 2);
 	paramset.AddNum("pulseint", "Pulse Int", 500, 0);
 	paramset.AddNum("freqscale", "Freq Scale", 20, 0);
-	paramset.AddNum("playspikes", "Play Spikes", 100, 0);
+	paramset.AddNum("playspikes", "Play Spikes", 0, 0);
 	paramset.AddNum("volume", "Volume", 20, 1);
 	paramset.AddNum("timerate", "Time Rate", 1, 1);
 
+	selfstore = true;
 	tracemode = 1;
 
 	ParamLayout(1);
@@ -72,6 +73,7 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	stype = mod->SoundLink(&spikedata, &wavedata);
 	if(spikedata != NULL) snum.Printf("%d", spikedata->spikecount); else snum.Printf("bad %d", stype);
 	numspikes->SetLabel(snum);
+	if(selfstore) Load();   // load self-stored tool parameter values
 
 	Connect(ID_Go, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnGo));
 	Connect(ID_Stop, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnStop));
@@ -304,8 +306,9 @@ void *SoundGen::Entry()
 	playspikes = (*params)["playspikes"];
 	timerate = (*params)["timerate"];
 	volume = (*params)["volume"];
-	
 
+	if(!playspikes) playspikes = spikedata->spikecount;
+	
 	if(spikedata->neurodata && spikedata->neurodata->numselects) {
 		selectmode = 1;
 		playspikes = spikedata->spikecount;

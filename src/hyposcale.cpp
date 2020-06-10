@@ -114,6 +114,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 		//g = gpos[i].data;
 		graphwin[i]->scalebox = this;
 		psetbox = new wxBoxSizer(wxVERTICAL);
+
         if(ostype == Mac) psetbox->AddSpacer(2);
 		//gpos[i].yf = AddScaleParam("YF", gpos[i].plot[0]->yfrom, psetbox);
 		//gpos[i].yt = AddScaleParam("YT", gpos[i].plot[0]->yto, psetbox);
@@ -149,14 +150,17 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 		gsync[i] = NULL;
 
-		if(boxtype == -1) mod->ScaleConsole(this, i);
+		
 
 		if(boxtype == modVMN) {
 			//gsync[i] = new wxCheckBox(panel, i, "Sync");
 			//psetbox->Add(gsync[i], 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 2);
 		}
 
+		if(boxtype == -1) mod->ScaleConsoleAbove(this, i);
 		vbox->Add(psetbox, 1, wxALIGN_CENTRE_HORIZONTAL, 0);
+		if(boxtype == -1) mod->ScaleConsoleBelow(this, i);
+
 		//vbox->AddSpacer(2);
 		if(boxtype == 0) {
 			if(i == 0) {

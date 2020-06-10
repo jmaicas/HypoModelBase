@@ -989,7 +989,6 @@ void ToolBox::Load()
 		return;
 	}
 
-	
 	toolfile.Open(filename);
 	readline = toolfile.ReadLine();
 
@@ -1010,7 +1009,6 @@ void ToolBox::Load()
 		if(toolfile.End()) return;
 		readline = toolfile.ReadLine();	
 	}
-	
 	
     toolfile.Close();
 }

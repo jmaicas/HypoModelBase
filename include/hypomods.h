@@ -116,7 +116,8 @@ public:
 	virtual void GHistLoad(wxComboBox *);
 	virtual void ModClose();
 	virtual void EvoRun();
-	virtual void ScaleConsole(ScaleBox *scalebox, int condex);
+	virtual void ScaleConsoleAbove(ScaleBox *scalebox, int condex) {};
+	virtual void ScaleConsoleBelow(ScaleBox *scalebox, int condex) {};
 	virtual void SetCell(int cellindex, GraphDat *);
 	virtual int GetCellIndex();
 	virtual void ParamScan();
