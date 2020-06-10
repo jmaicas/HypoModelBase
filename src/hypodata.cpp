@@ -1098,6 +1098,13 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 };
 
 
+void GridBox::PlotButton()
+{
+	buttonbox->AddSpacer(2);
+	AddButton(ID_Plot, "Plot", 40, buttonbox);
+	Connect(ID_Plot, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnPlot));
+}
+
 
 void GridBox::ParamButton()
 {
@@ -1128,6 +1135,14 @@ void GridBox::OnParamScan(wxCommandEvent& event)
 {
 	mod->ParamScan();
 	WriteVDU("Param Scan\n");
+	//diagbox->Write("param scan\n");
+}
+
+
+void GridBox::OnPlot(wxCommandEvent& event)
+{
+	//mod->RangePlot(textgrid);
+	WriteVDU("Plot\n");
 	//diagbox->Write("param scan\n");
 }
 

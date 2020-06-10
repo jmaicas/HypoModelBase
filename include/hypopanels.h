@@ -323,10 +323,12 @@ public:
 
 	void ParamButton();
 	void NeuroButton();
+	void PlotButton();
 
 	void OnParamMode(wxCommandEvent& event);
 	void OnParamScan(wxCommandEvent& event);
 	void OnNeuroScan(wxCommandEvent& event);
+	virtual void OnPlot(wxCommandEvent& event);
 
 	void NeuroGridFilter();
 	void NeuroScan();

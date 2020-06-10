@@ -1517,6 +1517,8 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	}
 	stime = start;
 
+	if(!spikecount) return;
+
 	if(calcdiag) fprintf(ofp, "Neuron %d  Spike Count %d\n", neurodat, spikecount);
 
 	// ISIs, Histogram, Freq, Variance
