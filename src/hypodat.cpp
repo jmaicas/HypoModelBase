@@ -59,6 +59,7 @@ void NeuroDat::ratecalc()
 
 	if(spikecount == 0) {
 		delete[] isis;
+		freq = 0;
 		return;
 	}
 
