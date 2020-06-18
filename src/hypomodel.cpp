@@ -599,8 +599,8 @@ void HypoMain::OnMove(wxMoveEvent& event)
 
     if(mod) {
         for(i=0; i<mod->modtools.numtools; i++) if(mod->modtools.box[i] != NULL) mod->modtools.box[i]->SetPosition();
-        snum.Printf("Move %d modtools", mod->modtools.numtools);
-        if(diagnostic) SetStatusText(snum);
+        //snum.Printf("Move %d modtools", mod->modtools.numtools);
+        //if(diagnostic) SetStatusText(snum);
     }
 
 	//gwindow->Refresh();

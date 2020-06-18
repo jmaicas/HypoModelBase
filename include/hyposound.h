@@ -58,6 +58,8 @@ public:
 	SoundGen *soundgen;
 
 	SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat=NULL);
+	~SoundBox();
+
 	void SoundTest();
 	void SpikeSonic();
 	void OnGo(wxCommandEvent& event);

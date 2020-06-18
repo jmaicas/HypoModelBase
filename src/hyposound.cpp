@@ -84,6 +84,12 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 }
 
 
+SoundBox::~SoundBox()
+{
+	delete soundmutex;
+}
+
+
 void SoundBox::OnHighlight(wxCommandEvent& event)
 {
 	int bin = event.GetInt();
