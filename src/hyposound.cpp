@@ -35,9 +35,10 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	paramset.AddNum("playspikes", "Play Spikes", 0, 0);
 	paramset.AddNum("volume", "Volume", 20, 1);
 	paramset.AddNum("timerate", "Time Rate", 1, 1);
+	paramset.AddNum("tracerate", "Trace Rate", 1000, 0);
 
 	selfstore = true;
-	tracemode = 1;
+	tracemode = 0;
 
 	ParamLayout(1);
 
@@ -80,6 +81,7 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnSpikes));
 	Connect(ID_Wave, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnWave));
 	Connect(ID_Highlight, wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(SoundBox::OnHighlight));
+	Connect(ID_Trace, wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(SoundBox::OnTrace));
 	//Connect(ID_Data, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnData));
 }
 
@@ -96,6 +98,15 @@ void SoundBox::OnHighlight(wxCommandEvent& event)
 
 	if(tracemode == 1) (*mod->graphwin)[0].Highlight(bin);
 	if(tracemode == 2) (*mod->graphwin)[0].Highlight(bin/1000, 5);
+}
+
+
+void SoundBox::OnTrace(wxCommandEvent& event)
+{
+	int timeX = event.GetInt();
+
+	mod->graphbase->GetGraph("cell0spikes1ms")->drawX = timeX;
+	(*mod->graphwin)[0].Refresh();
 }
 
 
@@ -147,7 +158,7 @@ void SoundBox::OnSpikes(wxCommandEvent& event)
 	}
 	soundmutex->Unlock();
 	
-	tracemode = 2;
+	tracemode = 3;
 
 	soundgen = new SoundGen(spikedata, GetParams(), this);
 	soundgen->Create();
@@ -312,6 +323,7 @@ void *SoundGen::Entry()
 	playspikes = (*params)["playspikes"];
 	timerate = (*params)["timerate"];
 	volume = (*params)["volume"];
+	tracerate = (*params)["tracerate"];
 
 	if(!playspikes) playspikes = spikedata->spikecount;
 	
@@ -324,6 +336,7 @@ void *SoundGen::Entry()
 	//spikemode = 1;
 	if(spikemode && soundbox->tracemode == 1) PlaySpikesBinTrace();   // PlaySpikes();
 	if(spikemode && soundbox->tracemode == 2) PlaySpikesTrace();   // PlaySpikes();
+	if(spikemode && soundbox->tracemode == 3) PlaySpikesTimeTrace();   // PlaySpikes();
 	else PlayWave();
 	
 	//cleanup:
@@ -598,3 +611,78 @@ void SoundGen::PlaySpikesTrace()
 
 	if(soundbox->mod->ostype != Mac) (*soundbox->mod->graphwin)[0].Refresh();
 }
+
+
+void SoundGen::PlaySpikesTimeTrace()
+{
+	int i, s, t=-1;
+	double stime;
+	int sbin;
+	int samprate = msamp * 1000;
+
+	SineWave sine;
+
+	//wxCommandEvent highevent(wxEVT_COMMAND_TEXT_UPDATED, ID_Highlight);
+	wxCommandEvent traceevent(wxEVT_COMMAND_TEXT_UPDATED, ID_Trace);
+
+	sine.setFrequency((*params)["soundfreq"]);
+
+	// msamp = samples per ms
+	// pulsedur = spike sound duration in ms
+	// fsamp = sound interval (inter-spike interval)
+
+	// Live Output
+
+	for(s=0; s<playspikes; s++) {
+
+		soundbox->soundmutex->Lock();          // check for Stop flag
+		if(!soundbox->soundon) {
+			soundbox->soundmutex->Unlock();
+			return;
+		}
+		soundbox->soundmutex->Unlock();
+
+		if(selectmode) {
+			if(spikedata->selectdata->spikes[s]) fsamp = spikedata->isis[s];
+			else continue;
+		}
+		else fsamp = spikedata->isis[s];
+		stime = spikedata->times[s];
+		sbin = floor(stime / 1000);
+		if(t < 0) {
+			t = stime - 1;   // initialise t on first loop
+			traceevent.SetInt(sbin * 1000);
+			soundbox->GetEventHandler()->AddPendingEvent(traceevent);
+		}
+
+		//sine.setFrequency(freqscale*1000/fsamp);
+
+		for(i=0; i<pulsedur * msamp; i+=timerate) {      // spike sound
+			dac->tick(sine.tick());
+			if(i % msamp == 0) {
+				t++;
+				if(t % tracerate == 0) {
+					traceevent.SetInt(t);
+					soundbox->GetEventHandler()->AddPendingEvent(traceevent);
+				}
+			}
+		}
+
+		for(i=0; i<(fsamp - pulsedur) * msamp; i+=timerate) {     // interspike silence
+			dac->tick(0);
+			if(i % msamp == 0) {
+				t++;
+				if(t % tracerate == 0) {
+					traceevent.SetInt(t);
+					soundbox->GetEventHandler()->AddPendingEvent(traceevent);
+				}
+			}
+		}
+
+	}
+
+	(*soundbox->mod->graphwin)[0].Refresh();
+}
+
+
+

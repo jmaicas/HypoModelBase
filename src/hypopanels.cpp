@@ -62,12 +62,14 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset.AddNum("ystep", "Y Step", graph->ystep, 2, labelwidth, numwidth);
 	wxBoxSizer *tickparams = ParamLayout(2);
 
-	wxStaticBoxSizer *xradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
-	xrad[0] = new wxRadioButton(panel, 0, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	xrad[1] = new wxRadioButton(panel, 1, "Step");
-	xradbox->Add(xrad[0], 1, wxTOP | wxBOTTOM, 3);
-	xradbox->Add(xrad[1], 1, wxTOP | wxBOTTOM, 3);
-	xrad[graph->xtickmode]->SetValue(true);
+	wxStaticBoxSizer *xtickradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Tick Mode");
+	xtickrad[0] = new wxRadioButton(panel, 0, "None", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	xtickrad[1] = new wxRadioButton(panel, 1, "Count");
+	xtickrad[2] = new wxRadioButton(panel, 2, "Step");
+	xtickradbox->Add(xtickrad[0], 1, wxTOP | wxBOTTOM, 3);
+	xtickradbox->Add(xtickrad[1], 1, wxTOP | wxBOTTOM, 3);
+	xtickradbox->Add(xtickrad[2], 1, wxTOP | wxBOTTOM, 3);
+	xtickrad[graph->xtickmode]->SetValue(true);
 
 	wxStaticBoxSizer *xlabradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Labels");
 	xlabrad[0] = new wxRadioButton(panel, 100, "None", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -79,12 +81,14 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	if(graph->xlabelmode >= 0 && graph->xlabelmode < 3) xlabrad[graph->xlabelmode]->SetValue(true);
 	else diagbox->Write(text.Format("ERROR xlabelmode %d\n", graph->xlabelmode));
 
-	wxStaticBoxSizer *yradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Tick Mode");
-	yrad[0] = new wxRadioButton(panel, 2, "Count", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	yrad[1] = new wxRadioButton(panel, 3, "Step");
-	yradbox->Add(yrad[0], 1, wxTOP | wxBOTTOM, 3);
-	yradbox->Add(yrad[1], 1, wxTOP | wxBOTTOM, 3);
-	yrad[graph->ytickmode]->SetValue(true);
+	wxStaticBoxSizer *ytickradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Tick Mode");
+	ytickrad[0] = new wxRadioButton(panel, 3, "None", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	ytickrad[1] = new wxRadioButton(panel, 4, "Count");
+	ytickrad[2] = new wxRadioButton(panel, 5, "Step");
+	ytickradbox->Add(ytickrad[0], 1, wxTOP | wxBOTTOM, 3);
+	ytickradbox->Add(ytickrad[1], 1, wxTOP | wxBOTTOM, 3);
+	ytickradbox->Add(ytickrad[2], 1, wxTOP | wxBOTTOM, 3);
+	ytickrad[graph->ytickmode]->SetValue(true);
 
 	wxStaticBoxSizer *ylabradbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Labels");
 	ylabrad[0] = new wxRadioButton(panel, 200, "None", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
@@ -97,32 +101,48 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	else diagbox->Write(text.Format("ERROR ylabelmode %d\n", graph->ylabelmode));
 
 	wxBoxSizer *radbox = new wxBoxSizer(wxHORIZONTAL);
-	radbox->Add(xradbox, 1, wxALL, 5);
+	radbox->Add(xtickradbox, 1, wxALL, 5);
 	radbox->Add(xlabradbox, 1, wxALL, 5);
-	radbox->Add(yradbox, 1, wxALL, 5);
+	radbox->Add(ytickradbox, 1, wxALL, 5);
 	radbox->Add(ylabradbox, 1, wxALL, 5);
 
 	// Scale mode controls  December 2017
-	wxStaticBoxSizer *xsmodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Scale Mode");
-	xsrad[0] = new wxRadioButton(panel, 10, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	xsrad[1] = new wxRadioButton(panel, 11, "Log");
-	xsmodebox->Add(xsrad[0], 1, wxTOP | wxBOTTOM, 3);
-	xsmodebox->Add(xsrad[1], 1, wxTOP | wxBOTTOM, 3);
-	xsrad[graph->xscalemode]->SetValue(true);
+	wxStaticBoxSizer *xscalemodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Scale Mode");
+	xscalerad[0] = new wxRadioButton(panel, 10, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	xscalerad[1] = new wxRadioButton(panel, 11, "Log");
+	xscalemodebox->Add(xscalerad[0], 1, wxTOP | wxBOTTOM, 3);
+	xscalemodebox->Add(xscalerad[1], 1, wxTOP | wxBOTTOM, 3);
+	xscalerad[graph->xscalemode]->SetValue(true);
 
-	wxStaticBoxSizer *ysmodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Scale Mode");
-	ysrad[0] = new wxRadioButton(panel, 12, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
-	ysrad[1] = new wxRadioButton(panel, 13, "Log");
-	ysmodebox->Add(ysrad[0], 1, wxTOP | wxBOTTOM, 3);
-	ysmodebox->Add(ysrad[1], 1, wxTOP | wxBOTTOM, 3);
-	ysrad[graph->yscalemode]->SetValue(true);
+	wxStaticBoxSizer *yscalemodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Scale Mode");
+	yscalerad[0] = new wxRadioButton(panel, 12, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	yscalerad[1] = new wxRadioButton(panel, 13, "Log");
+	yscalemodebox->Add(yscalerad[0], 1, wxTOP | wxBOTTOM, 3);
+	yscalemodebox->Add(yscalerad[1], 1, wxTOP | wxBOTTOM, 3);
+	yscalerad[graph->yscalemode]->SetValue(true);
+
+	// Axis mode controls  June 2020
+	wxStaticBoxSizer *xaxisbox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Axis");
+	xaxisrad[0] = new wxRadioButton(panel, 300, "Off", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	xaxisrad[1] = new wxRadioButton(panel, 301, "On");
+	xaxisbox->Add(xaxisrad[0], 1, wxTOP | wxBOTTOM, 3);
+	xaxisbox->Add(xaxisrad[1], 1, wxTOP | wxBOTTOM, 3);
+	xaxisrad[graph->xaxis]->SetValue(true);
+
+	wxStaticBoxSizer *yaxisbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Axis");
+	yaxisrad[0] = new wxRadioButton(panel, 400, "Off", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
+	yaxisrad[1] = new wxRadioButton(panel, 401, "On");
+	yaxisbox->Add(yaxisrad[0], 1, wxTOP | wxBOTTOM, 3);
+	yaxisbox->Add(yaxisrad[1], 1, wxTOP | wxBOTTOM, 3);
+	yaxisrad[graph->yaxis]->SetValue(true);
 
 	wxBoxSizer *scalemoderadbox = new wxBoxSizer(wxHORIZONTAL);
-	scalemoderadbox->Add(xsmodebox, 1, wxALL, 5);
-	scalemoderadbox->Add(ysmodebox, 1, wxALL, 5);
-
+	scalemoderadbox->Add(xaxisbox, 1, wxALL, 5);
+	scalemoderadbox->Add(xscalemodebox, 1, wxALL, 5);
+	scalemoderadbox->Add(yscalemodebox, 1, wxALL, 5);
+	scalemoderadbox->Add(yaxisbox, 1, wxALL, 5);
+	
 	numwidth = 50;
-
 	paramset.AddNum("xshift", "XShift", graph->xshift, 2, labelwidth, numwidth);
 	paramset.AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
 	paramset.AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
@@ -332,10 +352,14 @@ void GraphBox::SetControls()
 
 	clipcheck->SetValue(graph->clipmode);
 	scattercheck->SetValue(graph->scattermode);
-	xrad[graph->xtickmode]->SetValue(true);
-	yrad[graph->ytickmode]->SetValue(true);
-	xlabrad[graph->xlabelmode-1]->SetValue(true);
-	ylabrad[graph->ylabelmode-1]->SetValue(true);
+	xtickrad[graph->xtickmode]->SetValue(true);
+	ytickrad[graph->ytickmode]->SetValue(true);
+	xlabrad[graph->xlabelmode]->SetValue(true);
+	ylabrad[graph->ylabelmode]->SetValue(true);
+	xscalerad[graph->xscalemode]->SetValue(true);
+	yscalerad[graph->yscalemode]->SetValue(true);
+	xaxisrad[graph->xaxis]->SetValue(true);
+	yaxisrad[graph->yaxis]->SetValue(true);
 
 	strokepicker->SetColour(graph->strokecolour);
 	fillpicker->SetColour(graph->fillcolour);
@@ -453,11 +477,15 @@ void GraphBox::OnRadio(wxCommandEvent& event)
 {
 	if(event.GetId() == 0) graph->xtickmode = 0;
 	if(event.GetId() == 1) graph->xtickmode = 1;
-	if(event.GetId() == 2) graph->ytickmode = 0;
-	if(event.GetId() == 3) graph->ytickmode = 1;
+	if(event.GetId() == 2) graph->xtickmode = 2;
+
+	if(event.GetId() == 3) graph->ytickmode = 0;
+	if(event.GetId() == 4) graph->ytickmode = 1;
+	if(event.GetId() == 5) graph->ytickmode = 2;
 
 	if(event.GetId() == 10) graph->xscalemode = 0;
 	if(event.GetId() == 11) graph->xscalemode = 1;
+
 	if(event.GetId() == 12) graph->yscalemode = 0;
 	if(event.GetId() == 13) graph->yscalemode = 1;
 
@@ -468,6 +496,12 @@ void GraphBox::OnRadio(wxCommandEvent& event)
 	if(event.GetId() == 200) graph->ylabelmode = 0;
 	if(event.GetId() == 201) graph->ylabelmode = 1;
 	if(event.GetId() == 202) graph->ylabelmode = 2;
+
+	if(event.GetId() == 300) graph->xaxis = 0;
+	if(event.GetId() == 301) graph->xaxis = 1;
+
+	if(event.GetId() == 400) graph->yaxis = 0;
+	if(event.GetId() == 401) graph->yaxis = 1;
 
 	OnOK(event);
 }
@@ -556,6 +590,12 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	
 	setgraph->xtickmode = graph->xtickmode;
 	setgraph->ytickmode = graph->ytickmode;	
+
+	setgraph->xlabelmode = graph->xlabelmode;
+	setgraph->ylabelmode = graph->ylabelmode;
+
+	setgraph->xaxis = graph->xaxis;
+	setgraph->yaxis = graph->yaxis;	
 
 	setgraph->xscalemode = graph->xscalemode;
 	setgraph->yscalemode = graph->yscalemode;

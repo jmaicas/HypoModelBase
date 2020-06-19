@@ -319,7 +319,8 @@ enum {
 	ID_Highlight,
 	ID_Mod,
 	ID_Net,
-	ID_Data
+	ID_Data,
+	ID_Trace
 };
 
 

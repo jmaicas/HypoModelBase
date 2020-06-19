@@ -33,6 +33,7 @@ public:
 	int playspikes;
     int timerate;
 	double volume;
+	int tracerate;  // trace interval in ms
 
 	SoundGen(SpikeDat *, ParamStore *, SoundBox *);
 	SoundGen(datdouble *, ParamStore *, SoundBox *);
@@ -41,6 +42,7 @@ public:
 	void PlayWave();
 	void PlaySpikesBinTrace();
 	void PlaySpikesTrace();
+	void PlaySpikesTimeTrace();
 };
 
 
@@ -69,4 +71,5 @@ public:
 	void DataLink(SpikeDat *spikedata, datdouble *wavedata=NULL);
 	void OnHighlight(wxCommandEvent& event);
 	void OnData(wxCommandEvent& event);
+	void OnTrace(wxCommandEvent& event);
 };

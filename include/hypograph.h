@@ -141,9 +141,10 @@ public:
 	wxColourPickerCtrl *strokepicker, *fillpicker;
 	wxChoice *typechoice;
 	TypeSet typeset;
-	wxRadioButton *xrad[2], *yrad[2];
+	wxRadioButton *xtickrad[3], *ytickrad[3];
 	wxRadioButton *xlabrad[5], *ylabrad[5];
-	wxRadioButton *xsrad[2], *ysrad[2];
+	wxRadioButton *xscalerad[2], *yscalerad[2];
+	wxRadioButton *xaxisrad[2], *yaxisrad[2];
 	wxCheckBox *clipcheck, *scattercheck, *linecheck;
 
 	ParamNum *numdrawcon;

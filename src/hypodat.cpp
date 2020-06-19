@@ -453,11 +453,11 @@ wxString GraphDat::StoreDat(wxString tag)
     
     //diagbox->Write("colourtext: " + colourtext);
 
-	gtext1.Printf("v8 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
+	gtext1.Printf("v9 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, colourtext, xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
 		
-	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d", 
-		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode);
+	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d xa %d ya %d", 
+		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode, xaxis, yaxis);
 
 	return gtext1 + gtext2;
 }
@@ -595,6 +595,16 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		xscalemode = ParseLong(&readline, 's');
 		yscalemode = ParseLong(&readline, 's');
 	}
+
+	if(version < 9) {         // Convert to new tickmode 0 = off, 1 = count, 2 = step
+		xtickmode += 1;
+		ytickmode += 1;
+	}
+
+	if(version > 8) {
+		xaxis = ParseLong(&readline, 'a');
+		yaxis = ParseLong(&readline, 'a');
+	}
 }
 
 
@@ -683,8 +693,8 @@ void GraphDat::Init()
 	ylabels = 0;
 	xstep = 0;
 	ystep = 0;
-	xtickmode = 0;
-	ytickmode = 0;
+	xtickmode = 1;
+	ytickmode = 1;
 	plotstroke = 0.5;
 	xplot = 500;
 	yplot = 200;
@@ -725,6 +735,10 @@ void GraphDat::Init()
 
 	scatterfield = 0;
 	scattermean = 0;
+
+	drawX = -1;   // default to draw whole X range
+	xaxis = 1;
+	yaxis = 1;
 }
 
 
