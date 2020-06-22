@@ -1005,6 +1005,8 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	vdumode = vmode;
 	delete parambox;
 
+	startshift = true;
+
 	//InitMenu();
 	//SetModFlag(ID_FileIO, "ioflag", "IO Mode", 0); 
 
@@ -1671,7 +1673,8 @@ void GridBox::NeuroScan()
 	double cellval;
 	int view = 0;
 	int filterthresh;
-	double spikeint;
+	double spikeint, spiketime;
+	double spikestart, startthresh;
 	wxNumberFormatter numform;
 	wxString typetext;
 
@@ -1681,6 +1684,8 @@ void GridBox::NeuroScan()
 
 	ParamStore *params = neurobox->GetParams();
 	filterthresh = (*params)["filterthresh"];
+	spikestart = 0;
+	startthresh = 10;
 
 	cellcount = 0;
 	col = 0;
@@ -1723,13 +1728,14 @@ void GridBox::NeuroScan()
 		// Read and filter spike time data
 		while(!celltext.IsEmpty()) {
 			celltext.ToDouble(&cellval);
-			cellval = cellval * 1000;
+			if(spikecount == 0 && cellval > startthresh) spikestart = floor(cellval);     // shift spike times when there's a long initial silent period
+			spiketime = (cellval - spikestart) * 1000;
 			if(spikecount > 0) {       
-				spikeint = cellval - (*celldata)[cellcount].times[spikecount-1];
+				spikeint = spiketime - (*celldata)[cellcount].times[spikecount-1];
 				//if(spikecount < 10) diagbox->Write(text.Format("col %d spikeint %.2f filter %d\n", col, spikeint, filterthresh));
 			}
 			if(spikecount == 0 || spikeint > filterthresh) {
-				(*celldata)[cellcount].times[spikecount] = cellval;
+				(*celldata)[cellcount].times[spikecount] = spiketime;
 				spikecount++;
 			}
 			row++;

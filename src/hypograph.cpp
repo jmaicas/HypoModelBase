@@ -708,6 +708,7 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 	int xplaces, yplaces;
 	short gid;
 	wxPoint pos;
+	double xmeasure, ymeasure;
 
 	pos = event.GetPosition();
 
@@ -718,17 +719,25 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 		xdiff = graph->xto - graph->xfrom;
 		xscale = xdiff / xplot;
 		xgraph = (pos.x - xbase) * xscale + graph->xfrom;
+		if(anchorpos.x < pos.x) xmeasure = (pos.x - anchorpos.x) * xscale;
+		else xmeasure = (anchorpos.x - pos.x) * xscale;
 		xplaces = numplaces(xdiff);
 
 		ydiff = graph->yto - graph->yfrom;
 		yscale = ydiff / yplot;
 		ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
+		if(anchorpos.y < pos.y) ymeasure = (pos.y - anchorpos.y) * yscale;
+		else ymeasure = (anchorpos.y - pos.y) * yscale;
 		yplaces = numplaces(ydiff);
 
 		//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
 	
-		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
+		//if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
+		//else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
+		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d  Measure X %s Y %s", 
+			numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid, numstring(xmeasure, xplaces), numstring(ymeasure, yplaces));
 		else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
+
 		mainwin->SetStatusText(snum);
 	}
 
@@ -988,7 +997,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			gc->SetPen(colourpen[black]);
 
 			int xaxislength = xplot;
-			if(drawX != -1) xaxislength = drawX * binsize / (xto - xfrom) * xplot;
+			if(graph->axistrace && drawX != -1) xaxislength = drawX * binsize / (xto - xfrom) * xplot;
 
 			//mod->diagbox->Write(text.Format("drawX %.0f xfrom %.0f xto %.0f xplot %d xaxislength %d\n", drawX, xfrom, xto, xplot, xaxislength));
 			

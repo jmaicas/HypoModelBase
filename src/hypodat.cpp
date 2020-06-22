@@ -739,6 +739,7 @@ void GraphDat::Init()
 	drawX = -1;   // default to draw whole X range
 	xaxis = 1;
 	yaxis = 1;
+	axistrace = 0;
 }
 
 

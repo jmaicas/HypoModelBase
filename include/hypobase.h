@@ -320,7 +320,8 @@ enum {
 	ID_Mod,
 	ID_Net,
 	ID_Data,
-	ID_Trace
+	ID_Trace,
+	ID_Clear
 };
 
 

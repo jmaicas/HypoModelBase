@@ -299,6 +299,7 @@ public:
 	//PlotBox *plotbox;
 	bool bookmode, vdumode;
     bool undomode;
+	bool startshift;
 	int colflag[1000];
 
 	NeuroBox *neurobox;

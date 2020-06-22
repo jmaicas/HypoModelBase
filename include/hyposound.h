@@ -72,4 +72,5 @@ public:
 	void OnHighlight(wxCommandEvent& event);
 	void OnData(wxCommandEvent& event);
 	void OnTrace(wxCommandEvent& event);
+	void OnClear(wxCommandEvent& event);
 };

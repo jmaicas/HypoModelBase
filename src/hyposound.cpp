@@ -54,6 +54,8 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxBoxSizer *buttonbox2 = new wxBoxSizer(wxHORIZONTAL);
 	AddButton(ID_Data, "Data", 60, buttonbox2);
 	buttonbox2->AddSpacer(10);
+	AddButton(ID_Clear, "Clear", 60, buttonbox2);
+	buttonbox2->AddSpacer(10);
 	AddButton(ID_Stop, "Stop", 60, buttonbox2);
 
 	SetPanel(ID_Data, mod->gridbox);
@@ -82,6 +84,7 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(ID_Wave, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnWave));
 	Connect(ID_Highlight, wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(SoundBox::OnHighlight));
 	Connect(ID_Trace, wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(SoundBox::OnTrace));
+	Connect(ID_Clear, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnClear));
 	//Connect(ID_Data, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnData));
 }
 
@@ -89,6 +92,13 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 SoundBox::~SoundBox()
 {
 	delete soundmutex;
+}
+
+
+void SoundBox::OnClear(wxCommandEvent& event)
+{
+	mod->graphbase->GetGraph("cell0spikes1ms")->drawX = 0;
+	(*mod->graphwin)[0].Refresh();
 }
 
 
@@ -678,9 +688,11 @@ void SoundGen::PlaySpikesTimeTrace()
 				}
 			}
 		}
-
 	}
 
+
+	soundbox->mod->graphbase->GetGraph("cell0spikes1ms")->drawX = 100;
+	soundbox->mod->graphbase->GetGraph("cell0spikes1ms")->axistrace = 0;
 	(*soundbox->mod->graphwin)[0].Refresh();
 }
 

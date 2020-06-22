@@ -682,6 +682,7 @@ public:
 	int highstart, highstop, highcolour;
 	double drawX;    // default -1 to draw whole X range, set to limit drawn X range
 	int xaxis, yaxis;   // axis mode, currently 0 off, 1 on
+	int axistrace;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;
