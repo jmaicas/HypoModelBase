@@ -120,8 +120,8 @@ void OptionPanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	//mainwin->SetStatus(wxT("Scale OK")); 
 	
 	numdrawcon->numbox->GetValue().ToLong(&stringnum);
-	mainwin->numdraw = stringnum;
-	if(mainwin->mod) mainwin->mod->prefstore["numdraw"] = mainwin->numdraw;
+	mainwin->numdraw_set = stringnum;
+	if(mainwin->mod) mainwin->mod->prefstore["numdraw"] = mainwin->numdraw_set;
 	
 	viewheightcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->viewheight = stringnum;
@@ -137,8 +137,10 @@ void OptionPanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	mainwin->outpath = outpathcon->GetValue();
 	mainwin->modpath = modpathcon->GetValue();
 	
-	snum.Printf("ok numdraw %d", mainwin->numdraw);
-	mainwin->SetStatus(snum);
+	//snum.Printf("ok numdraw %d", mainwin->numdraw);
+	//mainwin->SetStatus(snum);
+
+	mainwin->GraphPanelsUpdate();
 	
 	Close();
 }

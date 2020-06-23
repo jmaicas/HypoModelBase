@@ -5,9 +5,10 @@
 
 
 
-ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, GraphDisp *gdisp, Model *model, GraphWindow3 **gwin, int start, int btype)
+ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, GraphDisp *gdisp, Model *model, GraphWindow3 **gwin, int btype)
 	: wxPanel(draw, wxID_ANY, wxPoint(0, 0), size, wxBORDER_SIMPLE | wxFULL_REPAINT_ON_RESIZE)
 {
+	int i;
 	mainwin = main;
 	drawframe = draw;
 	boxtype = btype;
@@ -18,7 +19,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	gpos = gdisp;
 	graphwin = gwin;
 	numgraphs = gnum;
-	startgraph = start; 
+	//startgraph = start; 
 	gmod = model;
 	mod = model;
     
@@ -29,7 +30,6 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	gflags = new ParamStore();
 	gflagrefs = new RefStore();
 
-	wxBoxSizer *psetbox;
 	//boxfont = new wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//boxfont.New(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	//boxfont.New(12, wxFONTFAMILY_ROMAN, wxNORMAL, wxNORMAL);
@@ -39,7 +39,6 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
     
     boxfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
     
-
 	hazmode1 = 0;
 	hazmode2 = 0;
 	binrestog1 = 0;
@@ -87,11 +86,9 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	//dc.SetTextBackground(backgroundColour);
 
 	panel = this;
-	vbox = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer *vbox = new wxBoxSizer(wxVERTICAL);
 	vbox->AddSpacer(5);
 
-	wxBitmap rightarrow, leftarrow;
-	wxBitmap downarrow, uparrow;
 	//wxBitmap downarrow(down_xpm);
 	//wxBitmap uparrow(up_xpm);
 	wxImage::AddHandler(new wxPNGHandler);
@@ -107,366 +104,21 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
         leftarrow = wxBitmap(iconpath + "leftarrow12.png", wxBITMAP_TYPE_PNG);
 	}
     
-    int zbheight = 16;
-    int zbwidth = 24;
+    zbheight = 16;
+    zbwidth = 24;
 
-	for(i=startgraph; i<numgraphs+startgraph; i++) {
-		//g = gpos[i].data;
-		graphwin[i]->scalebox = this;
-		psetbox = new wxBoxSizer(wxVERTICAL);
-
-        if(ostype == Mac) psetbox->AddSpacer(2);
-		//gpos[i].yf = AddScaleParam("YF", gpos[i].plot[0]->yfrom, psetbox);
-		//gpos[i].yt = AddScaleParam("YT", gpos[i].plot[0]->yto, psetbox);
-		//gpos[i].xf = AddScaleParam("XF", gpos[i].plot[0]->xfrom, psetbox);
-		//gpos[i].xt = AddScaleParam("XT", gpos[i].plot[0]->xto, psetbox);
-		graphwin[i]->yf = AddScaleParam("YF", 0, psetbox, i);
-		graphwin[i]->yt = AddScaleParam("YT", 10, psetbox, i);
-		graphwin[i]->xf = AddScaleParam("XF", 0, psetbox, i);
-		graphwin[i]->xt = AddScaleParam("XT", 500, psetbox, i);
-		wxBoxSizer *zoombox = new wxBoxSizer(wxHORIZONTAL);
-		if(ostype == Mac) {
-			graphwin[i]->yzoomin = new wxBitmapButton(this, 1000 + i, downarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
-			graphwin[i]->yzoomout = new wxBitmapButton(this, 1010 + i, uparrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
-			graphwin[i]->xzoomin = new wxBitmapButton(this, 1100 + i, leftarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
-			graphwin[i]->xzoomout = new wxBitmapButton(this, 1110 + i, rightarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
-		}
-		else {
-			graphwin[i]->yzoomin = new wxBitmapButton(this, 1000 + i, downarrow, wxDefaultPosition, wxSize(20, 20));
-			graphwin[i]->yzoomout = new wxBitmapButton(this, 1010 + i, uparrow, wxDefaultPosition, wxSize(20, 20));	
-			graphwin[i]->xzoomin = new wxBitmapButton(this, 1100 + i, leftarrow, wxDefaultPosition, wxSize(20, 20));
-			graphwin[i]->xzoomout = new wxBitmapButton(this, 1110 + i, rightarrow, wxDefaultPosition, wxSize(20, 20));
-		}
-		zoombox->Add(graphwin[i]->yzoomin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-		zoombox->Add(graphwin[i]->yzoomout, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-
-		//graphwin[i]->xzoomout = new wxButton(this, 1110 + i, "XO", wxDefaultPosition, wxSize(20, 20), 0);	
-
-		zoombox->AddSpacer(2);
-		zoombox->Add(graphwin[i]->xzoomin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-		zoombox->Add(graphwin[i]->xzoomout, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-        if(ostype == Mac) psetbox->AddSpacer(2);
-		psetbox->Add(zoombox, 0, wxALIGN_CENTRE_HORIZONTAL);
-
+	vconbox = new wxBoxSizer(wxVERTICAL);
+	for(i=0; i<numgraphs; i++) {
+		AddGraphConsole(i, graphwin[i]);
 		gsync[i] = NULL;
-
-		
-
-		if(boxtype == modVMN) {
-			//gsync[i] = new wxCheckBox(panel, i, "Sync");
-			//psetbox->Add(gsync[i], 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 2);
-		}
-
-		if(boxtype == -1) mod->ScaleConsoleAbove(this, i);
-		vbox->Add(psetbox, 1, wxALIGN_CENTRE_HORIZONTAL, 0);
-		if(boxtype == -1) mod->ScaleConsoleBelow(this, i);
-
-		//vbox->AddSpacer(2);
-		if(boxtype == 0) {
-			if(i == 0) {
-				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
-				wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
-
-				if(ostype == Mac) {
-					ScaleButton(ID_data, "Dat", 43, modebox);
-					ScaleButton(ID_intern, "Int", 43, modebox);
-					ScaleButton(ID_spikes, "Spike", 43, resbox);     // 37
-					ScaleButton(ID_rateres, "Rate", 43, resbox);    // 37
-				}
-				else {
-					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
-					resbox->AddSpacer(2);
-					ScaleButton(ID_rateres, "Rate", 37, resbox); 
-					ScaleButton(ID_data, "Data", 37, modebox);
-					modebox->AddSpacer(2);
-					ScaleButton(ID_intern, "Intern", 37, modebox);
-				}
-				vbox->Add(modebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				//vbox->Add(rightarrow, 0);
-			}
-			//vbox->AddSpacer(2);
-			
-			if(i == 1) {
-				/*
-				if(ostype == Mac) {
-				ScaleButton(ID_histhaz1, "Hist / Haz", 70, vbox);
-				ScaleButton(ID_binres1, "Bin Res", 60, vbox);
-				ScaleButton(ID_allburst, "All / Burst", 74, vbox);
-				}
-				else {
-				ScaleButton(ID_histhaz1, "Hist / Haz", 54, vbox);
-				ScaleButton(ID_binres1, "Bin Res", 43, vbox);
-				ScaleButton(ID_allburst, "All / Burst", 55, vbox);
-				}	*/	
-
-				// GraphButton replaces ScaleButton, gradual phase out    16/6/16
-
-				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
-				if(ostype == Mac) {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
-					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
-				}
-				else {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
-					//ScaleButton(ID_allburst, "All / Burst", 55, vbox);
-				}		
-				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-
-			//vbox->AddSpacer(2);
-			if(i == 2) {		
-				wxBoxSizer *profbox = new wxBoxSizer(wxHORIZONTAL); 
-				wxBoxSizer *quadbox = new wxBoxSizer(wxHORIZONTAL); 
-				GraphButton("quadtog", 0, ID_quad, "Quad", 35, quadbox);
-				ScaleButton(ID_expdat, "Exp", 35, quadbox);
-				vbox->Add(quadbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				GraphButton("proftype", 0, ID_profile, "Prof", 35, profbox);
-				profbox->AddSpacer(2);
-				GraphButton("profsmooth", 0, ID_smooth, "Smoo", 35, profbox);
-				//wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
-				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-				if(ostype == Mac) {
-					//ScaleButton(ID_histhaz2, "His", 43, hbox2);
-					//ScaleButton(ID_binres2, "Bin", 43, hbox2);
-					//ScaleButton(ID_secretion, "Sec", 43, secbox);
-					//secbox->AddSpacer(2);
-					//ScaleButton(ID_dendmode, "Den", 45, secbox);
-					ScaleButton(ID_overlay, "Ovl", 43, hbox);
-					ScaleButton(ID_position, "Pos", 43, hbox);
-				}
-				else {
-					//ScaleButton(ID_histhaz2, "His/Hz", 40, hbox2);
-					//hbox2->AddSpacer(2);
-					//ScaleButton(ID_binres2, "BinRes", 40, hbox2);
-					//ScaleButton(ID_secretion, "Sec", 37, secbox);
-					//secbox->AddSpacer(2);
-					//ScaleButton(ID_dendmode, "Dend", 37, secbox);
-					ScaleButton(ID_overlay, "Over", 35, hbox);
-					hbox->AddSpacer(2);
-					ScaleButton(ID_position, "Pos", 35, hbox);
-				}
-				vbox->Add(profbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-		}
-
-		if(boxtype == modAgent) {
-		}
-
-		if(boxtype == modHeat) {
-			if(i == 1) {
-				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-				if(ostype == Mac) {
-					ScaleButton(ID_overlay, "Ovl", 43, hbox);
-					ScaleButton(ID_position, "Pos", 43, hbox);
-				}
-				else {
-					ScaleButton(ID_overlay, "Over", 35, hbox);
-					hbox->AddSpacer(2);
-					ScaleButton(ID_position, "Pos", 35, hbox);
-				}
-				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-		}
-
-		/*
-		if(boxtype == modFirstTest) {
-			if(i == 1) {
-				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-				if(ostype == Mac) {
-					ScaleButton(ID_overlay, "Ovl", 43, hbox);
-					ScaleButton(ID_position, "Pos", 43, hbox);
-				}
-				else {
-					ScaleButton(ID_overlay, "Over", 35, hbox);
-					hbox->AddSpacer(2);
-					ScaleButton(ID_position, "Pos", 35, hbox);
-				}
-				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-		}*/
-
-		if(boxtype == modPlot) {
-			if(i == 0) {
-				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
-
-				if(ostype == Mac) {
-					ScaleButton(ID_spikes, "Sp", 40, resbox);   
-					ScaleButton(ID_rateres, "Ra", 40, resbox); 
-				}
-				else {
-					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
-					resbox->AddSpacer(2);
-					ScaleButton(ID_rateres, "Rate", 37, resbox); 
-				}
-				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-			if(i == 1) {
-				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
-				if(ostype == Mac) {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
-				}
-				else {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 60, vbox);
-					GraphButton("allselect", 0, ID_allselect, "All / Select", 60, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
-				}		
-				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-		}
-
-		if(boxtype == modOxy || boxtype == modOxySec) {
-			if(i == 0) {
-				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
-
-				if(ostype == Mac) {
-					ScaleButton(ID_spikes, "Spike", 40, resbox);
-					ScaleButton(ID_rateres, "Rate", 40, resbox);
-				}
-				else {
-					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
-					resbox->AddSpacer(2);
-					ScaleButton(ID_rateres, "Rate", 37, resbox); 
-				}
-				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-			if(i == 1) {
-				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
-				if(ostype == Mac) {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin", 45, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
-				}
-				else {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
-				}		
-				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-
-			if(i == 2) {
-				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-				if(ostype == Mac) {
-					ScaleButton(ID_overlay, "Ovl", 43, hbox);
-					ScaleButton(ID_position, "Pos", 43, hbox);
-				}
-				else {
-					ScaleButton(ID_overlay, "Over", 35, hbox);
-					hbox->AddSpacer(2);
-					ScaleButton(ID_position, "Pos", 35, hbox);
-				}
-				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				overpan1 = 2;
-				overpan2 = 3;
-			}
-		}
-
-		if(boxtype == modVMN) {
-			if(i == 0) {
-				wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
-				wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
-
-				if(ostype == Mac) {
-					ScaleButton(ID_spikes, "Spike", 40, resbox);
-					ScaleButton(ID_rateres, "Rate", 40, resbox);
-					GraphButton("nettog", 0, ID_net, "Net", 43, modebox);
-				}
-				else {
-					ScaleButton(ID_spikes, "Spikes", 37, resbox); 
-					resbox->AddSpacer(2);
-					ScaleButton(ID_rateres, "Rate", 37, resbox); 
-					//ScaleButton(ID_net, "Net", 37, modebox);
-					GraphButton("nettog", 0, ID_net, "Net", 37, modebox);
-				}
-				vbox->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				vbox->Add(modebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-
-			}
-			if(i == 1) {
-				wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
-				if(ostype == Mac) {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin", 45, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
-					//ScaleButton(ID_allburst, "All / Burst", 74, vbox);
-				}
-				else {
-					GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, vbox);
-					GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
-					//ScaleButton(ID_norm, "Norm", 35, binbox);
-					GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
-					//ScaleButton(ID_allburst, "All / Burst", 55, vbox);
-				}		
-				vbox->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}
-			if(i == 2) {
-				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-				if(ostype == Mac) {
-					ScaleButton(ID_overlay, "Ovl", 43, hbox);
-					ScaleButton(ID_position, "Pos", 43, hbox);
-				}
-				else {
-					ScaleButton(ID_overlay, "Over", 35, hbox);
-					hbox->AddSpacer(2);
-					ScaleButton(ID_position, "Pos", 35, hbox);
-				}
-				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				overpan1 = 2;
-				overpan2 = 3;
-			}
-			if(i == 4) {
-				wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-				if(ostype == Mac) {
-					ScaleButton(ID_overlay2, "Ovl", 43, hbox);
-					ScaleButton(ID_position2, "Pos", 43, hbox);
-				}
-				else {
-					ScaleButton(ID_overlay2, "Over", 35, hbox);
-					hbox->AddSpacer(2);
-					ScaleButton(ID_position2, "Pos", 35, hbox);
-				}
-				vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-				overpan3 = 4;
-				overpan4 = 5;
-			}
-
-			/*
-			if(i == 2) {		
-			wxBoxSizer *secbox = new wxBoxSizer(wxHORIZONTAL); 
-			ScaleButton(ID_expdat, "Exp", 45, vbox);
-			ScaleButton(ID_profile, "Profile", 55, vbox);
-
-			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
-			if(ostype == Mac) {
-
-			ScaleButton(ID_secretion, "Sec", 43, secbox);
-
-			ScaleButton(ID_dendmode, "Den", 45, secbox);
-			ScaleButton(ID_overlay, "Ovl", 43, hbox);
-			ScaleButton(ID_position, "Pos", 43, hbox);
-			}
-			else {
-			ScaleButton(ID_secretion, "Sec", 37, secbox);
-			secbox->AddSpacer(2);
-			ScaleButton(ID_dendmode, "Dend", 37, secbox);
-			ScaleButton(ID_overlay, "Over", 35, hbox);
-			hbox->AddSpacer(2);
-			ScaleButton(ID_position, "Pos", 35, hbox);
-			}
-			vbox->Add(secbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			vbox->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-			}*/
-		}
 	}
+	vbox->Add(vconbox, 1);
+
+
+	//if(boxtype == modVMN) {
+		//gsync[i] = new wxCheckBox(panel, i, "Sync");
+		//psetbox->Add(gsync[i], 0, wxALIGN_CENTRE_HORIZONTAL|wxALL, 2);
+	//}
 
 
 	//vbox->AddStretchSpacer(5);
@@ -504,7 +156,6 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 	//gmod->GHistLoad();
 
-	
 	dispmod = mod->modtype;
 	mod->GHistLoad(gstag);
 	//GraphSwitch(0);
@@ -517,16 +168,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 
 	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(ScaleBox::OnOK));
     Connect(wxEVT_TEXT_ENTER, wxCommandEventHandler(ScaleBox::OnOK));
-    //wxEVT_TEXT_ENTER
-	//Connect(ID_histhaz1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz1));
-	//Connect(ID_histhaz2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnHistHaz2));
-	//Connect(ID_binres1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes1));
-	//Connect(ID_binres2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnBinRes2));
-	//Connect(ID_net, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNetMode));
-	//Connect(ID_norm, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnNorm));
-
-	//Connect(ID_allburst, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnAllBurst));
-	//Connect(ID_profile, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnProfMode));
+    
 	Connect(ID_expdat, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnExpMode));
 	Connect(ID_secretion, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSecMode));
 	Connect(ID_dendmode, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnDendMode));
@@ -558,6 +200,334 @@ ScaleBox::~ScaleBox()
 {
 	delete gflags;
 	delete gflagrefs;
+}
+
+
+void ScaleBox::RemoveGraphConsole(int index)
+{
+	consolebox[index]->Clear(true);
+	vconbox->Detach(consolebox[index]);
+	numgraphs--;
+	GraphWindow3 *graphpanel = graphwin[index]; 
+
+
+
+	//delete graphpanel->yf;
+	//delete graphpanel->yt; 
+	//delete graphpanel->xf; 
+	//delete graphpanel->xt; 
+	//delete graphpanel->yzoomin; 
+	//delete graphpanel->yzoomout; 
+	//delete graphpanel->xzoomin; 
+	//delete graphpanel->xzoomout; 
+}
+
+
+void ScaleBox::AddGraphConsole(int index, GraphWindow3 *graphpanel)
+{
+	graphpanel->scalebox = this;
+	wxBoxSizer *psetbox = new wxBoxSizer(wxVERTICAL);
+	consolebox[index] = new wxBoxSizer(wxVERTICAL);
+
+	if(ostype == Mac) psetbox->AddSpacer(2);
+
+	graphpanel->yf = AddScaleParam("YF", 0, psetbox, index);
+	graphpanel->yt = AddScaleParam("YT", 10, psetbox, index);
+	graphpanel->xf = AddScaleParam("XF", 0, psetbox, index);
+	graphpanel->xt = AddScaleParam("XT", 500, psetbox, index);
+	wxBoxSizer *zoombox = new wxBoxSizer(wxHORIZONTAL);
+	if(ostype == Mac) {
+		graphpanel->yzoomin = new wxBitmapButton(this, 1000 + index, downarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
+		graphpanel->yzoomout = new wxBitmapButton(this, 1010 + index, uparrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
+		graphpanel->xzoomin = new wxBitmapButton(this, 1100 + index, leftarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
+		graphpanel->xzoomout = new wxBitmapButton(this, 1110 + index, rightarrow, wxDefaultPosition, wxSize(zbwidth, zbheight));
+	}
+	else {
+		graphpanel->yzoomin = new wxBitmapButton(this, 1000 + index, downarrow, wxDefaultPosition, wxSize(20, 20));
+		graphpanel->yzoomout = new wxBitmapButton(this, 1010 + index, uparrow, wxDefaultPosition, wxSize(20, 20));	
+		graphpanel->xzoomin = new wxBitmapButton(this, 1100 + index, leftarrow, wxDefaultPosition, wxSize(20, 20));
+		graphpanel->xzoomout = new wxBitmapButton(this, 1110 + index, rightarrow, wxDefaultPosition, wxSize(20, 20));
+	}
+	zoombox->Add(graphpanel->yzoomin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	zoombox->Add(graphpanel->yzoomout, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	zoombox->AddSpacer(2);
+	zoombox->Add(graphpanel->xzoomin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	zoombox->Add(graphpanel->xzoomout, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	if(ostype == Mac) psetbox->AddSpacer(2);
+
+	psetbox->Add(zoombox, 0, wxALIGN_CENTRE_HORIZONTAL);
+	
+	// Console Buttons
+	if(boxtype == -1) mod->ScaleConsoleAbove(this, index);
+	consolebox[index]->Add(psetbox, 0, wxALIGN_CENTRE_HORIZONTAL);
+	if(boxtype == -1) mod->ScaleConsoleBelow(this, index);
+	if(boxtype != -1) ConsoleButtons(index);  // Old switched mod specific controls
+	vconbox->Add(consolebox[index], 1, wxALIGN_CENTRE_HORIZONTAL, 0);
+}
+
+
+void ScaleBox::ConsoleButtons(int panel)
+{
+	if(boxtype == 0) {
+		if(panel == 0) {
+			wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+			wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
+
+			if(ostype == Mac) {
+				ScaleButton(ID_data, "Dat", 43, modebox);
+				ScaleButton(ID_intern, "Int", 43, modebox);
+				ScaleButton(ID_spikes, "Spike", 43, resbox);     // 37
+				ScaleButton(ID_rateres, "Rate", 43, resbox);    // 37
+			}
+			else {
+				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
+				resbox->AddSpacer(2);
+				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+				ScaleButton(ID_data, "Data", 37, modebox);
+				modebox->AddSpacer(2);
+				ScaleButton(ID_intern, "Intern", 37, modebox);
+			}
+			consolebox[panel]->Add(modebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			consolebox[panel]->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			//consolebox[panel]->Add(rightarrow, 0);
+		}
+		//consolebox[panel]->AddSpacer(2);
+
+		if(panel == 1) {
+			/*
+			if(ostype == Mac) {
+			ScaleButton(ID_histhaz1, "Hist / Haz", 70, consolebox[panel]);
+			ScaleButton(ID_binres1, "Bin Res", 60, consolebox[panel]);
+			ScaleButton(ID_allburst, "All / Burst", 74, consolebox[panel]);
+			}
+			else {
+			ScaleButton(ID_histhaz1, "Hist / Haz", 54, consolebox[panel]);
+			ScaleButton(ID_binres1, "Bin Res", 43, consolebox[panel]);
+			ScaleButton(ID_allburst, "All / Burst", 55, consolebox[panel]);
+			}	*/	
+
+			// GraphButton replaces ScaleButton, gradual phase out    16/6/16
+
+			wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+			if(ostype == Mac) {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+				//ScaleButton(ID_allburst, "All / Burst", 74, consolebox[panel]);
+			}
+			else {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+				//ScaleButton(ID_allburst, "All / Burst", 55, consolebox[panel]);
+			}		
+			consolebox[panel]->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+
+		//consolebox[panel]->AddSpacer(2);
+		if(panel == 2) {		
+			wxBoxSizer *profbox = new wxBoxSizer(wxHORIZONTAL); 
+			wxBoxSizer *quadbox = new wxBoxSizer(wxHORIZONTAL); 
+			GraphButton("quadtog", 0, ID_quad, "Quad", 35, quadbox);
+			ScaleButton(ID_expdat, "Exp", 35, quadbox);
+			consolebox[panel]->Add(quadbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			GraphButton("proftype", 0, ID_profile, "Prof", 35, profbox);
+			profbox->AddSpacer(2);
+			GraphButton("profsmooth", 0, ID_smooth, "Smoo", 35, profbox);
+			//wxBoxSizer *hbox2 = new wxBoxSizer(wxHORIZONTAL);
+			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+			if(ostype == Mac) {
+				//ScaleButton(ID_histhaz2, "His", 43, hbox2);
+				//ScaleButton(ID_binres2, "Bin", 43, hbox2);
+				//ScaleButton(ID_secretion, "Sec", 43, secbox);
+				//secbox->AddSpacer(2);
+				//ScaleButton(ID_dendmode, "Den", 45, secbox);
+				ScaleButton(ID_overlay, "Ovl", 43, hbox);
+				ScaleButton(ID_position, "Pos", 43, hbox);
+			}
+			else {
+				//ScaleButton(ID_histhaz2, "His/Hz", 40, hbox2);
+				//hbox2->AddSpacer(2);
+				//ScaleButton(ID_binres2, "BinRes", 40, hbox2);
+				//ScaleButton(ID_secretion, "Sec", 37, secbox);
+				//secbox->AddSpacer(2);
+				//ScaleButton(ID_dendmode, "Dend", 37, secbox);
+				ScaleButton(ID_overlay, "Over", 35, hbox);
+				hbox->AddSpacer(2);
+				ScaleButton(ID_position, "Pos", 35, hbox);
+			}
+			consolebox[panel]->Add(profbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			consolebox[panel]->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+	}
+
+	if(boxtype == modAgent) {
+	}
+
+	if(boxtype == modHeat) {
+		if(panel == 1) {
+			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+			if(ostype == Mac) {
+				ScaleButton(ID_overlay, "Ovl", 43, hbox);
+				ScaleButton(ID_position, "Pos", 43, hbox);
+			}
+			else {
+				ScaleButton(ID_overlay, "Over", 35, hbox);
+				hbox->AddSpacer(2);
+				ScaleButton(ID_position, "Pos", 35, hbox);
+			}
+			consolebox[panel]->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+	}
+
+	if(boxtype == modPlot) {
+		if(panel == 0) {
+			wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+
+			if(ostype == Mac) {
+				ScaleButton(ID_spikes, "Sp", 40, resbox);   
+				ScaleButton(ID_rateres, "Ra", 40, resbox); 
+			}
+			else {
+				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
+				resbox->AddSpacer(2);
+				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+			}
+			consolebox[panel]->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+		if(panel == 1) {
+			wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+			if(ostype == Mac) {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 45, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+			}
+			else {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 60, consolebox[panel]);
+				GraphButton("allselect", 0, ID_allselect, "All / Select", 60, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+			}		
+			consolebox[panel]->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+	}
+
+	if(boxtype == modOxy || boxtype == modOxySec) {
+		if(panel == 0) {
+			wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+
+			if(ostype == Mac) {
+				ScaleButton(ID_spikes, "Spike", 40, resbox);
+				ScaleButton(ID_rateres, "Rate", 40, resbox);
+			}
+			else {
+				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
+				resbox->AddSpacer(2);
+				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+			}
+			consolebox[panel]->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+		if(panel == 1) {
+			wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+			if(ostype == Mac) {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin", 45, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+			}
+			else {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+			}		
+			consolebox[panel]->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+
+		if(panel == 2) {
+			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+			if(ostype == Mac) {
+				ScaleButton(ID_overlay, "Ovl", 43, hbox);
+				ScaleButton(ID_position, "Pos", 43, hbox);
+			}
+			else {
+				ScaleButton(ID_overlay, "Over", 35, hbox);
+				hbox->AddSpacer(2);
+				ScaleButton(ID_position, "Pos", 35, hbox);
+			}
+			consolebox[panel]->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			overpan1 = 2;
+			overpan2 = 3;
+		}
+	}
+
+	if(boxtype == modVMN) {
+		if(panel == 0) {
+			wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
+			wxBoxSizer *modebox = new wxBoxSizer(wxHORIZONTAL); 
+
+			if(ostype == Mac) {
+				ScaleButton(ID_spikes, "Spike", 40, resbox);
+				ScaleButton(ID_rateres, "Rate", 40, resbox);
+				GraphButton("nettog", 0, ID_net, "Net", 43, modebox);
+			}
+			else {
+				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
+				resbox->AddSpacer(2);
+				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+				//ScaleButton(ID_net, "Net", 37, modebox);
+				GraphButton("nettog", 0, ID_net, "Net", 37, modebox);
+			}
+			consolebox[panel]->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			consolebox[panel]->Add(modebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+
+		}
+		if(panel == 1) {
+			wxBoxSizer *binbox = new wxBoxSizer(wxHORIZONTAL); 
+			if(ostype == Mac) {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 70, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin", 45, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 45, binbox);
+				//ScaleButton(ID_allburst, "All / Burst", 74, consolebox[panel]);
+			}
+			else {
+				GraphButton("hazmode1", 0, ID_histhaz1, "Hist / Haz", 54, consolebox[panel]);
+				GraphButton("binrestog1", 0, ID_binres1, "Bin Res", 43, binbox);
+				//ScaleButton(ID_norm, "Norm", 35, binbox);
+				GraphButton("normtog", 0, ID_norm, "Norm", 35, binbox);
+				//ScaleButton(ID_allburst, "All / Burst", 55, consolebox[panel]);
+			}		
+			consolebox[panel]->Add(binbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+		}
+		if(panel == 2) {
+			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+			if(ostype == Mac) {
+				ScaleButton(ID_overlay, "Ovl", 43, hbox);
+				ScaleButton(ID_position, "Pos", 43, hbox);
+			}
+			else {
+				ScaleButton(ID_overlay, "Over", 35, hbox);
+				hbox->AddSpacer(2);
+				ScaleButton(ID_position, "Pos", 35, hbox);
+			}
+			consolebox[panel]->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			overpan1 = 2;
+			overpan2 = 3;
+		}
+		if(panel == 4) {
+			wxBoxSizer *hbox = new wxBoxSizer(wxHORIZONTAL);
+			if(ostype == Mac) {
+				ScaleButton(ID_overlay2, "Ovl", 43, hbox);
+				ScaleButton(ID_position2, "Pos", 43, hbox);
+			}
+			else {
+				ScaleButton(ID_overlay2, "Over", 35, hbox);
+				hbox->AddSpacer(2);
+				ScaleButton(ID_position2, "Pos", 35, hbox);
+			}
+			consolebox[panel]->Add(hbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+			overpan3 = 4;
+			overpan4 = 5;
+		}
+	}
 }
 
 
@@ -1015,6 +985,7 @@ TextBox *ScaleBox::AddScaleParam(wxString name, double initval, wxBoxSizer *pset
 
 void ScaleBox::OnOK(wxCommandEvent& WXUNUSED(event))
 {
+	int i;
 	wxString fontname, sizetext, ostext, text;
 	wxSize panelsize;
 	double oldxfrom, oldxto;
@@ -1366,7 +1337,7 @@ int ScaleBox::CheckValue()
 
 void ScaleBox::GraphUpdate(int pos)
 {
-	for(g=0; g<numgraphs; g++)
+	for(int g=0; g<numgraphs; g++)
 		graphwin[g]->UpdateScroll(pos);
 }
 
@@ -1376,7 +1347,7 @@ void ScaleBox::XSynch(int pos)
 	if(gsynch) {
 		GraphDat *graph0 = graphwin[synchcon]->dispset[0]->plot[0];
 		if(!graph0->synchx) return;
-		for(i=startgraph; i<startgraph+numgraphs; i++) {
+		for(int i=startgraph; i<startgraph+numgraphs; i++) {
 			if(gsync[i] && !gsync[i]->GetValue()) {
 				//mainwin->diagbox->Write(text.Format("Sync break pos %d\n", i));
 				continue;
@@ -1394,6 +1365,7 @@ void ScaleBox::XSynch(int pos)
 
 void ScaleBox::SynchScale()
 {
+	int i, g;
 	GraphDat *plot0, *plot;
 
 	for(i=startgraph; i<startgraph+numgraphs; i++) {
@@ -1431,6 +1403,7 @@ void ScaleBox::ScaleUpdate()
 
 void ScaleBox::PanelUpdate()
 {
+	int i, g;
 	GraphDat *plot0, *plot;
 	//int yplaces;
 	wxString text;

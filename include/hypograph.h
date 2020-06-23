@@ -183,7 +183,7 @@ public:
 	MainFrame *mainwin;
 	wxFrame *drawframe;
 	int buttonheight;
-	int i, g, numgraphs, startgraph, modesum;
+	int numgraphs, startgraph, modesum;
 	int hazmode1, hazmode2, binrestog1, binrestog2;
 	int overtog, overtog2;
 	int timeres;
@@ -209,6 +209,9 @@ public:
 
 	int xmin, xmax, ymin, ymax;
 	int overpan1, overpan2, overpan3, overpan4;
+	int zbwidth, zbheight;  // zoom button sizes
+	wxBitmap rightarrow, leftarrow;
+	wxBitmap downarrow, uparrow;
 
 	wxString snum, redtag, text;
 	wxFont boxfont, confont;
@@ -228,9 +231,12 @@ public:
 	wxComboBox *gstag;
 	wxToggleButton *syncbutton;
 	wxCheckBox *gsync[10];
-	wxBoxSizer *vbox;
+	wxBoxSizer *consolebox[10];
+	wxBoxSizer *vconbox;
+	//wxBoxSizer *psetbox;
 
-	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, int boxtype=0);
+	//ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, int boxtype=0);
+	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int boxtype=0);
 	~ScaleBox();
 
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);
@@ -299,6 +305,10 @@ public:
 	void OnConFocus(wxFocusEvent& event);
 
 	int CheckValue();
+	void AddGraphConsole(int index, GraphWindow3 *graphwin);
+	void RemoveGraphConsole(int index);
+	void ConsoleButtons(int panel);  // Add mod type dependent panel buttons, now being replaced by Model class version (boxtype = -1)
+
 };
 
 

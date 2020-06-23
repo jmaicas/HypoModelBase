@@ -75,15 +75,16 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
         diagbox->Write(text.Format("mainpath %s\n", mainpath));
     }
     
-	OptionLoad();
+	OptionLoad();      // basic configuration
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
+	numdraw_set = numdraw;
     
 	toolpath = mainpath + "Tools";
     //if(modpath == "") modpath = mainpath;
     diagbox->Write("modpath " + modpath + "\n");
 
-	MainLoad();
+	MainLoad();     // main window tool configuration
 
 	spikedisp = 0;   // spike display mode   0 = plain   1 = burst   2 = hazard filter
 
@@ -192,7 +193,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		}
 
 		//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call\n");
-		scalebox = new ScaleBox(this, this, wxDefaultSize, numdraw, gpos, mod, graphwin, 0, scaletype);
+		scalebox = new ScaleBox(this, this, wxDefaultSize, numdraw, gpos, mod, graphwin, scaletype);
 		scalebox->GraphSwitch(0);
 
 	
@@ -311,18 +312,26 @@ void HypoMain::OnGraphAdd(wxCommandEvent& WXUNUSED(event))
 }
 
 
+void HypoMain::GraphPanelsUpdate()
+{
+	while(numdraw_set != numdraw) {
+		if (numdraw_set < numdraw) RemoveGraph(numdraw-1);
+		if (numdraw_set > numdraw) AddGraph();
+	}
+	SizeUpdate();
+}
+
+
 void HypoMain::AddGraph()
 {
 	graph = numdraw;
-
 	graphwin[graph] = new GraphWindow3(this, this, mod, wxPoint(0, graph*250 + 10), wxSize(100, 255), &gpos[graph], graph);
 	graphwin[graph]->FrontGraph(&gpos[graph]);
 	graphsizer->Add(graphwin[graph], 1, wxEXPAND);
-
-	//Refresh();
-
+	scalebox->AddGraphConsole(scalebox->numgraphs++, graphwin[graph]);
 	numdraw++;
-	Layout();
+	graphsizer->Layout();
+	Refresh();
 }
 
 
@@ -334,7 +343,7 @@ void HypoMain::RemoveGraph(int gindex)
 	numdraw--;
 	graphwin[gindex]->Hide();
 
-	//graphsizer->Remove(
+	scalebox->RemoveGraphConsole(gindex);
 }
 
 
@@ -609,67 +618,51 @@ void HypoMain::OnMove(wxMoveEvent& event)
 
 void HypoMain::OnSize(wxSizeEvent& event)
 {
-	int gspace, gspacex;
+	if(!numdraw) {
+		wxFrame::OnSize(event);
+		return;
+	}
+
+	SizeUpdate();
+}
+
+
+void HypoMain::SizeUpdate()
+{
+	int gspacey, gspacex;
 	int scalewidth = 155;
 	wxSize statusSize;
 	int i;
     
-    if(!numdraw) {
-        wxFrame::OnSize(event);
-        return;
-    }
-
 	wxSize newsize = GetSize();
 	wxSize graphsize = graphsizer->GetSize();
 	wxPoint mainpos = GetPosition();
 	snum.Printf("Main Size X %d Y %d", newsize.x, newsize.y);
 	SetStatusText(snum);
-	//DiagText(snum);
-
+	
 	statusSize = statusbar->GetSize();
 
-	yplot = 200;
-	xplot = 500;
-
-	//if(newsize.y < 825) yplot = 150;
-	//if(newsize.y < 675) yplot = 100;
-	//yplot = 150;
-
 	gspacex = newsize.x - scalewidth;
-	if(gspacex < 500) xplot = 450;
-	if(gspacex < 450) xplot = 400;
-	if(gspacex < 400) xplot = 350;
-	if(gspacex < 350) xplot = 300;
 	xplot = gspacex - 15;
-
-	//gspace = newsize.y - numdraw * 75 - statusSize.y;
-	//gspace = newsize.y - numdraw * 75 - 5;
-	gspace = graphsize.y - numdraw * 55 - 5;
-	if(gspace / numdraw < 200) yplot = 150;
-	if(gspace / numdraw < 150) yplot = 100;
-	yplot = gspace/numdraw;
+	
+	gspacey = graphsize.y - numdraw * 55 - 5;
+	yplot = gspacey / numdraw;
 
 	snum.Printf("Size X %d Y %d, Graph X %d Y %d, xplot %d yplot %d", newsize.x, newsize.y, graphsize.x, graphsize.y, xplot, yplot);
 	//SetStatusText(snum);
-	diagbox->Write(snum + "\n");
+	//diagbox->Write(snum + "\n");
 
 	viewwidth = newsize.x;
 	viewheight = newsize.y;
 
 	for(graph=0; graph<numdraw; graph++) {
 		graphwin[graph]->SetInitialSize();
-		//graphwin[graph]->SetSize(0, 200, xplot, yplot);
 		graphwin[graph]->ReSize(xplot, yplot);
 	}
 
 	for(i=0; i<toolset->numtools; i++) if(toolset->box[i] != NULL) toolset->box[i]->SetPosition();
 	for(i=0; i<mod->modtools.numtools; i++) if(mod->modtools.box[i] != NULL) mod->modtools.box[i]->SetPosition();
-	/*
-	if(igfbox != NULL && ostype != 2) {
-	igfbox->Move(mainpos.x + newsize.x, mainpos.y + 10);
-	if(newsize.y < 605) igfbox->SetSize(320, newsize.y - 10);
-	if(newsize.y >= 605) igfbox->SetSize(320, 750);
-	}*/
+	
 	Layout();
 }
 

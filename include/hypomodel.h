@@ -84,7 +84,8 @@ public:
 	wxCommandEvent blankevent;
 
 	int graph, numgraphs, yplot, xplot;
-	int numdraw, numdraw2;
+	int numdraw, numdraw2;  // number of graph panels (GraphWindow3 objects)
+	int numdraw_set;  // new options set value, before graph panels updated
 	int spikedisp;
 	int screenx;
 	int viewheight;
@@ -189,6 +190,8 @@ public:
 	void CleanUp();
 	void AddGraph();
 	void RemoveGraph(int);
+	void GraphPanelsUpdate();
+	void SizeUpdate();
 
 	void OnFlag(wxCommandEvent& event);
 	void SetMenuFlag(int, wxString, wxString, int state, wxMenu *menu); 
