@@ -681,6 +681,14 @@ GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, w
 }
 
 
+int GraphDat::MaxDex()
+{
+	if(gparam == -3) return 0;     // currently no maxindex for datint type
+	if(gparam == -4) return gdatadv->maxdex();
+	return 0;
+}
+
+
 void GraphDat::Init()
 {
 	diagbox = NULL;

@@ -86,7 +86,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	numdisps = 0;
 	currentgraph = 0;
 	spikedisp = 0;
-	gsynch = 1;
+	gsynch = 0;
 
 	selectband = false;
 	//overlay = wxOverlay();
@@ -166,6 +166,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	Connect(ID_MultiCell, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnMultiCell));
 	Connect(ID_Scale, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnScale));
 	Connect(ID_UnZoom, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnUnZoom));
+	Connect(ID_Test, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnDrawTest));
 }
 
 
@@ -173,6 +174,16 @@ GraphWindow3::~GraphWindow3()
 {
 	//delete overlay;
 	//delete menuPlot;
+}
+
+
+void GraphWindow3::OnDrawTest(wxCommandEvent& event)
+{
+	bool testdraw = true;
+
+	while(testdraw) {
+		Refresh();
+	}
 }
 
 
@@ -483,13 +494,14 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 			menuPlot->AppendSeparator();
 		}
 		else {
-		//menuPlot->Append(ID_GraphRemove, "Delete Graph");
-		menuPlot->Append(ID_GraphEPS, "Export EPS");
-		menuPlot->Append(ID_MultiEPS, "Multi EPS");
-		menuPlot->Append(ID_MultiCell, "Multi Cell");
-		menuPlot->Append(ID_Scale, "Plot Panel");
-		menuPlot->Append(ID_UnZoom, "Zoom Undo");
-		menuPlot->AppendSeparator();
+			//menuPlot->Append(ID_GraphRemove, "Delete Graph");
+			menuPlot->Append(ID_GraphEPS, "Export EPS");
+			menuPlot->Append(ID_MultiEPS, "Multi EPS");
+			menuPlot->Append(ID_MultiCell, "Multi Cell");
+			menuPlot->Append(ID_Scale, "Plot Panel");
+			menuPlot->Append(ID_UnZoom, "Zoom Undo");
+			menuPlot->Append(ID_Test, "Test");
+			menuPlot->AppendSeparator();
 		}
 	}
 
@@ -611,7 +623,7 @@ void GraphWindow3::UpdateScroll(int pos)
 
 	graph = gpos->plot[0];
 	if(graph->gparam == -3) max = graph->gdatav->max / graph->xscale;
-	else if(graph->gparam == -4) max = graph->gdatadv->max / graph->xscale;
+	else if(graph->gparam == -4) max = graph->gdatadv->maxindex / graph->xscale;
 	else {
 		mod->diagbox->Write("plot " + graph->gname + " no data\n");
 		return;
@@ -914,6 +926,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 	int barwidth, bargap;
 	double textwidth, textheight;
 	double drawX;
+	int xcount; // number of x steps in plot
 
 	int diag;
 	bool drawdiag;
@@ -1129,9 +1142,21 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			xto /= binsize;
 			xfrom /= binsize;
 
+
+			// xrange - pixels per x unit
+			// xnum - x units per pixel
+
 			yrange = (double)yplot / (yto - yfrom);
 			xrange = (double)xplot / (xto - xfrom);
 			xnum = (double)(xto - xfrom) / xplot;
+
+			//if(binsize != 1 && gtype == 5) {
+			//	mainwin->diagbox->Write(text.Format("name %s  xfrom %.2f  xto %.2f  binsize %.2f  xrange %.2f  xnum %.2f  xplot %d\n", 
+			//		gname, xfrom, xto, binsize, xrange, xnum, xplot));
+			//}
+
+			//mainwin->diagbox->Write(text.Format("name %s  xfrom %.2f  xto %.2f  binsize %.2f  xrange %.2f  xnum %.2f  xplot %d\n", 
+			//		gname, xfrom, xto, binsize, xrange, xnum, xplot));
 
 
 			/* Plot Types
@@ -1433,6 +1458,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			}
 
 
+			int maxdex;
+
 			if(gtype == 5) {                         // line graph with scaling fix
 				if(drawdiag) ofp = fopen("graph.txt", "w");
 				//mod->diagbox->Write(text.Format("line plot xrange %.4f  yscalemode %d  ylogbase %.4f  ylogmax %.4f\n", xrange, graph->yscalemode, ylogbase, ylogmax));
@@ -1441,19 +1468,37 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				pdir = 0;
 				xindex = (int)xfrom;
 				if(gpar == -3) preval = (*gdatav)[xindex];
-				if(gpar == -4) preval = (*gdatadv)[xindex];
+				if(gpar == -4) {
+				    maxdex = gdatadv->maxdex();
+					if(xindex > maxdex) break;
+					preval = (*gdatadv)[xindex];
+				}
+				else maxdex = 0;
 				oldx = xbase + xoffset;
 				oldy = (int)(yplot + ybase - yrange * (preval - yfrom));
 
-				for(i=1; i<xplot; i++) {
+				if(xrange < 1) xcount = xplot;
+				else {
+					xcount = xplot / xrange;
+					if(!xcount) xcount = 1;
+				}
+			
+				for(i=1; i<=xcount; i++) {
 					if(xrange < 1) {
 						xindex = (int)((i * xnum) + xfrom);
-						//mpoint = (*gdatadv)[xindex];
 						if(gpar == -3) mpoint = (*gdatav)[xindex];
-						if(gpar == -4) mpoint = (*gdatadv)[xindex];
+						//if(gpar == -4) mpoint = (*gdatadv)[xindex];
+						if(gpar == -4) {
+							if(maxdex && maxdex < xindex) {     //check for end of recorded data range
+								//mainwin->diagbox->Write(text.Format("data end xcount %d  i %d  xnum %.4f  xindex %d  maxdex %d\n", xcount, i, xnum, xindex, gdatadv->maxdex()));
+								break;  
+							}
+							mpoint = (*gdatadv)[xindex];
+						}
+
 						if(drawdiag) fprintf(ofp, "xdraw %d  preval %.4f  dir %d\n", i, preval, dir);
 						for(j=1; j<xnum; j++) {
-							//data = (*gdatadv)[xindex + j];
+							if(xindex + j > maxdex) break;
 							if(gpar == -3) data = (*gdatav)[xindex + j];
 							if(gpar == -4) data = (*gdatadv)[xindex + j];
 							if(drawdiag) fprintf(ofp, "xdraw %d, xnum %d, data %.4f\n", i, j, data);
@@ -1485,15 +1530,27 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						//oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 					}
 					else {
-						//yval = (*gdatadv)[(int)(i + xfrom)];
-						if(gpar == -3) yval = (*gdatav)[(int)(i + xfrom)];
-						if(gpar == -4) yval = (*gdatadv)[(int)(i + xfrom)];
+						xindex = (int)(i + xfrom);
+						if(gpar == -3) yval = (*gdatav)[xindex];
+						if(gpar == -4) {
+							if(maxdex && maxdex < xindex) break;    //check for end of recorded data range
+							yval = (*gdatadv)[xindex];
+						}
+					
 						if(graph->yscalemode == 1 && yfrom > 0) {
 							ypos = (int)((double)yplot * (log(yval / yfrom) / log(ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
 							if(yval < yfrom) ypos = -yfrom * yrange;
 						}
 						else ypos = yrange * (yval - yfrom);
-						DrawLine(dc, gc, oldx, oldy, (int)(i * xrange + xbase + xoffset), (int)(yplot + ybase - ypos));
+						if(i < xcount) DrawLine(dc, gc, oldx, oldy, (int)(i * xrange + xbase + xoffset), yplot + ybase - ypos);
+						else {   // interpolate y step for last partial x step
+							int xremain = xplot + xbase + xoffset - oldx;
+							double portion = (double)xrange / xremain;
+							if(portion > 1) portion = 1 / portion;  // where x plot range is less than one x step in data
+							double yremain = oldy - ((double)yplot + ybase - yrange * (yval - yfrom));
+							//mainwin->diagbox->Write(text.Format("xcount %d  xremain %d  portion %.2f  yremain %.2f\n", xcount, xremain, portion, yremain));
+							DrawLine(dc, gc, oldx, oldy, xplot + xbase + xoffset, oldy - yremain * portion);
+						}
 						oldx = i * xrange + xbase + xoffset;
 						oldy = (int)(yplot + ybase - ypos);
 					}

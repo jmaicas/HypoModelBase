@@ -690,6 +690,7 @@ public:
 	wxString StoreDat(wxString tag);
 	void LoadDat(wxString, int version);
 	void Init();
+	int MaxDex();   // get max index from attached dat type (currently only for datdouble)
 };
 
 

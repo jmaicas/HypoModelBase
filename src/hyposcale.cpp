@@ -837,6 +837,8 @@ void ScaleBox::OnXZoomIn(wxCommandEvent& event)
 	synchcon = startgraph + pos;
 	mainwin->SetStatusText("");
 	ScaleUpdate();
+
+	mainwin->diagbox->Write("XZoom\n");
 }
 
 
@@ -993,7 +995,8 @@ void ScaleBox::OnOK(wxCommandEvent& WXUNUSED(event))
 
 	//mainwin->SetStatus("Scale OK");
 	mainwin->SetStatusText("");
-	for(i=startgraph; i<startgraph+numgraphs; i++) {
+	//for(i=startgraph; i<startgraph+numgraphs; i++) {
+	for(i=0; i<numgraphs; i++) {
 		graph = graphwin[i]->dispset[0]->plot[0];
 		//oldxfrom = graph->xfrom;
 		//oldxto = graph->xto;
@@ -1408,7 +1411,8 @@ void ScaleBox::PanelUpdate()
 	//int yplaces;
 	wxString text;
 
-	for(i=startgraph; i<startgraph+numgraphs; i++) {
+	//for(i=startgraph; i<startgraph+numgraphs; i++) {
+	for(i=0; i<numgraphs; i++) {
 		if(graphwin[i]->numdisps > 0) {
 			graph = graphwin[i]->dispset[0]->plot[0];
 			plot0 = graphwin[i]->dispset[0]->plot[0];

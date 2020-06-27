@@ -227,6 +227,7 @@ enum {
 	ID_MultiCell,
 	ID_Scale,
 	ID_UnZoom,
+	ID_Test,
 	ID_Go,
 	ID_Stop, 
 	ID_Wave,
@@ -526,6 +527,10 @@ public:
 		}
 		if(index > maxindex) maxindex = index;
 		return data[index];
+	}
+
+	void reset() {
+		maxindex = 0;
 	}
 
 	int maxdex() {
