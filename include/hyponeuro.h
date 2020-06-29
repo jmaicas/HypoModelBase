@@ -5,7 +5,15 @@
 
 
 enum {
-	ID_epspsynch = 10000
+	ID_epspsynch = 10000,
+	ID_scalemode,
+	ID_polymode,
+	ID_synthmode,
+	ID_transmode,
+	ID_VSflag,
+	ID_transflag,
+	ID_Synth,
+	ID_Proto
 };
 
 
