@@ -20,6 +20,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	graphwin = gwin;
 	numgraphs = gnum;
 	//startgraph = start; 
+	startgraph = 0;
 	gmod = model;
 	mod = model;
     
@@ -186,6 +187,10 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(1010+startgraph, 1010+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomOut));
 	Connect(1100+startgraph, 1100+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomIn));
 	Connect(1110+startgraph, 1110+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomOut));
+	//Connect(1000, 1000+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomIn));
+	//Connect(1010, 1010+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomOut));
+	//Connect(1100, 1100+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomIn));
+	//Connect(1110, 1110+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomOut));
 
 	Connect(ID_gstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnGStore));
 	Connect(ID_gload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnGLoad));
