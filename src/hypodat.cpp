@@ -9,6 +9,9 @@ NeuroDat::NeuroDat()
 	//srate(std::make_shared<int>(maxtime)),
 	//srate10(std::make_shared<int>(maxtime))
 {
+	maxtime = 100000;
+	maxspikes = 100000;
+
 	times.resize(maxspikes);
 	srate.resize(maxtime);
 	srate10.resize(maxtime);
@@ -24,6 +27,14 @@ NeuroDat::NeuroDat()
 
 NeuroDat::~NeuroDat()
 {
+}
+
+
+void NeuroDat::diagstore()
+{
+	maxspikes = 1000000;
+
+	times.resize(maxspikes);
 }
 
 

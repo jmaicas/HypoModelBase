@@ -163,8 +163,8 @@ public:
 	int filter;
 	int gridcol;
 
-	static const int maxtime = 100000;
-	static const int maxspikes = 100000;
+	int maxtime;
+	int maxspikes;
 	
 	double freq;
 	double meanisi;
@@ -174,6 +174,7 @@ public:
 	~NeuroDat();
 	void ratecalc();
 	void ratereset();
+	void diagstore(); // expand default storage for diagnostics
 };
 
 

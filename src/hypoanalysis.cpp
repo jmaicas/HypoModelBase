@@ -1513,6 +1513,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	if(neurodat) {
 		spikecount = datneuron->spikecount;
+		maxspikes = datneuron->maxspikes;
 		//isis = datneuron->isis;
 	}
 	stime = start;

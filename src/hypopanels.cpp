@@ -718,6 +718,8 @@ ParamBox::~ParamBox()
 	delete checkrefs;
 	delete panelrefs;
 
+
+
 	//delete vbox1;
 	//delete vbox2;
 }
