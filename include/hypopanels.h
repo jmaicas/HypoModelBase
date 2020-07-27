@@ -188,6 +188,7 @@ public:
 	void OnClose(wxCloseEvent& event);
 	ParamCon *GetCon(wxString);
 	wxBoxSizer *RunBox();
+	void CopyParams(ParamStore *);   // copy parameters to panel from ParamStore
 };
 
 

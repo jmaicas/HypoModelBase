@@ -13,7 +13,8 @@ enum {
 	ID_VSflag,
 	ID_transflag,
 	ID_Synth,
-	ID_Proto
+	ID_Proto,
+	ID_storereset
 };
 
 

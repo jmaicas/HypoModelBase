@@ -717,12 +717,25 @@ ParamBox::~ParamBox()
 	delete conflagrefs;
 	delete checkrefs;
 	delete panelrefs;
-
-
-
-	//delete vbox1;
-	//delete vbox2;
 }
+
+
+void ParamBox::CopyParams(ParamStore *params)
+{
+	int i;
+	wxString tag;
+	double pval;
+
+	for(i=0; i<paramset.numparams; i++) {
+		tag = paramset.con[i]->name;
+		pval = (*params)[tag];
+		paramset.con[i]->SetValue(pval);
+	}
+
+	// This requires ParamStore to match paramset
+	// Consider version which loops based on ParamStore
+}
+
 
 
 void ParamBox::SetVBox(int num)
