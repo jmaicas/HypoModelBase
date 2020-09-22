@@ -14,7 +14,8 @@ enum {
 	ID_transflag,
 	ID_Synth,
 	ID_Proto,
-	ID_storereset
+	ID_storereset,
+	ID_diffusion
 };
 
 
