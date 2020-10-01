@@ -293,7 +293,8 @@ class GridBox: public ParamBox
 public:
 	Model *mod;
 	wxTextCtrl *textbox;
-	TextGrid *textgrid;   // base grid
+	TextGrid *textgrid[10];   // base grid
+	//TextGrid *textgrid2, *textgrid3;
 	TextGrid *currgrid;   // pointer to selected grid, textgrid by default
 	DiagBox *diagbox;
 	wxNotebook *notebook;
@@ -302,6 +303,7 @@ public:
     bool undomode;
 	bool startshift;
 	int colflag[1000];
+	int numgrids;
 
 	NeuroBox *neurobox;
 	vector<NeuroDat>* celldata;
@@ -313,16 +315,19 @@ public:
 	void GridStore();
 	void GridLoad();
 	void GridLoadFast();
-	void OnGridStore(wxCommandEvent& event);
-	void OnGridLoad(wxCommandEvent& event);
 	void HistLoad();
 	void HistStore();
+
+	void OnGridStore(wxCommandEvent& event);
+	void OnGridLoad(wxCommandEvent& event);
 	void OnRightClick(wxMouseEvent& event);
 	void OnUndo(wxCommandEvent& event);
 	void OnCopy(wxCommandEvent& event);
 	void OnButton(wxCommandEvent& event);
-	int ColumnData(int, datdouble *);
 
+	int ColumnData(int, datdouble *);
+	void AddGrid(wxString label, wxSize size);
+	void SetCurrentGrid();
 	void ParamButton();
 	void NeuroButton();
 	void PlotButton();
@@ -331,7 +336,8 @@ public:
 	void OnParamScan(wxCommandEvent& event);
 	void OnNeuroScan(wxCommandEvent& event);
 	virtual void OnPlot(wxCommandEvent& event);
-
+	void OnGridSelect(wxBookCtrlEvent& event);
+	
 	void NeuroGridFilter();
 	void NeuroScan();
 

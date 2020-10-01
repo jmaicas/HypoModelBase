@@ -995,6 +995,7 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	int gridrows, gridcols;
 	wxBoxSizer *vdubox;
 	mod = model;
+	numgrids = 1;
     
     undomode = true;
 
@@ -1014,25 +1015,25 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 
 	if(bookmode) notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
 
-	//textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
-	
 	if(bookmode) {
-		textgrid = new TextGrid(notebook, wxSize(gridrows, gridcols));
-		notebook->AddPage(textgrid, text.Format("Data %d", 0));
+		textgrid[0] = new TextGrid(notebook, wxSize(gridrows, gridcols));
+		notebook->AddPage(textgrid[0], text.Format("Data %d", 0));
 	}
-	else textgrid = new TextGrid(panel, wxSize(gridrows, gridcols));
+	else textgrid[0] = new TextGrid(panel, wxSize(gridrows, gridcols));
 
-	currgrid = textgrid;
-	textgrid->diagbox = diagbox;
+	currgrid = textgrid[0];
+	textgrid[0]->diagbox = diagbox;
 
 	//for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
 	//for(i=0; i<gridcols; i++) textgrid->SetColSize(i, 60);
-	textgrid->SetDefaultRowSize(20, true);
-	textgrid->SetDefaultColSize(60, true);
+	textgrid[0]->SetDefaultRowSize(20, true);
+	textgrid[0]->SetDefaultColSize(60, true);
 	//textgrid->SetRowLabelSize(80); 
-	textgrid->SetRowLabelSize(50); 
-	textgrid->vdu = NULL;
-	textgrid->gauge = NULL;
+	textgrid[0]->SetRowLabelSize(50); 
+	//textgrid[0]->vdu = NULL;
+	//textgrid[0]->gauge = NULL;
+
+	vdu = NULL;
 	gauge = NULL;
 
 	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
@@ -1075,7 +1076,7 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	controlbox->AddSpacer(10);
 
 	if(bookmode) mainbox->Add(notebook, 1, wxEXPAND);
-	else mainbox->Add(textgrid, 1, wxEXPAND);
+	else mainbox->Add(textgrid[0], 1, wxEXPAND);
 	mainbox->Add(controlbox, 0);
 	mainbox->AddSpacer(2);
 
@@ -1087,9 +1088,9 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 
 	panel->Layout();
 
-	textgrid->vdu = vdu;
-	textgrid->gauge = gauge;
-	textgrid->gridbox = this;
+	textgrid[0]->vdu = vdu;
+	textgrid[0]->gauge = gauge;
+	textgrid[0]->gridbox = this;
 
 	Connect(ID_paramstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnGridStore));
 	Connect(ID_paramload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnGridLoad));
@@ -1097,7 +1098,39 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	Connect(ID_Copy, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnCopy));
 	Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(GridBox::OnRightClick));
 	Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(GridBox::OnCellChange));
+	Connect(wxEVT_NOTEBOOK_PAGE_CHANGED, wxBookCtrlEventHandler(GridBox::OnGridSelect));
 };
+
+
+void GridBox::OnGridSelect(wxBookCtrlEvent& event) {
+	wxString text; 
+	int newpage;
+
+	newpage = event.GetSelection();
+	//diagbox->Write(text.Format("OnGridSelect %d\n", newpage));
+	currgrid = textgrid[newpage];
+}
+
+
+void GridBox::AddGrid(wxString label, wxSize size) {
+
+	// Initialise
+	textgrid[numgrids] = new TextGrid(notebook, size);
+	notebook->AddPage(textgrid[numgrids], label);
+
+	// Set Links
+	textgrid[numgrids]->diagbox = diagbox;
+	textgrid[numgrids]->vdu = vdu;
+	textgrid[numgrids]->gauge = gauge;
+	textgrid[numgrids]->gridbox = this;
+
+	// Format
+	textgrid[numgrids]->SetDefaultRowSize(20, true);
+	textgrid[numgrids]->SetDefaultColSize(60, true);
+	textgrid[numgrids]->SetRowLabelSize(50); 
+
+	numgrids++;
+}
 
 
 void GridBox::PlotButton()
@@ -1151,7 +1184,7 @@ void GridBox::OnPlot(wxCommandEvent& event)
 
 void GridBox::OnUndo(wxCommandEvent& event)
 {
-	textgrid->Undo();
+	currgrid->Undo();
 }
 
 
@@ -1165,7 +1198,7 @@ void GridBox::OnButton(wxCommandEvent& event)
 
 void GridBox::OnCopy(wxCommandEvent& event)
 {
-	textgrid->Copy();
+	currgrid->Copy();
 }
 
 
@@ -1183,7 +1216,7 @@ void GridBox::OnRightClick(wxMouseEvent& event)
 	//int id = event.GetId();
 	//wxWindow *pos = FindWindowById(id, toolpanel);
 	//wxPoint point = this->GetPosition();
-	textgrid->SetCellValue(10, 0, "right");
+	currgrid->SetCellValue(10, 0, "right");
 
 	wxPoint pos = event.GetPosition();
 	//wxSize size = this->GetSize();
@@ -1222,30 +1255,30 @@ void GridBox::TestGrid()
 	int i;
 	wxString text;
 
-	for(i=0; i<1000; i++) textgrid->SetCellValue(i, 0, text.Format("%.1f", i*0.1 + 10));
+	for(i=0; i<1000; i++) currgrid->SetCellValue(i, 0, text.Format("%.1f", i*0.1 + 10));
 }
 
 
 void GridBox::GridDefault()
 {
-	textgrid->SetCellValue(0, 0, "date");
-	textgrid->SetCellValue(1, 0, "breath rhy");
-	textgrid->SetCellValue(2, 0, "odour");
-	textgrid->SetCellValue(3, 0, "bedding");
-	textgrid->SetCellValue(4, 0, "val");
-	textgrid->SetCellValue(5, 0, "hex");
-	textgrid->SetCellValue(6, 0, "air");
-	textgrid->SetCellValue(7, 0, "other");
+	currgrid->SetCellValue(0, 0, "date");
+	currgrid->SetCellValue(1, 0, "breath rhy");
+	currgrid->SetCellValue(2, 0, "odour");
+	currgrid->SetCellValue(3, 0, "bedding");
+	currgrid->SetCellValue(4, 0, "val");
+	currgrid->SetCellValue(5, 0, "hex");
+	currgrid->SetCellValue(6, 0, "air");
+	currgrid->SetCellValue(7, 0, "other");
 
-	textgrid->SetCellValue(9, 0, "phasic");
-	textgrid->SetCellValue(10, 0, "other");
-	textgrid->SetCellValue(11, 0, "vas");
+	currgrid->SetCellValue(9, 0, "phasic");
+	currgrid->SetCellValue(10, 0, "other");
+	currgrid->SetCellValue(11, 0, "vas");
 
-	textgrid->SetCellValue(13, 0, "data");
-	textgrid->SetCellValue(14, 0, "spikes");
-	textgrid->SetCellValue(15, 0, "freq");
-	textgrid->SetCellValue(16, 0, "mean isi");
-	textgrid->SetCellValue(17, 0, "isi SD");
+	currgrid->SetCellValue(13, 0, "data");
+	currgrid->SetCellValue(14, 0, "spikes");
+	currgrid->SetCellValue(15, 0, "freq");
+	currgrid->SetCellValue(16, 0, "mean isi");
+	currgrid->SetCellValue(17, 0, "isi SD");
 }
 
 
@@ -1257,7 +1290,7 @@ void GridBox::OnGridStore(wxCommandEvent& event)
 
 void GridBox::OnGridLoad(wxCommandEvent& event)
 {
-	if(undomode) textgrid->CopyUndo();
+	if(undomode) currgrid->CopyUndo();
 	//GridLoad();
 	//int ioflag = (*modflags)["ioflag"];
 	int ioflag = true;
@@ -1285,8 +1318,8 @@ int GridBox::ColumnData(int col, datdouble *data)
 	wxString celltext;
 
 	count = 0;
-	for(row=0; row<textgrid->GetNumberRows(); row++) {
-		celltext = textgrid->GetCellValue(row, col);
+	for(row=0; row<currgrid->GetNumberRows(); row++) {
+		celltext = currgrid->GetCellValue(row, col);
 		if(celltext != "") {
 			celltext.ToDouble(&value);
 			count++;
@@ -1353,10 +1386,10 @@ void GridBox::GridStore()
 
 	WriteVDU("Writing file...");
 
-	for(row=0; row<textgrid->GetNumberRows(); row++) {
-		if(gauge) gauge->SetValue(100 * (row + 1) / textgrid->GetNumberRows());
-		for(col=0; col<textgrid->GetNumberCols(); col++) {
-			celltext = textgrid->GetCellValue(row, col);
+	for(row=0; row<currgrid->GetNumberRows(); row++) {
+		if(gauge) gauge->SetValue(100 * (row + 1) / currgrid->GetNumberRows());
+		for(col=0; col<currgrid->GetNumberCols(); col++) {
+			celltext = currgrid->GetCellValue(row, col);
 			celltext.Trim();                                                                     // Fixes odd line endings in pasted data  23/4/15
 			//if(!celltext.IsEmpty()) ofp.WriteLine(text.Format("%d %d %s", row, col, celltext));
 			if(!celltext.IsEmpty()) {
@@ -1375,7 +1408,7 @@ void GridBox::GridStore()
 	ofp.New(filename);
 	for(i=0; i<columnindex.count; i++) {
 		col = columnindex.list[i];
-		ofp.WriteLine(text.Format("col %d %d", col, textgrid->GetColSize(col)));
+		ofp.WriteLine(text.Format("col %d %d", col, currgrid->GetColSize(col)));
 	}
 	ofp.Close();
 }
@@ -1420,7 +1453,7 @@ void GridBox::GridLoad()            // Replaced by GridLoadFast()
 	paramstoretag->SetValue("");
 	paramstoretag->SetValue(filetag);
 
-	textgrid->ClearGrid();
+	currgrid->ClearGrid();
 
 	WriteVDU("Reading file...");
 
@@ -1447,7 +1480,7 @@ void GridBox::GridLoad()            // Replaced by GridLoadFast()
 
 		readline.Trim();
 		cell = readline;
-		textgrid->SetCell(row, col, cell);
+		currgrid->SetCell(row, col, cell);
 		cellcount++;
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		//readline = ifp.ReadLine();
@@ -1499,7 +1532,7 @@ void GridBox::GridLoadFast()
 	paramstoretag->SetValue("");
 	paramstoretag->SetValue(filetag);
 
-	textgrid->ClearGrid();
+	currgrid->ClearGrid();
 
 	WriteVDU("Reading file...");
 
@@ -1575,7 +1608,7 @@ void GridBox::GridLoadFast()
 
 		readline.Trim();
 		cell = readline;
-		textgrid->SetCell(row, col, cell);
+		currgrid->SetCell(row, col, cell);
 		//diagbox->Write(text.Format(" setcell %d %d %s\n", row, col, cell));
 		cellcount++;
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
@@ -1597,7 +1630,7 @@ void GridBox::GridLoadFast()
 		col = ParseLong(&readline, 'l');
 		width = ParseLong(&readline, 0);
 		//WriteVDU(text.Format("col %d %d\n", col, width));
-		textgrid->SetColSize(col, width);
+		currgrid->SetColSize(col, width);
 		if(ifp.End()) break;
 		readline = ifp.ReadLine();
 	}

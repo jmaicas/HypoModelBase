@@ -277,6 +277,8 @@ enum {
 	ID_ms,
 	ID_net, 
 	ID_norm,
+	ID_burst,
+	ID_select,
 	ID_allselect,
 	ID_clipmode,
 	ID_scatter,

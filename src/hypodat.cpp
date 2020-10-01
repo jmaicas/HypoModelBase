@@ -943,6 +943,8 @@ void GraphSet::IntervalSet(wxString tag, bool burst, bool select, int selectcode
 	AddFlag("burstmode", 100);
 	AddFlag("normtog", 1000);
 	AddFlag("quadtog", 10000);
+	AddFlag("selectmode", 100000);
+	selectcode = 100000;
 
 	Add(tag + "hist1ms", 0);
 	Add(tag + "haz1ms", 10);
