@@ -293,7 +293,7 @@ public:
 	int gpuparams, maxparams;
 	float runtime;
 	int *threaddata;
-	bool multirun;
+	bool multirun, batchrun;
 	int gpudevice;
 	int scorethreads;
 

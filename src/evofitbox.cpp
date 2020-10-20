@@ -516,7 +516,12 @@ void EvoFitBox::CreatePanels()
 	evobuttonbox->AddSpacer(10);
 	AddButton(ID_MultiRun, "RunX", 50, evobuttonbox);
 
+	wxBoxSizer *evobuttonbox2 = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_BatchRun, "Run Batch", 70, evobuttonbox2);
+
 	inputrangebox->Add(evobuttonbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	inputrangebox->AddSpacer(5);
+	inputrangebox->Add(evobuttonbox2, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	wxBoxSizer *seedbox = new wxBoxSizer(wxHORIZONTAL);
 	paramset.AddNum("evoseed", "", 0, 0, 0, 80);
@@ -641,6 +646,7 @@ void EvoFitBox::CreatePanels()
 	Connect(ID_loadfitscore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EvoFitBox::OnFitScore));
 	Connect(ID_Run, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EvoFitBox::OnEvoRun));
 	Connect(ID_MultiRun, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EvoFitBox::OnEvoRun));
+	Connect(ID_BatchRun, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EvoFitBox::OnEvoRun));
 	Connect(ID_datload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EvoFitBox::OnDataLoad));
 	//Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(VasoNewSecBox::OnRun));
 	//Connect(wxEVT_SCROLL_THUMBTRACK, wxSpinEventHandler(VasoNewSecBox::OnSpin));
@@ -839,6 +845,7 @@ void EvoFitBox::OnEvoRun(wxCommandEvent &event)
 	//mod->mainwin->GraphUpdate();
 
 	(*modflags)["multirun"] = false;
+	(*modflags)["batchrun"] = false;
 	(*modflags)["genlysis"] = false;
 
 	// Allocate and initialise chrome pop
@@ -879,6 +886,7 @@ void EvoFitBox::OnEvoRun(wxCommandEvent &event)
 	*/
 
 	if(event.GetId() == ID_MultiRun) (*modflags)["multirun"] = true;
+	if(event.GetId() == ID_BatchRun) (*modflags)["batchrun"] = true;
 
 	//vasomod->fitthread = new VasoEvoFit(vasomod, this);
 	//vasomod->fitthread->Create();
