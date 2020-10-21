@@ -369,6 +369,7 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	}
 	
 	currcell->SelectSpikes();
+	AnalyseSelection();
 	currcell->ColourSwitch(dispselect);
 	mainwin->scalebox->GraphUpdate();
 

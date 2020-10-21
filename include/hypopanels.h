@@ -159,6 +159,7 @@ public:
 	void StoreParam(wxString tag="");
 	void OnParamLoad(wxCommandEvent& event);
 	void ParamLoad(wxString tag="", bool compmode = false);
+	virtual void ParamLoadSync(wxString filetag, bool compmode = false);
 	void HistStore();
 	void HistLoad();
 	void OnFlag(wxCommandEvent& event);

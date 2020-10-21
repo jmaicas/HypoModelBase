@@ -850,6 +850,8 @@ void EvoFitBox::OnEvoRun(wxCommandEvent &event)
 
 	// Allocate and initialise chrome pop
 
+	// This code is probably all redundant now (see InitPop() etc in evofit class), TODO check and clean up
+
 	ParamStore *params = GetParams();
 	popsize = (int)(*params)["evopop"];
 	parentrange = (int)(*params)["parentrange"];

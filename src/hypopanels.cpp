@@ -1276,6 +1276,9 @@ void ParamBox::OnParamLoad(wxCommandEvent& event)
 }
 
 
+void ParamBox::ParamLoadSync(wxString filetag, bool compmode) {}
+
+
 void ParamBox::ParamLoad(wxString filetag, bool compmode)
 {
 	int id;
