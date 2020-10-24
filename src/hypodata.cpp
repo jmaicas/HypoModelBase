@@ -316,12 +316,22 @@ void NeuroBox::OnSelectStore(wxCommandEvent& event)
 	for(cellindex=0; cellindex<cellcount; cellindex++) {
 		cell = &(*cells)[cellindex];
 		for(i=1; i<=cell->numselects; i++) {
-			text.Printf("cel %d  index %d  sta %d  end %d", cellindex, i, cell->selectstore[i].start, cell->selectstore[i].end);	
+			text.Printf("dat %s  cel %d  index %d  sta %d  end %d", cell->name, cellindex, i, cell->selectstore[i].start, cell->selectstore[i].end);	
 			selectfile.WriteLine(text);
 		}
 	}
 
 	selectfile.Close();
+}
+
+
+NeuroDat *NeuroBox::GetCell(wxString name) 
+{
+	int i;
+
+	for(i=0; i<cellcount; i++) if((*cells)[i].name == name) return &(*cells)[i];
+	
+	return NULL;
 }
 
 
@@ -333,6 +343,7 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	wxString readline;
 	int index, start, end;
 	int cellindex;
+	wxString name;
 	bool diagnostic = true;
 	NeuroDat *cell;
 
@@ -349,16 +360,27 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	if(diagnostic) diagbox->Write("SelectLoad " + filename + "\n");
 
 	if(!selectfile.Exists(filename)) {
-		diagbox->Write("ToolLoad file not found\n");
+		diagbox->Write("SelectLoad file not found\n");
 		return;
 	}
 
 	selectfile.Open(filename);
 	readline = selectfile.ReadLine();
 
+	// Updated to reference by data name instead of index - October 2020
+
 	while(!readline.IsEmpty()) {
+		name == "";
+		if(readline.GetChar(0) == 'd') name = ParseString(&readline, 't');
 		cellindex = ParseLong(&readline, 'l');
-		cell = &(*cells)[cellindex];
+		if(diagnostic) diagbox->Write(text.Format("SelectLoad name %s  index %d\n", name, cellindex));
+		if(!name.IsEmpty()) cell = GetCell(name);   // new file format
+		else cell = &(*cells)[cellindex];           // old file format or blank name
+		if(!cell) {
+			if(diagnostic) diagbox->Write("NULL cell\n");
+			readline = selectfile.ReadLine();	
+			continue;
+		}
 		index = ParseLong(&readline, 'x');
 		cell->numselects++;
 		cell->selectstore[index].start = ParseLong(&readline, 'a');

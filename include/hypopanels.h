@@ -280,6 +280,8 @@ public:
 	void OnSelectStore(wxCommandEvent& event);
 	void OnSelectLoad(wxCommandEvent& event);
 
+	NeuroDat *GetCell(wxString name);  
+
 
 	// Functions ported from PlotModel
 	void DataSelect(double, double);
