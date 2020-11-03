@@ -826,6 +826,8 @@ void BurstDat::BurstScanFit()
 }
 
 
+// SelectSpikes() : convert select store to select array
+
 void SpikeDat::SelectSpikes()
 {
 	int i;
@@ -846,6 +848,8 @@ void SpikeDat::SelectSpikes()
 	}
 }
 
+
+// SelectScan() : convert select array to select store
 
 void SpikeDat::SelectScan()
 {
@@ -906,7 +910,9 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	double intracount, intratime, intravar;
 	double burstfreq;
 	double silencetime, silencevar;
-	bool scandiag;
+	bool scandiag, selectmode;
+
+	int *selectspikes = selectdata->spikes;
 
 	scandiag = false;
 
@@ -941,9 +947,17 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 			maxint, minspikes, maxspikes, startspike, endspike);
 	}
 
+	// check for data selection
+	if(neurodata->numselects) {
+		diagbox->Write("BurstScan selectmode\n");
+		selectmode = true;
+	}
+	else selectmode = false;
 
 	// Burst Scan (Based on Nancy's algorithm)
 	for(i=0; i<numspikes-1; i++) {
+
+		if(selectmode && !selectspikes[i]) continue;
 
 		isi = isis[i];        
 		tpoint = times[i];
@@ -953,12 +967,13 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		if(endspike && tpoint > endspike) continue;
 
 		if(!burston) {
-			if(isi < maxint)
+			if(isi <= maxint) {
 				bstart = i;
-			btime = 0;
-			bcount = 1;
-			burston = 1;
-			bcheck = 0;
+				btime = 0;
+				bcount = 1;
+				burston = 1;
+				bcheck = 0;
+			}
 		}
 
 		if(burston) {

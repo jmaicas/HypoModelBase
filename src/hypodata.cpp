@@ -367,7 +367,7 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	selectfile.Open(filename);
 	readline = selectfile.ReadLine();
 
-	// Updated to reference by data name instead of index - October 2020
+	// Updated to reference by data tag string instead of index - October 2020
 
 	while(!readline.IsEmpty()) {
 		name == "";
@@ -392,7 +392,7 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	
 	currcell->SelectSpikes();
 	AnalyseSelection();
-	currcell->ColourSwitch(dispselect);
+	if(!currcell->colourdata) currcell->ColourSwitch(2);
 	mainwin->scalebox->GraphUpdate();
 
 	selectfile.Close();	
@@ -566,13 +566,18 @@ void NeuroBox::SelectAdd()
 		}	
 	}
 
+	SelectUpdate();
+
+	/*
 	//currcell->burstdata->spikes = selectspikes[currselect];
 	currcell->selectdata->spikes = selectspikes[currselect];
-	currcell->ColourSwitch(2);
+	if(!currcell->colourdata) currcell->ColourSwitch(2);
 
 	//diagbox->Write(text.Format("add%d from %.2f to %.2f\n", currselect, sfrom, sto));	
 	AnalyseSelection();	
-	mainwin->scalebox->BurstDisp(1);
+	//mainwin->scalebox->BurstDisp(1);
+	mainwin->scalebox->GraphUpdate();
+	*/
 }
 
 
@@ -595,13 +600,19 @@ void NeuroBox::SelectSub()
 		}
 	}
 
+	SelectUpdate();
+}
+
+
+void NeuroBox::SelectUpdate()
+{
 	currcell->selectdata->spikes = selectspikes[currselect];
-	currcell->ColourSwitch(dispselect);
-	//currcell->burstdata->spikes = selectspikes[currselect];
+	if(!currcell->colourdata) currcell->ColourSwitch(2);
 	//diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", currselect, sfrom, sto));
 
-	mainwin->scalebox->BurstDisp(1);
 	AnalyseSelection();
+	burstbox->ExpDataScan(currcell);
+	mainwin->scalebox->GraphUpdate();
 }
 
 

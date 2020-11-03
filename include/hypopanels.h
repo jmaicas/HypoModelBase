@@ -274,6 +274,7 @@ public:
 	void OnToggle(wxCommandEvent& event);
 	void SelectAdd();
 	void SelectSub();
+	void SelectUpdate();
 
 	void OnBoxCheck(wxCommandEvent& event);
 	void OnGridFilter(wxCommandEvent& event);
