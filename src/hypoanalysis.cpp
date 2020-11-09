@@ -957,7 +957,9 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	// Burst Scan (Based on Nancy's algorithm)
 	for(i=0; i<numspikes-1; i++) {
 
-		if(selectmode && !selectspikes[i]) continue;
+		//if(selectmode && !selectspikes[i]) {
+		//	continue;
+		//}
 
 		isi = isis[i];        
 		tpoint = times[i];
@@ -967,6 +969,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		if(endspike && tpoint > endspike) continue;
 
 		if(!burston) {
+			if(selectmode && !selectspikes[i]) continue;
 			if(isi <= maxint) {
 				bstart = i;
 				btime = 0;
@@ -977,7 +980,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 		}
 
 		if(burston) {
-			if(isi > maxint) {
+			if(isi > maxint || (selectmode && !selectspikes[i])) {
 				burston = 0;
 				if(bcheck) {
 					if(!maxspikes || bcount <= maxspikes) { 
@@ -1001,7 +1004,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 					scheck = 0;			                                 
 				}
 			}
-			if(isi <= maxint) {
+			else {
 				btime = btime + isi;
 				bcount++;
 				if(!bcheck && bcount >= minspikes) bcheck = 1;

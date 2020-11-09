@@ -611,7 +611,7 @@ void NeuroBox::SelectUpdate()
 	//diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", currselect, sfrom, sto));
 
 	AnalyseSelection();
-	burstbox->ExpDataScan(currcell);
+	if(burstbox) burstbox->ExpDataScan(currcell);
 	mainwin->scalebox->GraphUpdate();
 }
 
@@ -640,8 +640,9 @@ void NeuroBox::OnInvert(wxCommandEvent& event)
 	//currselect = sel;
 	for(i=0; i<currcell->spikecount; i++) selectspikes[sel][i] = (sel + 1) - selectspikes[sel][i];
 
-	mainwin->scalebox->BurstDisp(1);
-	AnalyseSelection();
+	//mainwin->scalebox->BurstDisp(1);
+	//AnalyseSelection();
+	SelectUpdate();
 }
 
 
@@ -655,8 +656,9 @@ void NeuroBox::OnClear(wxCommandEvent& event)
 	//currselect = sel;
 	for(i=0; i<currcell->spikecount; i++) selectspikes[sel][i] = 0;
 
-	mainwin->scalebox->BurstDisp(1);
-	AnalyseSelection();
+	//mainwin->scalebox->BurstDisp(1);
+	//AnalyseSelection();
+	SelectUpdate();
 }
 
 
