@@ -477,6 +477,7 @@ wxString GraphDat::StoreDat(wxString tag)
 void GraphDat::LoadDat(wxString data, int version)                    // Not in use, see GraphBase::BaseLoad - now in use
 {
 	wxString readline, numstring, stringdat;
+	wxString colstring;
 	long numdat;
 	long red, green, blue;
 	//int version;
@@ -543,17 +544,31 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 	numstring.ToLong(&numdat);
 	colour = numdat;
 
+	wxString redtext, greentext, bluetext;
+
 	readline = readline.AfterFirst('b');
 	readline.Trim(false);
+	colstring = readline.BeforeFirst('x');
+	colstring.Trim();
+	strokecolour.Set(colstring);
+
+	/*
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToLong(&red);
+	redtext = numstring;
 	readline = readline.AfterFirst(' ');
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToLong(&green);
+	greentext = numstring;
 	readline = readline.AfterFirst(' ');
 	numstring = readline.BeforeFirst(' ');
 	numstring.ToLong(&blue);
+	bluetext = numstring;
 	strokecolour = wxColour(red, green, blue);
+	*/
+
+	//wxString text;
+	//diagbox->Write(text.Format("graph %s strokecolour red %s %d green %s %d blue %s %d\n", gname, redtext, red, greentext, green, bluetext, blue));
 
 	if(version > 0) {
 		xshift = ParseDouble(&readline, 's');

@@ -1024,7 +1024,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 			gc->SetFont(textfont, colourpen[black]);
 
-			//int ticks;
+
+			// tickmode 0 = off, 1 = count, 2 = step
 
 			int xcoord, ycoord;
 			double xplotstep, yplotstep;

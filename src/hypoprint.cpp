@@ -764,38 +764,46 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	xfrom = xfromAxis;
 	//ybase = ybase - (axisstroke / 2);    // offset to account for line width
 	ybase = ybase - yoffset;
+
+	int xaxislength = xplot;
+	if(graph->axistrace && graph->drawX != -1) xaxislength = graph->drawX * binsize / (xto - xfrom) * xplot;
+
 	out->WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
 	out->WriteLine(text.Format("%.2f setlinewidth", axisstroke));
 	out->WriteLine("newpath");
 	out->DrawLine(xbase, ybase, xbase, ybase + yplot);
-	out->DrawLine(xbase, ybase, xbase + xplot + xstretch, ybase);
+	out->DrawLine(xbase, ybase, xbase + xaxislength + xstretch, ybase);
 
 	out->WriteLine("");
 	out->WriteLine("");
 
 	// Draw Ticks
 
+	// new tickmode 0 = off, 1 = count, 2 = step
+
+	// Coding Note: ticks and labels in separate loops, unlike hypograph.cpp
+
 	double xcoord, ycoord;
 	double xplotstep, yplotstep;
 	double xlogrange, ylogrange;
 
-	if(graph->xtickmode && graph->xstep > 0) {
+	if(graph->xtickmode == 2) {   // && graph->xstep > 0) {
 		xlabels = (int)((xto - xfrom) / (xscale * graph->xstep));
 		xplotstep = (xplot * graph->xstep) / (xto - xfrom);  
 	}
 
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		xcoord = i * xplot / xlabels;
-		if(graph->xtickmode) xcoord = xplotstep * i;
-		out->DrawLine(xbase + xcoord, ybase, xbase + xcoord, ybase - xticklength);
+		if(graph->xtickmode == 2) xcoord = xplotstep * i;
+		if(graph->xtickmode && xcoord <= xaxislength) out->DrawLine(xbase + xcoord, ybase, xbase + xcoord, ybase - xticklength);
 	}
 
-	if(graph->ytickmode && graph->ystep > 0) {
+	if(graph->ytickmode == 2 && graph->ystep > 0) {
 		ylabels = (int)((yto - yfrom) / (yscale * graph->ystep));
 		yplotstep = (yplot * graph->ystep) / (yto - yfrom);  
 	}
 
-	if(graph->ytickmode == 1 && graph->yscalemode == 1) {          // tick count and spacing for log scale, step size specifies exponent step
+	if(graph->ytickmode == 2 && graph->yscalemode == 1) {          // tick count and spacing for log scale, step size specifies exponent step
 		ylogrange = log(yto - yfrom) / log(graph->ylogbase);
 		ylabels = (int)(ylogrange / graph->ystep);
 		yplotstep = (yplot * graph->ystep) / ylogrange;
@@ -804,7 +812,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 
 	for(i=0; i<=ylabels && ylabels > 0; i++) {
 		ycoord = i * yplot / ylabels;
-		if(graph->ytickmode) ycoord = yplotstep * i;
+		if(graph->ytickmode == 2) ycoord = yplotstep * i;
 		out->DrawLine(xbase, ybase + ycoord, xbase - yticklength, ybase + ycoord);
 	}
 
@@ -820,12 +828,13 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	//out->WriteLine("newpath");
 	for(i=0; i<=xlabels && xlabels > 0; i++) {
 		if(graph->xlabelmode == 0) break;
-		if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
+		//if(graph->xlabelmode == 2 && i > 0 && i < xlabels) continue;
+		if(!graph->xlabelmode || xcoord > xaxislength || (graph->xlabelmode == 2 && i > 0 && i < xlabels)) continue;
 		out->WriteLine("newpath");
 		xcoord = i * xplot / xlabels;
-		if(graph->xtickmode) xcoord = xplotstep * i;
+		if(graph->xtickmode == 2) xcoord = xplotstep * i;
 		xval = ((double)((xto - xfrom) / xlabels*i + xfrom) / xscale) * graph->xunitscale / graph->xunitdscale - xshift;
-		if(graph->xtickmode) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - xshift;
+		if(graph->xtickmode == 2) xval = (xfrom + graph->xstep * i) * graph->xunitscale / graph->xunitdscale - xshift;
 		if(graph->xscalemode == 1) xval = xfrom * pow(logbase, xlogmax * xval / xto);
 		srangex = abs((xto - xfrom) / xscale * graph->xunitscale / graph->xunitdscale);
 
@@ -856,9 +865,9 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		if(graph->ylabelmode == 0) break;
 		if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
 		ycoord = i * yplot / ylabels;
-		if(graph->ytickmode) ycoord = yplotstep * i;
-		yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;
-		if(graph->ytickmode) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+		if(graph->ytickmode == 2) ycoord = yplotstep * i;
+		if(graph->ytickmode == 1) yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;
+		if(graph->ytickmode == 2) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
 
 		// log scale mode
 		if(graph->yscalemode == 1 && yfrom > 0) {

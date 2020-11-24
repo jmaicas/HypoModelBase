@@ -89,7 +89,8 @@ enum {
 	secpulse = 6,
 	secfreq = 7,
 	pulse = 8,
-	range = 9
+	range = 9,
+	gavage = 10
 };
 
 
