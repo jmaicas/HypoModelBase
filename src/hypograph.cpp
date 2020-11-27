@@ -715,8 +715,9 @@ void GraphWindow3::HighlightTime(double tstart, double tstop)
 
 void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 {
-	double xdiff, xscale, xgraph;
-	double ydiff, yscale, ygraph;
+	double xdiff, xscale, xgraph, xpos;
+	double ydiff, yscale, ygraph, ypos;
+	double data;
 	int xplaces, yplaces;
 	short gid;
 	wxPoint pos;
@@ -728,27 +729,37 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 		graph = gpos->plot[0];
 		gid = graph->gindex;
 
+		// 27/11/20 fixed scaling using adjusted axis unit scales, still need to fix for measure
+
 		xdiff = graph->xto - graph->xfrom;
 		xscale = xdiff / xplot;
 		xgraph = (pos.x - xbase) * xscale + graph->xfrom;
+		xpos = xgraph * graph->xunitscale / graph->xunitdscale;
+		//xgraph = ((pos.x - xbase) * xscale + graph->xfrom) * graph->xunitscale / graph->xunitdscale;
 		if(anchorpos.x < pos.x) xmeasure = (pos.x - anchorpos.x) * xscale;
 		else xmeasure = (anchorpos.x - pos.x) * xscale;
-		xplaces = numplaces(xdiff);
+		xplaces = numplaces(xdiff * graph->xunitscale / graph->xunitdscale);
 
 		ydiff = graph->yto - graph->yfrom;
 		yscale = ydiff / yplot;
 		ygraph = (yplot - pos.y + ybase) * yscale + graph->yfrom;
+		ypos = ygraph * graph->yunitscale / graph->yunitdscale;
+		//ygraph = ((yplot - pos.y + ybase) * yscale + graph->yfrom) * graph->yunitscale / graph->yunitdscale;
 		if(anchorpos.y < pos.y) ymeasure = (pos.y - anchorpos.y) * yscale;
 		else ymeasure = (anchorpos.y - pos.y) * yscale;
-		yplaces = numplaces(ydiff);
+		yplaces = numplaces(ydiff * graph->yunitscale / graph->yunitdscale);
+
+		data = graph->GetData(xgraph);
 
 		//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
 	
 		//if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d", numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid);
 		//else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
-		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d  Measure X %s Y %s", 
-			numstring(xgraph, xplaces), numstring(ygraph, yplaces), gid, numstring(xmeasure, xplaces), numstring(ymeasure, yplaces));
-		else snum.Printf("Graph Position X %s Y %s", numstring(xgraph, xplaces), numstring(ygraph, yplaces));
+		//if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  ID %d  Measure X %s Y %s", 
+		//	numstring(xpos, xplaces), numstring(ypos, yplaces), gid, numstring(xmeasure, xplaces), numstring(ymeasure, yplaces));
+		if(mainwin->diagnostic) snum.Printf("Graph Position X %s Y %s  Data %s", 
+			numstring(xpos, xplaces), numstring(ypos, yplaces), numstring(data, yplaces));
+		else snum.Printf("Graph Position X %s Y %s", numstring(xpos, xplaces), numstring(ypos, yplaces));
 
 		mainwin->SetStatusText(snum);
 	}
@@ -1103,8 +1114,8 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				if(graph->ytickmode == 2) ycoord = (int)(yplotstep * i);
 				if(graph->ytickmode) DrawLine(dc, gc, xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
 				if(!graph->ylabelmode || (graph->ylabelmode == 2 && i > 0 && i < ylabels)) continue;
-				if(graph->ytickmode == 1) yval = ((double)(yto - yfrom) / ylabels * i + yfrom) / yscale * graph->yunitscale - graph->yshift;
-				if(graph->ytickmode == 2) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+				if(graph->ytickmode == 1) yval = ((double)(yto - yfrom) / ylabels * i + yfrom) / yscale * graph->yunitscale / graph->yunitdscale - graph->yshift;
+				if(graph->ytickmode == 2) yval = (yfrom + graph->ystep * i) * graph->yunitscale / graph->yunitdscale - graph->yshift;
 
 				// log scale mode
 				if(graph->yscalemode == 1 && yfrom > 0) {
@@ -1112,7 +1123,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					if(graph->ytickmode == 2) yval = pow(ylogbase, graph->ystep * i);
 				}
 
-				srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
+				srangey = abs((yto - yfrom) / yscale * graph->yunitscale / graph->yunitdscale);
 				if(graph->ylabelplaces == -1) {
 					if (srangey < 0.1) snum.Printf("%.3f", yval);
 					else if (srangey < 1) snum.Printf("%.2f", yval);
@@ -2013,8 +2024,8 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 				if(graph->ytickmode) ycoord = (int)(yplotstep * i);
 				dc.DrawLine(xbase, ybase + yplot - ycoord, xbase - 5, ybase + yplot - ycoord);
 				if(!graph->ylabelmode || (graph->ylabelmode == 2 && i > 0 && i < ylabels)) continue;
-				if(graph->ytickmode == 0) yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale - graph->yshift;
-				if(graph->ytickmode == 1) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+				if(graph->ytickmode == 0) yval = ((double)(yto - yfrom) / ylabels*i + yfrom) / yscale * graph->yunitscale / graph->yunitdscale - graph->yshift;
+				if(graph->ytickmode == 1) yval = (yfrom + graph->ystep * i) * graph->yunitscale / graph->yunitdscale - graph->yshift;
 
 				// log scale mode
 				if(graph->yscalemode == 1 && yfrom > 0) {
@@ -2022,7 +2033,7 @@ void GraphWindow3::OnPaint(wxPaintEvent &WXUNUSED(event))
 					if(graph->ytickmode == 0) yval = yfrom * pow(ylogbase, ylogmax * yval / yto);
 				}
 
-				srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
+				srangey = abs((yto - yfrom) / yscale * graph->yunitscale / graph->yunitdscale);
 				if(graph->ylabelplaces == -1) {
 					if(srangey < 0.1) snum.Printf("%.3f", yval);
 					else if(srangey < 1) snum.Printf("%.2f", yval);

@@ -180,7 +180,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(ID_xscale, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXScale));
 
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSpikes));
-	Connect(ID_rateres, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnRateRes));
+	//Connect(ID_rateres, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnRateRes));
 	Connect(ID_data, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnData));
 	Connect(ID_intern, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnIntern));
 	Connect(1000+startgraph, 1000+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomIn));
@@ -282,12 +282,14 @@ void ScaleBox::ConsoleButtons(int panel)
 				ScaleButton(ID_data, "Dat", 43, modebox);
 				ScaleButton(ID_intern, "Int", 43, modebox);
 				ScaleButton(ID_spikes, "Spike", 43, resbox);     // 37
-				ScaleButton(ID_rateres, "Rate", 43, resbox);    // 37
+				GraphButton("rateres", 0, ID_rateres, "Rate", 43, resbox); 
+				//ScaleButton(ID_rateres, "Rate", 43, resbox);    // 37
 			}
 			else {
 				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
 				resbox->AddSpacer(2);
-				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+				GraphButton("rateres", 0, ID_rateres, "Rate", 37, resbox); 
+				//ScaleButton(ID_rateres, "Rate", 37, resbox); 
 				ScaleButton(ID_data, "Data", 37, modebox);
 				modebox->AddSpacer(2);
 				ScaleButton(ID_intern, "Intern", 37, modebox);
@@ -390,13 +392,16 @@ void ScaleBox::ConsoleButtons(int panel)
 			wxBoxSizer *resbox = new wxBoxSizer(wxHORIZONTAL); 
 
 			if(ostype == Mac) {
-				ScaleButton(ID_spikes, "Sp", 40, resbox);   
-				ScaleButton(ID_rateres, "Ra", 40, resbox); 
+				ScaleButton(ID_spikes, "Sp", 40, resbox);  
+				GraphButton("rateres", 0, ID_rateres, "Rate", 40, resbox); 
+				//ScaleButton(ID_rateres, "Ra", 40, resbox); 
+
 			}
 			else {
 				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
 				resbox->AddSpacer(2);
-				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+				GraphButton("rateres", 0, ID_rateres, "Rate", 37, resbox); 
+				//ScaleButton(ID_rateres, "Rate", 37, resbox); 
 			}
 			consolebox[panel]->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 		}
@@ -423,12 +428,14 @@ void ScaleBox::ConsoleButtons(int panel)
 
 			if(ostype == Mac) {
 				ScaleButton(ID_spikes, "Spike", 40, resbox);
-				ScaleButton(ID_rateres, "Rate", 40, resbox);
+				GraphButton("rateres", 0, ID_rateres, "Rate", 40, resbox); 
+				//ScaleButton(ID_rateres, "Rate", 40, resbox);
 			}
 			else {
 				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
 				resbox->AddSpacer(2);
-				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+				GraphButton("rateres", 0, ID_rateres, "Rate", 37, resbox); 
+				//ScaleButton(ID_rateres, "Rate", 37, resbox); 
 			}
 			consolebox[panel]->Add(resbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 		}
@@ -471,13 +478,15 @@ void ScaleBox::ConsoleButtons(int panel)
 
 			if(ostype == Mac) {
 				ScaleButton(ID_spikes, "Spike", 40, resbox);
-				ScaleButton(ID_rateres, "Rate", 40, resbox);
+				GraphButton("rateres", 0, ID_rateres, "Rate", 40, resbox); 
+				//ScaleButton(ID_rateres, "Rate", 40, resbox);
 				GraphButton("nettog", 0, ID_net, "Net", 43, modebox);
 			}
 			else {
 				ScaleButton(ID_spikes, "Spikes", 37, resbox); 
 				resbox->AddSpacer(2);
-				ScaleButton(ID_rateres, "Rate", 37, resbox); 
+				GraphButton("rateres", 0, ID_rateres, "Rate", 37, resbox); 
+				//ScaleButton(ID_rateres, "Rate", 37, resbox); 
 				//ScaleButton(ID_net, "Net", 37, modebox);
 				GraphButton("nettog", 0, ID_net, "Net", 37, modebox);
 			}
@@ -883,7 +892,7 @@ wxButton *ScaleBox::ScaleButton(int id, wxString label, int width, wxBoxSizer *b
 	return button;
 }
 
-
+// type encodes number of states, defaults to 1 (two states 0 and 1)
 wxButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label, int width, wxBoxSizer *box, int type, int point)
 {
 	(*gflags)[tag] = state;
@@ -1167,12 +1176,14 @@ void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 	GraphSwitch();
 }
 
-
+/*
 void ScaleBox::OnRateRes(wxCommandEvent& WXUNUSED(event))
 {
 	rateres = 1 - rateres;
 	GraphSwitch();
 }
+*/
+
 
 
 void ScaleBox::OnIntern(wxCommandEvent& WXUNUSED(event))
@@ -1250,7 +1261,7 @@ ParamStore *ScaleBox::GetFlags()
 	// Old manually defined gflags
 
 	(*gflags)["cortflag"] = cortflag;
-	(*gflags)["rateres"] = rateres;
+	//(*gflags)["rateres"] = rateres;
 	(*gflags)["timeres"] = timeres;
 	//(*gflags)["nettog"] = nettog;
 	(*gflags)["expdatflag"] = expdatflag;

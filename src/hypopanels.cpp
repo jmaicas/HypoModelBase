@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 880),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 910),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -144,21 +144,24 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	
 	numwidth = 50;
 	paramset.AddNum("xshift", "XShift", graph->xshift, 2, labelwidth, numwidth);
-	paramset.AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
-	paramset.AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
+	paramset.AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
+	paramset.AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
 	paramset.AddNum("xplot", "Width", graph->xplot, 0, labelwidth, numwidth);
 	paramset.AddNum("xlogbase", "XLogB", graph->xlogbase, 4, labelwidth, numwidth);
 	paramset.AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
 	paramset.AddNum("xlabelplaces", "X Places", graph->xlabelplaces, 0, labelwidth, numwidth);
 	paramset.AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
-	paramset.AddNum("xscale", "XScale", graph->xunitscale, 3, labelwidth, numwidth);
-	paramset.AddNum("xdscale", "XDScale", graph->xunitdscale, 1, labelwidth, numwidth);
+	paramset.AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
+	paramset.AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
 	paramset.AddNum("yscale", "YScale", graph->yunitscale, 3, labelwidth, numwidth);
+	paramset.AddNum("ydscale", "YDScale", graph->yunitdscale, 1, labelwidth, numwidth);
 	paramset.AddNum("yplot", "Height", graph->yplot, 0, labelwidth, numwidth);
 	paramset.AddNum("ylogbase", "YLogB", graph->ylogbase, 4, labelwidth, numwidth);
 	paramset.AddNum("ylabelgap", "Y Gap", graph->ylabelgap, 0, labelwidth, numwidth);
 	paramset.AddNum("ylabelplaces", "Y Places", graph->ylabelplaces, 0, labelwidth, numwidth);
 	paramset.AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
+
+	
 	wxBoxSizer *plotparams = ParamLayout(2);
 
 	paramset.GetCon("xshift")->SetMinMax(-100000, 100000);
@@ -348,6 +351,7 @@ void GraphBox::SetControls()
 	paramset.GetCon("labelfontsize")->SetValue(graph->labelfontsize);
 	paramset.GetCon("scattersize")->SetValue(graph->scattersize);
 	paramset.GetCon("yscale")->SetValue(graph->yunitscale);
+	paramset.GetCon("ydscale")->SetValue(graph->yunitdscale);
 	paramset.GetCon("yshift")->SetValue(graph->yshift);
 
 	clipcheck->SetValue(graph->clipmode);
@@ -537,6 +541,7 @@ void GraphBox::SetParams(GraphDat *setgraph)
 	graph->labelfontsize = (*params)["labelfontsize"];
 	graph->scattersize = (*params)["scattersize"];
 	graph->yunitscale = (*params)["yscale"];
+	graph->yunitdscale = (*params)["ydscale"];
 	graph->yshift = (*params)["yshift"];
 
 	graph->barwidth = (*params)["barwidth"];
@@ -573,6 +578,7 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	setgraph->xunitscale = (*params)["xscale"];
 	setgraph->xunitdscale = (*params)["xdscale"];
 	setgraph->yunitscale = (*params)["yscale"];
+	setgraph->yunitdscale = (*params)["ydscale"];
 	setgraph->plotstroke = (*params)["plotstroke"];
 	setgraph->xlabelgap = (*params)["xlabelgap"];
 	setgraph->ylabelgap = (*params)["ylabelgap"];

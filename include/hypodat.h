@@ -304,6 +304,8 @@ public:
 	datint srate10;
 	datint srate10s;
 	datint srate100s;
+	datint srate30s;
+	datint srate600s;
 	datdouble synsim;
 	datdouble vasomean;
 	datdouble winfreq;
@@ -672,7 +674,7 @@ public:
 	double xlabelgap, ylabelgap;
 	double labelfontsize, tickfontsize;
 	double xunitscale, xunitdscale;
-	double yunitscale, yshift;
+	double yunitscale, yunitdscale, yshift;
 	int clipmode;
 	bool synchx;
 	double barwidth, barshift, bargap;
@@ -692,6 +694,7 @@ public:
 	void LoadDat(wxString, int version);
 	void Init();
 	int MaxDex();   // get max index from attached dat type (currently only for datdouble)
+	double GetData(double xvalue);     // get graph data for spoecified x-position
 };
 
 

@@ -866,8 +866,8 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		if(graph->ylabelmode == 2 && i > 0 && i < ylabels) continue;
 		ycoord = i * yplot / ylabels;
 		if(graph->ytickmode == 2) ycoord = yplotstep * i;
-		if(graph->ytickmode == 1) yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale - graph->yshift;
-		if(graph->ytickmode == 2) yval = (yfrom + graph->ystep * i) * graph->yunitscale - graph->yshift;
+		if(graph->ytickmode == 1) yval = ((double)((yto - yfrom) / ylabels*i + yfrom) / yscale) * graph->yunitscale / graph->yunitdscale - graph->yshift;
+		if(graph->ytickmode == 2) yval = (yfrom + graph->ystep * i) * graph->yunitscale / graph->yunitdscale - graph->yshift;
 
 		// log scale mode
 		if(graph->yscalemode == 1 && yfrom > 0) {
@@ -875,7 +875,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 			if(graph->ytickmode == 0) yval = yfrom * pow(graph->ylogbase, ylogmax * yval / yto);
 		}
 
-		srangey = abs((yto - yfrom) / yscale * graph->yunitscale);
+		srangey = abs((yto - yfrom) / yscale * graph->yunitscale / graph->yunitdscale);
 		if(graph->ylabelplaces == -1) {
 			if(srangey < 0.1) snum.Printf("%.3f", yval);
 			else if(srangey < 1) snum.Printf("%.2f", yval);

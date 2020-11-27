@@ -31,6 +31,9 @@ public:
 	vector<NeuroDat> celldata;
 	int cellcount;
 
+	// Model Neurons - November 2020
+	int neurons_max;   // current allocated number of model neuron objects
+
 	// Boxes
 
 	NeuroMod(int, wxString, HypoMain *);
