@@ -718,6 +718,7 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 	double xdiff, xscale, xgraph, xpos;
 	double ydiff, yscale, ygraph, ypos;
 	double data;
+	int xdata;
 	int xplaces, yplaces;
 	short gid;
 	wxPoint pos;
@@ -735,6 +736,7 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 		xscale = xdiff / xplot;
 		xgraph = (pos.x - xbase) * xscale + graph->xfrom;
 		xpos = xgraph * graph->xunitscale / graph->xunitdscale;
+		xdata = xgraph / graph->binsize;
 		//xgraph = ((pos.x - xbase) * xscale + graph->xfrom) * graph->xunitscale / graph->xunitdscale;
 		if(anchorpos.x < pos.x) xmeasure = (pos.x - anchorpos.x) * xscale;
 		else xmeasure = (anchorpos.x - pos.x) * xscale;
@@ -749,7 +751,7 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 		else ymeasure = (anchorpos.y - pos.y) * yscale;
 		yplaces = numplaces(ydiff * graph->yunitscale / graph->yunitdscale);
 
-		data = graph->GetData(xgraph);
+		data = graph->GetData(xgraph) * graph->yunitscale / graph->yunitdscale;
 
 		//snum.Printf("GMove X %d Y %d gX %.2f gY %.2f", pos.x, pos.y, xgraph, ygraph);
 	

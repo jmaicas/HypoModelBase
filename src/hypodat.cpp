@@ -723,8 +723,17 @@ int GraphDat::MaxDex()
 }
 
 
-double GraphDat::GetData(double xval) {
-	double data = 0;
+double GraphDat::GetData(double xval) 
+{
+	wxString text;
+	double data = -1;
+	int xindex;
+
+	xindex = xval / binsize;
+	if(gparam == -3) data = (*gdatav)[xindex];
+	if(gparam == -4) data = (*gdatadv)[xindex];
+
+	//diagbox->Write(text.Format("Get Data %.4f)
 
 	return data;
 }
