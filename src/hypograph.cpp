@@ -272,7 +272,7 @@ void GraphWindow3::OnGraphSelectSet(wxCommandEvent& event)
 
 	
 	graphset = mod->graphbase->GetSet(id - 1000);
-	gdex = graphset->GetPlot(mainwin->scalebox->GetFlags());
+	gdex = graphset->GetPlot(graphindex, mainwin->scalebox->GetFlags());
 	gpos->gdex = gdex;
 	gpos->sdex = graphset->sdex;
 	
@@ -290,6 +290,9 @@ void GraphWindow3::OnGraphSelectSet(wxCommandEvent& event)
 	gpos->GetFront()->xto = xto;
 	//mod->gcodes[graphindex] = mod->graphbase->GetTag(id-1000);
 	mod->gcodes[graphindex] = mod->graphbase->GetSetTag(id-1000);
+
+	mod->diagbox->Write(text.Format("gcodes index %d settag %s\n", graphindex, mod->graphbase->GetSetTag(id-1000)));
+
 	mainwin->scalebox->ScaleUpdate();
 	//Refresh();
 }
@@ -305,7 +308,7 @@ void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
 	int gdex;
 	wxString text;
 
-	snum.Printf("Graph Set Select ID %d\n", id);
+	snum.Printf("Graph Plot Select ID %d\n", id);
 	//mainwin->SetStatusText(snum);
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(snum);
 	xfrom = gpos->GetFront()->xfrom;
@@ -315,17 +318,26 @@ void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
 	gpos->gdex = gdex;
 	gpos->sdex = mod->graphbase->GetGraph(gdex)->sdex;
     graphset = mod->graphbase->GetSet(gpos->sdex);
+	if(graphset->submenu) {
+		graphset->subtag = mod->graphbase->GetTag(gdex);
+		graphset->subplot[graphindex] = gdex;
+		mod->gtags[graphindex] = graphset->subtag;
+	}
 	
 	gpos->Front((*mod->graphbase)[gdex]);
 	graph = (*mod->graphbase)[gdex];
 
-	mod->diagbox->Write(text.Format("OnGraph id %d set %d name %s plot %d name %s\n", id, graphset->sdex, graphset->name, gdex, graph->gname));
+	mod->diagbox->Write(text.Format("OnGraph id %d set %d name %s plot %d name %s tag %s\n", id, graphset->sdex, graphset->name, gdex, graph->gname, mod->graphbase->GetTag(gdex)));
 	mod->diagbox->Write(graphset->Display());
 
 	gpos->GetFront()->xfrom = xfrom;
 	gpos->GetFront()->xto = xto;
 	//mod->gcodes[graphindex] = mod->graphbase->GetTag(id-1000);
 	//mod->gcodes[graphindex] = mod->graphbase->GetSetTag(id-1000);
+
+	mod->gcodes[graphindex] = mod->graphbase->GetSetTag(gpos->sdex);
+	mod->diagbox->Write(text.Format("gcodes index %d settag %s\n", graphindex, mod->graphbase->GetSetTag(gpos->sdex)));
+
 	mainwin->scalebox->ScaleUpdate();
 	//Refresh();
 }
@@ -539,7 +551,7 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 	graphset = mod->graphbase->GetSet(gpos->sdex);
 	if(!graphset->submenu) menuPlot->Check(1000 + gpos->sdex, true);
 	else subPlot->Check(2000 + gpos->gdex, true);
-	mainwin->diagbox->Write(text.Format("graph menu set %d\n", gpos->sdex));
+	mainwin->diagbox->Write(text.Format("\ngraph menu set %d\n", gpos->sdex));
 	PopupMenu(menuPlot, pos.x + 20, pos.y);
 }
 

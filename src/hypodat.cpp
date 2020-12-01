@@ -880,6 +880,9 @@ GraphSet::GraphSet(GraphBase *gbase, int gdex)
 	if(gdex != -1) Add(gdex); 
 	current = 0;
 	submenu = 0;
+	subtag = "";
+	
+	for(int i=0; i<10; i++) subplot[i] = 0;
 
 	modeflag.resize(10);         
 	modeweight.resize(10);
@@ -926,11 +929,16 @@ void GraphSet::AddFlag(wxString flag, int weight)
 }
 
 
-int GraphSet::GetPlot(ParamStore *gflags)
+int GraphSet::GetPlot(int pos, ParamStore *gflags)
 {
 	int i, gdex;
 
 	if(single) return gindex[0];
+
+	if(submenu) {
+		if(subplot[pos]) return subplot[pos];    
+		else return gindex[0];
+	}
 
 	modesum = 0;
 	gdex = gindex[0];

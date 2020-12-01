@@ -912,7 +912,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	double silencetime, silencevar;
 	bool scandiag, selectmode;
 
-	int *selectspikes = selectdata->spikes;
+	int *selectspikes; 
 
 	scandiag = false;
 
@@ -951,6 +951,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	if(neurodata->numselects) {
 		diagbox->Write("BurstScan selectmode\n");
 		selectmode = true;
+		selectspikes = selectdata->spikes;
 	}
 	else selectmode = false;
 

@@ -39,6 +39,8 @@ Model::Model(int type, wxString name, HypoMain *main)
 	xscaletoggle = 0;
     runflag = false;   // Set to indicate model thread is running
 
+	for(int i=0; i<10; i++) gtags[i] = "";    // plot tags indexed by graph window, only used for submenu graph sets
+
 	prefstore["numdraw"] = 2;
 	evoflag = false;
 }
@@ -122,7 +124,7 @@ void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
 		for(i=0; i<gcount; i++) {
 			graphset = graphbase->GetSet(gcodes[i]);
 			if(!graphset) continue;
-			gdex = graphset->GetPlot(gflags);
+			gdex = graphset->GetPlot(i, gflags);
 			if(!gdex) continue;
 			if(diagbox) diagbox->textbox->AppendText(text.Format("gpos %d   gcode %s   set %s   plot %d   modesum %d   sdex %d  sync %d  current %d\n", 
 				i, gcodes[i], graphset->tag, gdex, graphset->modesum, graphset->sdex, (*graphbase)[gdex]->synchx, graphset->current));

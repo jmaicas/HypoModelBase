@@ -729,6 +729,8 @@ public:
 	int capacity;
 	int current;
 	int submenu;
+	wxString subtag;    // graph tag for submenu mode - not used
+	int subplot[10]; // graph index for submenu mode indexed by plot position
 
 	DiagBox *diagbox;
 	wxString text;
@@ -748,7 +750,7 @@ public:
 	void Add(int gdex, int gcode=-1);
 	void Add(wxString tag, int gcode=-1);
 	void AddFlag(wxString, int code);
-	int GetPlot(ParamStore *);
+	int GetPlot(int pos, ParamStore *gflags);
 	GraphDat *GetPlot(int index);
 	wxString Display();
 	void IntervalSet(wxString tag, bool burst = true, bool select = true, int selectcode = 200);

@@ -80,7 +80,7 @@ public:
 	ParamStore *toolflags;
 	ParamStore prefstore;
 	ToolSet modtools;
-	wxString gcodes[10];
+	wxString gcodes[10], gtags[10];
 	ScaleBox *scalebox;
 	GraphWindow3 **graphwin;
 
@@ -92,7 +92,10 @@ public:
 	EvoFitBox *fitbox;
 	EvoChrome *fitchrome;
 
+	// Data Storage
 	SpikeDat *expdata;
+	datdouble testhist[5], testhistx[5];
+	datdouble datahist[5], datahistx[5];
 
 
 	Model(int, wxString, HypoMain *);

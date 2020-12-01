@@ -607,8 +607,9 @@ void ScaleBox::OnGStore(wxCommandEvent& event)
 	gstag->SetValue(filetag);
 
 	outfile.New(filepath + "/" + filename);
-	for(i=0; i<gmod->gcount; i++) 
-		outfile.WriteLine(text.Format("%d %s", i, gmod->gcodes[i]));
+	for(i=0; i<gmod->gcount; i++) {
+		outfile.WriteLine(text.Format("%d %s %s", i, gmod->gcodes[i], gmod->gtags[i]));
+	}
 
 	outfile.WriteLine("");
 	for(i=0; i<gflagrefs->numrefs; i++) {
@@ -641,7 +642,7 @@ void ScaleBox::GLoad(wxString tag)
 	short check;
 	int gindex;
 	wxString filename, filetag, filepath;
-	wxString readline, numstring, gtag;
+	wxString readline, numstring, stag, gtag;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	TextFile infile;
 
@@ -673,14 +674,18 @@ void ScaleBox::GLoad(wxString tag)
 	if(!check) return;
 	readline = infile.ReadLine();
 
-	// Read file
+	// Read graph windows (panels)
 	while(!readline.IsEmpty()) {
 		numstring = readline.BeforeFirst(' ');
 		numstring.ToLong(&numdat);
 		gindex = (int)numdat;
+		readline = readline.AfterFirst(' ');
+		stag = readline.BeforeFirst(' ');
+		if(gbase->GraphExists(stag) || gbase->SetExists(stag)) gmod->gcodes[gindex] = stag;
+		else gmod->diagbox->Write(text.Format("GLoad graph/set %s not found\n", stag));
 		gtag = readline.AfterFirst(' ');
-		if(gbase->GraphExists(gtag) || gbase->SetExists(gtag)) gmod->gcodes[gindex] = gtag;
-		else gmod->diagbox->Write(text.Format("GLoad graph/set %s not found\n", gtag));
+		if(gbase->GraphExists(gtag)) gmod->gtags[gindex] = gtag;
+		gbase->GetSet(stag)->subplot[gindex] = gbase->tagindex[gtag];
 		readline = infile.ReadLine();
 	}
 
@@ -1423,7 +1428,7 @@ void ScaleBox::ScaleUpdate()
 void ScaleBox::PanelUpdate()
 {
 	int i, g;
-	GraphDat *plot0, *plot;
+	GraphDat *plot;
 	//int yplaces;
 	wxString text;
 
@@ -1431,7 +1436,8 @@ void ScaleBox::PanelUpdate()
 	for(i=0; i<numgraphs; i++) {
 		if(graphwin[i]->numdisps > 0) {
 			graph = graphwin[i]->dispset[0]->plot[0];
-			plot0 = graphwin[i]->dispset[0]->plot[0];
+			//plot0 = graphwin[i]->dispset[0]->plot[0];
+			if(!graph) continue;
 
 			if(abs(graph->yto - graph->yfrom) < 10) {
 				snum.Printf("%.2f", graph->yfrom);
@@ -1461,10 +1467,10 @@ void ScaleBox::PanelUpdate()
 
 			for(g=1; g<graphwin[i]->numdisps; g++) {
 				plot = graphwin[i]->dispset[g]->plot[0];
-				plot->yfrom = plot0->yfrom; 
-				plot->yto = plot0->yto; 
-				plot->xfrom = plot0->xfrom; 
-				plot->xto = plot0->xto; 
+				plot->yfrom = graph->yfrom; 
+				plot->yto = graph->yto; 
+				plot->xfrom = graph->xfrom; 
+				plot->xto = graph->xto; 
 			}
 		}
 	}
