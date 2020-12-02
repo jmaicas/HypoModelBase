@@ -97,6 +97,7 @@ public:
 	int startmod;
 	int pinmode;
 	int scaletype;
+	TypeSet fontset;
 
 	FILE *ofp;
 	wxTextFile *wxofp;

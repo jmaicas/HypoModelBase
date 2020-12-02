@@ -55,6 +55,15 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	diagnostic = 0;
 	xstretch = 50;
 	modpath = "";
+
+
+	fontset = TypeSet();
+	fontset.Add("Helvetica", 0);
+	fontset.Add("Arial", 1);
+	fontset.Add("Myriad", 2);
+	fontset.Add("Times", 3);
+	fontset.Add("Courier", 4);
+	fontset.Add("Calibri", 5);
     
     
     // OSX Path Check
@@ -574,6 +583,9 @@ void HypoMain::OnClose(wxCloseEvent& event)
 	OptionStore();
 	//ViewStore();
 	MainStore();
+
+	if(graphbox) graphbox->Close();
+
     if(mod) {
         mod->ModClose();
         mod->ModStore();

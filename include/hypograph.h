@@ -140,8 +140,8 @@ public:
 	BoxOut *boxout;
 	wxStaticText *status;
 	wxColourPickerCtrl *strokepicker, *fillpicker;
-	wxChoice *typechoice;
-	TypeSet typeset;
+	wxChoice *typechoice, *fontchoice;
+	TypeSet typeset, *fontset;
 	wxRadioButton *xtickrad[3], *ytickrad[3];
 	wxRadioButton *xlabrad[5], *ylabrad[5];
 	wxRadioButton *xscalerad[2], *yscalerad[2];

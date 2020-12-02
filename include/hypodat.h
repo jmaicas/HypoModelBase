@@ -555,6 +555,27 @@ public:
 };
 
 
+/*
+class FontSet
+{
+public:
+	int numfonts;
+	int refindex[20];
+	int fontindex[20];
+	wxString names[20];
+
+	FontSet() {
+		numfonts = 0;
+	};
+
+	void Add(wxString, int);
+	int GetIndex(int);
+	int GetType(int);
+	wxString List();
+};
+*/
+
+
 class TypeSet
 {
 public:
@@ -570,6 +591,7 @@ public:
 	void Add(wxString, int);
 	int GetIndex(int);
 	int GetType(int);
+	wxString GetName(int);
 	wxString List();
 };
 
@@ -686,6 +708,8 @@ public:
 	double drawX;    // default -1 to draw whole X range, set to limit drawn X range
 	int xaxis, yaxis;   // axis mode, currently 0 off, 1 on
 	int axistrace;
+	int labelfont;  // 0 for Helvetica, 1 for Arial
+	wxString labelfontstring; 
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

@@ -328,7 +328,9 @@ enum {
 	ID_Net,
 	ID_Data,
 	ID_Trace,
-	ID_Clear
+	ID_Clear,
+	ID_type,
+	ID_font
 };
 
 
@@ -361,7 +363,7 @@ wxString numtext(double number, int places);
 wxString ColourString(wxColour colour, int type=0);
 long ParseLong(wxString *, wxUniChar = NULL);
 double ParseDouble(wxString *, wxUniChar);
-wxString ParseString(wxString *, wxUniChar);
+wxString ParseString(wxString *, wxUniChar, wxUniChar = ' ');
 
 int GetSystem();
 

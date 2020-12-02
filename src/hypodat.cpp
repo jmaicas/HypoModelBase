@@ -397,6 +397,42 @@ CurrentDat::CurrentDat()
 }
 
 
+/*
+void FontSet::Add(wxString name, int font)
+{
+	names[numfonts] = name;
+	fontindex[numfonts] = font;
+	refindex[font] = numfonts;
+	numfonts++;
+}
+
+
+int FontSet::GetIndex(int id)
+{
+	return refindex[id];
+}
+
+
+int FontSet::GetFont(int ref)
+{
+	return typeindex[ref];
+}
+
+
+
+wxString TypeSet::List()
+{
+	wxString list, text;
+	int i;
+
+	list = "";
+	for(i=0; i<numtypes; i++) 
+		list = list + text.Format("Index %d Type %d Name %s\n", i, typeindex[i], names[i]); 
+	return list;
+}
+*/
+
+
 void TypeSet::Add(wxString name, int type)
 {
 	names[numtypes] = name;
@@ -419,6 +455,12 @@ int TypeSet::GetType(int ref)
 }
 
 
+wxString TypeSet::GetName(int ref)
+{
+	return names[ref];
+}
+
+
 wxString TypeSet::List()
 {
 	wxString list, text;
@@ -429,6 +471,36 @@ wxString TypeSet::List()
 		list = list + text.Format("Index %d Type %d Name %s\n", i, typeindex[i], names[i]); 
 	return list;
 }
+
+
+
+/* Plot Types  (drawing modes)
+
+(ordering mostly evolved rather than designed)
+
+1 - scaled width bars, histogram
+
+2 - line graph with x data
+
+3 - spike rate data with optional burst colouring
+
+4 - normal line graph - SHOULD BE OUT OF USE
+
+5 - line graph with scaling fix
+
+6 - line graph with sampling
+
+7 - scaled width bars
+
+8 - scatter with sampling
+
+9 - bar chart with x data
+
+10 - scatter plot with x data - MOSTLY REPLACED BY SCATTER OPTION IN TYPE 2
+
+11 - mean field plot (custom plot style for VMN paper)
+
+*/
 
 
 GraphDat::GraphDat()             // See more specific versions below
@@ -444,11 +516,98 @@ GraphDat::GraphDat()             // See more specific versions below
 }
 
 
+/*
+
+ GraphDat - graph object, used to store plot parameters and data links
+
+ StoreDat (tag string) - generate a string encoding GraphPanel controlled drawing parameters for text file storage
+
+ * Additional parameters are always added at the end to preserve backwards compatibility with old graph store files *
+
+ gindex - graph index
+
+ tag - graph tag
+
+ xfrom - x-axis from
+
+ xto - x-axis to
+
+ yfrom - y-axis from
+
+ yto - y-axis to
+
+ xlabels - number of x-axis ticks and labels
+
+ xstep - x-axis tick and label step size
+
+ xtickmode - x-axis tick mode (0 = off, 1 = count, 2 = step)  (off only turns off ticks not labels)
+
+ ylabels - number of y-axis ticks and labels
+
+ ystep - y-axis tick and label step size
+
+ ytickmode - y-axis tick mode (0 = off, 1 = count, 2 = step)  (off only turns off ticks not labels)
+
+ colour - stroke colour index (default index 9 is used for custom colour specified by rgb)
+
+ colourtext - string encoded rgb stroke colour
+
+ xshift - x-axis label value shift (usually used to shift data to start from 0) 
+
+ xunitscale - modifier for scaling up x-axis units (default 1 for no scaling)
+
+ plotstroke - stroke line width in points (only used for EPS. not screen)
+
+ storegname - gname (main graph label) reencoded with spaces replaced by underscores for store file
+
+ storextag - xtag (x-axis title) reencoded with spaces replaced by underscores for store file
+
+ storeytag - ytag (y-axis title) reencoded with spaces replaced by underscores for store file
+
+ xplot - x plot size (pixels for screen, points for EPS)
+
+ yplot - y plot size (pixels for screen, points for EPS)
+
+ labelfontsize - axes labels font size (only used for EPS)
+
+ clipmode - clip plot to graph are specified by xplot and yplot, 0 off, 1 on (only used for EPS)
+
+ type - plot type, see above
+
+ xunitdscale - modifier for scaling down x-axis units (default 1 for no scaling)
+
+ xsample - downscales number of datapoints plotted to reduce plot resolution, e.g. 10000 points reduced to 1000 using xsample 10 (only used for EPS)
+
+ barwidth - bar width for type 9 bar plot
+
+ bargap - bar gap for type 9 bar plot
+
+ xlabelplaces - number of decimals for x-axis tick labels, -1 for automatic
+ 
+ ylabelplaces - number of decimals for y-axis tick labels, -1 for automatic
+ 
+ xlabelmode - x-axis label mode, 0 for none, 1 for all (default), 2 for ends only
+ 
+ ylabelmode - y-axis label mode, 0 for none, 1 for all (default), 2 for ends only
+ 
+ xscalemode - x-axis scale mode, 0 for linear (default), 1 for log (no base control yet, specified in code)
+ 
+ yscalemode - y-axis scale mode, 0 for linear (default), 1 for log (no base control yet, specified in code)
+ 
+ xaxis - x-axis line, 0 off, 1 on
+ 
+ yaxis - y-axis line, 0 off, 1 on
+ 
+ yunitdscale - modifier for scaling down y-axis units (default 1 for no scaling)
+
+ */
+
+
 wxString GraphDat::StoreDat(wxString tag)
 {
 	wxString gtext1, gtext2;
 	wxString storegname, storextag, storeytag;
-    wxString colourtext;
+    wxString strokecolourtext, fillcolourtext;
 
 	if(!gname.IsEmpty()) storegname = gname;                       // replace spaces with underscores for textfile storing
 	else storegname = " ";
@@ -464,15 +623,17 @@ wxString GraphDat::StoreDat(wxString tag)
     
     //if(mainwin->ostype == Mac)
     //colourtext = ColourString(strokecolour, 1);
-    colourtext = strokecolour.GetAsString(wxC2S_CSS_SYNTAX);
+
+    strokecolourtext = strokecolour.GetAsString(wxC2S_CSS_SYNTAX);
+	fillcolourtext = fillcolour.GetAsString(wxC2S_CSS_SYNTAX);
     
     //diagbox->Write("colourtext: " + colourtext);
 
-	gtext1.Printf("v10 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d crgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
-		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, colourtext, xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
+	gtext1.Printf("v11 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d srgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
+		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, strokecolourtext, xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
 		
-	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d xa %d ya %d yd %.4f", 
-		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode, xaxis, yaxis, yunitdscale);
+	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d xa %d ya %d yd %.4f xg %.4f yg %.4f lf %d sc %.4f frgb %s x", 
+		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode, xaxis, yaxis, yunitdscale, xlabelgap, ylabelgap, labelfont, scattersize, fillcolourtext);
 
 	return gtext1 + gtext2;
 }
@@ -481,7 +642,7 @@ wxString GraphDat::StoreDat(wxString tag)
 void GraphDat::LoadDat(wxString data, int version)                    // Not in use, see GraphBase::BaseLoad - now in use
 {
 	wxString readline, numstring, stringdat;
-	wxString colstring;
+	wxString colourstring;
 	long numdat;
 	long red, green, blue;
 	//int version;
@@ -552,9 +713,9 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 
 	readline = readline.AfterFirst('b');
 	readline.Trim(false);
-	colstring = readline.BeforeFirst('x');
-	colstring.Trim();
-	strokecolour.Set(colstring);
+	colourstring = readline.BeforeFirst('x');
+	colourstring.Trim();
+	strokecolour.Set(colourstring);
 
 	/*
 	numstring = readline.BeforeFirst(' ');
@@ -575,7 +736,18 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 	//diagbox->Write(text.Format("graph %s strokecolour red %s %d green %s %d blue %s %d\n", gname, redtext, red, greentext, green, bluetext, blue));
 
 	if(version > 0) {
+		//if(diagbox) diagbox->Write(readline + '\n');
+
 		xshift = ParseDouble(&readline, 's');
+
+		/* ParseDouble
+		readline = readline.AfterFirst('s');
+		readline.Trim(false);
+		numstring = readline.BeforeFirst(' ');
+		numstring.ToDouble(&numdat);
+		readline = readline.AfterFirst(' ');
+		*/
+
 		xunitscale = ParseDouble(&readline, 'u');
 		plotstroke = ParseDouble(&readline, 's');
 
@@ -594,30 +766,32 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		if(ytag == " ") ytag = "";
 	}	
 
-	if(version > 2) {
+	if(version >= 3) {
 		xplot = ParseDouble(&readline, 'p');
 		yplot = ParseDouble(&readline, 'p');
 		labelfontsize = ParseDouble(&readline, 'f');
 		clipmode = ParseLong(&readline, 'm');
 	}
 
-	if(version > 3) type = ParseLong(&readline, 'e');
+	if(version >= 4) {
+		type = ParseLong(&readline, 'e');
+	}
 
-	if(version > 4) {
+	if(version >= 5) {
 		xunitdscale = ParseDouble(&readline, 'd');
 		xsample = ParseDouble(&readline, 'm');
 	}
 
-	if(version > 5) {
+	if(version >= 6) {
 		barwidth = ParseDouble(&readline, 'w');
 		bargap = ParseDouble(&readline, 'g');
 	}
 
-	if(version > 6) {
+	if(version >= 7) {
 		yunitscale = ParseDouble(&readline, 'u');
 	}
 
-	if(version > 7) {
+	if(version >= 8) {
 		xlabelplaces = ParseLong(&readline, 'l');
 		ylabelplaces = ParseLong(&readline, 'l');
 		xlabelmode = ParseLong(&readline, 'm');
@@ -631,13 +805,23 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		ytickmode += 1;
 	}
 
-	if(version > 8) {
+	if(version >= 9) {
 		xaxis = ParseLong(&readline, 'a');
 		yaxis = ParseLong(&readline, 'a');
 	}
 
-	if(version > 9) {
+	if(version >= 10) {
 		yunitdscale = ParseDouble(&readline, 'd');
+	}
+
+	if(version >= 11) {
+		xlabelgap = ParseDouble(&readline, 'g');
+		ylabelgap = ParseDouble(&readline, 'g');
+		labelfont = ParseLong(&readline, 'f');
+		scattersize = ParseDouble(&readline, 'c');
+		colourstring = ParseString(&readline, 'b', 'x');
+		colourstring.Trim();
+		fillcolour.Set(colourstring);
 	}
 }
 
@@ -767,7 +951,7 @@ void GraphDat::Init()
 	xtag = "X";
 	ytag = "Y";
 	xlabelgap = 30; //40;
-	ylabelgap = 20; //30;
+	ylabelgap = 30; // 20 //30;
 	labelfontsize = 10;
 	tickfontsize = 10;
 	clipmode = 0;
@@ -799,6 +983,8 @@ void GraphDat::Init()
 	xaxis = 1;
 	yaxis = 1;
 	axistrace = 0;
+
+	labelfont = 0;  //default Helvetica
 }
 
 

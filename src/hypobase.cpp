@@ -257,13 +257,13 @@ long ParseLong(wxString *readline, wxUniChar tag)
 }
 
 
-wxString ParseString(wxString *readline, wxUniChar tag)
+wxString ParseString(wxString *readline, wxUniChar tag, wxUniChar endtag)
 {
 	wxString string;
 
 	*readline = readline->AfterFirst(tag);
 	readline->Trim(false);
-	string = readline->BeforeFirst(' ');
+	string = readline->BeforeFirst(endtag);
 	*readline = readline->AfterFirst(' ');
 	return string;
 }

@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 910),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 925),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -42,6 +42,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 		//confont = wxFont(10, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
 	}
 	column = 0;
+	fontset = &graphwin->mainwin->fontset;
 
 	panel = new ToolPanel(this, wxDefaultPosition, wxDefaultSize);
 	panel->SetFont(boxfont);
@@ -179,6 +180,16 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	paramset.currlay++;
 
+	// Font Selector
+	fontchoice = new wxChoice(panel, ID_font, wxDefaultPosition, wxSize(150, -1), fontset->numtypes, fontset->names);
+	fontchoice->SetSelection(fontset->GetIndex(graph->labelfont));
+	wxBoxSizer *fontbox = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText *fontlabel = new wxStaticText(panel, wxID_ANY, "Font");
+	fontlabel->SetFont(confont);
+	fontbox->Add(fontlabel, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	fontbox->AddSpacer(5);
+	fontbox->Add(fontchoice);
+
 	linecheck = new wxCheckBox(panel, ID_line, "");
 	linecheck->SetFont(confont);
 	linecheck->SetValue(graph->linemode);
@@ -250,7 +261,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	typeset.Add("Mean field plot", 11);
 	diagbox->Write(typeset.List());
 
-	typechoice = new wxChoice(panel, 0, wxDefaultPosition, wxSize(150, -1), typeset.numtypes, typeset.names);
+	typechoice = new wxChoice(panel, ID_type, wxDefaultPosition, wxSize(150, -1), typeset.numtypes, typeset.names);
 	typechoice->SetSelection(typeset.GetIndex(graph->type));
 	wxBoxSizer *typebox = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Plot Type");
@@ -292,6 +303,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(fontparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	//mainbox->Add(scatterparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	//mainbox->Add(plotgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->Add(fontbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(strokebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->Add(fillbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
@@ -326,6 +338,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 }
 
 
+// SetControls sets panel parameter controls from a selected graph
 void GraphBox::SetControls()
 {
 	paramset.GetCon("gname")->SetValue(graph->gname);
@@ -369,6 +382,7 @@ void GraphBox::SetControls()
 	fillpicker->SetColour(graph->fillcolour);
 
 	typechoice->SetSelection(typeset.GetIndex(graph->type));
+	fontchoice->SetSelection(fontset->GetIndex(graph->labelfont));
 }
 
 
@@ -463,17 +477,25 @@ void GraphBox::OnSize(wxSizeEvent& event)
 void GraphBox::OnChoice(wxCommandEvent& event)
 {
 	wxString text;
+	int selection;
 
-	//graph = graphwin->dispset[0]->plot[0];
-	int selection = typechoice->GetSelection();
-	graph->type = typeset.GetType(selection);
-	if(graph->plotdata) (*graph->plotdata).gtype = graph->type;
-	//status->SetLabel(text.Format("Type %d", typeset.GetType(selection)));
-	graphwin->UpdateScroll();
+	if(event.GetId() == ID_type) {
+		selection = typechoice->GetSelection();
+		graph->type = typeset.GetType(selection);
+		if(graph->plotdata) (*graph->plotdata).gtype = graph->type;
+	
+		graphwin->UpdateScroll();
 
-	diagbox->Write(typeset.List());
+		diagbox->Write(typeset.List());
+		diagbox->Write(text.Format("Choice Select %d Type %d", selection, typeset.GetType(selection)));
+	}
 
-	diagbox->Write(text.Format("Choice Select %d Type %d", selection, typeset.GetType(selection)));
+	if(event.GetId() == ID_font) {
+		selection = fontchoice->GetSelection();
+		graph->labelfont = fontset->GetType(selection);
+		diagbox->Write(fontset->List());
+		diagbox->Write(text.Format("Choice Select %d Font %d", selection, fontset->GetType(selection)));
+	}
 }
 
 
@@ -518,6 +540,7 @@ void GraphBox::OnPrint(wxCommandEvent& event)
 }
 
 
+// SetParams reads panel parameters into GraphDat graph 
 void GraphBox::SetParams(GraphDat *setgraph)
 {
 	ParamStore *params = paramset.GetParamsNew(boxout);
@@ -562,6 +585,7 @@ void GraphBox::SetParams(GraphDat *setgraph)
 }
 
 
+// SetParamsCopy copies panel parameters to another GraphDat graph on the same GraphWindow (used for overlay)
 void GraphBox::SetParamsCopy(GraphDat *setgraph)
 {
 	ParamStore *params = paramset.GetParamsNew(boxout);
@@ -608,6 +632,8 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 
 	setgraph->xlogbase = graph->xlogbase;
 	setgraph->ylogbase = graph->ylogbase;
+
+	setgraph->labelfont = graph->labelfont;
 }
 
 

@@ -756,7 +756,22 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	}
 
 	//out->WriteLine(text.Format("/Helvetica findfont %.2f scalefont setfont", graph->labelfontsize));
-	out->WriteLine(text.Format("/Arial findfont %.2f scalefont setfont", graph->labelfontsize));
+	//out->WriteLine(text.Format("/Arial findfont %.2f scalefont setfont", graph->labelfontsize));
+
+	/*
+	if(graph->labelfont == 0) graph->labelfontstring = "Helvetica";
+	if(graph->labelfont == 1) graph->labelfontstring = "Arial";
+	if(graph->labelfont == 2) graph->labelfontstring = "Myriad-Pro";
+	if(graph->labelfont == 3) graph->labelfontstring = "Times-Roman";
+	if(graph->labelfont == 4) graph->labelfontstring = "Courier";
+	if(graph->labelfont == 5) graph->labelfontstring = "Calibri";
+	*/
+
+
+
+	mod->diagbox->Write(text.Format("Font index %d name %s\n", graph->labelfont, mainwin->fontset.GetName(graph->labelfont)));
+
+	out->WriteLine(text.Format("/%s findfont %.2f scalefont setfont", mainwin->fontset.GetName(graph->labelfont), graph->labelfontsize));
 
 	// Draw Axes
 
