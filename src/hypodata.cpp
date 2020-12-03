@@ -370,7 +370,7 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	// Updated to reference by data tag string instead of index - October 2020
 
 	while(!readline.IsEmpty()) {
-		name == "";
+		name = "";
 		if(readline.GetChar(0) == 'd') name = ParseString(&readline, 't');
 		cellindex = ParseLong(&readline, 'l');
 		if(diagnostic) diagbox->Write(text.Format("SelectLoad name %s  index %d\n", name, cellindex));
