@@ -433,6 +433,23 @@ wxString TypeSet::List()
 */
 
 
+void OverSet::Add(int id, int panel1, int panel2)
+{
+	buttonindex[num] = id; 
+	overindex[num].panel1 = panel1;
+	overindex[num].panel2 = panel2;
+	num++;
+}
+
+
+OverDat *OverSet::GetOver(int id)
+{
+	for(i=0; i<num; i++)
+		if(buttonindex[i] == id) return &overindex[i];
+	return NULL;
+}
+
+
 void TypeSet::Add(wxString name, int type)
 {
 	names[numtypes] = name;
@@ -444,7 +461,7 @@ void TypeSet::Add(wxString name, int type)
 
 int TypeSet::GetIndex(int type)
 {
-	if(type == 4) type = 5;
+	if(type == 4) type = 5;    // specific to GraphDat type conversion
 	return refindex[type];
 }
 
@@ -629,11 +646,11 @@ wxString GraphDat::StoreDat(wxString tag)
     
     //diagbox->Write("colourtext: " + colourtext);
 
-	gtext1.Printf("v11 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d srgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
+	gtext1.Printf("v12 index %d tag %s xf %.4f xt %.4f yf %.4f yt %.4f xl %d xs %.4f xm %d yl %d ys %.4f ym %d c %d srgb %s xs %.4f xu %.4f ps %.4f name %s xtag %s ytag %s xp %d yp %d pf %.4f cm %d type %d xd %.4f xsam %.4f bw %.4f bg %.4f yu %.4f ", 
 		gindex, tag, xfrom, xto, yfrom, yto, xlabels, xstep, xtickmode, ylabels, ystep, ytickmode, colour, strokecolourtext, xshift, xunitscale, plotstroke, storegname, storextag, storeytag, xplot, yplot, labelfontsize, clipmode, type, xunitdscale, xsample, barwidth, bargap, yunitscale);
 		
-	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d xa %d ya %d yd %.4f xg %.4f yg %.4f lf %d sc %.4f frgb %s x", 
-		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode, xaxis, yaxis, yunitdscale, xlabelgap, ylabelgap, labelfont, scattersize, fillcolourtext);
+	gtext2.Printf("xl %d yl %d xm %d ym %d xs %d ys %d xa %d ya %d yd %.4f xg %.4f yg %.4f lf %d sc %.4f frgb %s xfm %d fs %d lm %d sm %d", 
+		xlabelplaces, ylabelplaces, xlabelmode, ylabelmode, xscalemode, yscalemode, xaxis, yaxis, yunitdscale, xlabelgap, ylabelgap, labelfont, scattersize, fillcolourtext, fillmode, fillstroke, linemode, scattermode);
 
 	return gtext1 + gtext2;
 }
@@ -823,6 +840,13 @@ void GraphDat::LoadDat(wxString data, int version)                    // Not in 
 		colourstring.Trim();
 		fillcolour.Set(colourstring);
 	}
+
+	if(version >= 12) {
+		fillmode = ParseLong(&readline, 'm');
+		fillstroke = ParseLong(&readline, 's');
+		linemode = ParseLong(&readline, 'm');
+		scattermode = ParseLong(&readline, 'm');
+	}
 }
 
 
@@ -985,6 +1009,8 @@ void GraphDat::Init()
 	axistrace = 0;
 
 	labelfont = 0;  //default Helvetica
+	fillmode = 1;
+	fillstroke = 0;
 }
 
 

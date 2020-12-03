@@ -576,6 +576,41 @@ public:
 */
 
 
+
+// ScaleBox Overlay Buttons 
+class OverDat
+{
+public:
+	int panel1;
+	int panel2;
+	bool toggle;
+	int numdisps;
+
+	OverDat() {
+		numdisps = 0;
+		toggle = false;
+	};
+};
+
+// Overlay panel data indexed by button ID
+class OverSet
+{
+	int i, num;
+	int buttonindex[20];
+	OverDat overindex[20];
+
+public:
+	OverSet() { 
+		num = 0; 
+	};
+
+	void Add(int id, int panel1, int panel2);
+	//int GetIndex(int id);
+	OverDat *GetOver(int id);
+};
+
+
+// General class for storing indexed string tags and reference numbers, currently used for GraphDat plot types and fonts
 class TypeSet
 {
 public:
@@ -710,6 +745,7 @@ public:
 	int axistrace;
 	int labelfont;  // 0 for Helvetica, 1 for Arial
 	wxString labelfontstring; 
+	int fillmode, fillstroke;
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

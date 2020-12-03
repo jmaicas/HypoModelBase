@@ -16,7 +16,7 @@
 
 GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//: ParamBox(NULL, title, wxDefaultPosition, wxSize(450, 450), "Axes", 0)
-	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 925),
+	: wxDialog(NULL, -1, title, wxDefaultPosition, wxSize(325, 910),
 	wxFRAME_FLOAT_ON_PARENT | wxFRAME_TOOL_WINDOW | wxCAPTION | wxSYSTEM_MENU | wxCLOSE_BOX | wxRESIZE_BORDER)
 {
 	int i;
@@ -152,7 +152,6 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset.AddNum("xlabelgap", "X Gap", graph->xlabelgap, 0, labelwidth, numwidth);
 	paramset.AddNum("xlabelplaces", "X Places", graph->xlabelplaces, 0, labelwidth, numwidth);
 	paramset.AddNum("barwidth", "Bar Wid", graph->barwidth, 0, labelwidth, numwidth);
-	paramset.AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
 	paramset.AddNum("yshift", "YShift", graph->yshift, 2, labelwidth, numwidth);
 	paramset.AddNum("yscale", "YScale", graph->yunitscale, 3, labelwidth, numwidth);
 	paramset.AddNum("ydscale", "YDScale", graph->yunitdscale, 1, labelwidth, numwidth);
@@ -162,7 +161,6 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset.AddNum("ylabelplaces", "Y Places", graph->ylabelplaces, 0, labelwidth, numwidth);
 	paramset.AddNum("bargap", "Bar Gap", graph->bargap, 0, labelwidth, numwidth);
 
-	
 	wxBoxSizer *plotparams = ParamLayout(2);
 
 	paramset.GetCon("xshift")->SetMinMax(-100000, 100000);
@@ -170,25 +168,30 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	paramset.GetCon("xlabelplaces")->SetMinMax(-1, 100);
 	paramset.GetCon("ylabelplaces")->SetMinMax(-1, 100);
 
-	paramset.AddNum("labelfontsize", "Font Size", graph->labelfontsize, 2, 50);
+	wxBoxSizer *samplebox = new wxBoxSizer(wxHORIZONTAL);
+	paramset.AddNum("xsample", "XSample", graph->xsample, 0, labelwidth, numwidth);
+	samplebox->Add(paramset.GetCon("xsample"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	clipcheck = new wxCheckBox(panel, ID_clipmode, "Clip");
 	clipcheck->SetFont(confont);
 	clipcheck->SetValue(graph->clipmode);
-	wxBoxSizer *fontparams = new wxBoxSizer(wxHORIZONTAL);
-	fontparams->Add(paramset.GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-	fontparams->AddSpacer(5);
-	fontparams->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	samplebox->AddSpacer(40);
+	samplebox->Add(clipcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	samplebox->AddSpacer(25);
 	paramset.currlay++;
 
 	// Font Selector
-	fontchoice = new wxChoice(panel, ID_font, wxDefaultPosition, wxSize(150, -1), fontset->numtypes, fontset->names);
+	fontchoice = new wxChoice(panel, ID_font, wxDefaultPosition, wxSize(100, -1), fontset->numtypes, fontset->names);
 	fontchoice->SetSelection(fontset->GetIndex(graph->labelfont));
 	wxBoxSizer *fontbox = new wxBoxSizer(wxHORIZONTAL);
 	wxStaticText *fontlabel = new wxStaticText(panel, wxID_ANY, "Font");
 	fontlabel->SetFont(confont);
 	fontbox->Add(fontlabel, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	fontbox->AddSpacer(5);
-	fontbox->Add(fontchoice);
+	fontbox->Add(fontchoice, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	fontbox->AddSpacer(5);
+	paramset.AddNum("labelfontsize", "Size", graph->labelfontsize, 2, 25);
+	fontbox->Add(paramset.GetCon("labelfontsize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	paramset.currlay++;
 
 	linecheck = new wxCheckBox(panel, ID_line, "");
 	linecheck->SetFont(confont);
@@ -222,13 +225,23 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	strokebox->Add(linecheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	strokebox->Add(strokepicker);
 
-	fillpicker = new wxColourPickerCtrl(panel, 0, graph->fillcolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
+	fillstrokecheck = new wxCheckBox(panel, ID_fillstroke, "");
+	fillstrokecheck->SetFont(confont);
+	fillstrokecheck->SetValue(graph->fillstroke);
+	strokebox->Add(fillstrokecheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+	fillpicker = new wxColourPickerCtrl(panel, 0, graph->fillcolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL|wxCLRP_SHOW_ALPHA);
 	paramset.AddNum("scattersize", "Scatter Size", graph->scattersize, 2, labelwidth);
 	wxBoxSizer *fillbox = new wxBoxSizer(wxHORIZONTAL);
 	fillbox->Add(paramset.con[paramset.GetID("scattersize")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	paramset.currlay++;
 	fillbox->Add(scattercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	fillbox->Add(fillpicker);
+
+	fillcheck = new wxCheckBox(panel, ID_fillmode, "");
+	fillcheck->SetFont(confont);
+	fillcheck->SetValue(graph->fillmode);
+	fillbox->Add(fillcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 
 	// plot layer selection and synch
 	paramset.AddCon("plotlayer", "Layer", 0, 1, 0, labelwidth);
@@ -299,8 +312,9 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	mainbox->Add(scalemoderadbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 	mainbox->AddStretchSpacer();
 	mainbox->Add(plotparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
-	mainbox->AddStretchSpacer();
-	mainbox->Add(fontparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	//mainbox->AddStretchSpacer();
+	mainbox->Add(samplebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	mainbox->AddSpacer(5);
 	//mainbox->Add(scatterparams, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	//mainbox->Add(plotgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	mainbox->Add(fontbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
@@ -321,6 +335,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	panel->Layout();
 
 	Connect(wxEVT_CHOICE, wxCommandEventHandler(GraphBox::OnChoice));
+	Connect(wxEVT_CHECKBOX, wxCommandEventHandler(GraphBox::OnCheck));
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(GraphBox::OnRadio));
 	Connect(ID_Sync, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnSynch));
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GraphBox::OnOK));
@@ -368,7 +383,11 @@ void GraphBox::SetControls()
 	paramset.GetCon("yshift")->SetValue(graph->yshift);
 
 	clipcheck->SetValue(graph->clipmode);
+	linecheck->SetValue(graph->linemode);
 	scattercheck->SetValue(graph->scattermode);
+	fillcheck->SetValue(graph->fillmode);
+	fillstrokecheck->SetValue(graph->fillstroke);
+
 	xtickrad[graph->xtickmode]->SetValue(true);
 	ytickrad[graph->ytickmode]->SetValue(true);
 	xlabrad[graph->xlabelmode]->SetValue(true);
@@ -474,6 +493,12 @@ void GraphBox::OnSize(wxSizeEvent& event)
 }
 
 
+void GraphBox::OnCheck(wxCommandEvent& event)
+{
+	OnOK(event);
+}
+
+
 void GraphBox::OnChoice(wxCommandEvent& event)
 {
 	wxString text;
@@ -570,8 +595,12 @@ void GraphBox::SetParams(GraphDat *setgraph)
 	graph->barwidth = (*params)["barwidth"];
 	graph->bargap = (*params)["bargap"];
 
+	graph->linemode = linecheck->GetValue();
 	graph->clipmode = clipcheck->GetValue();
 	graph->scattermode = scattercheck->GetValue();
+	graph->fillmode = fillcheck->GetValue();
+
+	graph->fillstroke = fillstrokecheck->GetValue();
 	graph->strokecolour = strokepicker->GetColour();
 	graph->fillcolour = fillpicker->GetColour();
 	graph->colour = custom;
@@ -612,8 +641,12 @@ void GraphBox::SetParamsCopy(GraphDat *setgraph)
 	setgraph->scattersize = (*params)["scattersize"];
 	setgraph->barwidth = (*params)["barwidth"];
 	setgraph->bargap = (*params)["bargap"];
+
+	setgraph->linemode = linecheck->GetValue();
 	setgraph->clipmode = clipcheck->GetValue();
 	setgraph->scattermode = scattercheck->GetValue();
+	setgraph->fillmode = fillcheck->GetValue();
+	setgraph->fillstroke = fillstrokecheck->GetValue();
 	
 	setgraph->xtag = paramset.GetCon("xtag")->GetString();
 	setgraph->ytag = paramset.GetCon("ytag")->GetString();

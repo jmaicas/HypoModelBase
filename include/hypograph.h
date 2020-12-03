@@ -147,6 +147,7 @@ public:
 	wxRadioButton *xscalerad[2], *yscalerad[2];
 	wxRadioButton *xaxisrad[2], *yaxisrad[2];
 	wxCheckBox *clipcheck, *scattercheck, *linecheck;
+	wxCheckBox *fillcheck, *fillstrokecheck;
 
 	ParamNum *numdrawcon;
 	ParamNum *viewheightcon;
@@ -163,6 +164,7 @@ public:
 	void OnRadio(wxCommandEvent& event);
 	void OnSynch(wxCommandEvent& event);
 	void OnChoice(wxCommandEvent& event);
+	void OnCheck(wxCommandEvent& event);
 	void OnSize(wxSizeEvent& event);
 	void OnSpin(wxSpinEvent& event);
 	wxBoxSizer *ParamLayout(int columns=1);
@@ -207,9 +209,11 @@ public:
 	int normtog;
 	int boxtype;
 	int synchcon;
+	//int overlayindex[10][2];
 
 	int xmin, xmax, ymin, ymax;
 	int overpan1, overpan2, overpan3, overpan4;
+	OverSet overset;
 	int zbwidth, zbheight;  // zoom button sizes
 	wxBitmap rightarrow, leftarrow;
 	wxBitmap downarrow, uparrow;

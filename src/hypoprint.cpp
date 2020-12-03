@@ -608,11 +608,14 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 						xpos = (xval - xfrom) * xrange;
 						y = (*gdatadv)[i];		
 						out->WriteLine("newpath");
+						if(graph->fillstroke) out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
 						out->WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
-						out->WriteLine("gsave");
-						out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
-						out->WriteLine("fill");
-						out->WriteLine("grestore");
+						if(graph->fillmode) {
+							out->WriteLine("gsave");
+							out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
+							out->WriteLine("fill");
+							out->WriteLine("grestore");
+						}
 						out->WriteLine("stroke");
 					}
 				}

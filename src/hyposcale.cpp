@@ -173,10 +173,16 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	Connect(ID_expdat, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnExpMode));
 	Connect(ID_secretion, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSecMode));
 	Connect(ID_dendmode, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnDendMode));
+
 	Connect(ID_overlay, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
 	Connect(ID_overlay2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
+	Connect(ID_overlay3, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
+	Connect(ID_overlay4, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnOverlay));
 	Connect(ID_position, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
 	Connect(ID_position2, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
+	Connect(ID_position3, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
+	Connect(ID_position4, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnPosition));
+
 	Connect(ID_xscale, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXScale));
 
 	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSpikes));
@@ -1481,39 +1487,64 @@ void ScaleBox::PanelUpdate()
 
 void ScaleBox::OnOverlay(wxCommandEvent& event)
 {
+	int i;
 	int pan1, pan2;
-	int toggle;
+	int numdisps;
+	OverDat *overlay;
+	GraphDat *refgraph;
+	GraphDisp *disp;
 
-	if(event.GetId() == ID_overlay) {
-		pan1 = overpan1;  
-		pan2 = overpan2;
-		toggle = overtog;
-		overtog = 1 - overtog;
-	}
-	else {
-		pan1 = overpan3;
-		pan2 = overpan4;
-		toggle = overtog2;
-		overtog2 = 1 - overtog2;
-	}
-	
-	if(!toggle) {	
-		GraphDisp *pos = graphwin[pan1]->dispset[0];
-		graph = pos->plot[0];
-		graphwin[pan2]->AddGraph(pos);
-		graphwin[pan1]->numdisps--;
-		graph->yto = graphwin[pan2]->dispset[0]->plot[0]->yto;
-		graph->yfrom = graphwin[pan2]->dispset[0]->plot[0]->yfrom;
-		graph->xto = graphwin[pan2]->dispset[0]->plot[0]->xto;
-		graph->xfrom = graphwin[pan2]->dispset[0]->plot[0]->xfrom;
-	}
-	else {
-		graphwin[pan2]->numdisps--;
-		graphwin[pan1]->AddGraph(graphwin[pan2]->dispset[graphwin[pan2]->numdisps]);	
+	overlay = overset.GetOver(event.GetId());
+	if(!overlay) {
+		mod->diagbox->Write("ScaleBox overlay ID not found\n");
+		return;
 	}	
-	//overtog = 1 - overtog;
-	//snum.Printf("overlay = %d", overtog);
-	//mainwin->SetStatusText(snum);
+	pan1 = overlay->panel1;
+	pan2 = overlay->panel2;
+	
+	if(!overlay->toggle) {	
+		overlay->numdisps = graphwin[pan1]->numdisps;
+		if(!overlay->numdisps) return;
+		refgraph = graphwin[pan1]->dispset[0]->plot[0];
+
+		// Synchronise axis scales in panel2
+		for(i=0; i<graphwin[pan2]->numdisps; i++) {
+			graph = graphwin[pan2]->dispset[i]->plot[0];
+			graph->yto = refgraph->yto;
+			graph->yfrom = refgraph->yfrom;
+			graph->xto = refgraph->xto;
+			graph->xfrom = refgraph->xfrom;
+		}
+		
+		// Move GraphDisps down
+		for(i=0; i<overlay->numdisps; i++) {
+			disp = graphwin[pan1]->dispset[i];
+			graph = graphwin[pan1]->dispset[i]->plot[0];
+			graphwin[pan2]->AddGraph(disp);
+			graphwin[pan1]->numdisps--;
+		}
+	}
+	else {
+		numdisps = graphwin[pan2]->numdisps;
+		if(!numdisps) return;
+		// Move GraphDisps up, last in first out
+		//for(i=numdisps-1; i>=numdisps-overlay->numdisps; i--) {
+		for(i=numdisps-overlay->numdisps; i<numdisps; i++) {
+			disp = graphwin[pan2]->dispset[i];
+			graphwin[pan1]->AddGraph(disp);
+			graphwin[pan2]->numdisps--;
+		}		
+	}	
+
+	mod->diagbox->Write(text.Format("Overlay pan1 %d numdisps %d\n", pan1, overlay->numdisps));
+	//mod->diagbox->Write(text.Format("%s", pan1, overlay->numdisps));
+	for(i=0; i<graphwin[pan1]->numdisps; i++) mod->diagbox->Write(graphwin[pan1]->dispset[i]->plot[0]->gname + " ");
+	mod->diagbox->Write("\n");
+	for(i=0; i<graphwin[pan2]->numdisps; i++) mod->diagbox->Write(graphwin[pan2]->dispset[i]->plot[0]->gname + " ");
+	mod->diagbox->Write("\n\n");
+
+	overlay->toggle = 1 - overlay->toggle;
+	
 	ScaleUpdate();
 }
 
