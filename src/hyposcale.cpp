@@ -1526,9 +1526,8 @@ void ScaleBox::OnOverlay(wxCommandEvent& event)
 	}
 	else {
 		numdisps = graphwin[pan2]->numdisps;
-		if(!numdisps) return;
-		// Move GraphDisps up, last in first out
-		//for(i=numdisps-1; i>=numdisps-overlay->numdisps; i--) {
+		//if(!numdisps) return;
+		// Move GraphDisps up
 		for(i=numdisps-overlay->numdisps; i<numdisps; i++) {
 			disp = graphwin[pan2]->dispset[i];
 			graphwin[pan1]->AddGraph(disp);
@@ -1536,12 +1535,14 @@ void ScaleBox::OnOverlay(wxCommandEvent& event)
 		}		
 	}	
 
+	
 	mod->diagbox->Write(text.Format("Overlay pan1 %d numdisps %d\n", pan1, overlay->numdisps));
 	//mod->diagbox->Write(text.Format("%s", pan1, overlay->numdisps));
 	for(i=0; i<graphwin[pan1]->numdisps; i++) mod->diagbox->Write(graphwin[pan1]->dispset[i]->plot[0]->gname + " ");
 	mod->diagbox->Write("\n");
 	for(i=0; i<graphwin[pan2]->numdisps; i++) mod->diagbox->Write(graphwin[pan2]->dispset[i]->plot[0]->gname + " ");
 	mod->diagbox->Write("\n\n");
+	
 
 	overlay->toggle = 1 - overlay->toggle;
 	
@@ -1551,6 +1552,39 @@ void ScaleBox::OnOverlay(wxCommandEvent& event)
 
 void ScaleBox::OnPosition(wxCommandEvent& event)
 {
+	int i;
+	int numdisps;
+	int pan2;
+	OverDat *overlay;
+	GraphDisp *disp;
+
+	overlay = overset.GetOver(event.GetId());
+	if(!overlay) {
+		mod->diagbox->Write("ScaleBox overlay ID not found\n");
+		return;
+	}	
+
+	pan2 = overlay->panel2;
+
+	numdisps = graphwin[pan2]->numdisps;
+	if(!overlay->toggle || numdisps < 2) return;
+
+	disp = graphwin[pan2]->dispset[numdisps-1];
+	for(i=numdisps-1; i>0; i--) {
+		graphwin[pan2]->dispset[i] = graphwin[pan2]->dispset[i-1]; 
+	}
+	graphwin[pan2]->dispset[0] = disp;
+
+	//mod->diagbox->Write(text.Format("Overlay pan1 %d numdisps %d\n", pan1, overlay->numdisps));
+	//mod->diagbox->Write(text.Format("%s", pan1, overlay->numdisps));
+	//for(i=0; i<graphwin[pan1]->numdisps; i++) mod->diagbox->Write(graphwin[pan1]->dispset[i]->plot[0]->gname + " ");
+	//mod->diagbox->Write("\n");
+
+	mod->diagbox->Write(text.Format("Overlay pan2 %d numdisps %d\n", pan2, numdisps));
+	for(i=0; i<graphwin[pan2]->numdisps; i++) mod->diagbox->Write(graphwin[pan2]->dispset[i]->plot[0]->gname + " ");
+	mod->diagbox->Write("\n\n");
+
+	/*
 	if(graphwin[overpan1]->numdisps > 1) {
 		GraphDisp *pos = graphwin[overpan1]->dispset[0];
 		graphwin[overpan1]->dispset[0] = graphwin[overpan1]->dispset[1];
@@ -1566,6 +1600,10 @@ void ScaleBox::OnPosition(wxCommandEvent& event)
 		gpos[3].plot[0] = gpos[3].plot[1];
 		gpos[3].plot[1] = graph;
 	}
+	*/
+
+
+
 	GraphUpdate();
 }
 

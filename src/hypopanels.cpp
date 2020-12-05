@@ -108,14 +108,14 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	radbox->Add(ylabradbox, 1, wxALL, 5);
 
 	// Scale mode controls  December 2017
-	wxStaticBoxSizer *xscalemodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Scale Mode");
+	wxStaticBoxSizer *xscalemodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "X Scale");
 	xscalerad[0] = new wxRadioButton(panel, 10, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	xscalerad[1] = new wxRadioButton(panel, 11, "Log");
 	xscalemodebox->Add(xscalerad[0], 1, wxTOP | wxBOTTOM, 3);
 	xscalemodebox->Add(xscalerad[1], 1, wxTOP | wxBOTTOM, 3);
 	xscalerad[graph->xscalemode]->SetValue(true);
 
-	wxStaticBoxSizer *yscalemodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Scale Mode");
+	wxStaticBoxSizer *yscalemodebox = new wxStaticBoxSizer(wxVERTICAL, panel, "Y Scale");
 	yscalerad[0] = new wxRadioButton(panel, 12, "Linear", wxDefaultPosition, wxDefaultSize, wxRB_GROUP);
 	yscalerad[1] = new wxRadioButton(panel, 13, "Log");
 	yscalemodebox->Add(yscalerad[0], 1, wxTOP | wxBOTTOM, 3);
@@ -1318,7 +1318,6 @@ ParamStore *ParamBox::GetParams(ParamStore *pstore)
 
 	return pstore;
 }
-
 
 
 ParamStore *ParamBox::GetNumParams()

@@ -433,9 +433,10 @@ wxString TypeSet::List()
 */
 
 
-void OverSet::Add(int id, int panel1, int panel2)
+void OverSet::Add(int overid, int posid, int panel1, int panel2)
 {
-	buttonindex[num] = id; 
+	buttonindex[num].overid = overid; 
+	buttonindex[num].posid = posid; 
 	overindex[num].panel1 = panel1;
 	overindex[num].panel2 = panel2;
 	num++;
@@ -445,7 +446,7 @@ void OverSet::Add(int id, int panel1, int panel2)
 OverDat *OverSet::GetOver(int id)
 {
 	for(i=0; i<num; i++)
-		if(buttonindex[i] == id) return &overindex[i];
+		if(buttonindex[i].overid == id || buttonindex[i].posid == id) return &overindex[i];
 	return NULL;
 }
 

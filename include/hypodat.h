@@ -592,11 +592,19 @@ public:
 	};
 };
 
+
+class OverButtons
+{
+public:
+	int overid;
+	int posid;
+};
+
 // Overlay panel data indexed by button ID
 class OverSet
 {
 	int i, num;
-	int buttonindex[20];
+	OverButtons buttonindex[20];
 	OverDat overindex[20];
 
 public:
@@ -604,8 +612,7 @@ public:
 		num = 0; 
 	};
 
-	void Add(int id, int panel1, int panel2);
-	//int GetIndex(int id);
+	void Add(int overid, int posid, int panel1, int panel2);
 	OverDat *GetOver(int id);
 };
 

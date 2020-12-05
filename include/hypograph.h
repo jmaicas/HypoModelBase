@@ -36,7 +36,7 @@ public:
 	//wxBufferedPaintDC dc;
 	ScaleBox *scalebox;
 	wxScrollBar *scrollbar;
-	GraphDisp *gpos;
+	//GraphDisp *gpos;
 	GraphDat *graph;
 	GraphBase *graphbase;
 	Model *mod;
@@ -74,7 +74,7 @@ public:
 	int ypos;
 	int xpos;
 	GraphDisp *dispset[5];
-	int numdisps;
+	int numdisps, maxdisps;
 	int currentgraph;
 	int spikedisp;
 

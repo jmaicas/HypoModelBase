@@ -62,7 +62,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 {
 	mainwin = main;
 	drawframe = parent;
-	gpos = gdisp;
+	//gpos = gdisp;
 	graphindex = index;
 	mod = model;
 	graphbase = mod->graphbase;
@@ -83,6 +83,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	ybase = 10;
 	xstretch = mainwin->xstretch;
 
+	maxdisps = 5;
 	numdisps = 0;
 	currentgraph = 0;
 	spikedisp = 0;
@@ -260,39 +261,40 @@ void GraphWindow3::OnGraphSelectSet(wxCommandEvent& event)
 	double xfrom, xto;
 	//int modesum = -1;
 	GraphSet *graphset;
-	GraphDat *graph;
+	//GraphDat *graph;
 	int gdex;
 	wxString text;
 
 	snum.Printf("Graph Set Select ID %d\n", id);
 	//mainwin->SetStatusText(snum);
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(snum);
-	xfrom = gpos->GetFront()->xfrom;
-	xto = gpos->GetFront()->xto;
+	//xfrom = gpos->GetFront()->xfrom;
+	//xto = gpos->GetFront()->xto;
+	//xfrom = dispset[0]->GetFront()->xfrom;
+	//xto = dispset[0]->GetFront()->xto;
 
 	
 	graphset = mod->graphbase->GetSet(id - 1000);
 	gdex = graphset->GetPlot(graphindex, mainwin->scalebox->GetFlags());
-	gpos->gdex = gdex;
-	gpos->sdex = graphset->sdex;
-	
-
-	gpos->Front((*mod->graphbase)[gdex]);
+	dispset[0]->gdex = gdex;
+	dispset[0]->sdex = graphset->sdex;
+	dispset[0]->Front((*mod->graphbase)[gdex]);
 	
 	//gpos->Front((*mod->graphbase)[id-1000]);
 
 	graph = (*mod->graphbase)[gdex];
-
 	mod->diagbox->Write(text.Format("OnGraph id %d set %d name %s plot %d name %s\n", id, graphset->sdex, graphset->name, gdex, graph->gname));
 	mod->diagbox->Write(graphset->Display());
 
-	gpos->GetFront()->xfrom = xfrom;
-	gpos->GetFront()->xto = xto;
+	//gpos->GetFront()->xfrom = xfrom;
+	//gpos->GetFront()->xto = xto;
+	
 	//mod->gcodes[graphindex] = mod->graphbase->GetTag(id-1000);
 	mod->gcodes[graphindex] = mod->graphbase->GetSetTag(id-1000);
 
 	mod->diagbox->Write(text.Format("gcodes index %d settag %s\n", graphindex, mod->graphbase->GetSetTag(id-1000)));
 
+	mainwin->scalebox->PanelUpdate();
 	mainwin->scalebox->ScaleUpdate();
 	//Refresh();
 }
@@ -304,40 +306,41 @@ void GraphWindow3::OnGraphSelectPlot(wxCommandEvent& event)
 	double xfrom, xto;
 	//int modesum = -1;
 	GraphSet *graphset;
-	GraphDat *graph;
+	//GraphDat *graph;
 	int gdex;
 	wxString text;
 
 	snum.Printf("Graph Plot Select ID %d\n", id);
 	//mainwin->SetStatusText(snum);
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(snum);
-	xfrom = gpos->GetFront()->xfrom;
-	xto = gpos->GetFront()->xto;
+	//xfrom = dispset[0]->GetFront()->xfrom;
+	//xto = dispset[0]->GetFront()->xto;
 
     gdex = id - 2000;
-	gpos->gdex = gdex;
-	gpos->sdex = mod->graphbase->GetGraph(gdex)->sdex;
-    graphset = mod->graphbase->GetSet(gpos->sdex);
+	dispset[0]->gdex = gdex;
+	dispset[0]->sdex = mod->graphbase->GetGraph(gdex)->sdex;
+    graphset = mod->graphbase->GetSet(dispset[0]->sdex);
 	if(graphset->submenu) {
 		graphset->subtag = mod->graphbase->GetTag(gdex);
 		graphset->subplot[graphindex] = gdex;
 		mod->gtags[graphindex] = graphset->subtag;
 	}
 	
-	gpos->Front((*mod->graphbase)[gdex]);
-	graph = (*mod->graphbase)[gdex];
+	dispset[0]->Front((*mod->graphbase)[gdex]);
 
+	graph = (*mod->graphbase)[gdex];
 	mod->diagbox->Write(text.Format("OnGraph id %d set %d name %s plot %d name %s tag %s\n", id, graphset->sdex, graphset->name, gdex, graph->gname, mod->graphbase->GetTag(gdex)));
 	mod->diagbox->Write(graphset->Display());
 
-	gpos->GetFront()->xfrom = xfrom;
-	gpos->GetFront()->xto = xto;
+	//dispset[0]->GetFront()->xfrom = xfrom;
+	//dispset[0]->GetFront()->xto = xto;
 	//mod->gcodes[graphindex] = mod->graphbase->GetTag(id-1000);
 	//mod->gcodes[graphindex] = mod->graphbase->GetSetTag(id-1000);
 
-	mod->gcodes[graphindex] = mod->graphbase->GetSetTag(gpos->sdex);
-	mod->diagbox->Write(text.Format("gcodes index %d settag %s\n", graphindex, mod->graphbase->GetSetTag(gpos->sdex)));
+	mod->gcodes[graphindex] = mod->graphbase->GetSetTag(dispset[0]->sdex);
+	mod->diagbox->Write(text.Format("gcodes index %d settag %s\n", graphindex, mod->graphbase->GetSetTag(dispset[0]->sdex)));
 
+	mainwin->scalebox->PanelUpdate();
 	mainwin->scalebox->ScaleUpdate();
 	//Refresh();
 }
@@ -414,7 +417,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 
 	wxPoint pos = event.GetPosition();
 	if(pos.x - mousedown.x > 5) {
-		graph = gpos->plot[0];
+		graph = dispset[0]->plot[0];
 
 		xdiff = graph->xto - graph->xfrom;
 		xscale = xdiff / xplot;
@@ -548,10 +551,10 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 	Connect(2000, 2000 + mod->graphbase->numgraphs, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphSelectPlot));
 
 	//menuPlot->Check(1000, false);
-	graphset = mod->graphbase->GetSet(gpos->sdex);
-	if(!graphset->submenu) menuPlot->Check(1000 + gpos->sdex, true);
-	else subPlot->Check(2000 + gpos->gdex, true);
-	mainwin->diagbox->Write(text.Format("\ngraph menu set %d\n", gpos->sdex));
+	graphset = mod->graphbase->GetSet(dispset[0]->sdex);
+	if(!graphset->submenu) menuPlot->Check(1000 + dispset[0]->sdex, true);
+	else subPlot->Check(2000 + dispset[0]->gdex, true);
+	mainwin->diagbox->Write(text.Format("\ngraph menu set %d\n", dispset[0]->sdex));
 	PopupMenu(menuPlot, pos.x + 20, pos.y);
 }
 
@@ -595,15 +598,15 @@ void GraphWindow3::OnRightClickOld(wxMouseEvent& event)
 
 	Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphSelectSet));
 
-	menuPlot->Check(1000 + gpos->sdex, true);
-	mainwin->diagbox->Write(text.Format("graph menu set %d\n", gpos->sdex));
+	menuPlot->Check(1000 + dispset[0]->sdex, true);
+	mainwin->diagbox->Write(text.Format("graph menu set %d\n", dispset[0]->sdex));
 	PopupMenu(menuPlot, pos.x + 20, pos.y);
 }
 
 
 void GraphWindow3::AddGraph(GraphDisp *newgraph)
 {
-	if(numdisps < 5) {
+	if(numdisps < maxdisps) {
 		dispset[numdisps] = newgraph;
 		numdisps++;
 	}
@@ -633,7 +636,7 @@ void GraphWindow3::UpdateScroll(int pos)
 
 	max = 1440;
 
-	graph = gpos->plot[0];
+	graph = dispset[0]->plot[0];
 	if(graph->gparam == -3) max = graph->gdatav->max / graph->xscale;
 	else if(graph->gparam == -4) max = graph->gdatadv->maxindex / graph->xscale;
 	else {
@@ -739,7 +742,7 @@ void GraphWindow3::OnMouseMove(wxMouseEvent &event)
 	pos = event.GetPosition();
 
 	if((*mainwin->hypoflags)["xypos"]) {
-		graph = gpos->plot[0];
+		graph = dispset[0]->plot[0];
 		gid = graph->gindex;
 
 		// 27/11/20 fixed scaling using adjusted axis unit scales, still need to fix for measure
