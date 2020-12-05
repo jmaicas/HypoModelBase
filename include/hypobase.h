@@ -81,16 +81,17 @@ enum {                 // IGF = 1   Vaso = 2   VMN = 3   Cort = 4
 
 enum {
 	none = 0,
-	synaptic = 1,
-	antidromic = 2,
-	ramp = 3,
-	osmoinject = 4,
-	synrate = 5,
-	secpulse = 6,
-	secfreq = 7,
-	pulse = 8,
-	range = 9,
-	gavage = 10
+	synaptic,
+	antidromic,
+	ramp,
+	osmoinject,
+	synrate,
+	secpulse,
+	secfreq,
+	secdura,
+	pulse,
+	range,
+	gavage
 };
 
 
