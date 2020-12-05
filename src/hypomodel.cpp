@@ -514,6 +514,20 @@ void HypoMain::OnEnter(wxCommandEvent& WXUNUSED(event))
 }
 
 
+void HypoMain::PlotModule(Model *model)
+{
+	wxSize boxsize;
+	if(ostype == Mac) boxsize = wxSize(600, 400);
+	else boxsize = wxSize(600, 400);
+
+	if(!plotbox) {
+		plotbox = new PlotBox(model, "Plot Box", wxPoint(320, 455), boxsize);
+		toolset->AddBox(plotbox);
+	}
+	plotbox->Show(true);
+}
+
+
 void HypoMain::SoundModule(Model *model)
 {
 	wxSize boxsize;
@@ -787,6 +801,7 @@ void HypoMain::OnNeuroBox(wxCommandEvent& WXUNUSED(event))
 void HypoMain::OnPlotBox(wxCommandEvent& WXUNUSED(event))
 {
 	if(plotbox) plotbox->Show(true);
+	else PlotModule(mod);
 }
 
 

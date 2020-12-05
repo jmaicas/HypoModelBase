@@ -140,6 +140,9 @@ public:
 
 	ProtocolBox *protocolbox;
 
+	// Plot Data
+	
+
 
 	//DiagBox *diagbox;
 
@@ -183,6 +186,7 @@ public:
 	void SpikeBox(int modmode = 0);
 	//void EvoSpikeModule(Model *);
 	void SoundModule(Model *);
+	void PlotModule(Model *);
 
 	void BasicMenu();
 	void FullMenu();

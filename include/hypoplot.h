@@ -8,13 +8,19 @@
 #include "hypopanels.h"
 
 
-class PlotModel;
+enum {
+	ID_plotflag = 9000,
+	ID_ioflag,
+	ID_V1data,
+	ID_neurodice
+};
+
 
 
 class PlotBox: public ParamBox
 {
 public:
-	PlotModel *mod;
+	Model *mod;
 	TextGrid *textgrid;
 	wxString text;
 
@@ -23,12 +29,21 @@ public:
 	GraphWindow3 *graphwin;
 	GraphDisp *graphdisp;
 
+	GridBox *gridbox;
+	//PlotSet *plotset;
+	NeuroBox *neurobox;
+
+	vector<datdouble>ycoldata;
+	vector<datdouble>xcoldata;
+	int plotsetindex;
+	PlotSet *plotset;
+
 	int plotcount;
 	int plotlayer;
 	int graphindex;
 	wxString coltag;
 
-	PlotBox(PlotModel *mod, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size);
+	PlotBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//~PlotBox();
 	void OnPlotXY(wxCommandEvent& event);
 	void OnPlotY(wxCommandEvent& event);
@@ -49,8 +64,21 @@ public:
 	void OnParamStore(wxCommandEvent& event);
 	void OnParamLoad(wxCommandEvent& event);
     
-    void OnV1(wxCommandEvent& event);
+    //void OnV1(wxCommandEvent& event);
 	void OnNeuroDice(wxCommandEvent& event);
+
+	// Copied from PlotModel
+	void PlotStore(wxString);
+	void PlotLoad(wxString);
+	void DataSelect(double, double);
+	void SetCell(int, GraphDat *);
+	int GetCellIndex();
+
+	// Running Wheel Data
+	datdouble wheeldata;
+	datdouble bindata;
+	int datacount;
+	void WheelBin(int);
 };
 
 
