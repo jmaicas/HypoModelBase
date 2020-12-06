@@ -107,6 +107,7 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 		AddButton(ID_V1data, "V1 Ana", 50, v1datapanel);
 	}
 
+	/*
 	wxBoxSizer *datapathbox = new wxBoxSizer(wxHORIZONTAL);
 	paramset.AddText("datapath", "Data Path", "", 60, 350);
 	datapathbox->Add(paramset.GetCon("datapath"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
@@ -138,6 +139,7 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	datafilebox->Add(datapathbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	datafilebox->AddSpacer(5);
 	datafilebox->Add(datatagbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	*/
 
 	wxBoxSizer *conbox = new wxBoxSizer(wxHORIZONTAL);
 	conbox->Add(dataplotbox, 0, wxEXPAND|wxALL, 5);	
@@ -165,7 +167,7 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	mainbox->AddStretchSpacer();
 	//mainbox->Add(runbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);	
 	//mainbox->AddSpacer(5);
-	mainbox->Add(datafilebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);	
+	//mainbox->Add(datafilebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);	
 	mainbox->AddStretchSpacer();
 	mainbox->Add(storebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);	
 	mainbox->AddSpacer(5);
