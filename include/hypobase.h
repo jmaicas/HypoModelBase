@@ -9,12 +9,12 @@
 #include "wx/scrolwin.h"
 #include <vector>
 #include <list>
-#include "mersenne.h"
+#include <mersenne.h>
 #include "wx/dcbuffer.h"
 #include "wx/msgqueue.h"
 #include "wx/textfile.h"
-#include <hypodef.h>
-#include <SFMT.h>
+#include "hypodef.h"
+#include "SFMT.h"
 
 
 //#include "hypocontrols.h"
