@@ -20,6 +20,12 @@ class ParamBox;
 
 //wxDEFINE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
 
+wxDECLARE_EVENT(EVT_MODTHREAD_COMPLETED, wxThreadEvent);
+
+wxDECLARE_EVENT(EVT_DIAG_WRITE, wxThreadEvent);
+
+//wxDEFINE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
+
 
 class ModThread : public wxThread
 {
@@ -57,8 +63,12 @@ public:
 	int xscaletoggle;
 	bool oldhist;
 	int basicmode;
-    bool runflag;
 	bool evoflag;
+    
+    // Threads
+    wxMutex *runmute;
+    bool runflag;
+    //wxCommandEvent diagevent(wxEVT_COMMAND_TEXT_UPDATED, ID_Diagnostic);
 
 	// Prefs
 	int numdraw;
@@ -103,6 +113,7 @@ public:
 
 	long ReadNextData(wxString *);
 	wxString GetPath();
+    void DiagWrite(wxString);
 	virtual void RunModel();
 	virtual void Output();
 	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags);
@@ -128,6 +139,8 @@ public:
 	virtual void BurstUpdate();
 	virtual void GridColumn(int col);
     virtual void DataCopy(wxString oldpath, wxString newpath);
+    virtual void OnModThreadCompletion(wxThreadEvent&);
+    void OnDiagWrite(wxThreadEvent&);
 };
 
 

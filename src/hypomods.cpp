@@ -8,6 +8,11 @@
 DEFINE_EVENT_TYPE(wxEVT_SPIKE)
 DEFINE_EVENT_TYPE(wxEVT_SYNCH)
 
+//wxDECLARE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
+//wxDEFINE_EVENT(wxEVT_COMMAND_MODTHREAD_COMPLETED, wxThreadEvent);
+
+wxDEFINE_EVENT(EVT_MODTHREAD_COMPLETED, wxThreadEvent);
+wxDEFINE_EVENT(EVT_DIAG_WRITE, wxThreadEvent);
 
 
 Model::Model(int type, wxString name, HypoMain *main)
@@ -27,6 +32,9 @@ Model::Model(int type, wxString name, HypoMain *main)
 	scalebox = mainwin->scalebox;
 	diagbox = mainwin->diagbox;
 	graphwin = mainwin->graphwin;
+    
+    //wxDEFINE_EVENT(EVT_MODTHREAD_COMPLETED, wxThreadEvent);
+    //wxDEFINE_EVENT(EVT_DIAGNOSTIC, wxCommandEvent);
 
 	ostype = GetSystem();
 	graphload = true;
@@ -37,12 +45,17 @@ Model::Model(int type, wxString name, HypoMain *main)
 	path = "";
 	oldhist = true;
 	xscaletoggle = 0;
+    
     runflag = false;   // Set to indicate model thread is running
+    runmute = new wxMutex;
 
 	for(int i=0; i<10; i++) gtags[i] = "";    // plot tags indexed by graph window, only used for submenu graph sets
 
 	prefstore["numdraw"] = 2;
 	evoflag = false;
+    
+    Connect(wxID_ANY, EVT_MODTHREAD_COMPLETED, wxThreadEventHandler(Model::OnModThreadCompletion));
+    Connect(wxID_ANY, EVT_DIAG_WRITE, wxThreadEventHandler(Model::OnDiagWrite));
 }
 
 
@@ -51,6 +64,37 @@ Model::~Model()
 	delete graphbase;
 	delete modeflags;
 	delete toolflags;
+}
+
+
+void Model::OnModThreadCompletion(wxThreadEvent&)
+{
+    runmute->Lock();
+    runflag = 0;
+    runmute->Unlock();
+    mainwin->scalebox->GraphUpdate();
+
+    diagbox->textbox->AppendText("thread exit\n");
+}
+
+
+void Model::OnDiagWrite(wxThreadEvent& event)
+{
+    diagbox->Write(event.GetString());
+}
+
+
+void Model::DiagWrite(wxString text)
+{
+    //diagevent.SetString(text);
+    //AddPendingEvent(diagevent);
+    //wxQueueEvent(this, &diagevent);
+    
+    wxThreadEvent event(EVT_DIAG_WRITE, ID_Diagnostic);
+    event.SetString(text);
+    //pFrame is a wxEvtHandler*
+    QueueEvent(event.Clone());
+    
 }
 
 

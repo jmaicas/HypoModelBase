@@ -325,6 +325,7 @@ enum {
 	ID_GridBox,
 	ID_Gavage,
 	ID_Progress,
+    ID_Diagnostic,
 	ID_EndRun,
 	ID_Dend,
 	ID_realtime,
