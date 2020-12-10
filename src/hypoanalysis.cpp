@@ -1211,7 +1211,7 @@ void SpikeDat::output(wxString filetag, wxString path)
 
 	outfile.New(filename.Format(path + "%s-srate.txt", filetag));
 	for(i=0; i<=10000; i++)   
-		outfile.WriteLine(text.Format("%d  %d", i, srate.data[i]));
+		outfile.WriteLine(text.Format("%d  %d", i, srate1s.data[i]));
 	outfile.Close();
 
 	outfile.New(filename.Format(path + "%s-times.txt", filetag));
@@ -1305,7 +1305,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 		hist5norm[i] = 0;
 	}
 
-	for(i=0; i<maxtime; i++) srate[i] = 0;
+	for(i=0; i<maxtime; i++) srate1s[i] = 0;
 	for(i=0; i<max1; i++) srate1[i] = 0;
 	for(i=0; i<max100; i++) srate100[i] = 0;
 
@@ -1319,7 +1319,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	//haz1norm.max = 0;
 	haz5norm.max = 0;
 	hazquad.max = 0;
-	srate.max = 0;
+	srate1s.max = 0;
 	srate1.max = 0;
 	srate100.max = 0;
 
@@ -1374,7 +1374,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 	//if(calcdiag) fprintf(ofp, "Rate count  last spike at %.2fs.\n", times[spikecount-1]/1000);
 
 	spikestep = 0;
-	srate.max = (int)(times[spikecount-1]/1000 + 0.5); 
+	srate1s.max = (int)(times[spikecount-1]/1000 + 0.5); 
 	for(i=0; i<times[spikecount-1]/1000; i++) {	     // spike rate count (1s)
 		if(calcdiag) fprintf(ofp, "%ds. ", i);
 		if(spikestep > spikecount) {
@@ -1383,7 +1383,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 		}
 		while(times[spikestep]/1000 < i+1) {
 			if(calcdiag) fprintf(ofp, "spike %d  ", spikestep);
-			if(i < maxtime) srate.data[i]++;
+			if(i < maxtime) srate1s.data[i]++;
 			spikestep++;
 			if(spikestep >= spikecount) break;
 		}
@@ -1418,7 +1418,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 
 		ofp = fopen("net-rate1.txt", "w");
 		fprintf(ofp, "Numspikes = %d\n\n", spikecount);
-		fprintf(ofp, "max = %d\n\n", srate.max);
+		fprintf(ofp, "max = %d\n\n", srate1s.max);
 		for(i=0; i<2000; i++)
 			fprintf(ofp, "%d ms, %d spikes\n", i, srate1.data[i]); 
 		fclose(ofp);
@@ -1502,7 +1502,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		haz5norm[i] = 0;
 	}
 
-	for(i=0; i<maxtime; i++) srate[i] = 0;
+	for(i=0; i<maxtime; i++) srate1s[i] = 0;
 	for(i=0; i<max1; i++) srate1[i] = 0;
 	for(i=0; i<max100; i++) {
 		srate10[i] = 0;
@@ -1525,7 +1525,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	//haz1norm.max = 0;
 	//haz5norm.max = 0;
 	hazquad.max = 0;
-	srate.max = 0;
+	srate1s.max = 0;
 	srate1.max = 0;
 	srate100.max = 0;
 
@@ -1695,7 +1695,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	if(calcdiag) fprintf(ofp, "Rate count  last spike at %.2fs.\n", times[spikecount-1]/1000);
 
 	spikestep = 0;
-	srate.max = (int)(times[spikecount-1]/1000 + 0.5); 
+	srate1s.max = (int)(times[spikecount-1]/1000 + 0.5); 
 	for(i=0; i<times[spikecount-1]/1000; i++) {	     // spike rate count (1s)
 		if(calcdiag) fprintf(ofp, "%ds. ", i);
 		if(spikestep > spikecount) {
@@ -1704,11 +1704,11 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		}
 		while(times[spikestep]/1000 < i+1) {
 			if(calcdiag) fprintf(ofp, "spike %d  ", spikestep);
-			if(i < maxtime) srate.data[i]++;
+			if(i < maxtime) srate1s.data[i]++;
 			spikestep++;
 			if(spikestep >= spikecount) break;
 		}
-		if(calcdiag) fprintf(ofp, "srate %d\n", srate.data[i]);
+		if(calcdiag) fprintf(ofp, "srate %d\n", srate1s.data[i]);
 	}
 
 	if(calcdiag) fprintf(ofp, "Rate count end  spikestep %d  spikecount %d\n", spikestep, spikecount);
@@ -1753,11 +1753,11 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	double winsum = 0;
 	for(i=0; i<=times[spikecount-1]/1000; i++) {
 		if(i<=freqwindow) {
-			winsum += srate[i];
+			winsum += srate1s[i];
 			winfreq[i] = 0;
 		}
 		else {
-			winsum += srate[i] - srate[i-freqwindow];
+			winsum += srate1s[i] - srate1s[i - freqwindow];
 			winfreq[i - freqwindow / 2] = winsum / freqwindow;
 		}
 	}
@@ -1773,7 +1773,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 		ofp = fopen("net-rate1.txt", "w");
 		fprintf(ofp, "Numspikes = %d\n\n", spikecount);
-		fprintf(ofp, "max = %d\n\n", srate.max);
+		fprintf(ofp, "max = %d\n\n", srate1s.max);
 		for(i=0; i<2000; i++)
 			fprintf(ofp, "%d ms, %d spikes\n", i, srate1.data[i]); 
 		fclose(ofp);
@@ -2058,7 +2058,7 @@ int SpikeDat::PlotSet(GraphBase *graphbase, wxString tag, int colour, int light,
 
 	if(diagbox) diagbox->Write(text.Format("GraphSet entered... tag %s\n", tag));
 
-	graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", null);
+	graphbase->Add(GraphDat(&srate1s, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", null);
 	graphbase->Add(GraphDat(&srate600s, 0, 500, 0, 200, tag + "Spike Rate 600s", this, 600, red + shift), reftag + "rate600s", null);
 	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", null);
 	graphbase->Add(GraphDat(&srate30s, 0, 500, 0, 200, tag + "Spike Rate 30s", this, 30, red + shift), reftag + "rate30s", null);
@@ -2139,7 +2139,7 @@ int SpikeDat::GraphSetLysis(GraphBase *graphbase, wxString tag, int colour, int 
 	if(light) shift = 5;
 	else shift = 0;
 
-	setindex = graphbase->Add(GraphDat(&srate, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s");
+	setindex = graphbase->Add(GraphDat(&srate1s, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s");
 	graphbase->Add(GraphDat(&srate100, 0, 50, 0, 20, tag + "Spikes 100ms", this, 0.1, red + shift), reftag + "rate100ms");
 	graphbase->Add(GraphDat(&srate1, 0, 0.5, 0, 3, tag + "Spikes 1ms", this, 0.001, red + shift), reftag + "spikes1ms");
 	graphbase->Add(GraphDat(&hist1, 0, 500, 0, 100, tag + "ISI Histogram 1ms", 1, 1, colour + shift), reftag + "hist1ms");

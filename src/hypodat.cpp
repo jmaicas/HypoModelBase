@@ -13,8 +13,8 @@ NeuroDat::NeuroDat()
 	maxspikes = 100000;
 
 	times.resize(maxspikes);
-	srate.resize(maxtime);
-	srate10.resize(maxtime);
+	//srate.resize(maxtime);
+	//srate10.resize(maxtime);
 
 	maxselect = 100;
 	selectstore.resize(maxselect);
@@ -43,14 +43,14 @@ void NeuroDat::ratereset()
 	int i;
 
 	for(i=0; i<maxtime; i++) {
-		srate[i] = 0;
-		srate10[i] = 0;
+		//srate[i] = 0;
+		//srate10[i] = 0;
 	}
 	for(i=0; i<10000; i++) srate100[i] = 0;
 }
 
 
-void NeuroDat::ratecalc()
+void NeuroDat::ratecalc(std::vector<int> &srate)
 {
 	short spikestep;
 	int i;
@@ -136,7 +136,7 @@ SpikeDat::SpikeDat()
 	//haz1norm.setsize(10000);
 	haz5norm.setsize(10000);
 
-	srate.setsize(100000);
+	srate1s.setsize(100000);
 	srate1.setsize(1000000);
 	srate10.setsize(100000);
 	srate100.setsize(100000);
@@ -223,7 +223,7 @@ void SpikeDat::Clear()
 		haz5[i] = 0;
 	}
 	for(i=0; i<100000; i++) {
-		srate[i] = 0;
+		srate1s[i] = 0;
 		times[i] = 0;
 		isis[i] = 0;
 	}
@@ -239,7 +239,7 @@ void SpikeDat::ReSize(int newsize)
 {
 	//srate.data.resize(newsize);
 	//srate.max = newsize;
-	srate.setsize(newsize);
+	srate1s.setsize(newsize);
 	times.resize(newsize);
 	//times.max = newsize;
 	isis.data.resize(newsize);

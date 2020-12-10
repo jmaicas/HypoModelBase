@@ -145,8 +145,8 @@ public:
 class NeuroDat{
 public:
 	std::vector<double> times;
-	std::vector<int> srate;
-	std::vector<int> srate10;
+	//std::vector<int> srate;
+	//std::vector<int> srate10;
 
 	int numselects, maxselect;
 	std::vector <burst> selectstore;  // selection store using burst type
@@ -172,7 +172,7 @@ public:
 	
 	NeuroDat();
 	~NeuroDat();
-	void ratecalc();
+	void ratecalc(std::vector<int> &srate);
 	void ratereset();
 	void diagstore(); // expand default storage for diagnostics
 };
@@ -298,7 +298,7 @@ public:
 	//datdouble haz1norm;
 	datdouble haz5norm;
 
-	datint srate;      // change to srate1s
+	datint srate1s;      // change to srate1s
 	datint srate1;
 	datint srate100;
 	datint srate10;
