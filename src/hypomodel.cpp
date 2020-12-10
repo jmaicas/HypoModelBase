@@ -303,11 +303,11 @@ HypoMain::~HypoMain()
 }
 
 
-void HypoMain::ToolLoad()
+void HypoMain::ToolLoad(Model *mod)
 {
-	if((*mod->toolflags)["burstbox"]) SpikeBox(2); 
+	if((*mod->toolflags)["burstbox"]) BurstModule(mod, 2); 
 
-	if((*mod->toolflags)["spikebox"]) SpikeBox(1); 
+	if((*mod->toolflags)["spikebox"]) BurstModule(mod, 1); 
 
 	if((*mod->toolflags)["soundbox"]) SoundModule(mod); 
 }
@@ -473,10 +473,11 @@ void HypoMain::UserMenu()
 
 	menuTools->Append(ID_Diag, "Diagnostic Box");
 	menuTools->Append(ID_Grid, "Data Grid");
-	menuTools->Append(ID_Neuro, "Neuro Box");
+	menuTools->Append(ID_Neuro, "Cell Box");
 	menuTools->Append(ID_Plot, "Plot Box");
 	menuTools->Append(ID_Sound, "Sound Box");
 	menuTools->Append(ID_Mod, "Mod Box");
+	menuTools->Append(ID_Burst, "Burst Box");
 
 
 	menuSystem->Append(ID_Options, "Options");
@@ -514,6 +515,54 @@ void HypoMain::OnEnter(wxCommandEvent& WXUNUSED(event))
 }
 
 
+//burstbox = new BurstBox(this, "Burst Analysis", wxPoint(320, 455), wxSize(330, 355), currvaso);
+
+
+void HypoMain::BurstModule(Model *model, int mode)
+{
+	int boxwidth, boxheight;
+	int modmode = mode;
+
+	//wxString tag;
+
+	//SetStatusText("Burst Box");
+	//burstdata->spikedata = vasodata->spikedat;
+	if(ostype == Mac) {
+		boxwidth = 285;
+		boxheight = 380;
+	}
+	else {
+		boxwidth = 425;
+		boxheight = 500;
+	}
+
+	diagbox->Write(text.Format("Burst box init type %d\n", modmode));
+
+
+	if(modmode == 2) burstbox = new BurstBox(model, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
+
+	if(modmode == 1) burstbox = new BurstBox(model, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
+	//mainpos = GetPosition();
+
+	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
+	burstbox->loaddata = expdata;
+
+	diagbox->Write(text.Format("BurstModule modmode %d\n", modmode));
+
+	//if(!expdata->graphs) {
+	//	SpikeModule(mod);
+	//	if(!modmode) scalebox->GraphSwitch();
+	//}
+
+	diagbox->Write(text.Format("BurstModule OK\n"));
+
+	model->modtools.AddBox(burstbox, true);
+
+	//toolset->AddBox(burstbox);
+	burstbox->Show(true);
+}
+
+
 void HypoMain::PlotModule(Model *model)
 {
 	wxSize boxsize;
@@ -543,7 +592,6 @@ void HypoMain::SoundModule(Model *model)
 	soundbox->Show(true);
 #endif
 }
-
 
 void HypoMain::OnSound(wxCommandEvent& WXUNUSED(event))
 {
@@ -873,51 +921,6 @@ void HypoMain::OnParams(wxCommandEvent& WXUNUSED(event))
 	//igfbox = new IGFBox(this, "IGF Model", wxPoint(0, 5), wxSize(320, 750), igfparams);
 	//toolset.AddBox(igfbox);
 	//igfbox->Show(true);
-}
-
-
-
-void HypoMain::SpikeBox(int modmode)
-{
-	int boxwidth, boxheight;
-
-	//wxString tag;
-
-	//SetStatusText("Burst Box");
-	//burstdata->spikedata = vasodata->spikedat;
-	if(ostype == Mac) {
-		boxwidth = 285;
-		boxheight = 380;
-	}
-	else {
-		boxwidth = 425;
-		boxheight = 500;
-	}
-
-	diagbox->Write(text.Format("Spike box init type %d\n", modmode));
-
-
-	if(modmode == 2) burstbox = new BurstBox(mod, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
-
-	if(modmode == 1) burstbox = new BurstBox(mod, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
-	//mainpos = GetPosition();
-	
-	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
-	burstbox->loaddata = expdata;
-
-	diagbox->Write(text.Format("SpikeModule modmode %d\n", modmode));
-
-	if(!expdata->graphs) {
-		SpikeModule(mod);
-		if(!modmode) scalebox->GraphSwitch();
-	}
-
-	diagbox->Write(text.Format("SpikeModule OK\n"));
-
-	mod->modtools.AddBox(burstbox, true);
-
-	//toolset->AddBox(burstbox);
-	burstbox->Show(true);
 }
 
 

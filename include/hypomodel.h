@@ -181,9 +181,10 @@ public:
 	void ViewLoad();
 	void ViewStore();
 
-	void ToolLoad();
+	void ToolLoad(Model *);
 	void SpikeModule(Model *);
-	void SpikeBox(int modmode = 0);
+	//void SpikeBox(int modmode = 0);
+	void BurstModule(Model *, int mode);
 	//void EvoSpikeModule(Model *);
 	void SoundModule(Model *);
 	void PlotModule(Model *);

@@ -902,6 +902,28 @@ GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, w
 }
 
 
+GraphDat::GraphDat(datdouble *newdat, double xf, double xt, double yf, double yt, wxString name, SpikeDat *newspikedata, double bin, int gcolour)
+{
+	xscale = 1;
+	xdis = 0;
+	negscale = 0;
+
+	type = 3;
+	spikedata = newspikedata;
+	gdatadv = newdat;
+	gparam = -4;
+
+	xfrom = xf;
+	xto = xt;
+	yfrom = yf;
+	yto = yt;
+	gname = name;
+	colour = gcolour;
+	binsize = bin;
+	Init();
+}
+
+
 GraphDat::GraphDat(datint *newdat, double xf, double xt, double yf, double yt, wxString name, SpikeDat *newspikedata, double bin, int gcolour)
 {
 	xscale = 1;

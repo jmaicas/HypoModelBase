@@ -1708,7 +1708,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 			spikestep++;
 			if(spikestep >= spikecount) break;
 		}
-		if(calcdiag) fprintf(ofp, "srate %d\n", srate1s.data[i]);
+		if(calcdiag) fprintf(ofp, "srate %.0f\n", srate1s.data[i]);
 	}
 
 	if(calcdiag) fprintf(ofp, "Rate count end  spikestep %d  spikecount %d\n", spikestep, spikecount);

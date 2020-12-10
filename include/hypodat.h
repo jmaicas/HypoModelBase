@@ -298,14 +298,14 @@ public:
 	//datdouble haz1norm;
 	datdouble haz5norm;
 
-	datint srate1s;      // change to srate1s
+	datdouble srate1s;      // change to srate1s
 	datint srate1;
 	datint srate100;
 	datint srate10;
-	datint srate10s;
-	datint srate100s;
-	datint srate30s;
-	datint srate600s;
+	datdouble srate10s;
+	datdouble srate100s;
+	datdouble srate30s;
+	datdouble srate600s;
 	datdouble synsim;
 	datdouble vasomean;
 	datdouble winfreq;
@@ -674,6 +674,7 @@ public:
 	GraphDat();
 	GraphDat(datdouble *, double, double, double, double, wxString, int type, double bin = 1, int colour = red, int xscale = 1, int xdis = 0);
 	GraphDat(datint *, double, double, double, double, wxString, int type, double bin = 1, int colour = red);
+	GraphDat(datdouble *, double, double, double, double, wxString, SpikeDat *, double bin = 1, int colour = red);
 	GraphDat(datint *, double, double, double, double, wxString, SpikeDat *, double bin = 1, int colour = red);
 
 	DiagBox *diagbox;
