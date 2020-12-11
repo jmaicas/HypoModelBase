@@ -782,7 +782,7 @@ void NeuroBox::NeuroData(bool dispupdate)
 	
 	if(burstbox) {
 		burstbox->ExpDataScan(currcell);
-		burstbox->SetExpGrid();
+		//burstbox->SetExpGrid();
 	}
 	mod->SpikeDataSwitch(currcell);
 
@@ -1031,7 +1031,7 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	int gridrows, gridcols;
 	wxBoxSizer *vdubox;
 	mod = model;
-	numgrids = 1;
+	numgrids = 0;
     
     undomode = true;
 
@@ -1043,34 +1043,50 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	delete parambox;
 
 	startshift = true;
+	notebook = NULL;
+	vdu = NULL;
+	gauge = NULL;
 
 	//InitMenu();
 	//SetModFlag(ID_FileIO, "ioflag", "IO Mode", 0); 
 
 	diagbox = mod->diagbox;
 
-	if(bookmode) notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
+	if(vdumode) {
+		vdu = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(-1, -1), wxBORDER_RAISED|wxTE_MULTILINE);
+		vdu->SetFont(confont);
+		vdu->SetForegroundColour(wxColour(0,255,0)); // set text color
+		vdu->SetBackgroundColour(wxColour(0,0,0)); // set text back color
+
+		gauge = new wxGauge(panel, wxID_ANY, 10);
+		vdubox = new wxBoxSizer(wxVERTICAL);
+		vdubox->Add(vdu, 1, wxEXPAND);
+	}
 
 	if(bookmode) {
-		textgrid[0] = new TextGrid(notebook, wxSize(gridrows, gridcols));
-		notebook->AddPage(textgrid[0], text.Format("Data %d", 0));
+		notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
+		AddGrid("Data", wxSize(gridrows, gridcols));
+		AddGrid("Output", wxSize(gridrows, gridcols));
+		//textgrid[0] = new TextGrid(notebook, wxSize(gridrows, gridcols));
+		//notebook->AddPage(textgrid[0], text.Format("Data"));
+		//textgrid[1] = new TextGrid(notebook, wxSize(gridrows, gridcols));
+		//notebook->AddPage(textgrid[1], text.Format("Output"));
 	}
-	else textgrid[0] = new TextGrid(panel, wxSize(gridrows, gridcols));
+	else AddGrid("", wxSize(gridrows, gridcols));
 
 	currgrid = textgrid[0];
-	textgrid[0]->diagbox = diagbox;
+	//textgrid[0]->diagbox = diagbox;
 
 	//for(i=0; i<gridrows; i++) textgrid->SetRowSize(i, 25);
 	//for(i=0; i<gridcols; i++) textgrid->SetColSize(i, 60);
-	textgrid[0]->SetDefaultRowSize(20, true);
-	textgrid[0]->SetDefaultColSize(60, true);
+	//textgrid[0]->SetDefaultRowSize(20, true);
+	//textgrid[0]->SetDefaultColSize(60, true);
 	//textgrid->SetRowLabelSize(80); 
-	textgrid[0]->SetRowLabelSize(50); 
+	//textgrid[0]->SetRowLabelSize(50); 
 	//textgrid[0]->vdu = NULL;
 	//textgrid[0]->gauge = NULL;
 
-	vdu = NULL;
-	gauge = NULL;
+	
 
 	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *storebox = StoreBox();
@@ -1080,22 +1096,6 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	AddButton(ID_Undo, "Undo", 40, buttonbox);
 	buttonbox->AddSpacer(2);
 	AddButton(ID_Copy, "Copy", 40, buttonbox);
-
-	if(vdumode) {
-		vdu = new wxTextCtrl(panel, wxID_ANY, "", wxDefaultPosition, wxSize(-1, -1), wxBORDER_RAISED|wxTE_MULTILINE);
-		vdu->SetFont(confont);
-		vdu->SetForegroundColour(wxColour(0,255,0)); // set text color
-		vdu->SetBackgroundColour(wxColour(0,0,0)); // set text back color
-	
-		//wxBoxSizer *statusbox = new wxBoxSizer(wxHORIZONTAL);
-		//statusbox->Add(status, 1, wxEXPAND);
-
-		gauge = new wxGauge(panel, wxID_ANY, 10);
-		vdubox = new wxBoxSizer(wxVERTICAL);
-		//displaybox->Add(vdu, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-		vdubox->Add(vdu, 1, wxEXPAND);
-		//displaybox->Add(gauge, 0, wxEXPAND);
-	}
 
 	wxBoxSizer *leftbox = new wxBoxSizer(wxVERTICAL);
 	leftbox->Add(buttonbox, 0);  
@@ -1124,9 +1124,9 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 
 	panel->Layout();
 
-	textgrid[0]->vdu = vdu;
-	textgrid[0]->gauge = gauge;
-	textgrid[0]->gridbox = this;
+	//textgrid[0]->vdu = vdu;
+	//textgrid[0]->gauge = gauge;
+	//textgrid[0]->gridbox = this;
 
 	Connect(ID_paramstore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnGridStore));
 	Connect(ID_paramload, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnGridLoad));
@@ -1151,8 +1151,11 @@ void GridBox::OnGridSelect(wxBookCtrlEvent& event) {
 void GridBox::AddGrid(wxString label, wxSize size) {
 
 	// Initialise
-	textgrid[numgrids] = new TextGrid(notebook, size);
-	notebook->AddPage(textgrid[numgrids], label);
+	if(notebook) {
+		textgrid[numgrids] = new TextGrid(notebook, size);
+		notebook->AddPage(textgrid[numgrids], label);
+	}
+	else textgrid[numgrids] = new TextGrid(panel, size);
 
 	// Set Links
 	textgrid[numgrids]->diagbox = diagbox;

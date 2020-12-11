@@ -539,13 +539,13 @@ void HypoMain::BurstModule(Model *model, int mode)
 	diagbox->Write(text.Format("Burst box init type %d\n", modmode));
 
 
-	if(modmode == 2) burstbox = new BurstBox(model, "Spike Data Load and Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected");
+	if(modmode == 2) burstbox = new BurstBox(model, "Burst Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), NULL, "Intra Burst");
 
-	if(modmode == 1) burstbox = new BurstBox(model, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), 0, "Selected", false, 0);
+	if(modmode == 1) burstbox = new BurstBox(model, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), NULL, "Selected", false, 0);
 	//mainpos = GetPosition();
 
 	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
-	burstbox->loaddata = expdata;
+	//burstbox->loaddata = expdata;
 
 	diagbox->Write(text.Format("BurstModule modmode %d\n", modmode));
 

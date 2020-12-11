@@ -444,6 +444,7 @@ public:
 
 	int burstmode;
 	bool legacymode;
+	bool modmode;
 
 	HypoMain *mainwin;
 	Model *mod;
