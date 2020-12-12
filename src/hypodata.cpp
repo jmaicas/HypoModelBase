@@ -1047,6 +1047,14 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	vdu = NULL;
 	gauge = NULL;
 
+	textdata.resize(1000);
+	//textdatagrid.max = 1000;
+	textdatagrid.grow = 10;
+
+	numdata.resize(10000);
+	//numdatagrid.max = 10000;
+	numdatagrid.grow = 100;
+
 	//InitMenu();
 	//SetModFlag(ID_FileIO, "ioflag", "IO Mode", 0); 
 
@@ -1332,9 +1340,19 @@ void GridBox::OnGridLoad(wxCommandEvent& event)
 	if(undomode) currgrid->CopyUndo();
 	//GridLoad();
 	//int ioflag = (*modflags)["ioflag"];
-	int ioflag = true;
-	if(ioflag) GridLoadFast();
-	else GridLoad();
+
+	/*
+	GridLoad *gridload = new GridLoad(this);  
+	gridload->Create();
+	gridload->Run();
+	gridload->Wait();
+	delete gridload;
+	*/
+
+	//int ioflag = true;
+	//if(ioflag) GridLoadFast();
+	//else GridLoad();
+	GridLoadFast();
 
 	//textgrid->AutoSizeColumns(false);
 }
@@ -1452,13 +1470,14 @@ void GridBox::GridStore()
 	ofp.Close();
 }
 
-
+/*
 void GridBox::GridLoad()            // Replaced by GridLoadFast()
 {
 	TextFile ifp;
-	int row, col;
+	int i, row, col;
 	long numdat;
-	wxString text, filetag, filename, filepath, cell;
+	double cellnum;
+	wxString text, filetag, filename, filepath, celldata;
 	wxString datstring;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, sfilename;
@@ -1468,12 +1487,7 @@ void GridBox::GridLoad()            // Replaced by GridLoadFast()
 	filetag = paramstoretag->GetValue();
 	filename = filepath + "/" + filetag + "-grid.txt";
 
-	/*
-	filename = filetag + "-grid.txt";
-	if(!ifp.Open(filename)) {
-	paramstoretag->SetValue("Not found");
-	return;
-	}*/
+	
 
 	sfilename = filename.ToStdString();
 	ifstream infile(sfilename.c_str());
@@ -1518,8 +1532,9 @@ void GridBox::GridLoad()            // Replaced by GridLoadFast()
 		readline = readline.AfterFirst(' ');
 
 		readline.Trim();
-		cell = readline;
-		currgrid->SetCell(row, col, cell);
+		celldata = readline;
+
+		currgrid->SetCell(row, col, celldata);
 		cellcount++;
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		//readline = ifp.ReadLine();
@@ -1528,10 +1543,236 @@ void GridBox::GridLoad()            // Replaced by GridLoadFast()
 		if(gauge) gauge->SetValue(100 * linecount / numlines);
 	}
 	infile.close();
+
 	diagbox->Write("OK\n");
 	//WriteVDU("OK\n");
 	WriteVDU(text.Format("OK, %d cells\n", cellcount));
 	if(gauge) gauge->SetValue(0);
+}
+*/
+
+
+void GridBox::SetNumCell(int row, int col, double data)
+{
+	if(numdatagrid.count == numdata.size()) numdata.resize(numdata.size() + numdatagrid.grow);
+	if(row > numdatagrid.rowmax) numdatagrid.rowmax = row;
+	if(col > numdatagrid.colmax) numdatagrid.colmax = col;
+
+	numdata[numdatagrid.count].row = row;
+	numdata[numdatagrid.count].col = col;
+	numdata[numdatagrid.count].data = data;
+
+	numdatagrid.count++;
+}
+
+
+void GridBox::SetTextCell(int row, int col, wxString data)
+{
+	if(textdatagrid.count == textdata.size()) textdata.resize(textdata.size() + textdatagrid.grow);
+	if(row > textdatagrid.rowmax) textdatagrid.rowmax = row;
+	if(col > textdatagrid.colmax) textdatagrid.colmax = col;
+
+	textdata[textdatagrid.count].row = row;
+	textdata[textdatagrid.count].col = col;
+	textdata[textdatagrid.count].data = data;
+
+	textdatagrid.count++;
+}
+
+
+
+GridLoad::GridLoad(GridBox *gbox)
+	: wxThread(wxTHREAD_JOINABLE)
+{
+	gridbox = gbox;
+}
+
+
+void *GridLoad::Entry()
+{
+	wxString text;
+	TextFile ifp;
+	int i;
+	int row, col, width;
+	long numdat;
+	double cellnum;
+	wxString filetag, filepath, filename, celldata;
+	wxString datstring, readline;
+	wxColour redpen("#dd0000"), blackpen("#000000");
+	string line, sfilename;
+	int numlines, linecount, cellcount;
+
+
+	filepath = gridbox->mod->GetPath() + "/Grids";
+	filetag = gridbox->paramstoretag->GetValue();
+	filename = filepath + "/" + filetag + "-grid.txt";
+
+	if(!ifp.Exists(filename)) {
+		filename = filetag + "-grid.txt";            // Backwards compatibility, try old grid file location
+		if(!ifp.Exists(filename)) {
+			gridbox->paramstoretag->SetValue("Not found");
+			return NULL;
+		}
+	}
+	sfilename = filename.ToStdString();
+	ifstream readfile(sfilename.c_str());
+
+	// Param file history
+	short tagpos = gridbox->paramstoretag->FindString(filetag);
+	if(tagpos != wxNOT_FOUND) gridbox->paramstoretag->Delete(tagpos);
+	gridbox->paramstoretag->Insert(filetag, 0);
+
+	gridbox->redtag = "";
+	gridbox->paramstoretag->SetForegroundColour(blackpen);
+	gridbox->paramstoretag->SetValue("");
+	gridbox->paramstoretag->SetValue(filetag);
+
+	gridbox->currgrid->ClearGrid();
+	gridbox->textdatagrid.Clear();
+	gridbox->numdatagrid.Clear();
+
+	gridbox->WriteVDU("Reading file...");
+
+	numlines = count(istreambuf_iterator<char>(readfile), istreambuf_iterator<char>(), '\n');
+	if(!numlines) {
+		gridbox->WriteVDU("File empty\n");
+		return NULL;
+	}
+	readfile.clear();
+	//readfile.seekg(0, ios::beg);
+	linecount = 0;
+
+	//string filetext = (ReadFile(filename.c_str()));
+	//istringstream filetext(ReadFile(filename.c_str()));
+
+	//ifstream infile(filename, std::ios::in | std::ios::binary);
+
+	/*
+	string contents;
+	readfile.seekg(0, ios::end);
+	contents.resize(readfile.tellg());
+	readfile.seekg(0, ios::beg);
+	readfile.read(&contents[0], contents.size());
+	readfile.close();
+	istringstream infile(contents);
+	*/
+
+	string contents;
+	readfile.seekg(0, readfile.end);
+	contents.resize(readfile.tellg());
+	readfile.seekg(0, readfile.beg);
+	readfile.read(&contents[0], contents.size());
+	readfile.close();
+	istringstream infile(contents);
+
+	/*
+	diagbox->Write("Contents codes:\n");
+	for(i=0; i<contents.length(); i++) {
+	diagbox->Write(text.Format("%d ", contents[i]));
+	if(contents[i] == '\n') diagbox->Write("\n");
+	}
+	diagbox->Write("EOF Contents\n");
+
+	diagbox->Write(text.Format("File length %d size %d numlines %d :\n%s\n", (int)contents.length(), (int)contents.size(), numlines, contents));
+	*/
+
+	cellcount = 0;
+
+	//readline = ifp.ReadLine();
+	while(getline(infile, line)) {
+		//diagbox->Write(text.Format(" line length %d first %d\n", (int)line.length(), (char)line[0]));
+		wxString readline(line);
+		/*
+		diagbox->Write("Line codes:");
+		for(i=0; i<readline.Len(); i++) diagbox->Write(text.Format("%d ", readline[i]));
+		diagbox->Write("\n");
+		*/
+		//readline.Trim(false);
+		//readline.Trim();
+		//diagbox->Write("readline " + readline);
+		if(readline.IsEmpty() || !readline[0]) break;
+		//else diagbox->Write(text.Format(" length %d ", (int)readline.Len()));
+		//diagbox->Write(readline + "\n");
+		datstring = readline.BeforeFirst(' ');
+		datstring.ToLong(&numdat);
+		row = numdat;
+		readline = readline.AfterFirst(' ');
+
+		datstring = readline.BeforeFirst(' ');
+		datstring.ToLong(&numdat);
+		col = numdat;
+		readline = readline.AfterFirst(' ');
+
+		readline.Trim();
+		celldata = readline;
+
+		if(celldata.ToDouble(&cellnum)) gridbox->SetNumCell(row, col, cellnum);
+		else gridbox->SetTextCell(row, col, celldata);
+
+		//currgrid->SetCell(row, col, celldata);
+
+		//diagbox->Write(text.Format(" setcell %d %d %s\n", row, col, cell));
+		cellcount++;
+		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
+		//readline = ifp.ReadLine();
+		//diagbox->Write("Read " + readline + "\n");
+		linecount++;
+		//if(gauge && (linecount % (numlines / 10)) == 0) {
+		//	//diagbox->Write(text.Format("Gauge %d%%\n", 100 * linecount / numlines));
+		//	gauge->SetValue(100 * linecount / numlines);
+		//}
+		if(gridbox->gauge) gridbox->gauge->SetValue(100 * linecount / numlines);
+	}
+
+
+	// Transfer cell data to display grid
+
+
+	int numrows, rowmax;
+	int numcols, colmax;
+
+	rowmax = gridbox->numdatagrid.rowmax;
+	if(gridbox->textdatagrid.rowmax > rowmax) rowmax = gridbox->textdatagrid.rowmax;
+	colmax = gridbox->numdatagrid.colmax;
+	if(gridbox->textdatagrid.colmax > colmax) colmax = gridbox->textdatagrid.colmax;
+
+	//if(gauge) gauge->SetValue(100);
+	//diagbox->Write(text.Format("\nlinecount %d  numlines %d\n", linecount, numlines));
+
+	numrows = gridbox->currgrid->GetNumberRows();
+	numcols = gridbox->currgrid->GetNumberCols();
+	if(rowmax > numrows) gridbox->currgrid->AppendRows(rowmax - numrows);
+	if(colmax > numcols) gridbox->currgrid->AppendCols(colmax - numcols);
+
+	int numcount, textcount;
+	numcount = gridbox->numdatagrid.count;
+	textcount =	gridbox->textdatagrid.count;
+
+	for(i=0; i<numcount; i++) gridbox->currgrid->SetCell(gridbox->numdata[i].row, gridbox->numdata[i].col, text.Format("%.6f", gridbox->numdata[i].data));
+	for(i=0; i<textcount; i++) gridbox->currgrid->SetCell(gridbox->textdata[i].row, gridbox->textdata[i].col, gridbox->textdata[i].data);
+
+
+	//infile.close();
+	//diagbox->Write("OK\n");
+	//WriteVDU(text.Format("OK, %d grid cells\n", cellcount));
+	gridbox->WriteVDU("OK\n");
+	if(gridbox->gauge) gridbox->gauge->SetValue(0);
+
+	if(!ifp.Open(filetag + "-gridsize.txt")) return NULL;
+
+	readline = ifp.ReadLine();
+	while(!readline.IsEmpty()) {
+		col = ParseLong(&readline, 'l');
+		width = ParseLong(&readline, 0);
+		//WriteVDU(text.Format("col %d %d\n", col, width));
+		gridbox->currgrid->SetColSize(col, width);
+		if(ifp.End()) break;
+		readline = ifp.ReadLine();
+	}
+
+	ifp.Close();
+
+	return NULL;
 }
 
 
@@ -1540,7 +1781,8 @@ void GridBox::GridLoadFast()
 	TextFile ifp;
 	int row, col, width;
 	long numdat;
-	wxString text, filetag, filepath, filename, cell;
+	double cellnum;
+	wxString text, filetag, filepath, filename, celldata;
 	wxString datstring, readline;
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, sfilename;
@@ -1572,6 +1814,8 @@ void GridBox::GridLoadFast()
 	paramstoretag->SetValue(filetag);
 
 	currgrid->ClearGrid();
+	textdatagrid.Clear();
+	numdatagrid.Clear();
 
 	WriteVDU("Reading file...");
 
@@ -1646,16 +1890,52 @@ void GridBox::GridLoadFast()
 		readline = readline.AfterFirst(' ');
 
 		readline.Trim();
-		cell = readline;
-		currgrid->SetCell(row, col, cell);
+		celldata = readline;
+
+		if(celldata.ToDouble(&cellnum)) SetNumCell(row, col, cellnum);
+		else SetTextCell(row, col, celldata);
+
+		//currgrid->SetCell(row, col, celldata);
+
 		//diagbox->Write(text.Format(" setcell %d %d %s\n", row, col, cell));
 		cellcount++;
 		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
 		//readline = ifp.ReadLine();
 		//diagbox->Write("Read " + readline + "\n");
 		linecount++;
-		if(gauge) gauge->SetValue(100 * linecount / numlines);
+		//if(gauge && (linecount % (numlines / 10)) == 0) {
+		//	//diagbox->Write(text.Format("Gauge %d%%\n", 100 * linecount / numlines));
+		//	gauge->SetValue(100 * linecount / numlines);
+		//}
+		gauge->SetValue(100 * linecount / numlines);
 	}
+
+
+	// Transfer cell data to display grid
+
+	
+	int numrows, rowmax;
+	int numcols, colmax;
+
+	rowmax = numdatagrid.rowmax;
+	if(textdatagrid.rowmax > rowmax) rowmax = textdatagrid.rowmax;
+	colmax = numdatagrid.colmax;
+	if(textdatagrid.colmax > colmax) colmax = textdatagrid.colmax;
+
+	if(gauge) gauge->SetValue(100);
+	diagbox->Write(text.Format("\nlinecount %d  numlines %d\n", linecount, numlines));
+
+	numrows = currgrid->GetNumberRows();
+	numcols = currgrid->GetNumberCols();
+	if(rowmax > numrows) currgrid->AppendRows(rowmax - numrows);
+	if(colmax > numcols) currgrid->AppendCols(colmax - numcols);
+
+	
+
+	for(i=0; i<numdatagrid.count; i++) currgrid->SetCell(numdata[i].row, numdata[i].col, text.Format("%.6f", numdata[i].data));
+	for(i=0; i<textdatagrid.count; i++) currgrid->SetCell(textdata[i].row, textdata[i].col, textdata[i].data);
+	
+
 	//infile.close();
 	//diagbox->Write("OK\n");
 	//WriteVDU(text.Format("OK, %d grid cells\n", cellcount));

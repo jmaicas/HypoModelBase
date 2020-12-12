@@ -1375,6 +1375,7 @@ void SpikeDat::neurocalcBasic(NeuroDat *datneuron, ParamStore *calcparams)
 
 	spikestep = 0;
 	srate1s.max = (int)(times[spikecount-1]/1000 + 0.5); 
+	srate1s.maxindex = srate1s.max;
 	for(i=0; i<times[spikecount-1]/1000; i++) {	     // spike rate count (1s)
 		if(calcdiag) fprintf(ofp, "%ds. ", i);
 		if(spikestep > spikecount) {
@@ -1696,6 +1697,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 
 	spikestep = 0;
 	srate1s.max = (int)(times[spikecount-1]/1000 + 0.5); 
+	srate1s.maxindex = srate1s.max;
 	for(i=0; i<times[spikecount-1]/1000; i++) {	     // spike rate count (1s)
 		if(calcdiag) fprintf(ofp, "%ds. ", i);
 		if(spikestep > spikecount) {
@@ -1811,6 +1813,10 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		hist5norm[i] = normscale * hist5[i] / isicount;
 		haz5norm[i] = haz5[i] * haznorm;
 	}
+
+	hist1norm.max = hist1.max;
+	hist5norm.max = hist5.max;
+
 
 
 	// Index of Dispersion Code

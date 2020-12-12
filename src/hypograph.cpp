@@ -638,7 +638,8 @@ void GraphWindow3::UpdateScroll(int pos)
 
 	graph = dispset[0]->plot[0];
 	if(graph->gparam == -3) max = graph->gdatav->max / graph->xscale;
-	else if(graph->gparam == -4) max = graph->gdatadv->maxindex / graph->xscale;
+	//else if(graph->gparam == -4) max = graph->gdatadv->maxindex / graph->xscale;
+	else if(graph->gparam == -4) max = graph->gdatadv->max / graph->xscale;
 	else {
 		mod->diagbox->Write("plot " + graph->gname + " no data\n");
 		return;

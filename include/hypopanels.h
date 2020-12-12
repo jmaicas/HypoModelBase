@@ -292,6 +292,56 @@ public:
 };
 
 
+class GridNumDat
+{
+public:
+	int row;
+	int col;
+	double data;
+};
+
+
+class GridTextDat
+{
+public:
+	int row;
+	int col;
+	wxString data;
+};
+
+
+class DataGrid
+{
+public:
+	int count;
+	int grow;      // expansion step for increasing storage
+	int rowmax;
+	int colmax;
+
+	DataGrid() {
+		count = 0;
+		rowmax = 0;
+		colmax = 0;
+	};
+
+	void Clear() {
+		count = 0;
+		rowmax = 0;
+		colmax = 0;
+	}
+};
+
+
+class GridLoad : public wxThread
+{
+public:
+	GridBox *gridbox;
+
+	GridLoad(GridBox *gridbox);
+	virtual void *Entry();
+};
+
+
 class GridBox: public ParamBox
 {
 public:
@@ -312,12 +362,23 @@ public:
 	NeuroBox *neurobox;
 	vector<NeuroDat>* celldata;
 
+	vector<GridNumDat> numdata;
+	DataGrid numdatagrid;
+
+	vector<GridTextDat> textdata;
+	DataGrid textdatagrid;
+
+	//int numdatamax, textdatamax;
+	//int numdatacount, textdatacount;
+	//int numdatagrow, textdatagrow;    // expansion step for increasing storage
+	//int numdatarowmax, textdatarowmax
+
 	GridBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true, bool vdumode=true);
 
 	virtual void GridDefault();
 	virtual void TestGrid();
 	void GridStore();
-	void GridLoad();
+	//void GridLoad();
 	void GridLoadFast();
 	void HistLoad();
 	void HistStore();
@@ -347,6 +408,9 @@ public:
 
 	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);
+
+	void SetNumCell(int row, int col, double data);
+	void SetTextCell(int row, int col, wxString data);
 
 	//void OnNeuro(wxCommandEvent& event);
 };
