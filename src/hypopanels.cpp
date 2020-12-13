@@ -802,7 +802,6 @@ void ParamBox::CopyParams(ParamStore *params)
 }
 
 
-
 void ParamBox::SetVBox(int num)
 {
 	int i;
@@ -819,7 +818,6 @@ void ParamBox::SetStatus(wxString text)
 	//status = NULL;
 
 	if(status != NULL) status->SetLabel(text);
-
 }
 
 
