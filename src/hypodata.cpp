@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-using namespace std;
+//using namespace std;
 
 #include <fcntl.h>
 //#include <unistd.h>
@@ -775,19 +775,20 @@ void NeuroBox::NeuroData(bool dispupdate)
 	//currcell->neurocalc(&((*cells)[neuroindex]));
 	currcell->neurocalc(&(*cells)[neuroindex]);
 	currcell->id = neuroindex;
+	currcell->name = (*cells)[neuroindex].name;
 
     #ifdef HYPOSOUND
     if(mainwin->soundbox) mainwin->soundbox->DataLink(currcell);
     #endif
+
+	currcell->SelectSpikes();
+	AnalyseSelection();
 	
 	if(burstbox) {
 		burstbox->ExpDataScan(currcell);
 		//burstbox->SetExpGrid();
 	}
-	mod->SpikeDataSwitch(currcell);
-
-	currcell->SelectSpikes();
-	AnalyseSelection();
+	mod->SpikeDataSwitch(currcell);   // Switch evo fitting data source
 
 	if(dispupdate) {
 		PanelData();
@@ -797,8 +798,10 @@ void NeuroBox::NeuroData(bool dispupdate)
 	SetCheck(filtercheck, (*cells)[neuroindex].filter);
 
 	diagbox->Write(text.Format("NeuroData cell %d gridcol %d\n", neuroindex, (*cells)[neuroindex].gridcol));
-	gridbox->currgrid->SelectCol((*cells)[neuroindex].gridcol);
-	gridbox->currgrid->MakeCellVisible(0, (*cells)[neuroindex].gridcol);
+	gridbox->textgrid[0]->SelectCol((*cells)[neuroindex].gridcol);
+	gridbox->textgrid[0]->MakeCellVisible(0, (*cells)[neuroindex].gridcol);
+
+	//mod->DataOutput();
 }
 
 
@@ -1787,6 +1790,8 @@ void GridBox::GridLoadFast()
 	wxColour redpen("#dd0000"), blackpen("#000000");
 	string line, sfilename;
 	int numlines, linecount, cellcount;
+	int numrows, rowmax;
+	int numcols, colmax;
 
 
 	filepath = mod->GetPath() + "/Grids";
@@ -1833,16 +1838,6 @@ void GridBox::GridLoadFast()
 
 	//ifstream infile(filename, std::ios::in | std::ios::binary);
 
-	/*
-	string contents;
-	readfile.seekg(0, ios::end);
-	contents.resize(readfile.tellg());
-	readfile.seekg(0, ios::beg);
-	readfile.read(&contents[0], contents.size());
-	readfile.close();
-	istringstream infile(contents);
-	*/
-
 	string contents;
 	readfile.seekg(0, readfile.end);
 	contents.resize(readfile.tellg());
@@ -1868,17 +1863,9 @@ void GridBox::GridLoadFast()
 	while(getline(infile, line)) {
 		//diagbox->Write(text.Format(" line length %d first %d\n", (int)line.length(), (char)line[0]));
 		wxString readline(line);
-		/*
-		diagbox->Write("Line codes:");
-		for(i=0; i<readline.Len(); i++) diagbox->Write(text.Format("%d ", readline[i]));
-		diagbox->Write("\n");
-		*/
-		//readline.Trim(false);
-		//readline.Trim();
-		//diagbox->Write("readline " + readline);
+		
 		if(readline.IsEmpty() || !readline[0]) break;
-		//else diagbox->Write(text.Format(" length %d ", (int)readline.Len()));
-		//diagbox->Write(readline + "\n");
+
 		datstring = readline.BeforeFirst(' ');
 		datstring.ToLong(&numdat);
 		row = numdat;
@@ -1892,48 +1879,41 @@ void GridBox::GridLoadFast()
 		readline.Trim();
 		celldata = readline;
 
-		if(celldata.ToDouble(&cellnum)) SetNumCell(row, col, cellnum);
-		else SetTextCell(row, col, celldata);
-
-		//currgrid->SetCell(row, col, celldata);
+		if(ostype != Mac) {
+			if(celldata.ToDouble(&cellnum)) SetNumCell(row, col, cellnum);
+			else SetTextCell(row, col, celldata);
+		}
+		else currgrid->SetCell(row, col, celldata);
 
 		//diagbox->Write(text.Format(" setcell %d %d %s\n", row, col, cell));
 		cellcount++;
-		//diagbox->Write(text.Format("Load R %d C %d String %s\n", row, col, cell));
-		//readline = ifp.ReadLine();
-		//diagbox->Write("Read " + readline + "\n");
+		
 		linecount++;
 		//if(gauge && (linecount % (numlines / 10)) == 0) {
 		//	//diagbox->Write(text.Format("Gauge %d%%\n", 100 * linecount / numlines));
 		//	gauge->SetValue(100 * linecount / numlines);
 		//}
-		gauge->SetValue(100 * linecount / numlines);
+		if(gauge) gauge->SetValue(100 * linecount / numlines);
 	}
 
 
 	// Transfer cell data to display grid
 
 	
-	int numrows, rowmax;
-	int numcols, colmax;
+	if(ostype != Mac) {
+		rowmax = numdatagrid.rowmax;
+		if(textdatagrid.rowmax > rowmax) rowmax = textdatagrid.rowmax;
+		colmax = numdatagrid.colmax;
+		if(textdatagrid.colmax > colmax) colmax = textdatagrid.colmax;
 
-	rowmax = numdatagrid.rowmax;
-	if(textdatagrid.rowmax > rowmax) rowmax = textdatagrid.rowmax;
-	colmax = numdatagrid.colmax;
-	if(textdatagrid.colmax > colmax) colmax = textdatagrid.colmax;
+		numrows = currgrid->GetNumberRows();
+		numcols = currgrid->GetNumberCols();
+		if(rowmax > numrows) currgrid->AppendRows(rowmax - numrows);
+		if(colmax > numcols) currgrid->AppendCols(colmax - numcols);
 
-	if(gauge) gauge->SetValue(100);
-	diagbox->Write(text.Format("\nlinecount %d  numlines %d\n", linecount, numlines));
-
-	numrows = currgrid->GetNumberRows();
-	numcols = currgrid->GetNumberCols();
-	if(rowmax > numrows) currgrid->AppendRows(rowmax - numrows);
-	if(colmax > numcols) currgrid->AppendCols(colmax - numcols);
-
-	
-
-	for(i=0; i<numdatagrid.count; i++) currgrid->SetCell(numdata[i].row, numdata[i].col, text.Format("%.6f", numdata[i].data));
-	for(i=0; i<textdatagrid.count; i++) currgrid->SetCell(textdata[i].row, textdata[i].col, textdata[i].data);
+		for(i=0; i<numdatagrid.count; i++) currgrid->SetCell(numdata[i].row, numdata[i].col, text.Format("%.6f", numdata[i].data));
+		for(i=0; i<textdatagrid.count; i++) currgrid->SetCell(textdata[i].row, textdata[i].col, textdata[i].data);
+	}
 	
 
 	//infile.close();

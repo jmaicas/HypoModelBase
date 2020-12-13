@@ -381,7 +381,7 @@ void InfoBox::OnDatLoad(wxCommandEvent& event)
 // BurstBox - now used as general spike time data loading and analysis box - December 2020 return to more specific with grid based data loading
 
 BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode, int mode)
-	: ToolBox(model->mainwin, "BurstBox", title, pos, size)
+	: ToolBox(model->mainwin, "burstbox", title, pos, size)
 {
 	int numwidth = 50;
 	int gridwidth = 65;
@@ -695,6 +695,8 @@ void BurstBox::ExpDataScan(SpikeDat *data)
 	if(data != NULL) loaddata = data;
 	if(!loaddata) return;
 
+	diagbox->Write("ExpDataScan call\n");
+
 	loaddata->BurstScan(this);
 	if(loaddata->burstdata->numbursts > 0) loaddata->BurstProfile();
 	BurstDataDisp(loaddata, datburst);
@@ -742,7 +744,10 @@ void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 {
 	BurstScan();
 	mod->BurstUpdate();
-	if(loaddata) loaddata->ColourSwitch(dispburst);
+	if(loaddata) {
+		loaddata->ColourSwitch(dispburst);
+		mainwin->scalebox->ratedata = dispburst;
+	}
 	//Store();
 }
 
@@ -994,9 +999,12 @@ void BurstBox::OnDatOutput(wxCommandEvent& event)
 {
 	wxString outdir = mainwin->outpath + "/output";
 
+	filetag = loaddata->name;
 	loaddata->output(filetag, outdir);
-	snum.Printf("%s output", filetag);
-	datstatus->SetLabel(snum);
+	//snum.Printf("%s output", filetag);
+	//datstatus->SetLabel(snum);
+
+	mod->DataOutput();
 }
 
 /*

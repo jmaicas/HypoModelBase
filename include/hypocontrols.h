@@ -82,6 +82,9 @@ public:
 	bool compmode;
 	DiagBox *diagbox;
 
+	int linkID;
+	wxWindow *parent;
+
 	virtual void OnLeftUp(wxMouseEvent & event);
 	virtual void OnLeftDClick(wxMouseEvent & event);
 

@@ -2,6 +2,7 @@
 //#include "hypomodel.h"
 #include "hyposound.h"
 #include "hypograph.h"
+#include "hypodata.h"
 
 #include "SineWave.h"
 #include "Noise.h"
@@ -16,7 +17,7 @@ using namespace stk;
 #ifdef HYPOSOUND
 
 SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat)
-	: ParamBox(model, title, pos, size)
+	: ParamBox(model, title, pos, size, "soundbox")
 {
 	int i;
 	short stype;

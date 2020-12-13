@@ -1209,9 +1209,9 @@ void SpikeDat::output(wxString filetag, wxString path)
 		outfile.WriteLine(text.Format("%d  %d", i, srate1.data[i]));
 	outfile.Close();
 
-	outfile.New(filename.Format(path + "%s-srate.txt", filetag));
+	outfile.New(filename.Format(path + "%s-srate1s.txt", filetag));
 	for(i=0; i<=10000; i++)   
-		outfile.WriteLine(text.Format("%d  %d", i, srate1s.data[i]));
+		outfile.WriteLine(text.Format("%d  %.0f", i, srate1s.data[i]));
 	outfile.Close();
 
 	outfile.New(filename.Format(path + "%s-times.txt", filetag));

@@ -14,6 +14,7 @@
 #include "hypopanels.h"
 #include "hypomods.h"
 #include "hypodat.h"
+#include "hypodata.h"
 //#include <hypodef.h>
 #include "wx/generic/printps.h"
 #include "wx/generic/prntdlgg.h"

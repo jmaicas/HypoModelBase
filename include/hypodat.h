@@ -338,7 +338,8 @@ public:
 	//int index[100000];
 	int maxtime;
 	int maxspikes;
-	char name[100];
+	//char name[100];
+	wxString name;
 	double start;
 	double freq;              // mean frequency of detected spikes
 	double spikefreq;         // mean frequency over run time

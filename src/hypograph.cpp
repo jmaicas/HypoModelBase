@@ -862,6 +862,8 @@ void GraphWindow3::ReSize(int newxplot, int newyplot)
 	scrollbar->Move(30, yplot + 35);
 	//Layout();
 
+	UpdateScroll();
+
 	overlay.Reset();
 	Refresh();
 }

@@ -5,6 +5,7 @@
 #include "hypotools.h"
 #include <hypopanels.h>
 #include "hypodef.h"
+#include "hypodata.h"
 
 
 

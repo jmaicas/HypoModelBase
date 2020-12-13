@@ -244,6 +244,7 @@ enum {
 	ID_inputgen,
 	ID_Input,
 	ID_data,
+	ID_disp,
 	ID_intern,
 	ID_dendmode,
 	ID_inputramp,

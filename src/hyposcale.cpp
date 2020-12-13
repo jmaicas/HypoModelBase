@@ -892,19 +892,20 @@ void ScaleBox::OnXZoomOut(wxCommandEvent& event)
 }
 
 
-wxButton *ScaleBox::ScaleButton(int id, wxString label, int width, wxBoxSizer *box, int point)
+ToolButton *ScaleBox::ScaleButton(int id, wxString label, int width, wxBoxSizer *box, int point)
 {
     confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
 	//confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
     if(ostype == Mac) confont = wxFont(wxFontInfo(point).FaceName("Tahoma"));
-	wxButton *button = new wxButton(this, id, label, wxDefaultPosition, wxSize(width, buttonheight), 0);
+	ToolButton *button = new ToolButton(this, id, label, wxDefaultPosition, wxSize(width, buttonheight), mainwin->diagbox);
 	button->SetFont(confont);
 	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
 	return button;
 }
 
+
 // type encodes number of states, defaults to 1 (two states 0 and 1)
-wxButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label, int width, wxBoxSizer *box, int type, int point)
+ToolButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label, int width, wxBoxSizer *box, int type, int point)
 {
 	(*gflags)[tag] = state;
 	gflagrefs->AddRef(id, tag, type);
@@ -920,14 +921,17 @@ void ScaleBox::OnGraphButton(wxCommandEvent& event)
 	int id = event.GetId();
 	wxString tag = gflagrefs->GetRef(id);
 	int type = gflagrefs->GetType(id);
+	int mode = event.GetInt();
 
-	if((*gflags)[tag] == type) (*gflags)[tag] = 0;
+	// 'mode' is used for linked button commands, mode=0 default normal behaviour, mode=1 switches off 
+
+	if(mode == 1 || (*gflags)[tag] == type) (*gflags)[tag] = 0;
 	else (*gflags)[tag]++;                          // new code for multi-state cycling buttons, i.e. all/burst/select, 'type' encodes number of states
 	
 	//if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
 	//else (*gflags)[tag] = 0;
 
-	mainwin->diagbox->Write(text.Format("\ngraphbutton %s %.0f type %d\n", tag, (*gflags)[tag], type));
+	mainwin->diagbox->Write(text.Format("\ngraphbutton %s %.0f  type %d  mode %d\n", tag, (*gflags)[tag], type, mode));
 
 	GraphSwitch();
 }
@@ -1174,7 +1178,9 @@ void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 	graph = gpos[0].plot[0]; 
 
 	//if((*gflags)[tag] == type) (*gflags)[tag] = 0;
-	//else (*gflags)[tag]++;   
+	//else (*gflags)[tag]++;  
+
+	// Used for both switching data plot (cell/model) and switching data colour mode (normal/burst/select)
 
 	if(ratedata == graph->spikedata->dispmodemax) ratedata = 0;
 	else ratedata++;

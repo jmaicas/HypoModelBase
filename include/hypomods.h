@@ -141,6 +141,7 @@ public:
 	virtual void GridColumn(int col);
     virtual void DataCopy(wxString oldpath, wxString newpath);
     virtual void OnModThreadCompletion(wxThreadEvent&);
+	virtual void DataOutput() {};
     void OnDiagWrite(wxThreadEvent&);
 };
 

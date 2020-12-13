@@ -6,14 +6,16 @@
 
 
 
-ToolButton::ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *db)
-	: wxButton(parent, id, label, pos, size)
+ToolButton::ToolButton(wxWindow *par, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *db)
+	: wxButton(par, id, label, pos, size)
 {
 	//toolbox = tbox;
 	//pinmode = 0;
 	//toolbox = NULL;
 	//mainwin = main;
 	diagbox = db;
+	parent = par;
+	linkID = 0;
 
 	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolButton::OnLeftUp));
 	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolButton::OnLeftDClick));
@@ -32,6 +34,14 @@ void ToolButton::OnLeftDClick(wxMouseEvent& event)
 void ToolButton::OnLeftUp(wxMouseEvent& event)
 {
 	//diagbox->Write("tool button click\n");
+
+	wxCommandEvent linkpress(wxEVT_COMMAND_BUTTON_CLICKED, linkID);
+	if(linkID) {
+		linkpress.SetInt(1);
+		AddPendingEvent(linkpress);
+		diagbox->Write("ToolButton linkpress\n");
+	}
+
 	event.Skip();
 }
 
