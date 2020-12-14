@@ -121,7 +121,10 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	//filterbox->Add(filtercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 
 	datneuron = new wxTextCtrl(activepanel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
-	datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+    if(ostype == Mac)
+        datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(-1, -1), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+    else
+        datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
 	datspin->SetRange(-1000000, 1000000);
 
 	wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
@@ -1097,8 +1100,6 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	//textgrid[0]->vdu = NULL;
 	//textgrid[0]->gauge = NULL;
 
-	
-
 	wxBoxSizer *controlbox = new wxBoxSizer(wxHORIZONTAL);
 	wxBoxSizer *storebox = StoreBox();
 
@@ -1201,8 +1202,11 @@ void GridBox::ParamButton()
 
 void GridBox::NeuroButton()
 {
+    int buttwidth;
+    if(ostype == Mac) buttwidth = 45;
+    else buttwidth = 40;
 	buttonbox->AddSpacer(2);
-	AddButton(ID_Neuron, "Neuro", 40, buttonbox);
+	AddButton(ID_Neuron, "Neuro", buttwidth, buttonbox);
 	Connect(ID_Neuron, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GridBox::OnNeuroScan));
 }
 
@@ -1260,7 +1264,6 @@ void GridBox::OnCellChange(wxGridEvent& event)
 }
 
 
-
 void GridBox::OnRightClick(wxMouseEvent& event)
 {
 	//int id = event.GetId();
@@ -1297,7 +1300,6 @@ void GridBox::HistLoad()
 	}
 	paramstoretag->SetValue(initparams);
 }
-
 
 
 void GridBox::TestGrid()
