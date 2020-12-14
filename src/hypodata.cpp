@@ -1334,7 +1334,8 @@ void GridBox::GridDefault()
 
 void GridBox::OnGridStore(wxCommandEvent& event)
 {
-	GridStore();
+	//GridStore();
+	GridStoreAll();
 }
 
 
@@ -1355,7 +1356,7 @@ void GridBox::OnGridLoad(wxCommandEvent& event)
 	//int ioflag = true;
 	//if(ioflag) GridLoadFast();
 	//else GridLoad();
-	GridLoadFast();
+	GridLoadAll();
 
 	//textgrid->AutoSizeColumns(false);
 }
@@ -1388,6 +1389,92 @@ int GridBox::ColumnData(int col, datdouble *data)
 		(*data)[row] = value;
 	}
 	return count;
+}
+
+
+void GridBox::GridStoreAll()
+{
+	TextFile ofp;
+	int gridindex, row, col;
+	wxString celltext, text, filename, filetag, filepath;
+	wxColour redpen("#dd0000"), blackpen("#000000");
+	string line, sfilename;
+	std::vector <Index> columnindex;  // stores list of columns (by index) containing data
+	int storeversion = 1;   //  initial multi grid store 14/12/20
+
+	columnindex.resize(numgrids);
+
+	filepath = mod->GetPath() + "/Grids";
+	if(!wxDirExists(filepath)) wxMkdir(filepath);
+
+	filetag = paramstoretag->GetValue();
+	filename = filepath + "/" + filetag + "-grid.txt";
+
+	short tagpos = paramstoretag->FindString(filetag);
+	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
+	paramstoretag->Insert(filetag, 0);
+
+	if(ofp.Exists(filename) && redtag != filetag) {
+		paramstoretag->SetForegroundColour(redpen);
+		paramstoretag->SetValue("");
+		paramstoretag->SetValue(filetag);
+		redtag = filetag;
+		return;
+	}
+
+	redtag = "";
+	paramstoretag->SetForegroundColour(blackpen);
+	paramstoretag->SetValue("");
+	paramstoretag->SetValue(filetag);
+
+	sfilename = filename.ToStdString();
+	ofstream outfile(sfilename.c_str());
+
+	if(!outfile.is_open()) {
+		paramstoretag->SetValue("File error");
+		return;
+	}
+
+	WriteVDU("Writing file...");
+
+	text.Printf("gsv %d\n", storeversion);
+	outfile << text.ToStdString();
+	text.Printf("num %d\n", numgrids);
+	outfile << text.ToStdString();
+
+	for(gridindex=0; gridindex<numgrids; gridindex++) {
+		text.Printf("g %d r %d c %d\n", gridindex, textgrid[gridindex]->GetNumberRows(), textgrid[gridindex]->GetNumberCols());
+		outfile << text.ToStdString();
+	}
+
+	for(gridindex=0; gridindex<numgrids; gridindex++) {
+		for(row=0; row<textgrid[gridindex]->GetNumberRows(); row++) {
+			if(gauge) gauge->SetValue(100 * (row + 1) / textgrid[gridindex]->GetNumberRows());
+			for(col=0; col<textgrid[gridindex]->GetNumberCols(); col++) {
+				celltext = textgrid[gridindex]->GetCellValue(row, col);
+				celltext.Trim();                                                                     
+				if(!celltext.IsEmpty()) {
+					text.Printf("%d %d %d %s\n", gridindex, row, col, celltext);
+					columnindex[gridindex].Add(col);
+					outfile << text.ToStdString();
+				}
+			}
+		}
+	}
+
+	outfile.close();
+	if(gauge) gauge->SetValue(0);
+	WriteVDU("OK\n");
+
+	filename = filepath + "/" + filetag + "-gridsize.txt";
+	ofp.New(filename);
+	for(gridindex=0; gridindex<numgrids; gridindex++) {
+		for(i=0; i<columnindex[gridindex].count; i++) {
+			col = columnindex[gridindex].list[i];
+			ofp.WriteLine(text.Format("grid %d col %d %d", gridindex, col, textgrid[gridindex]->GetColSize(col)));
+		}
+	}
+	ofp.Close();
 }
 
 
@@ -1471,6 +1558,159 @@ void GridBox::GridStore()
 		ofp.WriteLine(text.Format("col %d %d", col, currgrid->GetColSize(col)));
 	}
 	ofp.Close();
+}
+
+
+void GridBox::GridLoadAll()
+{
+	TextFile ifp;
+	int row, col, width;
+	long numdat;
+	double cellnum;
+	wxString text, filetag, filepath, filename;
+	wxString vertag, celldata;
+	wxString datstring, readline;
+	wxColour redpen("#dd0000"), blackpen("#000000");
+	string line, sfilename;
+	int numlines, linecount, cellcount;
+	int numrows, numcols;
+	int newnumgrids;
+	int storeversion = 0;
+	int gindex;  // grid index
+
+	
+	filepath = mod->GetPath() + "/Grids";
+	filetag = paramstoretag->GetValue();
+	filename = filepath + "/" + filetag + "-grid.txt";
+
+	if(!ifp.Exists(filename)) {
+		paramstoretag->SetValue("Not found");
+		return;
+	}
+	
+	sfilename = filename.ToStdString();
+	ifstream readfile(sfilename.c_str());
+
+	// Param file history
+	short tagpos = paramstoretag->FindString(filetag);
+	if(tagpos != wxNOT_FOUND) paramstoretag->Delete(tagpos);
+	paramstoretag->Insert(filetag, 0);
+
+	redtag = "";
+	paramstoretag->SetForegroundColour(blackpen);
+	paramstoretag->SetValue("");
+	paramstoretag->SetValue(filetag);
+
+	//textdatagrid.Clear();
+	//numdatagrid.Clear();
+
+	WriteVDU("Reading file header...");
+
+	numlines = count(istreambuf_iterator<char>(readfile), istreambuf_iterator<char>(), '\n');
+	if(!numlines) {
+		WriteVDU("File empty\n");
+		return;
+	}
+	readfile.clear();
+	linecount = 0;
+
+	// Read file to stream
+	string contents;
+	readfile.seekg(0, readfile.end);
+	contents.resize(readfile.tellg());
+	readfile.seekg(0, readfile.beg);
+	readfile.read(&contents[0], contents.size());
+	readfile.close();
+	istringstream infile(contents);
+
+	// Read and check file version
+	getline(infile, line);
+	readline = StringConvert(line);
+	vertag = readline.BeforeFirst(' ');
+	if(vertag != "gsv") {
+		diagbox->Write("GridLoadAll file version not found, trying old GridLoad\n");
+		GridLoad();
+		return;
+	}
+	storeversion = ParseLong(&readline, 'v');
+
+	// Read and set number of grids
+	getline(infile, line);
+	readline = StringConvert(line);
+	newnumgrids = ParseLong(&readline, 'm');
+	if(newnumgrids > numgrids) {
+		// code to add new grids
+		numgrids = newnumgrids;
+	}
+	diagbox->Write(text.Format("GridLoadAll  numgrids %d  newnumgrids %d\n", numgrids, newnumgrids));
+
+	// Read and set grid sizes
+	for(i=0; i<numgrids; i++) {
+		getline(infile, line);
+		wxString readline(line);
+		gindex = ParseLong(&readline, 'g');
+		numrows = ParseLong(&readline, 'r');
+		numcols = ParseLong(&readline, 'c');
+		if(numrows > textgrid[gindex]->GetNumberRows()) textgrid[gindex]->AppendRows(numrows - textgrid[gindex]->GetNumberRows());
+		if(numcols > textgrid[gindex]->GetNumberCols()) textgrid[gindex]->AppendRows(numcols - textgrid[gindex]->GetNumberCols());
+		textgrid[gindex]->ClearGrid();
+	}
+
+	WriteVDU("OK\n");
+
+	// Read cells
+	cellcount = 0;
+	WriteVDU("Reading file data...");
+
+	cellcount = 0;
+	while(getline(infile, line)) {
+		//diagbox->Write(text.Format(" line length %d first %d\n", (int)line.length(), (char)line[0]));
+		wxString readline(line);
+
+		if(readline.IsEmpty() || !readline[0]) break;
+
+		datstring = readline.BeforeFirst(' ');
+		datstring.ToLong(&numdat);
+		gindex = numdat;
+		readline = readline.AfterFirst(' ');
+
+		datstring = readline.BeforeFirst(' ');
+		datstring.ToLong(&numdat);
+		row = numdat;
+		readline = readline.AfterFirst(' ');
+
+		datstring = readline.BeforeFirst(' ');
+		datstring.ToLong(&numdat);
+		col = numdat;
+		readline = readline.AfterFirst(' ');
+
+		readline.Trim();
+		celldata = readline;
+		textgrid[gindex]->SetCell(row, col, celldata);
+		cellcount++;
+		linecount++;
+		if(gauge) gauge->SetValue(100 * linecount / numlines);
+	}
+
+	WriteVDU("OK\n");
+	if(gauge) gauge->SetValue(0);
+
+	// Read column sizes file
+	filename = filepath + "/" + filetag + "-gridsize.txt";
+	if(!ifp.Open(filename)) return;
+
+	readline = ifp.ReadLine();
+	while(!readline.IsEmpty()) {
+		gindex = ParseLong(&readline, 'd');
+		col = ParseLong(&readline, 'l');
+		width = ParseLong(&readline);
+		//WriteVDU(text.Format("gindex %d col %d %d\n", gindex, col, width));
+		textgrid[gindex]->SetColSize(col, width);
+		if(ifp.End()) break;
+		readline = ifp.ReadLine();
+	}
+
+	ifp.Close();
 }
 
 /*
@@ -1584,14 +1824,17 @@ void GridBox::SetTextCell(int row, int col, wxString data)
 
 
 
-GridLoad::GridLoad(GridBox *gbox)
+
+// Experimental file access thread for improving GUI performance during load     December 2020 - not currently in use
+
+GridLoadThread::GridLoadThread(GridBox *gbox)
 	: wxThread(wxTHREAD_JOINABLE)
 {
 	gridbox = gbox;
 }
 
 
-void *GridLoad::Entry()
+void *GridLoadThread::Entry()
 {
 	wxString text;
 	TextFile ifp;
@@ -1779,7 +2022,7 @@ void *GridLoad::Entry()
 }
 
 
-void GridBox::GridLoadFast()
+void GridBox::GridLoad()
 {
 	TextFile ifp;
 	int row, col, width;

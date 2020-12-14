@@ -373,6 +373,7 @@ wxString ColourString(wxColour colour, int type=0);
 long ParseLong(wxString *, wxUniChar = NULL);
 double ParseDouble(wxString *, wxUniChar);
 wxString ParseString(wxString *, wxUniChar, wxUniChar = ' ');
+wxString StringConvert(string);
 
 int GetSystem();
 

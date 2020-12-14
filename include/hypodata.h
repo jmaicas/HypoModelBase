@@ -125,12 +125,12 @@ public:
 };
 
 
-class GridLoad : public wxThread
+class GridLoadThread : public wxThread
 {
 public:
 	GridBox *gridbox;
 
-	GridLoad(GridBox *gridbox);
+	GridLoadThread(GridBox *gridbox);
 	virtual void *Entry();
 };
 
@@ -171,8 +171,10 @@ public:
 	virtual void GridDefault();
 	virtual void TestGrid();
 	void GridStore();
+	void GridStoreAll();
 	//void GridLoad();
-	void GridLoadFast();
+	void GridLoad();
+	void GridLoadAll();
 	void HistLoad();
 	void HistStore();
 

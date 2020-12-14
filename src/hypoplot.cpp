@@ -214,8 +214,8 @@ void PlotBox::OnParamLoad(wxCommandEvent& event)
 	if(synccheck->GetValue()) {
 		filetag = paramstoretag->GetValue();
 		gridbox->paramstoretag->SetValue(filetag);
-		// gridbox->GridLoad();
-		gridbox->GridLoadFast();
+		gridbox->GridLoad();
+		//gridbox->GridLoadFast();
 	}
 	ParamBox::ParamLoad();	
 

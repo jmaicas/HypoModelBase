@@ -7,6 +7,7 @@
 //#include "osmopanels.h"
 //#include "hypograph.h"
 #include <hypotools.h>
+#include <string>
 
 
  //[[NSApplication sharedApplication] activateIgnoringOtherApps : YES];
@@ -266,6 +267,12 @@ wxString ParseString(wxString *readline, wxUniChar tag, wxUniChar endtag)
 	string = readline->BeforeFirst(endtag);
 	*readline = readline->AfterFirst(' ');
 	return string;
+}
+
+
+wxString StringConvert(string text)
+{
+	return wxString(text);
 }
 
 
