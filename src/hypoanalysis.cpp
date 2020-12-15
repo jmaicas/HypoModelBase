@@ -668,7 +668,7 @@ void BurstDat::BurstScanFit()
 	double tstart, tend;
 	double stime, scheck;
 	double btime, tpoint;
-	double intracount, intratime, intravar;
+	double intracount, intravar;
 	double burstfreq;
 	double silencetime, silencevar;
 	bool scandiag;
@@ -801,7 +801,7 @@ void BurstDat::BurstScanFit()
 	meanlength = meantime / 1000;
 	meansilence = (double)silencetime / numbursts-1;
 	freq = intracount / (intratime / 1000);
-	actQ = intratime / times[numspikes-1];   // looks odd, correct?  17/9/19
+	actQ = intratime / times[numspikes-1];   // looks odd, correct?  17/9/19   I think OK  15/12/20
 	if(numbursts == 0) actQ = 1;
 
 	for(i=1; i<numbursts; i++) {
@@ -857,12 +857,14 @@ void SpikeDat::SelectScan()
 	int selecton;
 	int selectstart, selectend;
 	int selectindex;
+	double selecttime;
 	wxString text;
 
 	int *selectspikes = selectdata->spikes;
 
 	selecton = 0;
 	selectindex = 0;
+	selecttime = 0;
 
 	diagbox->Write(text.Format("SelectScan %d spikes\n", spikecount));
 
@@ -879,17 +881,21 @@ void SpikeDat::SelectScan()
 				neurodata->selectstore[selectindex].start = selectstart;
 				neurodata->selectstore[selectindex].end = i-1;
 				selecton = 0;
+				selecttime += selectdata->times[i-1] - selectdata->times[selectstart]; 
 			}
 		}
 	}
 
+	// Select at end of data
 	if(selecton) {
 		selectindex++;		
 		neurodata->selectstore[selectindex].start = selectstart;
 		neurodata->selectstore[selectindex].end = spikecount-1;
+		selecttime += selectdata->times[spikecount-1] - selectdata->times[selectstart]; 
 	}
 	
 	neurodata->numselects = selectindex;
+	selectdata->intratime = selecttime;
 
 	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numselects));
 }
@@ -1073,7 +1079,8 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	burstdata->meanlength = burstdata->meantime / 1000;
 	burstdata->meansilence = (double)silencetime / burstdata->numbursts-1;
 	burstfreq = intracount / (intratime / 1000);
-	burstdata->actQ = intratime / times[spikecount-1];  
+	if(selectmode) burstdata->actQ = intratime / selectdata->intratime; 
+	else burstdata->actQ = intratime / times[spikecount-1]; 
 	if(burstdata->numbursts == 0) burstdata->actQ = 1;
 
 	if(scandiag) fprintf(ofp, "\ntotal time %.2f  burst time %.2f\n\n", intratime, times[spikecount-1]);

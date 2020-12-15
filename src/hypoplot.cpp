@@ -787,7 +787,7 @@ int PlotBox::GetCellIndex()
 
 void PlotBox::DataSelect(double from, double to)
 {
-	neurobox->SetSelect(from, to);
+	neurobox->SetSelectRange(from, to);
 }
 
 

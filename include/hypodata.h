@@ -61,13 +61,14 @@ public:
 	void OnClear(wxCommandEvent& event);
 	void OnInvert(wxCommandEvent& event);
 	void AnalyseSelection();
-	void SetSelect(double, double);
+	void SetSelectRange(double, double);
 	void OnClick(wxPoint);
 	//void OnClick(wxMouseEvent &event);
 	void OnToggle(wxCommandEvent& event);
 	void SelectAdd();
 	void SelectSub();
 	void SelectUpdate();
+	void AddSubToggle(int sel, int type);
 
 	void OnBoxCheck(wxCommandEvent& event);
 	void OnGridFilter(wxCommandEvent& event);

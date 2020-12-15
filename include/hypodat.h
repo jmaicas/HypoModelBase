@@ -501,6 +501,7 @@ public:
 	
 	int intraspikes;
 	int numbursts;
+	double intratime;
 	double meancount;
 	double meantime;
 	double meanlength;

@@ -36,6 +36,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	selfstore = true;
 
 	selectcount = 2;
+	neuroindex = 0;
 	//selected = new SpikeDat();
 	//selectdata[0] = new BurstDat(true);
     //selectdata[1] = new BurstDat(true);
@@ -395,7 +396,11 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	
 	currcell->SelectSpikes();
 	AnalyseSelection();
-	if(!currcell->colourdata) currcell->ColourSwitch(2);
+	if(!currcell->colourdata) {
+		currcell->ColourSwitch(2);
+		mainwin->scalebox->ratedata = 2;
+		mainwin->scalebox->databutton->SetLabel("Select");
+	}
 	mainwin->scalebox->GraphUpdate();
 
 	selectfile.Close();	
@@ -495,6 +500,15 @@ void NeuroBox::OnToggle(wxCommandEvent& event)
 	type = id / 100;
 	sel = id % 100;
 
+	AddSubToggle(sel, type);
+}
+
+
+void NeuroBox::AddSubToggle(int sel, int type)      
+{
+	int i;
+	wxString text;
+	
 	for(i=0; i<selectcount; i++) {
 		addbutton[i]->SetValue(false);
 		subbutton[i]->SetValue(false);
@@ -502,7 +516,7 @@ void NeuroBox::OnToggle(wxCommandEvent& event)
 
 	if(type == 1) addbutton[sel]->SetValue(true);
 	if(type == 2) subbutton[sel]->SetValue(true);
-	
+
 	selectmode[sel] = type;	
 	currselect = sel;
 
@@ -510,12 +524,10 @@ void NeuroBox::OnToggle(wxCommandEvent& event)
 }
 
 
-//void NeuroBox::OnClick(wxMouseEvent &event)              // currently not in use - 24/1/20
 void NeuroBox::OnClick(wxPoint pos)
 {
 	wxString text;
 	bool select = false;
-	//wxPoint pos = event.GetPosition();
 	
 	wxRect selrect1 = wxRect(selectbox1->GetPosition(), selectbox1->GetSize());
 	wxRect selrect2 = wxRect(selectbox2->GetPosition(), selectbox2->GetSize());
@@ -524,15 +536,15 @@ void NeuroBox::OnClick(wxPoint pos)
 	if(selrect1.Contains(pos)) currselect = 0;
 	if(selrect2.Contains(pos)) currselect = 1;
 
-	currcell->burstdata->spikes = selectspikes[currselect];
+	AddSubToggle(currselect, 1);
+	SelectUpdate();
 
-	//mainwin->SetStatusText(text.Format("Neuro Box Click x %d y %d", pos.x, pos.y));
 	if(select) diagbox->Write(text.Format("Neuro Box Click x %d y %d  Select %d\n", pos.x, pos.y, currselect));
 	mod->mainwin->scalebox->BurstDisp(1);
 }
 
 
-void NeuroBox::SetSelect(double from, double to)
+void NeuroBox::SetSelectRange(double from, double to)
 {
 	int id;
 
@@ -610,7 +622,20 @@ void NeuroBox::SelectSub()
 void NeuroBox::SelectUpdate()
 {
 	currcell->selectdata->spikes = selectspikes[currselect];
-	if(!currcell->colourdata) currcell->ColourSwitch(2);
+	if(!currcell->colourdata) {
+		currcell->ColourSwitch(2);
+		mainwin->scalebox->ratedata = 2;
+		mainwin->scalebox->databutton->SetLabel("Select");
+	}
+
+	/*
+	// Switch to select plots if not in burst mode
+	if(!(*mainwin->scalebox->gflags)["burstmode"]) {
+		(*mainwin->scalebox->gflags)["selectmode"] = 1;
+		mainwin->scalebox->GraphSwitch();
+	}
+	*/
+
 	//diagbox->textbox->AppendText(text.Format("sub%d from %d to %d\n", currselect, sfrom, sto));
 
 	AnalyseSelection();
@@ -712,7 +737,8 @@ void NeuroBox::AnalyseSelection()
 
 	PanelData();
 
-	diagbox->Write(text.Format("\nSelect analyse %d spikes %.2fHz test %d\n", currcell->selectdata->intraspikes, currcell->selectdata->freq, currcell->selectdata->test));
+	diagbox->Write(text.Format("\nSelect analyse %d spikes %.2fHz time %.2f test %d\n", 
+		currcell->selectdata->intraspikes, currcell->selectdata->freq, currcell->selectdata->intratime, currcell->selectdata->test));
 
 	//if(currselect == 0) mod->burstbox->BurstDataDisp(mod->spikedata, mod->burstbox->modburst);
 	//if(currselect == 1) mod->burstbox->BurstDataDisp(mod->spikedata, mod->burstbox->evoburst);
@@ -1026,7 +1052,7 @@ int NeuroBox::GetCellIndex()
 
 void NeuroBox::DataSelect(double from, double to)
 {
-	SetSelect(from, to);
+	SetSelectRange(from, to);
 }
 
 
@@ -2336,7 +2362,7 @@ void GridBox::NeuroScan()
 	else {
 		diagbox->Write(text.Format("Neuro scan: %d cells read OK\n", cellcount));
 		//mod->cellcount = cellcount;
-		neurobox->neuroindex = 0;
+		if(neurobox->neuroindex > cellcount) neurobox->neuroindex = 0;
 		neurobox->cellcount = cellcount;
 		//diagbox->Write(text.Format("Neuro analysis...."));
 		//neurobox->Analysis();

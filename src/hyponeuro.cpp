@@ -2,6 +2,7 @@
 
 
 #include "hyponeuro.h"
+#include "hypodata.h"
 
 
 NeuroMod::NeuroMod(int type, wxString name, HypoMain *main)
@@ -58,6 +59,12 @@ void NeuroMod::EvoGraphs()
 	graphbase->GetGraph("iodevo")->xcount = 7;  
 	graphbase->GetGraph("iodevo")->synchx = false; 
 	graphbase->GetGraph("iodevo")->barshift  = 20;
+}
+
+
+void NeuroMod::DataSelect(double from, double to)
+{
+	neurobox->SetSelectRange(from, to);
 }
 
 

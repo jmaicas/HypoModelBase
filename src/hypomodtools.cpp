@@ -747,6 +747,7 @@ void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 	if(loaddata) {
 		loaddata->ColourSwitch(dispburst);
 		mainwin->scalebox->ratedata = dispburst;
+		mainwin->scalebox->databutton->SetLabel("Burst");
 	}
 	//Store();
 }

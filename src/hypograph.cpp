@@ -1233,7 +1233,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			double xsdneg, xsdpos, ysdneg, ysdpos;
 			int xoffset = 1;
 
-			bool filediag = false;
+			bool filediag = true;
 
 			if(drawX != -1) xto = drawX;
 
@@ -1254,14 +1254,11 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						gc->SetPen(colourpen[colour]);
 					}
 
-					if((int)xrange <= 1) {
+					if((int)xrange <= 1) 
 						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
-					}
-					else {
-						for(k=0; k<(int)(xrange-0.5); k++) {
-							DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
-						}
-					}
+					else
+						//for(k=0; k<(int)(xrange-0.5); k++) DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
+						for(xpos=i*xrange; xpos<(int)((i+1)*xrange-1); xpos++) DrawLine(dc, gc, xbase + xpos, ybase + yplot, xbase + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));    // spacing fixed 15/12/20
 				}
 			}
 
@@ -1328,7 +1325,6 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						gc->SetPen(colourpen[red]);
 						//mainwin->SetStatusText("no colour");
 					}
-
 					else {                  // burst colouring
 						burstcolour = 0;
 						//fprintf(ofp, "spikedisp 1\n");
@@ -1340,9 +1336,10 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 							//else if(burstdata[res][(i + (int)xfrom)] % 2 == 1) dc.SetPen(colourpen[green]);
 						}
 
-						if(binsize == 10 || binsize == 100) {
+						if(binsize > 1) {                             // 15/12/20
+						//if(binsize == 10 || binsize == 100) {
 							timepoint = (xfrom + i + 1) * binsize * 1000;
-							while (timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
+							while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
 								//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
 								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
 								if (!burstcolour) burstcolour = burstdata->spikes[spikestep];
@@ -1424,14 +1421,14 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					*/
 
 					xpos = i * xrange + xbase;
-					if(xrange <= 1)
+					if(xrange <= 1) 
 						DrawLine(dc, gc, xpos, ybase + yplot, xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
-					else {
-						for(k=0; k<xrange-1; k++)
-							DrawLine(dc, gc, xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom)));
-					}
+					else 
+						//for(k=0; k<xrange-1; k++) DrawLine(dc, gc, xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom)));
+						for(xpos=i*xrange; xpos<(int)((i+1)*xrange-1); xpos++) DrawLine(dc, gc, xbase + xpos, ybase + yplot, xbase + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));    // spacing fixed 15/12/20
+				
 
-					if(filediag && y > 0) opfile.WriteLine(text.Format("xpos %d  y %.2f  spike %d  burstcolour %d", xpos, y, spikestep, burstcolour));
+					if(filediag && y > 0) opfile.WriteLine(text.Format("xpos start %d end %d xrange %.4f y %.2f  spike %d  burstcolour %d", (int)(i*xrange), xpos, xrange, y, spikestep, burstcolour));
 				}
 				if(filediag) opfile.Close();
 			}

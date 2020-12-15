@@ -35,12 +35,12 @@ public:
 	int neurons_max;   // current allocated number of model neuron objects
 
 	// Boxes
-
 	NeuroMod(int, wxString, HypoMain *);
 	virtual ~NeuroMod();
 
 	//void SpikeBox(int modmode = 0);
 	void EvoGraphs();
 	void IoDGraph(datdouble *, datdouble *, wxString, wxString, int, int barshift=0, wxString settag="");
+	void DataSelect(double, double);
 	//virtual void DataSwitch();
 };

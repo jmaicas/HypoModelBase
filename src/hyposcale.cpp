@@ -81,6 +81,8 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	overpan1 = 1;
 	overpan2 = 2;
 
+	databutton = NULL;
+
 	backgroundcolour = GetBackgroundColour();
 	SetBackgroundColour(backgroundcolour);
 	SetFont(boxfont);                       // //
@@ -1184,6 +1186,11 @@ void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 
 	if(ratedata == graph->spikedata->dispmodemax) ratedata = 0;
 	else ratedata++;
+
+	// Dynamic button
+	if(ratedata == 0) databutton->SetLabel("All");
+	if(ratedata == 1) databutton->SetLabel("Burst");
+	if(ratedata == 2) databutton->SetLabel("Select");
 
 	//ratedata = 1 - ratedata;
 	(*gflags)["ratedata"] = ratedata;

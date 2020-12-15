@@ -235,6 +235,10 @@ public:
 
 	wxComboBox *gstag;
 	wxToggleButton *syncbutton;
+	ToolButton *databutton;
+	ToolButton *burstbutton;
+	ToolButton *selectbutton;
+
 	wxCheckBox *gsync[10];
 	wxBoxSizer *consolebox[10];
 	wxBoxSizer *vconbox;

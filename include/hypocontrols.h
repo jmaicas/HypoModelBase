@@ -82,11 +82,12 @@ public:
 	bool compmode;
 	DiagBox *diagbox;
 
-	int linkID;
+	int ID, linkID;
 	wxWindow *parent;
 
 	virtual void OnLeftUp(wxMouseEvent & event);
 	virtual void OnLeftDClick(wxMouseEvent & event);
+	virtual void Press();
 
 	ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *diagbox);
 };
