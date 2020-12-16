@@ -1233,7 +1233,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			double xsdneg, xsdpos, ysdneg, ysdpos;
 			int xoffset = 1;
 
-			bool filediag = true;
+			bool filediag = false;
 
 			if(drawX != -1) xto = drawX;
 

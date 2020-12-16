@@ -954,7 +954,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	}
 
 	// check for data selection
-	if(neurodata->numselects) {
+	if(neurodata && neurodata->numselects) {
 		diagbox->Write("BurstScan selectmode\n");
 		selectmode = true;
 		selectspikes = selectdata->spikes;

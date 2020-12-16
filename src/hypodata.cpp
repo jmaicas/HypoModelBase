@@ -1673,7 +1673,7 @@ void GridBox::GridLoadAll()
 	diagbox->Write(text.Format("GridLoadAll  numgrids %d  newnumgrids %d\n", numgrids, newnumgrids));
 
 	// Read and set grid sizes
-	for(i=0; i<numgrids; i++) {
+	for(i=0; i<newnumgrids; i++) {                 // use newnumgrids to match number of grids to load from file
 		getline(infile, line);
 		wxString readline(line);
 		gindex = ParseLong(&readline, 'g');
