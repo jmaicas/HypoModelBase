@@ -139,6 +139,7 @@ public:
 	virtual void SpikeDataSwitch(SpikeDat *);
 	virtual void BurstUpdate();
 	virtual void GridColumn(int col);
+	virtual void GridRow(int row) {};
     virtual void DataCopy(wxString oldpath, wxString newpath);
     virtual void OnModThreadCompletion(wxThreadEvent&);
 	virtual void DataOutput() {};

@@ -42,5 +42,6 @@ public:
 	void EvoGraphs();
 	void IoDGraph(datdouble *, datdouble *, wxString, wxString, int, int barshift=0, wxString settag="");
 	void DataSelect(double, double);
+	virtual void ParamScan() {};
 	//virtual void DataSwitch();
 };

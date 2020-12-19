@@ -141,9 +141,8 @@ class GridBox: public ParamBox
 public:
 	Model *mod;
 	wxTextCtrl *textbox;
-	TextGrid *textgrid[10];   // base grid
-							  //TextGrid *textgrid2, *textgrid3;
-	TextGrid *currgrid;   // pointer to selected grid, textgrid by default
+	TextGrid *textgrid[10];   // grid store array
+	TagStore gridindex;
 	DiagBox *diagbox;
 	wxNotebook *notebook;
 	//PlotBox *plotbox;
@@ -153,19 +152,21 @@ public:
 	int colflag[1000];
 	int numgrids;
 
+	// NeuroBox links
 	NeuroBox *neurobox;
-	vector<NeuroDat>* celldata;
+	vector<NeuroDat>* celldata;   
 
+	// Grid data vectors for large grids, currently not in use 
 	vector<GridNumDat> numdata;
 	DataGrid numdatagrid;
-
 	vector<GridTextDat> textdata;
 	DataGrid textdatagrid;
 
-	//int numdatamax, textdatamax;
-	//int numdatacount, textdatacount;
-	//int numdatagrow, textdatagrow;    // expansion step for increasing storage
-	//int numdatarowmax, textdatarowmax
+	// Standard grid links
+	TextGrid *currgrid;   // pointer to selected grid, textgrid[0] by default
+	TextGrid *datagrid;
+	TextGrid *outputgrid;
+	TextGrid *paramgrid;
 
 	GridBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true, bool vdumode=true);
 
@@ -173,7 +174,6 @@ public:
 	virtual void TestGrid();
 	void GridStore();
 	void GridStoreAll();
-	//void GridLoad();
 	void GridLoad();
 	void GridLoadAll();
 	void HistLoad();
@@ -204,9 +204,8 @@ public:
 
 	virtual void OnCellChange(wxGridEvent& event);
 	virtual void ColumnSelect(int);
+	virtual void RowSelect(int);
 
 	void SetNumCell(int row, int col, double data);
 	void SetTextCell(int row, int col, wxString data);
-
-	//void OnNeuro(wxCommandEvent& event);
 };

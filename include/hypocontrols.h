@@ -280,6 +280,7 @@ public:
 	ParamNum *num[100];
 	ParamStore ref;
 	ParamStore paramstore;
+	TagStore tagstore;     // new December 2020, ParamCon tag store and checking, currently in parallel to old 'ref' system
 
 	// New default width settings   Novemeber 2018
 	int num_labelwidth, num_numwidth;

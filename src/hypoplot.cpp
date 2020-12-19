@@ -438,7 +438,7 @@ void PlotBox::OnPlotXY(wxCommandEvent& event)
 	ycol = (*params)["ycol"];
 	xcol = (*params)["xcol"];
 
-	if(!graphdisp->plotset) graphdisp->plotset = plotset;      // currently only manages a single plotset for one graph panel
+	if(!graphdisp->plotset) graphdisp->plotset = plotset;      // currently only manages a single plotset for one graph panel   // *18/12/20 FIX THIS*
 	plotset = graphdisp->plotset;
 	plotcount = plotset->plotcount;
 

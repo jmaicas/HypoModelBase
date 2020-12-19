@@ -32,16 +32,19 @@ class TextGrid : public wxGrid
 {
 public:
 	wxMenu *rightmenu;
-	TextGrid(wxWindow *parent, wxSize size);
-	~TextGrid();
 	int ostype;
 	DiagBox *diagbox;
 	Model *mod;
+
+	int selectcol, selectrow;
 
 	wxGridStringTable *undogrid;
 	wxTextCtrl *vdu;
 	GridBox *gridbox;
 	wxGauge *gauge;
+
+	TextGrid(wxWindow *parent, wxSize size);
+	~TextGrid();
 
 	void OnRightClick(wxGridEvent& event);
 	void OnLeftClick(wxGridEvent& event);
@@ -57,7 +60,7 @@ public:
 	void OnBold(wxCommandEvent& event);
 	void CopyUndo();
 	void Copy();
-	void Paste();
+	void Paste(int mode=0);  // mode 0 normal, mode 1 transpose
 	void Cut();
 	void Delete();
 	void SetBold();
@@ -66,6 +69,7 @@ public:
 	void ParseLabel(int row, int col, wxString line);
 	void SetCell(int row, int col, wxString data);
 	double ReadDouble(int row, int col);
+	bool CheckDouble(int row, int col, double *data);
 	wxString GetCell(int row, int col);
 	void CopyColumn(int source, int dest);
 };

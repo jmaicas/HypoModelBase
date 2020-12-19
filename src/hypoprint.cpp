@@ -32,6 +32,7 @@ void GraphWindow3::MultiCell()
 
 	// Read panel data from OutBox
 	textgrid = mod->gridbox->currgrid;
+
 	cellcount = (int)textgrid->ReadDouble(0, 1);
 	if(!cellcount) {
 		mod->diagbox->Write("ERROR parameters zero cellcount\n");

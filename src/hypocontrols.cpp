@@ -477,7 +477,12 @@ int ParamSet::GetID(wxString tag)
 
 ParamCon *ParamSet::GetCon(wxString tag)
 {
-	return con[(int)ref[tag]];
+	if(!tagstore.Check(tag)) {
+		panel->mainwin->diagbox->Write("ParamSet GetCon " + tag + " not found\n");
+		return NULL;
+	}
+	
+	else return con[(int)ref[tag]];
 }
 
 
@@ -488,6 +493,7 @@ ParamCon *ParamSet::AddCon(wxString name, wxString labelname, double initval, do
 
 	con[numparams] = new ParamCon(panel, spincon, name, labelname, initval, step, places, labelwidth, numwidth);           // number + spin
 	ref[name] = numparams;
+	tagstore.Add(name);     // new December 2020
 
 	return con[numparams++];
 }
@@ -500,6 +506,7 @@ ParamCon *ParamSet::AddNum(wxString name, wxString labelname, double initval, in
 
 	con[numparams] = new ParamCon(panel, numcon, name, labelname, initval, 0, places, labelwidth, numwidth);              // number
 	ref[name] = numparams;
+	tagstore.Add(name);
 	
 	return con[numparams++];
 }
@@ -512,6 +519,7 @@ ParamCon *ParamSet::AddText(wxString name, wxString labelname, wxString initval,
 
 	con[numparams] = new ParamCon(panel, name, labelname, initval, labelwidth, textwidth);								   // text
 	ref[name] = numparams;
+	tagstore.Add(name);
 
 	return con[numparams++];
 }

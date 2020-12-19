@@ -1087,6 +1087,10 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	//numdatagrid.max = 10000;
 	numdatagrid.grow = 100;
 
+	datagrid = NULL;
+	outputgrid = NULL;
+	paramgrid = NULL;
+
 	//InitMenu();
 	//SetModFlag(ID_FileIO, "ioflag", "IO Mode", 0); 
 
@@ -1107,6 +1111,7 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 		notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
 		AddGrid("Data", wxSize(gridrows, gridcols));
 		AddGrid("Output", wxSize(gridrows, gridcols));
+		AddGrid("Params", wxSize(20, 20));
 		//textgrid[0] = new TextGrid(notebook, wxSize(gridrows, gridcols));
 		//notebook->AddPage(textgrid[0], text.Format("Data"));
 		//textgrid[1] = new TextGrid(notebook, wxSize(gridrows, gridcols));
@@ -1186,12 +1191,16 @@ void GridBox::OnGridSelect(wxBookCtrlEvent& event) {
 }
 
 
+// AddGrid() in (now default) notebook mode adds a new TextGrid and wxNotebook page
+// initialises grid and links to output controls
+
 void GridBox::AddGrid(wxString label, wxSize size) {
 
 	// Initialise
 	if(notebook) {
 		textgrid[numgrids] = new TextGrid(notebook, size);
 		notebook->AddPage(textgrid[numgrids], label);
+		gridindex.Add(label);
 	}
 	else textgrid[numgrids] = new TextGrid(panel, size);
 
@@ -1248,9 +1257,26 @@ void GridBox::OnParamMode(wxCommandEvent& event)
 
 void GridBox::OnParamScan(wxCommandEvent& event)
 {
-	mod->ParamScan();
+	int paramindex;
+
+	paramindex = gridindex.GetIndex("Params");
+	if(textgrid[paramindex]->selectrow == 0) {
+		textgrid[paramindex]->selectrow = 2;
+		textgrid[paramindex]->GoToCell(2, 0);
+	}
+
+
+	// On first press if Params grid is hidden bring to front
+	if(bookmode && notebook->GetSelection() != paramindex) {
+		notebook->SetSelection(gridindex.GetIndex("Params"));
+		textgrid[paramindex]->SelectRow(textgrid[paramindex]->selectrow);
+		return;
+	}
+
+	if(!textgrid[paramindex]->IsSelection()) textgrid[paramindex]->SelectRow(textgrid[paramindex]->selectrow);
+
 	WriteVDU("Param Scan\n");
-	//diagbox->Write("param scan\n");
+	mod->ParamScan();
 }
 
 
@@ -1397,6 +1423,16 @@ void GridBox::ColumnSelect(int col)
 	WriteVDU(text.Format("Column Select %d\n", col));
 
 	mod->GridColumn(col);
+}
+
+
+void GridBox::RowSelect(int row)
+{
+	wxString text;
+
+	WriteVDU(text.Format("Row Select %d\n", row));
+
+	mod->GridRow(row);
 }
 
 

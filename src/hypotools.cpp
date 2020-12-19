@@ -45,11 +45,14 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	gridbox = NULL;
 	diagbox = NULL;
 	mod = NULL;
+	selectcol = 0;
+	selectrow = 0;
 
 	rightmenu = new wxMenu;
 	rightmenu->Append(ID_SelectAll, "Select All", "Grid Select", wxITEM_NORMAL);
 	rightmenu->Append(ID_Copy, "Copy", "Copy Selection", wxITEM_NORMAL);
 	rightmenu->Append(ID_Paste, "Paste", "Paste Clipboard", wxITEM_NORMAL);
+	rightmenu->Append(ID_PasteTranspose, "Paste Transpose", "Paste Clipboard", wxITEM_NORMAL);
 	rightmenu->Append(ID_Undo, "Undo", "Undo", wxITEM_NORMAL);
 	//rightmenu->Append(ID_Bold, "Bold", "Set Bold", wxITEM_NORMAL);
 	//for(i=0; i<mod->graphbase->numgraphs; i++) menuPlot->AppendRadioItem(1000 + i, (*mod->graphbase)[i]->gname);
@@ -62,6 +65,7 @@ TextGrid::TextGrid(wxWindow *parent, wxSize size)
 	Connect(ID_Cut, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnCut));
 	Connect(ID_Copy, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnCopy));
 	Connect(ID_Paste, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnPaste));
+	Connect(ID_PasteTranspose, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnPaste));
 	Connect(ID_Undo, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnUndo));
 	Connect(ID_Bold, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(TextGrid::OnBold));
 	Connect(wxID_ANY, wxEVT_KEY_DOWN, wxKeyEventHandler(TextGrid::OnKey));  
@@ -99,6 +103,15 @@ double TextGrid::ReadDouble(int row, int col)
 	if(!celltext.IsEmpty()) celltext.ToDouble(&celldata);
 	else return 0;
 	return celldata;
+}
+
+
+bool TextGrid::CheckDouble(int row, int col, double *celldata)
+{
+	wxString celltext = GetCell(row, col);
+	celltext.Trim();
+	if(celltext.IsEmpty()) return false;
+	return celltext.ToDouble(celldata);
 }
 
 
@@ -147,6 +160,8 @@ void TextGrid::OnKey(wxKeyEvent &event)
 	if(event.GetUnicodeKey() == 'C' && event.ControlDown() == true) Copy();
 
 	else if(event.GetUnicodeKey() == 'V' && event.ControlDown() == true) Paste();
+
+	else if(event.GetUnicodeKey() == 'T' && event.ControlDown() == true) Paste(1);
 
 	else if(event.GetUnicodeKey() == 'X' && event.ControlDown() == true) Cut();
 
@@ -244,7 +259,8 @@ void TextGrid::OnCopy(wxCommandEvent& event)
 
 void TextGrid::OnPaste(wxCommandEvent& event)
 {
-	Paste();
+	if(event.GetId() == ID_PasteTranspose) Paste(1);
+	else Paste(0);
 }
 
 
@@ -332,7 +348,7 @@ void TextGrid::Copy()
 }
 
 
-void TextGrid::Paste()
+void TextGrid::Paste(int mode)
 {
 	long i, j, k, datasize;
 	wxString text;
@@ -344,7 +360,7 @@ void TextGrid::Paste()
 
 	wxString copy_data, cur_field, cur_line;
 
-	if(vdu) vdu->AppendText("Pasting...\n");
+	if(vdu) vdu->AppendText("Transpose Pasting...\n");
 	if(vdu) vdu->AppendText("Copy clipboard...");
 
 	if(ostype == Mac || ostype == Windows) {
@@ -367,7 +383,8 @@ void TextGrid::Paste()
 
 	i = GetGridCursorRow();
 	j = GetGridCursorCol();
-	k = j;
+	if(mode == 1) k = i;
+	else k = j;
 	prog = 0.1;
 
 	while(!copy_data.IsEmpty()) {
@@ -375,13 +392,19 @@ void TextGrid::Paste()
 		//if(vdu) vdu->AppendText(text.Format("\nRow %d", i));	
 		while(!cur_line.IsEmpty()) {
 			cur_field = cur_line.BeforeFirst('\t');
-			//if(i < GetNumberRows() && j < GetNumberCols()) SetCell(i, j, cur_field);
 			if(!(cur_field.Trim()).IsEmpty()) SetCell(i, j, cur_field);
-			j++;
+			if(mode == 1) i++;  // transpose
+			else j++;
 			cur_line  = cur_line.AfterFirst ('\t');
 		}
-		i++;
-		j = k;
+		if(mode == 1) {  // transpose
+			j++; 
+			i = k;
+		}
+		else {           // normal
+			i++;
+			j = k;
+		}
 		copy_data = copy_data.AfterFirst('\n');
 		if(copy_data.Len() < datasize * (1 - prog)) {
 				if(vdu) vdu->AppendText(text.Format(".%.0f%%.", prog * 100));
@@ -402,15 +425,25 @@ void TextGrid::OnUndo(wxCommandEvent& event)
 void TextGrid::OnLabelClick(wxGridEvent& event)
 {
 	int r, c;
+	wxString text;
 
 	//if(vdu) vdu->AppendText("Label Click\n");
 	c = event.GetCol();
+	r = event.GetRow();
 
-	if(gridbox && c >= 0) gridbox->ColumnSelect(event.GetCol());
+	if(gridbox && c >= 0) {
+		gridbox->ColumnSelect(c);
+		selectcol = c;}
+
+	if(gridbox && r >= 0) {
+		gridbox->RowSelect(r);
+		selectrow = r;
+	}
 
 	//if(mod) mod->GridColumn(c);
 
-	GoToCell(0, c);
+	//diagbox->Write(text.Format("TextGrid LabelClick c %d\n", c));
+	//GoToCell(0, c);
 
 	event.Skip();
 }
@@ -418,13 +451,19 @@ void TextGrid::OnLabelClick(wxGridEvent& event)
 
 void TextGrid::OnLeftClick(wxGridEvent& event)
 {
-	int i, r, c;
+	int row, col;
+	wxString text;
 
 	wxPoint pos = event.GetPosition();
-	r = GetGridCursorRow();
-	c = GetGridCursorCol();
+	//row = GetGridCursorRow();
+	//col = GetGridCursorCol();
+	row = event.GetRow();
+	col = event.GetCol();
 
-	if(diagbox) diagbox->Write("grid click\n");
+	selectrow = row;
+	selectcol = col;
+
+	if(diagbox) diagbox->Write(text.Format("grid click row %d col %d\n", row, col));
 
 	/*
 	if(event.GetRow() == r && event.GetCol() == c) 
@@ -460,7 +499,6 @@ void TextGrid::OnLeftClick(wxGridEvent& event)
 
 void TextGrid::OnRightClick(wxGridEvent& event)
 {
-	int i;
 	//int id = event.GetId();
 	//wxWindow *pos = FindWindowById(id, toolpanel);
 	//wxPoint point = this->GetPosition();

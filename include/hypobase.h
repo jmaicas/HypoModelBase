@@ -210,6 +210,7 @@ enum {
 	ID_smooth,
 	ID_Protocol,
 	ID_Signal,
+	ID_Spike,
 	ID_EvoFit,
 	ID_Ramp,
 	ID_Pulse,
@@ -270,6 +271,7 @@ enum {
 	ID_SelectAll,
 	ID_Copy,
 	ID_Paste,
+	ID_PasteTranspose,
 	ID_Undo,
 	ID_Bold,
 	ID_Italic,
@@ -688,6 +690,52 @@ public:
 		if(index < 0) index=0;
 		if(index >= store.size()) return "";
 		return store[index].tag;
+	}
+};
+
+
+class TagStore {
+	int i;
+	int numtags;
+	int grow;
+	std::vector <wxString> store;
+
+public:
+	TagStore () {
+		numtags = 0;
+		grow = 10;
+		store.resize(10);
+	}
+
+	void Add(wxString tag) {
+		if(store.size() == numtags) store.resize(numtags + grow);
+		store[numtags] = tag;
+		numtags++;
+	}
+
+	int GetIndex(wxString tag) {
+		for(i=0; i<numtags; i++) 
+			if(tag == store[i]) return i;
+		return -1;
+	}
+
+	wxString GetTag(int index) {
+		if(index < numtags) return store[i];
+		return "";
+	}
+
+	int GetSize() {
+		return numtags;
+	}
+
+	bool Check(wxString tag) {
+		for(i=0; i<numtags; i++) 
+			if(tag == store[i]) return true;
+		return false;
+	}
+
+	void SetGrow(int newgrow) {
+		if(newgrow >= 1) grow = newgrow;
 	}
 };
 
