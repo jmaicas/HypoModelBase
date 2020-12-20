@@ -305,6 +305,7 @@ public:
 	datdouble srate10s;
 	datdouble srate100s;
 	datdouble srate30s;
+	datdouble srate300s;
 	datdouble srate600s;
 	datdouble synsim;
 	datdouble vasomean;

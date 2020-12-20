@@ -144,7 +144,8 @@ SpikeDat::SpikeDat()
 	srate100s.setsize(100000);
 
 	// New November 2020 for oxytocin gavage spike rate analysis
-	srate30s.setsize(20000);           
+	srate30s.setsize(20000);   
+	srate300s.setsize(20000);
 	srate600s.setsize(20000);
 
 	synsim.data.resize(1000100);

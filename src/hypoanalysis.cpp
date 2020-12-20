@@ -1520,6 +1520,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	for(i=0; i<20000; i++) {
 		srate30s[i] = 0;
 		srate100s[i] = 0;
+		srate300s[i] = 0;
 		srate600s[i] = 0;
 	}
 
@@ -1729,6 +1730,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 	srate100s.max = (int)(times[spikecount-1]/100000 + 0.5);
 
 	srate30s.max = (int)(times[spikecount-1]/30000 + 0.5);
+	srate300s.max = (int)(times[spikecount-1]/300000 + 0.5);
 	srate600s.max = (int)(times[spikecount-1]/600000 + 0.5);
 
 
@@ -1740,6 +1742,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		if(times[i]/10000 < 100000) srate10s[(int)(times[i] + 0.5)/10000]++;
 		if(times[i]/100000 < 100000) srate100s[(int)(times[i] + 0.5)/100000]++;
 		if(times[i]/30000 < 20000) srate30s[(int)(times[i] + 0.5)/30000]++;
+		if(times[i]/300000 < 20000) srate300s[(int)(times[i] + 0.5)/300000]++;
 		if(times[i]/600000 < 20000) srate600s[(int)(times[i] + 0.5)/600000]++;
 		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));
 		//if(mainwin) mainwin->diagbox->Write(text.Format("srate10s i=%d time %.2f bin %d\n", i, times[i], (int)(times[i]+0.5)/10000));
@@ -2073,6 +2076,7 @@ int SpikeDat::PlotSet(GraphBase *graphbase, wxString tag, int colour, int light,
 
 	graphbase->Add(GraphDat(&srate1s, 0, 500, 0, 20, tag + "Spike Rate 1s", this, 1, red + shift), reftag + "rate1s", null);
 	graphbase->Add(GraphDat(&srate600s, 0, 500, 0, 200, tag + "Spike Rate 600s", this, 600, red + shift), reftag + "rate600s", null);
+	graphbase->Add(GraphDat(&srate300s, 0, 500, 0, 200, tag + "Spike Rate 300s", this, 300, red + shift), reftag + "rate300s", null);
 	graphbase->Add(GraphDat(&srate100s, 0, 500, 0, 2000, tag + "Spike Rate 100s", this, 100, red + shift), reftag + "rate100s", null);
 	graphbase->Add(GraphDat(&srate30s, 0, 500, 0, 200, tag + "Spike Rate 30s", this, 30, red + shift), reftag + "rate30s", null);
 	graphbase->Add(GraphDat(&srate10s, 0, 500, 0, 200, tag + "Spike Rate 10s", this, 10, red + shift), reftag + "rate10s", null);

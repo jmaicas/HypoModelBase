@@ -1174,6 +1174,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			xto /= binsize;
 			xfrom /= binsize;
 
+			// WARNING: not renaming bin scaled xfrom and xto makes code confusing, should replace with xfrombin and xtobin   19/12/20
 
 			// xrange - pixels per x unit
 			// xnum - x units per pixel
@@ -1238,7 +1239,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			if(drawX != -1) xto = drawX;
 
 			if(gtype == 1) {                             // scaled width bars, Histogram    
-				for (i=0; i<(xto - xfrom); i++) {
+				for(i=0; i<(xto - xfrom); i++) {
 					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
 					if(gpar == -2) y = gdatad[i + (int)xfrom];
 					if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
@@ -1298,9 +1299,9 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			}
 
 
-			double xbinoffset;
-			xbinoffset = (xfrom - floor(xfrom)) * xrange;
-			int partbin = ceil(xfrom - floor(xfrom));
+			//double xbinoffset;
+			//xbinoffset = (xfrom - floor(xfrom)) * xrange;
+			//int partbin = ceil(xfrom - floor(xfrom));
 
 
 			if(gtype == 3) {                             // spike rate data with optional burst colouring
@@ -1308,10 +1309,13 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 				int burstcolour = 0;
 				if(filediag) opfile.New("spikegraph.txt");
 				//for(i=0; i<10; i++) opfile.WriteLine(text.Format("spike %d  Burst time %.2f\n", i, burstdata->times[i]));
-				if(filediag) opfile.WriteLine(text.Format("plot %s  binsize %.4f  xrange %.4f  gpar %d\n\n", graph->gname, binsize, xrange, gpar));
+				//if(filediag) opfile.WriteLine(text.Format("plot %s  binsize %.4f  xrange %.4f  xbinoffset %.4f partbin %d gpar %d\n\n", 
+					//graph->gname, binsize, xrange, xbinoffset, ceil(xfrom - floor(xfrom)), gpar));
 
-				for(i=0; i<ceil(xto - xfrom + partbin); i++) {               // account for extra bin with unaligned xfrom
-				//for(i=0; i<(xto-xfrom); i++) {
+				//partbin = 0;
+
+				//for(i=0; i<ceil(xto - xfrom + partbin); i++) {               // account for extra bin with unaligned xfrom
+				for(i=0; i<(xto - xfrom); i++) {   
 					if(gpar == -1) y = (double)gdata[i + (int)xfrom];
 					if(gpar == -2) y = gdatad[i + (int)xfrom];
 					if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
@@ -1348,7 +1352,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 							while(timepoint < burstdata->maxtime && burstdata->times[spikestep] < timepoint + 0.0005) {
 								//while(burstdata->times[spikestep] < timepoint * binsize + 0.0005) {
 								//opfile.WriteLine(text.Format("while  i %d  spike %d  time %.2f\n", i, spikestep, burstdata->times[spikestep]));
-								if (!burstcolour) burstcolour = burstdata->spikes[spikestep];
+								if(!burstcolour) burstcolour = burstdata->spikes[spikestep];
 								spikestep++;
 							}
 						}
@@ -1426,11 +1430,12 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					}
 					*/
 
+					/*
 					int xposstart, xposend;
 					//double xbinoffset;
-
+					
 					// correctly align large bins with non-zero xfrom
-
+					
 					if(i == 0) xposstart = 0;
 					else xposstart = i * xrange - xbinoffset;
 					//if(i == ((int)(xto - xfrom + partbin)) - 1) xposend = (int)(i*xrange);
@@ -1439,20 +1444,37 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					if(i == ceil(xto - xfrom + partbin - 1)) xposend = (int)((i + 1 - partbin) * xrange);   // last bin, 0.05 to guard against fp error
 					else xposend = (int)((i+1)*xrange - xbinoffset - 1);
 					//xposend = (int)((i+1)*xrange - xbinoffset - 1);
-
-
-					xpos = i * xrange + xbase;
+					
+					
 					if((int)xrange <= 1) 
 						DrawLine(dc, gc, xpos, ybase + yplot, xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
 					else 
 						//for(k=0; k<xrange-1; k++) DrawLine(dc, gc, xpos + k, ybase + yplot, xpos + k, ybase + yplot - (int)(yrange * (y - yfrom)));
-						//for(xpos=i*xrange; xpos<(int)((i+1)*xrange-1); xpos++) DrawLine(dc, gc, xbase + xpos, ybase + yplot, xbase + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));    // spacing fixed 15/12/20
-						for(xpos=xposstart; xpos<xposend; xpos++) DrawLine(dc, gc, xbase+1 + xpos, ybase + yplot, xbase+1 + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));    // large bin align 19/12/20
+						//for(xpos=xposstart; xpos<xposend; xpos++) DrawLine(dc, gc, xbase+1 + xpos, ybase + yplot, xbase+1 + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));    // spacing fixed 15/12/20
+						for(xpos=i*xrange; xpos<(int)((i+1)*xrange-1); xpos++) DrawLine(dc, gc, xbase + xpos, ybase + yplot, xbase + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));
+	*/
 
-					if(filediag && y > 0) opfile.WriteLine(text.Format("xpos start %d end %d xrange %.4f y %.2f  spike %d  burstcolour %d", (int)(i*xrange), xpos, xrange, y, spikestep, burstcolour));
+
+					//if(filediag && y > 0) opfile.WriteLine(text.Format("i %d xpos start %d end %d xrange %.4f xbinoffset %.4f  y %.2f  spike %d  burstcolour %d", i, (int)xposstart, xpos, xrange, xbinoffset, y, spikestep, burstcolour));
+				
+					//mainwin->diagbox->Write(text.Format("i %d test %d  testf %.20f  ft %.20f\n", 
+					//	i, ((int)(xto - xfrom + partbin)) - 1, (xto - xfrom + partbin), xto - xfrom));
+					//mainwin->diagbox->Write(text.Format("i %d testf %.20f  ft %.20f\n", 
+					//	i, xto - xfrom + partbin - 2, xto - xfrom));
+
+					if((int)xrange <= 1) 
+						DrawLine(dc, gc, xpos, yplot + ybase, xpos, yplot + ybase - (int)(yrange * (y - yfrom)));
+					else
+						//for(k=0; k<(int)(xrange-0.5); k++) DrawLine(dc, gc, xpos + k, yplot + ybase, xpos + k, yplot + ybase - (int)(yrange * (y - yfrom)));
+						for(xpos=i*xrange; xpos<(int)((i+1)*xrange-1); xpos++) DrawLine(dc, gc, xbase + xpos, ybase + yplot, xbase + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));    // spacing fixed 15/12/20
 				}
+
+
 				if(filediag) opfile.Close();
 			}
+
+
+			//for(xpos=i*xrange; xpos<(int)((i+1)*xrange-1); xpos++) DrawLine(dc, gc, xbase + xpos, ybase + yplot, xbase + xpos, ybase + yplot - (int)(yrange * (y - yfrom)));    // spacing fixed 15/12/20
 
 
 			if(gtype == 4) {                         // normal line graph   - no longer in use, see type 5 below
