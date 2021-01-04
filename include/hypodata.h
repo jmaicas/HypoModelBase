@@ -27,6 +27,7 @@ public:
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
 	TagBox *neurodatatag;
+	TagBox *selectstoretag;
 	TextGrid *textgrid;
 
 	wxStaticBoxSizer *selectbox1, *selectbox2;  //, *filterbox;

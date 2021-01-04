@@ -189,16 +189,16 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	wxBoxSizer *filterbox = new wxBoxSizer(wxHORIZONTAL);
 	AddButton(ID_filter, "Grid Update", 80, filterbox);
 
-
 	wxBoxSizer *selectstorebox = new wxBoxSizer(wxVERTICAL); 
-	selectstorebox->Add(paramset.AddText("selectstoretag", "", "", 0, 100), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	//selectstorebox->Add(paramset.AddText("selectstoretag", "", "", 0, 100), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	selectstoretag = new TagBox(mainwin, activepanel, ID_Select, "", wxDefaultPosition, wxSize(150, -1), "selectstoretag", mod->path);
+	selectstorebox->Add(selectstoretag, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	wxBoxSizer *selectbuttons = new wxBoxSizer(wxHORIZONTAL);
 	AddButton(ID_selectstore, "Store", 40, selectbuttons, 2);
 	AddButton(ID_selectload, "Load", 40, selectbuttons, 2);
 	selectstorebox->Add(selectbuttons, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	filterbox->AddSpacer(20);
 	filterbox->Add(selectstorebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
-
 
 	selectpanelbox->Add(fromtobox, 0, wxALIGN_CENTRE_HORIZONTAL);
 	selectpanelbox->AddSpacer(15);
@@ -300,22 +300,26 @@ NeuroBox::~NeuroBox()
 void NeuroBox::OnSelectStore(wxCommandEvent& event)
 {
 	int i, cellindex;
-	wxString filetag, filename, filepath;
+	wxString filepath;
+	wxString filedir, filesuffix;
 	wxString text;
 	TextFile selectfile;
 	NeuroDat *cell;
 
-	currcell->selectdata->spikes = selectspikes[currselect];
-	currcell->SelectScan();
-	
-	filepath = mod->GetPath() + "/Tools";
-	if(!wxDirExists(filepath)) wxMkdir(filepath);
+	if(currcell->spikecount) {
+		currcell->selectdata->spikes = selectspikes[currselect];
+		currcell->SelectScan();
+	}
+
+	filedir = mod->GetPath() + "/Tools";
+	if(!wxDirExists(filedir)) wxMkdir(filedir);
+	filesuffix = "-select.dat";
 
 	// Select data file
-	filetag = paramset.GetText("selectstoretag");
-	filename = filepath + "/" + filetag + "-select.dat";
+	filepath = selectstoretag->StoreTag(filedir, filesuffix);
+	if(filepath.IsEmpty()) return;
 
-	selectfile.New(filename);
+	selectfile.New(filepath);
 
 	for(cellindex=0; cellindex<cellcount; cellindex++) {
 		cell = &(*cells)[cellindex];
@@ -342,7 +346,8 @@ NeuroDat *NeuroBox::GetCell(wxString name)
 void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 {
 	int i;
-	wxString filetag, filename, filepath;
+	wxString filedir, filepath;
+	wxString filesuffix;
 	TextFile selectfile;
 	wxString readline;
 	int index, start, end;
@@ -350,25 +355,20 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 	wxString name;
 	bool diagnostic = true;
 	NeuroDat *cell;
+	
 
-	currcell->selectdata->spikes = selectspikes[currselect];
+	if(currcell->selectdata) currcell->selectdata->spikes = selectspikes[currselect];
 
 	for(i=0; i<cellcount; i++) (*cells)[i].numselects = 0;
 
-	filepath = mod->GetPath() + "/Tools";
-	
-	// Select data file
-	filetag = paramset.GetText("selectstoretag");
-	filename = filepath + "/" + filetag + "-select.dat";
+	filedir = mod->GetPath() + "/Tools";
+	filesuffix = "-select.dat";
+	filepath = selectstoretag->LoadTag(filedir, filesuffix);
+	if(filepath.IsEmpty()) return;
 
-	if(diagnostic) diagbox->Write("SelectLoad " + filename + "\n");
+	if(diagnostic) diagbox->Write("SelectLoad " + filepath + "\n");
 
-	if(!selectfile.Exists(filename)) {
-		diagbox->Write("SelectLoad file not found\n");
-		return;
-	}
-
-	selectfile.Open(filename);
+	selectfile.Open(filepath);
 	readline = selectfile.ReadLine();
 
 	// Updated to reference by data tag string instead of index - October 2020
@@ -394,15 +394,17 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 		readline = selectfile.ReadLine();	
 	}
 	
-	currcell->SelectSpikes();
-	AnalyseSelection();
-	if(!currcell->colourdata) {
-		currcell->ColourSwitch(2);
-		mainwin->scalebox->ratedata = 2;
-		mainwin->scalebox->databutton->SetLabel("Select");
+	if(currcell->spikecount) {
+		currcell->SelectSpikes();
+		AnalyseSelection();
+		if(!currcell->colourdata) {
+			currcell->ColourSwitch(2);
+			mainwin->scalebox->ratedata = 2;
+			mainwin->scalebox->databutton->SetLabel("Select");
+		}
 	}
-	mainwin->scalebox->GraphUpdate();
 
+	mainwin->scalebox->GraphUpdate();
 	selectfile.Close();	
 }
 

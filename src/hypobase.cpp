@@ -51,6 +51,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	colourpen[9].Set("#FFFF80");       // 9 light yellow
 	colourpen[10].Set("#FF80FF");      // 10 light purple
 	colourpen[11].Set("#000000");      // 11 custom
+
+	redpen.Set("#dd0000");
+	blackpen.Set("#000000");
+	greenpen.Set("#009900");
+	bluepen.Set("#0000dd");
     
     wxString text, colourtext;
     colourtext = colourpen[0].GetAsString();

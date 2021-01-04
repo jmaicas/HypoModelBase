@@ -1311,6 +1311,7 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 {
     mainwin = main;
     modpath = path;
+	redtag = "";
     
     mainwin->tagset->AddTag(this);
     
@@ -1358,6 +1359,60 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	//Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(TagBox::OnDClick));
 	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(TagBox::OnDClick));
 	Connect(wxEVT_RIGHT_UP, wxMouseEventHandler(TagBox::OnRClick));
+}
+
+
+wxString TagBox::LoadTag(wxString dir, wxString suffix)
+{
+	wxString filetag, filepath;
+	int tagpos;
+
+	filetag = GetValue();
+	filepath = dir + "/" + filetag + suffix;
+
+	if(!wxFileExists(filepath)) {
+		SetValue("Not found");
+		return "";
+	}
+
+	tagpos = FindString(filetag);
+	if(tagpos != wxNOT_FOUND) Delete(tagpos);
+	Insert(filetag, 0);
+	redtag = "";
+	SetForegroundColour(mainwin->blackpen);
+	SetValue("");
+	SetValue(filetag);
+
+	return filepath;
+}
+
+
+wxString TagBox::StoreTag(wxString dir, wxString suffix)
+{
+	wxString filetag, filepath;
+	int tagpos;
+
+	filetag = GetValue();
+	filepath = dir + "/" + filetag + suffix;
+
+	tagpos = FindString(filetag);
+	if(tagpos != wxNOT_FOUND) Delete(tagpos);
+	Insert(filetag, 0);
+
+	if(wxFileExists(filepath) && redtag != filetag) {
+		SetForegroundColour(mainwin->redpen);
+		SetValue("");
+		SetValue(filetag);
+		redtag = filetag;
+		return "";
+	}
+
+	redtag = "";
+	SetForegroundColour(mainwin->blackpen);
+	SetValue("");
+	SetValue(filetag);
+
+	return filepath;
 }
 
 

@@ -1349,7 +1349,6 @@ void ParamBox::ParamLoad(wxString filetag, bool compmode)
 	short diagnostic;
 	wxString filename, filepath;
 	wxString readline, datname;
-	wxColour redpen("#dd0000"), blackpen("#000000"), greenpen("#009900"), bluepen("#0000dd");
 	TextFile checkfile;
 	wxString text;
 
@@ -1397,7 +1396,7 @@ void ParamBox::ParamLoad(wxString filetag, bool compmode)
 		diagbox->Write("Insert " + filetag + "\n");
 
 		redtag = "";
-		paramstoretag->SetForegroundColour(blackpen);
+		paramstoretag->SetForegroundColour(mainwin->blackpen);
 		paramstoretag->SetValue("");
 		paramstoretag->SetValue(filetag);
 	}
@@ -1420,9 +1419,9 @@ void ParamBox::ParamLoad(wxString filetag, bool compmode)
 			id = paramset.ref[datname];
 			if(paramset.con[id]->type != textcon) {
 				readline.ToDouble(&datval);
-				paramset.con[id]->SetPen(blackpen);
+				paramset.con[id]->SetPen(mainwin->blackpen);
 				if(compmode && datval != (*oldparams)[datname]) {
-					paramset.con[id]->SetPen(greenpen);
+					paramset.con[id]->SetPen(mainwin->greenpen);
 					mainwin->diagbox->Write(datname + " param change\n");
 				}
 				//paramset.con[id]->SetForegroundColour(greenpen);

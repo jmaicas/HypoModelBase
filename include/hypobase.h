@@ -377,6 +377,7 @@ double ParseDouble(wxString *, wxUniChar);
 wxString ParseString(wxString *, wxUniChar, wxUniChar = ' ');
 wxString StringConvert(string);
 
+
 int GetSystem();
 
 class MainFrame;
@@ -430,6 +431,7 @@ public:
     TagSet *tagset;
 	DiagBox *diagbox;
 	wxColour colourpen[20];
+	wxColour redpen, blackpen, greenpen, bluepen;
     wxString toolpath, initpath, mainpath;
     wxString homepath, hypopath, respath;
     wxString modpath;

@@ -41,6 +41,7 @@ class TagBox: public wxComboBox
 public:
 	wxString name, tagpath, tagfilepath, tagfilename;
     wxString modpath, text;
+	wxString redtag;
 	bool labelset, histmode;
 	DiagBox *diagbox;
 	MainFrame *mainwin;
@@ -55,6 +56,8 @@ public:
 	void OnDClick(wxMouseEvent & event);
 	void OnRClick(wxMouseEvent & event);
     void PathUpdate();
+	wxString LoadTag(wxString path, wxString suffix="");
+	wxString StoreTag(wxString path, wxString suffix="");
 };
 
 
