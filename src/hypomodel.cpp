@@ -51,7 +51,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	pinmode = 0;
 	basic = 1;
 	user = 1;
-	project = 1;
+	student = 1;
 	diagnostic = 0;
 	xstretch = 50;
 	modpath = "";
@@ -64,7 +64,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	fontset.Add("Times", 3);
 	fontset.Add("Courier", 4);
 	fontset.Add("Calibri", 5);
-    
+
+	
     
     // OSX Path Check
     if(ostype == Mac) {
@@ -87,6 +88,8 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	OptionLoad();      // basic configuration
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
+
+
 	numdraw_set = numdraw;
     
 	toolpath = mainpath + "Tools";
@@ -102,6 +105,11 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	gpos = new GraphDisp[numgraphs];
 
 	filebase = new FileBase(100);
+
+	// Project                January 2021
+	project = new Project(this);
+	project->tagset = tagset;
+	projectmode = 0;
 
 
 	// Spike Analysis Module                  July 2015
@@ -1093,7 +1101,7 @@ void HypoMain::OptionStore()
 
 	opfile.WriteLine(outline.Format("user %d", user));
 
-	opfile.WriteLine(outline.Format("project %d", project));
+	opfile.WriteLine(outline.Format("student %d", student));
 
 	opfile.WriteLine(outline.Format("diagnostic %d", diagnostic));
 
@@ -1133,7 +1141,7 @@ void HypoMain::OptionLoad()
 		datsample = 1;
 		basic = 0;
 		user = 0;
-		project = 0;
+		student = 0;
 	}
 	else {
 		opfile.Open();
@@ -1160,7 +1168,7 @@ void HypoMain::OptionLoad()
 		datsample = prefstore["datsample"];
 		basic = prefstore["basic"];
 		user = prefstore["user"];
-		project = prefstore["project"];
+		student = prefstore["student"];
 		diagnostic = prefstore["diagnostic"];
 	}
 

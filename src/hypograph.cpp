@@ -161,7 +161,7 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	//Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph), 1000, 1050);
 	//Connect(1000, 1000 + mod->graphbase->numgraphs - 1, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraph));
 	Connect(ID_GraphRemove, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphRemove));
-	Connect(ID_GraphPrint, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphPrint));
+	//Connect(ID_GraphPrint, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphPrint));
 	Connect(ID_GraphEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnGraphEPS));
 	Connect(ID_MultiEPS, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnMultiEPS));
 	Connect(ID_MultiCell, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(GraphWindow3::OnMultiCell));
@@ -225,6 +225,7 @@ void GraphWindow3::OnMultiCell(wxCommandEvent& event)
 }
 
 
+/*
 void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
 {
 	wxString text; 
@@ -244,6 +245,7 @@ void GraphWindow3::OnGraphPrint(wxCommandEvent& event)
 
 	//(*g_printData) = printer.GetPrintDialogData().GetPrintData();
 }
+*/
 
 
 void GraphWindow3::OnScale(wxCommandEvent& event)
@@ -502,7 +504,7 @@ void GraphWindow3::OnRightClick(wxMouseEvent& event)
 	menuPlot = new wxMenu;
 
 	if(!mainwin->basic) {
-		if(mainwin->project) {
+		if(mainwin->student) {
 			menuPlot->Append(ID_GraphEPS, "Export EPS");
 			menuPlot->Append(ID_Scale, "Plot Panel");
 			menuPlot->Append(ID_UnZoom, "Zoom Undo");
@@ -574,7 +576,7 @@ void GraphWindow3::OnRightClickOld(wxMouseEvent& event)
 
 	wxMenu *menuPlot = new wxMenu;
 	if(!mainwin->basic) {
-		if(mainwin->project) {
+		if(mainwin->student) {
 			menuPlot->Append(ID_GraphEPS, "Export EPS");
 			menuPlot->Append(ID_Scale, "Plot Panel");
 			menuPlot->Append(ID_UnZoom, "Zoom Undo");

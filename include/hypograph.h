@@ -101,7 +101,7 @@ public:
 	void OnGraphSelectSet(wxCommandEvent& event);
 	void OnGraphSelectPlot(wxCommandEvent& event);
 	void OnGraphRemove(wxCommandEvent& event);
-	void OnGraphPrint(wxCommandEvent& event);
+	//void OnGraphPrint(wxCommandEvent& event);
 	void OnGraphEPS(wxCommandEvent& event);
 	void OnMultiEPS(wxCommandEvent& event);
 	void OnMultiCell(wxCommandEvent& event);

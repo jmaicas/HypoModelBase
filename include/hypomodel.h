@@ -8,22 +8,26 @@
 //#define CUDA 1 
 
 
-#include "wx/wx.h"
+//#include "wx/wx.h"
+
+#include "hypopch.h"
+
 #include "hypograph.h"
 #include "hypoplot.h"
 #include "hypopanels.h"
 #include "hypomods.h"
 #include "hypodat.h"
 #include "hypodata.h"
+#include <hypoproject.h>
 //#include <hypodef.h>
-#include "wx/generic/printps.h"
-#include "wx/generic/prntdlgg.h"
+//#include "wx/generic/printps.h"
+//#include "wx/generic/prntdlgg.h"
 
 #ifdef HYPOSOUND
 #include "hyposound.h"
 #endif
 
-using namespace std;
+//using namespace std;
 
 
 class HypoApp: public wxApp
@@ -107,12 +111,16 @@ public:
     //wxString modpath; // mainpath;
 	wxBoxSizer *graphsizer;
 	ParamStore prefstore;
-	wxPrintData *printdata;
-	wxPageSetupDialogData *pageSetupData;
+	//wxPrintData *printdata;
+	//wxPageSetupDialogData *pageSetupData;
 
 	int moddex;
 	//ModelDat moddata[20];
 	ModelSet modset;
+
+	// Project   - system for storing and loading project specific panel setups and file tag histories   new January 2021
+	Project *project;
+	int projectmode;
 
 	// Display
 	//ScaleBox *scalebox;

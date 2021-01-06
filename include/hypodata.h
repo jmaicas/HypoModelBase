@@ -1,7 +1,6 @@
 #pragma once
 
 
-#include "wx/grid.h"
 #include "hypocontrols.h"
 #include "hypotools.h"
 #include "hypodat.h"

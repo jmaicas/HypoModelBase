@@ -4,9 +4,9 @@
 #define HYPODAT_H
 
 
-#include "wx/wx.h"
+//#include "wx/wx.h"
 #include "hypobase.h"
-#include <vector>
+//#include <vector>
 
 
 
@@ -658,7 +658,7 @@ class PlotSet
 {
 public:
 	int plotcount;
-	vector<PlotDat>plotdata;
+	std::vector<PlotDat>plotdata;
 	int dispindex;
 
 	PlotSet() {
@@ -791,12 +791,12 @@ public:
 	int numgraphs;
 	int numflags;
 	int gpos;
-	vector<int> gindex;
-	vector<int> gcodes;
+	std::vector<int> gindex;
+	std::vector<int> gcodes;
 	int modesum;
 	bool single;
-	vector<wxString> modeflag;          // Set of flags is used to control the selected, displayed graph 
-	vector<int> modeweight;
+	std::vector<wxString> modeflag;          // Set of flags is used to control the selected, displayed graph 
+	std::vector<int> modeweight;
 	int capacity;
 	int current;
 	int submenu;

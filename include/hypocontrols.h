@@ -142,17 +142,26 @@ public:
 };
 
 
+class TagDat
+{
+public:
+	wxString tag;
+	TagBox *box;
+};
+
+
 class TagSet
 {
 public:
     int numtags;
-    TagBox *box[100];
+    //TagBox *box[100];
+	TagDat tagdata[100];
     
     TagSet() {
         numtags = 0;
     }
     
-    void AddTag(TagBox *newbox);
+    void AddTag(wxString boxtag, TagBox *newbox);
     void UpdatePath();
 };
 

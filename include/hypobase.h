@@ -3,6 +3,10 @@
 #define HYPOBASE_H
 
 
+#include "hypopch.h"
+
+
+/*
 #include "wx/wx.h"
 
 #include "wx/spinctrl.h"
@@ -28,6 +32,7 @@
 //#include "RtWvOut.h"
 //#include "FileWvOut.h"
 #include <cstdlib>
+*/
 
 //#define _CRTDBG_MAP_ALLOC
 //#define _CRTDBG_MAP_ALLOC_NEW
@@ -45,7 +50,7 @@
 #endif
 
 
-using namespace std;
+//using namespace std;
 //using namespace stk
 
 
@@ -375,7 +380,7 @@ wxString ColourString(wxColour colour, int type=0);
 long ParseLong(wxString *, wxUniChar = NULL);
 double ParseDouble(wxString *, wxUniChar);
 wxString ParseString(wxString *, wxUniChar, wxUniChar = ' ');
-wxString StringConvert(string);
+wxString StringConvert(std::string);
 
 
 int GetSystem();
@@ -398,6 +403,7 @@ class PlotBox;
 class NeuroBox;
 class GridBox;
 class SoundBox;
+class Project;
 
 
 //DiagBox *gdiag;
@@ -452,7 +458,7 @@ public:
     
 	int basic;
 	int user;
-	int project;
+	int student;
 	int diagnostic;
 	int ostype;
     
@@ -610,7 +616,7 @@ class DatStore{
 		int xscale;
 	};
 private:
-	vector<DatData> store;
+	std::vector<DatData> store;
 
 public:
 	unsigned long size() {
@@ -776,7 +782,7 @@ class RefStore{
 public:
 	int numrefs;
 	//RefEntry refbase[100];
-	vector <RefEntry> refbase;
+	std::vector <RefEntry> refbase;
 	
 	RefStore() {
 		numrefs = 0;

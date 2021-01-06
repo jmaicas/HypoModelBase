@@ -209,33 +209,6 @@ void Model::RunModel()
 }
 
 
-void Model::ModClose()
-{}
-
-
-void Model::Output()
-{}
-
-
-void Model::ScaleSwitch(double newxscale)
-{}
-
-
-void Model::DataSelect(double x, double y)
-{}
-
-
-void Model::EvoRun()
-{}
-
-
-void Model::ParamScan()
-{}
-
-
-void Model::SetCell(int cellindex, GraphDat *graph)
-{}
-
 
 int Model::GetCellIndex()
 {
@@ -553,6 +526,5 @@ int Model::ModeSum(ParamStore *gflags)
 {
 	return 0;
 }
-
 
 

@@ -49,6 +49,7 @@ public:
 };
 
 
+
 class Model : public wxEvtHandler
 {
 public:
@@ -116,26 +117,26 @@ public:
 	wxString GetPath();
     void DiagWrite(wxString);
 	virtual void RunModel();
-	virtual void Output();
+	virtual void Output() {};
 	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags);
-	virtual void ScaleSwitch(double xscale = 0);
+	virtual void ScaleSwitch(double xscale = 0) {};
 	virtual int ModeSum(ParamStore *gflags);
 	virtual int SoundLink(SpikeDat **, datdouble **);
 	virtual void SoundOn() {}; 
 	virtual void ModStore();
 	virtual void ModLoad();
-	virtual void DataSelect(double, double);
+	virtual void DataSelect(double, double) {};
 	//virtual void GStore(wxComboBox *);
 	//virtual void GLoad(wxComboBox *);
 	virtual void GHistStore();
 	virtual void GHistLoad(wxComboBox *);
-	virtual void ModClose();
-	virtual void EvoRun();
+	virtual void ModClose() {};
+	virtual void EvoRun() {};
 	virtual void ScaleConsoleAbove(ScaleBox *scalebox, int condex) {};
 	virtual void ScaleConsoleBelow(ScaleBox *scalebox, int condex) {};
-	virtual void SetCell(int cellindex, GraphDat *);
+	virtual void SetCell(int cellindex, GraphDat *) {};
 	virtual int GetCellIndex();
-	virtual void ParamScan();
+	virtual void ParamScan() {};
 	virtual void SpikeDataSwitch(SpikeDat *);
 	virtual void BurstUpdate();
 	virtual void GridColumn(int col);

@@ -27,8 +27,8 @@ public:
 	SpikeDat *evodata, *evodata2;
 
 	// Cell grid data - November 2019
-	vector<SpikeDat> viewcell;
-	vector<NeuroDat> celldata;
+	std::vector<SpikeDat> viewcell;
+	std::vector<NeuroDat> celldata;
 	int cellcount;
 
 	// Model Neurons - November 2020

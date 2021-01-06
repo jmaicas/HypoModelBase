@@ -1293,16 +1293,19 @@ void ToolBox::OnClose(wxCloseEvent& event)
 }
 
 
-void TagSet::AddTag(TagBox *newbox) {
+void TagSet::AddTag(wxString boxtag, TagBox *newbox) {
     if(!newbox) return;
-    box[numtags++] = newbox;
+	tagdata[numtags].tag = boxtag;
+	tagdata[numtags].box = newbox;
+	numtags++;
+    //box[numtags++] = newbox;
 }
 
 
 void TagSet::UpdatePath() {
     int i;
     
-    for(i=0; i<numtags; i++) box[i]->PathUpdate();
+    for(i=0; i<numtags; i++) tagdata[i].box->PathUpdate();
 }
 
 
@@ -1313,7 +1316,8 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
     modpath = path;
 	redtag = "";
     
-    mainwin->tagset->AddTag(this);
+    mainwin->tagset->AddTag(boxtag, this);
+	//mainwin->project->AddTag(boxtag, this);
     
     if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
     else tagpath = mainwin->modpath + modpath + "/Tags/";

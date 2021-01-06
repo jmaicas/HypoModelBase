@@ -275,7 +275,7 @@ wxString ParseString(wxString *readline, wxUniChar tag, wxUniChar endtag)
 }
 
 
-wxString StringConvert(string text)
+wxString StringConvert(std::string text)
 {
 	return wxString(text);
 }
