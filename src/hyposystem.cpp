@@ -41,7 +41,7 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 	wxBoxSizer *projectbox = new wxBoxSizer(wxHORIZONTAL);
 	projecttag = new TagBox(mainwin, panel, wxID_ANY, "", wxDefaultPosition, wxSize(200, 23), "projectbox", "");
 	projectbox->Add(projecttag, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
-	projecttag->SetLabel(mainwin->project->protag);
+	//projecttag->SetLabel(mainwin->project->protag);
 
 	button = new wxButton(panel, ID_ProjectStore, "Store", wxDefaultPosition, wxSize(40, 25));
 	button->SetFont(confont);
@@ -115,6 +115,7 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 	
 	Connect(wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler(OptionPanel::OnModRadio));
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnOK));
+	Connect(wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler(OptionPanel::OnEnter));
 	Connect(ID_DataBrowse, ID_ModBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnBrowse));
 	//Connect(ID_OutputBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnBrowse));
 	Connect(ID_ProjectStore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnProjectStore));
@@ -144,11 +145,14 @@ void OptionPanel::OnProjectLoad(wxCommandEvent& event)
 
 	filepath = projecttag->LoadTag(mainwin->project->path, "-prefs.ini");
 	if(filepath.IsEmpty()) return;
+	projecttag->HistStore();  // store updated tag list before project load
 
 	tag = projecttag->GetValue();
+	
 	mainwin->project->Init(tag);
 	mainwin->project->Load();
-	numdrawcon->SetValue(mainwin->numdraw);
+
+	this->Raise();
 }
 
 
@@ -168,11 +172,10 @@ void OptionPanel::OnModRadio(wxCommandEvent& event)
 }
 
 
-void OptionPanel::OnOK(wxCommandEvent& WXUNUSED(event))
+void OptionPanel::OnEnter(wxCommandEvent& event)
 {
 	long stringnum;
 	wxString snum;
-	//mainwin->SetStatus(wxT("Scale OK")); 
 	
 	numdrawcon->numbox->GetValue().ToLong(&stringnum);
 	mainwin->numdraw_set = stringnum;
@@ -196,8 +199,20 @@ void OptionPanel::OnOK(wxCommandEvent& WXUNUSED(event))
 	//mainwin->SetStatus(snum);
 
 	mainwin->GraphPanelsUpdate();
-	
+}
+
+
+void OptionPanel::OnOK(wxCommandEvent& event)
+{
+	OnEnter(event);
 	Close();
+}
+
+
+void OptionPanel::OnClose(wxCloseEvent& event)
+{
+	mainwin->OptionStore();
+	Show(false);
 }
 
 

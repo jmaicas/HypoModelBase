@@ -50,9 +50,10 @@ public:
 	~TagBox();
 
 	void HistLoad();
-	//void HistStore();
+	void HistStore();
 	void SetLabel(wxString);
-	void SetFile();
+	void SetFile(wxString filename);
+	void ChooseFile();
 	void OnDClick(wxMouseEvent & event);
 	void OnRClick(wxMouseEvent & event);
     void PathUpdate();
@@ -154,7 +155,6 @@ class TagSet
 {
 public:
     int numtags;
-    //TagBox *box[100];
 	TagDat tagdata[100];
     
     TagSet() {
@@ -163,6 +163,7 @@ public:
     
     void AddTag(wxString boxtag, TagBox *newbox);
     void UpdatePath();
+	TagBox *GetBox(wxString tag);
 };
 
 

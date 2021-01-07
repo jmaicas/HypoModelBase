@@ -10,23 +10,8 @@ Project::Project(HypoMain *main)
 	mod = NULL;
 	protag = "";
 	path = "";
+	tagset = mainwin->tagset;
 }
-
-/*
-Project::Project(Model *model, wxString projtag)
-{
-mod = model;
-protag = projtag;
-path = mod->GetPath();
-
-tagcount = 0;
-
-boxfile = mod->modname + "-" + protag + "-box.ini";
-graphfile = mod->modname + "-" + protag + "-graph.ini";
-tagfile = mod->modname + "-" + protag + "-tag.ini";
-projectfile = mod->modname + "-" + protag + "-project.ini";
-}
-*/
 
 
 void Project::Init(wxString tag, Model *model)
@@ -37,14 +22,26 @@ void Project::Init(wxString tag, Model *model)
 	else mod = model;
 
 	protag = tag;
-	path = mod->GetPath();
+	path = mod->GetPath() + "/Projects";
 
 	//boxfile = mod->modname + "-" + protag + "-box.ini";
 	//prefsfile = mod->modname + "-" + protag + "-prefs.ini";
 	boxfile = protag + "-box.ini";
 	prefsfile = protag + "-prefs.ini";
+	tagfile = protag + "-tags.ini";
 
 	mainwin->diagbox->Write(text.Format("Project boxfile %s\n", boxfile));
+}
+
+
+void Project::TagSetDisp()
+{
+	int i;
+	wxString text;
+
+	for(i=0; i<tagset->numtags; i++) {
+		mainwin->diagbox->Write(text.Format("Tag %d %s\n", i, tagset->tagdata[i].tag));
+	}
 }
 
 
@@ -52,8 +49,9 @@ void Project::Store()
 {
 	int i;
 	TextFile outfile;
-	wxString text, filepath;
+	wxString text, filepath, tagpath;
 	
+	if(!wxDirExists(path)) wxMkdir(path);
 	filepath = path + "/" + projectfile;
 
 	outfile.Open(filepath);
@@ -79,7 +77,11 @@ void Project::Store()
 	outfile.Close();
 
 	// Tag Store
-
+	outfile.New(path + "/" + tagfile);
+	for(i=0; i<tagset->numtags; i++) {
+		outfile.WriteLine(text.Format("%s %s", tagset->tagdata[i].tag, tagset->tagdata[i].box->tagfilename));
+	}
+	outfile.Close();
 
 }
 
@@ -89,7 +91,7 @@ void Project::Load()
 	int i;
 	TextFile infile;
 	wxString text, filepath;
-	wxString readline, numstring, tag;
+	wxString readline, numstring, tag, tagboxfile;
 	long numdat;
 	int boxindex;
 	bool check;
@@ -101,7 +103,7 @@ void Project::Load()
 	// Prefs Load
 	check = infile.Open(filepath + "/" + prefsfile);
 	if(!check) mainwin->diagbox->Write("Project prefs file not found\n");
-	if(check) {
+	else {
 		readline = infile.ReadLine();
 		while(!readline.IsEmpty()) {
 			tag = readline.BeforeFirst(' ');
@@ -112,49 +114,70 @@ void Project::Load()
 			readline = infile.ReadLine();
 		}
 		infile.Close();
-	}
-	mainwin->numdraw_set = mod->prefstore["numdraw"];
-	mainwin->GraphPanelsUpdate();
 
+		mainwin->numdraw_set = mod->prefstore["numdraw"];
+		mainwin->optionpanel->numdrawcon->SetValue(mainwin->numdraw_set);
+		mainwin->GraphPanelsUpdate();
+	}
+	
 	// Box Load
 	check = infile.Open(filepath + "/" + boxfile);
-	if(!check) return;
-	readline = infile.ReadLine();
-	
-	while(!readline.IsEmpty()) {
-		numstring = readline.BeforeFirst(' ');
-		numstring.ToLong(&numdat);
-		boxindex = numdat;
-		if(boxindex >= mod->modtools.numtools) break;
-		pos.x = ReadNextData(&readline);
-		pos.y = ReadNextData(&readline);
-		size.x = ReadNextData(&readline);
-		size.y = ReadNextData(&readline);
-		if(mod->modtools.box[boxindex]->servant) mod->modtools.box[boxindex]->visible = (bool)ReadNextData(&readline);
-		else mod->modtools.box[boxindex]->visible = true;
-		if(pos.x >= -5000 && pos.x < 5000 && pos.y >= -5000 && pos.y < 5000) mod->modtools.box[boxindex]->mpos = pos;
-		if(size.x >= 50 && size.x < 2000 && size.y >= 50 && size.y < 2000) mod->modtools.box[boxindex]->boxsize = size;
-		readline = infile.ReadLine();  // Read next line										
-	}
-
-	infile.Close();
-	for(i=0; i<mod->modtools.numtools; i++) {
-		mod->modtools.box[i]->ReSize();
-		mod->modtools.box[i]->Show(mod->modtools.box[i]->visible);
+	if(!check) mainwin->diagbox->Write("Project box file not found\n");
+	else {
+		readline = infile.ReadLine();
+		while(!readline.IsEmpty()) {
+			numstring = readline.BeforeFirst(' ');
+			numstring.ToLong(&numdat);
+			boxindex = numdat;
+			if(boxindex >= mod->modtools.numtools) break;
+			pos.x = ReadNextData(&readline);
+			pos.y = ReadNextData(&readline);
+			size.x = ReadNextData(&readline);
+			size.y = ReadNextData(&readline);
+			if(mod->modtools.box[boxindex]->servant) mod->modtools.box[boxindex]->visible = (bool)ReadNextData(&readline);
+			else mod->modtools.box[boxindex]->visible = true;
+			if(pos.x >= -5000 && pos.x < 5000 && pos.y >= -5000 && pos.y < 5000) mod->modtools.box[boxindex]->mpos = pos;
+			if(size.x >= 50 && size.x < 2000 && size.y >= 50 && size.y < 2000) mod->modtools.box[boxindex]->boxsize = size;
+			readline = infile.ReadLine();  // Read next line										
+		}
+		infile.Close();
+		for(i=0; i<mod->modtools.numtools; i++) {
+			mod->modtools.box[i]->ReSize();
+			mod->modtools.box[i]->Show(mod->modtools.box[i]->visible);
+			mod->modtools.box[i]->SetPosition();
+		}
 	}
 
 	// Tag Load
-
-}
-
-
-
-void Project::TagSetDisp()
-{
-	int i;
-	wxString text;
-
-	for(i=0; i<tagset->numtags; i++) {
-		mainwin->diagbox->Write(text.Format("Tag %d %s\n", i, tagset->tagdata[i].tag));
+	check = infile.Open(filepath + "/" + tagfile);
+	if(!check) mainwin->diagbox->Write("Project tag file not found\n");
+	else {
+		readline = infile.ReadLine();
+		while(!readline.IsEmpty()) {
+			tag = readline.BeforeFirst(' ');
+			tagboxfile = readline.AfterFirst(' ');
+			tagboxfile.Trim();
+			//mainwin->diagbox->Write(text.Format("Project Load Tag %d %s %s\n", i, tag, tagboxfile));
+			tagset->GetBox(tag)->SetFile(tagboxfile);
+			readline = infile.ReadLine(); 
+		}
 	}
 }
+
+
+
+/*
+Project::Project(Model *model, wxString projtag)
+{
+mod = model;
+protag = projtag;
+path = mod->GetPath();
+
+tagcount = 0;
+
+boxfile = mod->modname + "-" + protag + "-box.ini";
+graphfile = mod->modname + "-" + protag + "-graph.ini";
+tagfile = mod->modname + "-" + protag + "-tag.ini";
+projectfile = mod->modname + "-" + protag + "-project.ini";
+}
+*/

@@ -1301,12 +1301,23 @@ void ToolBox::OnClose(wxCloseEvent& event)
 }
 
 
-void TagSet::AddTag(wxString boxtag, TagBox *newbox) {
+void TagSet::AddTag(wxString boxtag, TagBox *newbox) 
+{
     if(!newbox) return;
 	tagdata[numtags].tag = boxtag;
 	tagdata[numtags].box = newbox;
 	numtags++;
     //box[numtags++] = newbox;
+}
+
+
+TagBox *TagSet::GetBox(wxString tag) 
+{
+	int i;
+
+	for(i=0; i<numtags; i++)
+		if(tagdata[i].tag == tag) return tagdata[i].box;
+	return NULL;
 }
 
 
@@ -1317,6 +1328,7 @@ void TagSet::UpdatePath() {
 }
 
 
+
 TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString boxtag, wxString path)
 	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
@@ -1325,7 +1337,6 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	redtag = "";
     
     mainwin->tagset->AddTag(boxtag, this);
-	//mainwin->project->AddTag(boxtag, this);
     
     //if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
     //else tagpath = mainwin->modpath + modpath + "/Tags/";
@@ -1336,7 +1347,7 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 		else tagpath = mainwin->modpath + "/" + modpath + "/Tags/";
 	}
     
-    mainwin->diagbox->Write(text.Format("TagBox tagpath %s\n", tagpath));
+    mainwin->diagbox->Write(text.Format("TagBox tagpath %s modpath %s\n", tagpath, modpath));
 	
 	name = boxtag;
 	diagbox = NULL;
@@ -1362,16 +1373,7 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	    if(!tagfile.Exists(tagpath + tagfilename)) tagfilename = name + "tags.ini";    // mostly used for update from old version full path opfile
 	}
 
-
-	//if(tagpath == "") tagpath = path + name + "tags.ini";
-
-	
-	//mainwin = panel->mainwin;
-
-	//if(panel->mainwin) diagbox = panel->mainwin->diagbox;
-
 	mainwin->diagbox->Write("\nTagBox init " + name + "\n");
-
 	HistLoad();
 
 	//Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(TagBox::OnDClick));
@@ -1379,7 +1381,7 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	Connect(wxEVT_RIGHT_UP, wxMouseEventHandler(TagBox::OnRClick));
 }
 
-
+// LoadTag() checks for existing file using current tag with specified directory and suffix, if found updates tag list and returns file path
 wxString TagBox::LoadTag(wxString dir, wxString suffix)
 {
 	wxString filetag, filepath;
@@ -1407,7 +1409,7 @@ wxString TagBox::LoadTag(wxString dir, wxString suffix)
 	return filepath;
 }
 
-
+// StoreTag() checks for existing file using current tag with specified directory and suffix, if found overwrite warns with tag in red, and on repeat call updates tag list and returns file path
 wxString TagBox::StoreTag(wxString dir, wxString suffix)
 {
 	wxString filetag, filepath;
@@ -1452,23 +1454,20 @@ void TagBox::PathUpdate()
 
 TagBox::~TagBox()
 {
+	HistStore();
+}
+
+
+void TagBox::HistStore()
+{
 	int i;
 	wxString filename, filepath, outline, text;
 	TextFile opfile, tagfile;
-    
-    //if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
-    //else tagpath = mainwin->modpath + modpath + "/Tags/";
-    
-    if(!wxDirExists(tagpath)) wxMkdir(tagpath);
 
-	//if(diagbox) diagbox->Write(text.Format("closing tag box %s\n", name)); 
+	if(!wxDirExists(tagpath)) wxMkdir(tagpath);
 
 	// Tag history
 	if(tagfilename == "") return;
-	//filename = name + "tags.ini";
-	//filepath = path + "/Tags/";
-	//if(!wxDirExists(path)) wxMkdir(path);
-
 	tagfile.New(tagpath + tagfilename);
 	for(i=GetCount()-1; i>=0; i--) {
 		outline.Printf("tag %s", GetString(i));
@@ -1476,11 +1475,11 @@ TagBox::~TagBox()
 	}
 	tagfile.Close();
 
+	// Fixed location option file, directs to selectable tagfile location
 	opfile.New(tagpath + name + "op.ini");
 	opfile.WriteLine(tagfilename);
 	opfile.Close();
 }
-
 
 
 void TagBox::HistLoad()
@@ -1494,17 +1493,12 @@ void TagBox::HistLoad()
 
 	// tag history load
 	if(tagpath == "") {
-		diagbox->Write("Tag file not set\n");
+		mainwin->diagbox->Write("Tag file not set\n");
 		return;
 	}
-	//filename =  name + "tags.ini";
-	//filename = tagfile;
-	//check = opfile.Open(path + "/Tags/" + filename);
-
-	//filepath = path + "/Tags/" + tagfile;
 	check = tagfile.Open(tagpath + tagfilename);
 	if(!check) {
-		if(diagbox) diagbox->Write("No tag history\n");
+		mainwin->diagbox->Write("No tag history\n");
 		return;
 	}
 
@@ -1538,27 +1532,36 @@ void TagBox::OnDClick(wxMouseEvent& event)
 void TagBox::OnRClick(wxMouseEvent& event)
 {
 	if(diagbox) diagbox->Write("\ntag rclick\n");
-	SetFile();
+	ChooseFile();
 }
 
 
-void TagBox::SetFile()
+void TagBox::ChooseFile()
 {
-	diagbox->Write("Set File\n");
+	mainwin->diagbox->Write("TagBox ChooseFile\n");
 
-	wxFileDialog *filebox = new wxFileDialog(this, _("Choose tag file"), "", "",
-		"INI files (*.ini)|*.ini", wxFD_OVERWRITE_PROMPT);
+	wxFileDialog *filebox = new wxFileDialog(this, "Choose tag file", tagpath, tagfilename, "INI files (*.ini)|*.ini", wxFD_OVERWRITE_PROMPT);
 
 	//wxFileDialog *filebox = new wxFileDialog(this, "Choose a directory", path, 0, wxDefaultPosition);
-	if(filebox->ShowModal() == wxID_OK) tagfilepath = filebox->GetPath(); 
+	if(filebox->ShowModal() == wxID_OK) {
+		tagfilepath = filebox->GetPath(); 
+		mainwin->diagbox->Write("Selected file path:" + tagfilepath + "\n");
+		if(mainwin->ostype = Windows) tagfilename = tagfilepath.AfterLast('\\');
+		else tagfilename = tagfilepath.AfterLast('/');
+		mainwin->diagbox->Write("Selected:" + tagfilename + "\n");
+		SetFile(tagfilename);
+	}
 
-	diagbox->Write("Selected file path:" + tagfilepath);
-	tagfilename = tagfilepath.AfterLast('\\');
-	diagbox->Write("Selected:" + tagfilename);
+	//path = filebox->GetPath();
+	mainwin->diagbox->Write("TagBox tagpath " + tagpath);
+}
+
+
+void TagBox::SetFile(wxString newfilename)
+{
+	tagfilename = newfilename;
 	Clear();
 	HistLoad();
-	//path = filebox->GetPath();
-	diagbox->Write(tagpath);
 }
 
 

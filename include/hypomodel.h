@@ -136,6 +136,9 @@ public:
 	FileBase *filebase;
 	//graphdisp *gpos2;
 
+	// OptionPanel, general preferences and model/project control, changed to permanent instead of modal dialog, but starts hidden 7/1/21
+	OptionPanel *optionpanel;
+
 	// Tools and Analysis 
 	InfoBox *infobox;
 	BurstBox *burstbox;

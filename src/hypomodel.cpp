@@ -20,6 +20,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 {
 	wxIcon icon;
 	wxColour backcolour, panelcolour;
+	wxString tag;
 
 	backcolour.Set("#ffffff");
 	//panelcolour.Set("#eeeeee");     // grey
@@ -106,9 +107,9 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 
 	filebase = new FileBase(100);
 
+
 	// Project                January 2021
 	project = new Project(this);
-	project->tagset = tagset;
 	projectmode = 0;
 
 
@@ -246,8 +247,11 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
     //if(modpath == "") modpath = mainpath;
     //diagbox->Write("modpath " + modpath + "\n");
 
+	optionpanel = new OptionPanel(this, "System Panel");
+	tag = optionpanel->projecttag->GetValue();
+
 	project->TagSetDisp();
-	project->Init("testproject");
+	project->Init(tag);
 	project->Load();
     
 	SetSizer(mainsizer);
@@ -656,6 +660,7 @@ void HypoMain::GraphOut()
 void HypoMain::OnClose(wxCloseEvent& event)
 {
 	OptionStore();
+	optionpanel->Destroy();
 	//ViewStore();
 	MainStore();
 
@@ -1019,9 +1024,10 @@ void HypoMain::OnOptionPanel(wxCommandEvent& event)
 	//int ID = event->GetId;
 
 	//if(event.GetId() == ID_IGFPanel) {}
-	OptionPanel *optionpanel = new OptionPanel(this, "System Panel");
+	//OptionPanel *optionpanel = new OptionPanel(this, "System Panel");
+	optionpanel->Raise();
 	optionpanel->Show(true);
-	OptionStore();
+	//OptionStore();
 }
 
 

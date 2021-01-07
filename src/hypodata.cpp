@@ -539,7 +539,7 @@ void NeuroBox::OnClick(wxPoint pos)
 	if(selrect2.Contains(pos)) currselect = 1;
 
 	AddSubToggle(currselect, 1);
-	SelectUpdate();
+	SelectUpdate();      
 
 	if(select) diagbox->Write(text.Format("Neuro Box Click x %d y %d  Select %d\n", pos.x, pos.y, currselect));
 	mod->mainwin->scalebox->BurstDisp(1);
@@ -623,6 +623,8 @@ void NeuroBox::SelectSub()
 
 void NeuroBox::SelectUpdate()
 {
+	if(!currcell->spikecount) return;      // use spikecount to check for spike data
+
 	currcell->selectdata->spikes = selectspikes[currselect];
 	if(!currcell->colourdata) {
 		currcell->ColourSwitch(2);
