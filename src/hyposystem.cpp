@@ -12,9 +12,14 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 	int i, modindex;
 	int nummods = 9;
 	mainwin = main; 
-	wxPanel *panel = new wxPanel(this, -1);
+	ToolPanel *panel = new ToolPanel(this, wxDefaultPosition, wxDefaultSize);
 	wxRadioButton *modrad[20];
 	wxString text;
+	wxFont confont;
+	wxButton *button;
+
+	if(mainwin->ostype == Mac) confont = wxFont(wxFontInfo(11).FaceName("Tahoma"));
+	else confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
 	
 	wxBoxSizer *mainbox = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *panelbox = new wxBoxSizer(wxVERTICAL);
@@ -31,6 +36,25 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 	ylabelcon = new ParamNum(panel, "ylabels", "Y Labels", mainwin->ylabels);
 	datsamplecon = new ParamNum(panel, "datsample", "Data Sample Rate", mainwin->datsample);
 
+
+	// Project
+	wxBoxSizer *projectbox = new wxBoxSizer(wxHORIZONTAL);
+	projecttag = new TagBox(mainwin, panel, wxID_ANY, "", wxDefaultPosition, wxSize(200, 23), "projectbox", "");
+	projectbox->Add(projecttag, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
+	projecttag->SetLabel(mainwin->project->protag);
+
+	button = new wxButton(panel, ID_ProjectStore, "Store", wxDefaultPosition, wxSize(40, 25));
+	button->SetFont(confont);
+	projectbox->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM);
+
+	projectbox->AddSpacer(2);
+
+	button = new wxButton(panel, ID_ProjectLoad, "Load", wxDefaultPosition, wxSize(40, 25));
+	button->SetFont(confont);
+	projectbox->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM);
+
+
+	// Paths
 	datapathcon = new ParamText(panel, "datapath", "Data", mainwin->datapath, 30, 320);
 	datapathcon->AddButton("Path", ID_DataBrowse, 40);
 	outpathcon = new ParamText(panel, "outpath", "Out", mainwin->outpath, 30, 320);
@@ -73,6 +97,8 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 
 	panelbox->Add(panelhbox, 0);
 	panelbox->AddStretchSpacer(5);
+	panelbox->Add(projectbox, 0, wxALIGN_CENTRE);
+	panelbox->AddStretchSpacer(5);
 	panelbox->Add(pathbox, 0);
 
 	panel->SetSizer(panelbox);
@@ -91,9 +117,38 @@ OptionPanel::OptionPanel(HypoMain *main, const wxString & title)
 	Connect(wxID_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnOK));
 	Connect(ID_DataBrowse, ID_ModBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnBrowse));
 	//Connect(ID_OutputBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnBrowse));
+	Connect(ID_ProjectStore, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnProjectStore));
+	Connect(ID_ProjectLoad, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(OptionPanel::OnProjectLoad));
 	
-	ShowModal();
-	Destroy(); 
+	//ShowModal();
+	//Destroy(); 
+}
+
+
+void OptionPanel::OnProjectStore(wxCommandEvent& event)
+{
+	wxString tag, filepath;
+
+	filepath = projecttag->StoreTag(mainwin->project->path, "-prefs.ini");
+	if(filepath.IsEmpty()) return;
+
+	tag = projecttag->GetValue();
+	mainwin->project->Init(tag);
+	mainwin->project->Store();
+}
+
+
+void OptionPanel::OnProjectLoad(wxCommandEvent& event)
+{
+	wxString tag, filepath;
+
+	filepath = projecttag->LoadTag(mainwin->project->path, "-prefs.ini");
+	if(filepath.IsEmpty()) return;
+
+	tag = projecttag->GetValue();
+	mainwin->project->Init(tag);
+	mainwin->project->Load();
+	numdrawcon->SetValue(mainwin->numdraw);
 }
 
 

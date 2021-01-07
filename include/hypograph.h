@@ -178,13 +178,13 @@ public:
 };
 
 
-class ScaleBox: public wxPanel
+class ScaleBox: public ToolPanel
 {
 public:
-	wxPanel *panel;
+	ToolPanel *panel;
 	wxColour backgroundcolour;
 	MainFrame *mainwin;
-	wxFrame *drawframe;
+	//wxFrame *drawframe;
 	int buttonheight;
 	int numgraphs, startgraph, modesum;
 	int hazmode1, hazmode2, binrestog1, binrestog2;
@@ -233,7 +233,8 @@ public:
 	RefStore *gflagrefs;
 	int *gflagmax;
 
-	wxComboBox *gstag;
+	//wxComboBox *gstag;
+	TagBox *gstag;
 	wxToggleButton *syncbutton;
 	ToolButton *databutton;
 	ToolButton *burstbutton;
@@ -245,7 +246,7 @@ public:
 	//wxBoxSizer *psetbox;
 
 	//ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int startgraph=0, int boxtype=0);
-	ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int boxtype=0);
+	ScaleBox(HypoMain *main, const wxSize& size, int numgraphs, GraphDisp *gpos, Model *model, GraphWindow3 **graphwin, int boxtype=0);
 	~ScaleBox();
 
 	//wxTextCtrl *AddScaleParam(wxString name, double initval, wxBoxSizer *sizer);

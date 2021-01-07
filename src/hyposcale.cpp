@@ -4,13 +4,17 @@
 #include "hypodef.h"
 
 
+//ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size);
+//ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
+//ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
 
-ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, GraphDisp *gdisp, Model *model, GraphWindow3 **gwin, int btype)
-	: wxPanel(draw, wxID_ANY, wxPoint(0, 0), size, wxBORDER_SIMPLE | wxFULL_REPAINT_ON_RESIZE)
+
+ScaleBox::ScaleBox(HypoMain *main, const wxSize& size, int gnum, GraphDisp *gdisp, Model *model, GraphWindow3 **gwin, int btype)
+	: ToolPanel(main, wxPoint(0, 0), size, wxBORDER_SIMPLE | wxFULL_REPAINT_ON_RESIZE)
 {
 	int i;
 	mainwin = main;
-	drawframe = draw;
+	//drawframe = draw;
 	boxtype = btype;
 	ostype = GetSystem();
 	if(ostype == Mac) buttonheight = 20; else buttonheight = 23;
@@ -160,7 +164,7 @@ ScaleBox::ScaleBox(HypoMain *main, wxFrame *draw, const wxSize& size, int gnum, 
 	//gmod->GHistLoad();
 
 	dispmod = mod->modtype;
-	mod->GHistLoad(gstag);
+	//mod->GHistLoad(gstag);     
 	//GraphSwitch(0);
 
 	panel->SetSizer(vbox);
@@ -1614,9 +1618,6 @@ void ScaleBox::OnPosition(wxCommandEvent& event)
 		gpos[3].plot[1] = graph;
 	}
 	*/
-
-
-
 	GraphUpdate();
 }
 
@@ -1638,12 +1639,14 @@ wxBoxSizer *ScaleBox::GSBox(wxString label, wxPanel *storepanel)
 	if(!storepanel) storepanel = panel;
 
 	//gstag = TextInputCombo(100, 20, label);
-	gstag = new wxComboBox(panel, wxID_ANY, label, wxDefaultPosition, wxSize(80, 23));
+	//gstag = new wxComboBox(panel, wxID_ANY, label, wxDefaultPosition, wxSize(80, 23));
+	gstag = new TagBox(mainwin, panel, wxID_ANY, label, wxDefaultPosition, wxSize(80, 23), "scalebox", mod->path);
+	//TagBox(MainFrame *mainwin, ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString path);
 	gstag->SetFont(confont);
 	//return text;
 
-	gstag->SetLabel(label);
-	gstag->Show(true);
+	//gstag->SetLabel(label);
+	//gstag->Show(true);
 	if(ostype == Mac) {
 		AddButton(ID_gstore, "Store", 43, gsbuttons);
 		gsbuttons->AddSpacer(2);

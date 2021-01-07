@@ -32,12 +32,16 @@ public:
 	ParamText *outpathcon;
 	ParamText *parampathcon;
 	ParamText *modpathcon;
+	TagBox *projecttag;
+
 	OptionPanel(HypoMain *, const wxString&);
 
 	void OnOK(wxCommandEvent& event);
 	void OnBrowse(wxCommandEvent& event);
 	//void OnBrowseOut(wxCommandEvent& event);
 	void OnModRadio(wxCommandEvent& event);
+	void OnProjectLoad(wxCommandEvent& event);
+	void OnProjectStore(wxCommandEvent& event);
 };
 
 

@@ -210,7 +210,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		}
 
 		//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call\n");
-		scalebox = new ScaleBox(this, this, wxDefaultSize, numdraw, gpos, mod, graphwin, scaletype);
+		scalebox = new ScaleBox(this, wxDefaultSize, numdraw, gpos, mod, graphwin, scaletype);
 		scalebox->GraphSwitch(0);
 
 	
@@ -245,6 +245,10 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
     
     //if(modpath == "") modpath = mainpath;
     //diagbox->Write("modpath " + modpath + "\n");
+
+	project->TagSetDisp();
+	project->Init("testproject");
+	project->Load();
     
 	SetSizer(mainsizer);
 	Layout();
@@ -332,10 +336,11 @@ void HypoMain::OnGraphAdd(wxCommandEvent& WXUNUSED(event))
 void HypoMain::GraphPanelsUpdate()
 {
 	while(numdraw_set != numdraw) {
-		if (numdraw_set < numdraw) RemoveGraph(numdraw-1);
-		if (numdraw_set > numdraw) AddGraph();
+		if(numdraw_set < numdraw) RemoveGraph(numdraw-1);
+		if(numdraw_set > numdraw) AddGraph();
 	}
 	SizeUpdate();
+	SizeUpdate();    // duplicate call produces correct update, must be ordering issue, need to further investigate, 7/1/21
 }
 
 
@@ -347,8 +352,8 @@ void HypoMain::AddGraph()
 	graphsizer->Add(graphwin[graph], 1, wxEXPAND);
 	scalebox->AddGraphConsole(scalebox->numgraphs++, graphwin[graph]);
 	numdraw++;
-	graphsizer->Layout();
-	Refresh();
+	//graphsizer->Layout();
+	//Refresh();
 }
 
 
@@ -656,10 +661,14 @@ void HypoMain::OnClose(wxCloseEvent& event)
 
 	if(graphbox) graphbox->Close();
 
+	if(project->mod) {
+		project->Store();
+	}
+
     if(mod) {
         mod->ModClose();
         mod->ModStore();
-        mod->GHistStore();
+        //mod->GHistStore();
     }
 	CleanUp();
 	Destroy();

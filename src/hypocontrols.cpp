@@ -166,6 +166,14 @@ wxString ParamNum::GetValue()
 }
 
 
+void ParamNum::SetValue(double val)
+{
+	snum = numstring(val, decimals);
+	numbox->SetValue(snum);
+}
+
+
+
 ParamCon::ParamCon(ToolPanel *pan, wxString pname, wxString labelname, wxString initval, int labelwid, int numwid)               // Stripped down string only version for text entry
 {
 	ostype = GetSystem();
@@ -722,7 +730,7 @@ ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)
 }
 
 
-ToolPanel::ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size)
+ToolPanel::ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size, long style)
 	: wxPanel(main, wxID_ANY, pos, size)
 {
 	toolbox = NULL;
@@ -1319,8 +1327,14 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
     mainwin->tagset->AddTag(boxtag, this);
 	//mainwin->project->AddTag(boxtag, this);
     
-    if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
-    else tagpath = mainwin->modpath + modpath + "/Tags/";
+    //if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
+    //else tagpath = mainwin->modpath + modpath + "/Tags/";
+
+	if(mainwin->modpath == "") tagpath = mainwin->mainpath + "/Tags/";
+	else {
+		if(mainwin->ostype == Mac) tagpath = mainwin->modpath + modpath + "/Tags/";
+		else tagpath = mainwin->modpath + "/" + modpath + "/Tags/";
+	}
     
     mainwin->diagbox->Write(text.Format("TagBox tagpath %s\n", tagpath));
 	
@@ -1354,9 +1368,9 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	
 	//mainwin = panel->mainwin;
 
-	if(panel->mainwin) diagbox = panel->mainwin->diagbox;
+	//if(panel->mainwin) diagbox = panel->mainwin->diagbox;
 
-	diagbox->Write("\nTagBox init " + name + "\n");
+	mainwin->diagbox->Write("\nTagBox init " + name + "\n");
 
 	HistLoad();
 
@@ -1372,7 +1386,10 @@ wxString TagBox::LoadTag(wxString dir, wxString suffix)
 	int tagpos;
 
 	filetag = GetValue();
+	//if(!dir.IsEmpty()) filepath = tagpath + filetag;       // placeholder 6/1/21
 	filepath = dir + "/" + filetag + suffix;
+
+	mainwin->diagbox->Write(text.Format("TagBox Load filepath %s\n", filepath));
 
 	if(!wxFileExists(filepath)) {
 		SetValue("Not found");
@@ -1398,6 +1415,8 @@ wxString TagBox::StoreTag(wxString dir, wxString suffix)
 
 	filetag = GetValue();
 	filepath = dir + "/" + filetag + suffix;
+
+	mainwin->diagbox->Write(text.Format("TagBox filepath %s\n", filepath));
 
 	tagpos = FindString(filetag);
 	if(tagpos != wxNOT_FOUND) Delete(tagpos);
@@ -1425,7 +1444,7 @@ void TagBox::PathUpdate()
     if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
     else tagpath = mainwin->modpath + modpath + "/Tags/";
     
-    mainwin->diagbox->Write(text.Format("TagBox tagpath %s\n", tagpath));
+    diagbox->Write(text.Format("TagBox tagpath %s\n", tagpath));
        
     //if(!wxDirExists(tagpath)) wxMkdir(tagpath);
 }
@@ -1489,7 +1508,7 @@ void TagBox::HistLoad()
 		return;
 	}
 
-	diagbox->Write("Reading tag history " + filename + "\n");
+	mainwin->diagbox->Write("Reading tag history " + filename + "\n");
 
 	readline = tagfile.ReadLine();
 
@@ -1505,7 +1524,7 @@ void TagBox::HistLoad()
 
 	tagfile.Close();	
 	SetLabel(tag);
-	diagbox->Write(name + " " + tag + "\n");
+	mainwin->diagbox->Write(name + " " + tag + "\n");
 	if(tag != "") labelset = true;
 }
 
@@ -1546,7 +1565,11 @@ void TagBox::SetFile()
 void TagBox::SetLabel(wxString label)
 {
 	wxComboBox::SetLabel(label);
-	diagbox->Write("TagBox SetLabel " + label + "\n");
+	mainwin->diagbox->Write("TagBox SetLabel " + label + "\n");
+
+	int tagpos = FindString(label);
+	if(tagpos != wxNOT_FOUND) Delete(tagpos);
+	Insert(label, 0);
 }
 
 /*

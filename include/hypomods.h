@@ -66,6 +66,7 @@ public:
 	int basicmode;
 	bool evoflag;
 	int burstmode;
+	int projmode;
     
     // Threads
     wxMutex *runmute;

@@ -346,7 +346,9 @@ enum {
 	ID_Trace,
 	ID_Clear,
 	ID_type,
-	ID_font
+	ID_font,
+	ID_ProjectLoad,
+	ID_ProjectStore
 };
 
 

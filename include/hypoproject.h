@@ -1,10 +1,11 @@
 #pragma once
 
 
-#include "wx/wx.h"
+//#include "wx/wx.h"
 #include "hypodat.h"
-#include <hypotools.h>
-#include <hypomods.h>
+#include "hypotools.h"
+#include "hypomods.h"
+#include "hypomodel.h"
 
 
 class Project
@@ -20,7 +21,7 @@ public:
 	wxString path;
 	wxString boxfile;
 	wxString graphfile;
-	//wxString paramfile;
+	wxString prefsfile;
 	wxString tagfile;
 	wxString projectfile;
 
@@ -30,5 +31,6 @@ public:
 	void Load();
 	void Store();
 	void TagSetDisp();
+	void Init(wxString tag, Model *mod=NULL);
 	//void AddTag(wxString tag, TagBox *box);
 };

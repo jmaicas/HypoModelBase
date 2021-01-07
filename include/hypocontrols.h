@@ -46,7 +46,7 @@ public:
 	DiagBox *diagbox;
 	MainFrame *mainwin;
 
-	TagBox(MainFrame *mainwin, ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString modpath);
+	TagBox(MainFrame *mainwin, ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString path);
 	~TagBox();
 
 	void HistLoad();
@@ -110,7 +110,7 @@ public:
 	void OnMouseMove(wxMouseEvent & event);
 	
 	ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size);
-	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size);
+	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size, long style=wxTAB_TRAVERSAL | wxNO_BORDER);
 	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
 	ToolPanel(wxNotebook *notebook, const wxPoint& pos, const wxSize& size);
 	//ToolPanel(wxAuiNotebook *notebook, ToolBox *tbox, const wxPoint& pos, const wxSize& size);
@@ -205,6 +205,7 @@ public:
 	
 	ParamNum(wxPanel *panel, wxString name, wxString labelname, double initval, int places=0);
 	wxString GetValue();
+	void SetValue(double val);
 	
 protected:
 	virtual wxSize DoGetBestSize() const;

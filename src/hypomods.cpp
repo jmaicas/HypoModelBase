@@ -46,6 +46,7 @@ Model::Model(int type, wxString name, HypoMain *main)
 	oldhist = true;
 	xscaletoggle = 0;
 	burstmode = 0;
+	projmode = 0;  // 0 for old model based prefs and box store, 1 for new Project store
     
     runflag = false;   // Set to indicate model thread is running
     runmute = new wxMutex;
@@ -233,7 +234,7 @@ long Model::ReadNextData(wxString *readline)
 }
 
 
-void Model::GHistStore()
+void Model::GHistStore()     // 6/1/21 being phased out of use, replaced with TagBox
 {
 	wxString filename, filepath;
 	wxString text;
@@ -254,7 +255,7 @@ void Model::GHistStore()
 }
 
 
-void Model::GHistLoad(wxComboBox *gstag)
+void Model::GHistLoad(wxComboBox *gstag)     // 6/1/21 being phased out of use, replaced with TagBox
 {
 	wxString filename, filepath;
 	wxString readline, text;
