@@ -148,8 +148,9 @@ public:
 	//std::vector<int> srate;
 	//std::vector<int> srate10;
 
-	int numselects, maxselect;
-	std::vector <burst> selectstore;  // selection store using burst type
+	int maxselect;
+	int numselects[2];
+	std::vector <burst> selectstore[2];  // selection store using burst type
 	int burstfitmode;
 
 	int srate100[10000];
@@ -386,8 +387,8 @@ public:
 	void output(wxString, wxString);
 	void inputsim(double);
 	void BurstScan(BurstBox *);
-	void SelectScan();
-	void SelectSpikes();
+	void SelectScan(int select=0);
+	void SelectSpikes(int select=0);
 	//void BurstScanFit();     // moved to BurstDat to reduce pointer dereferencing
 	void IntraSelectAnalysis();
 	void SelectFitAnalysis();

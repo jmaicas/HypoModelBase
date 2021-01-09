@@ -275,6 +275,17 @@ wxString ParseString(wxString *readline, wxUniChar tag, wxUniChar endtag)
 }
 
 
+bool ParseCheck(wxString *readline, wxString tag)
+{
+	wxString string;
+
+	string = readline->Trim(false);
+	string = string.BeforeFirst(' ');
+	if(string == tag) return true;
+	return false;
+}
+
+
 wxString StringConvert(std::string text)
 {
 	return wxString(text);

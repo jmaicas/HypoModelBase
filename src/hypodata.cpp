@@ -20,6 +20,149 @@
 
 
 
+CellPanel::CellPanel(NeuroBox *box, SpikeDat *newcell, std::vector<NeuroDat>*newcells)
+	: ToolPanel(box, box->tabpanel)
+{
+	int i;
+	int datwidth, labelwidth, buttspace;
+
+	neurobox = box;
+	currcell = newcell;
+	cells = newcells;
+
+	selectcount = 2;
+	cellindex = 0;
+	cellcount = 0;
+
+	selectspikes[0].resize(100000);
+	selectspikes[1].resize(100000);
+
+	for(i=0; i<100000; i++) {
+		selectspikes[0][i] = 0;
+		selectspikes[1][i] = 0;
+	}
+
+	this->SetFont(neurobox->boxfont);
+	wxBoxSizer *selectsizer = new wxBoxSizer(wxVERTICAL);
+	this->SetSizer(selectsizer);
+	neurobox->paramset.panel = this;
+
+	//
+	// Neuron selection
+	//
+	datwidth = 50;
+	labelwidth = 70;
+	label = neurobox->NumPanel(labelwidth, wxALIGN_CENTRE);
+	spikes = neurobox->NumPanel(datwidth, wxALIGN_RIGHT);
+	freq = neurobox->NumPanel(datwidth, wxALIGN_RIGHT);
+	selectspikecount = neurobox->NumPanel(datwidth, wxALIGN_RIGHT);
+	selectfreq = neurobox->NumPanel(datwidth, wxALIGN_RIGHT);
+
+	wxGridSizer *datagrid = new wxGridSizer(2, 5, 5);
+	datagrid->Add(new wxStaticText(this, -1, "Name"), 0, wxALIGN_CENTRE);
+	datagrid->Add(label);
+	datagrid->Add(new wxStaticText(this, -1, "Spikes"), 0, wxALIGN_CENTRE);
+	datagrid->Add(spikes);
+	datagrid->Add(new wxStaticText(this, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(freq);
+	datagrid->Add(new wxStaticText(this, -1, "Select Spikes"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(selectspikecount);
+	datagrid->Add(new wxStaticText(this, -1, "Select Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(selectfreq);
+
+	filtercheck = neurobox->SetBoxCheck(ID_filtercheck, "filter", "Filter", false);
+	
+	datneuron = new wxTextCtrl(this, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
+	if(neurobox->ostype == Mac) 
+		datspin = new wxSpinButton(this, wxID_ANY, wxDefaultPosition, wxSize(-1, -1), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+	else 
+		datspin = new wxSpinButton(this, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+	datspin->SetRange(-1000000, 1000000);
+
+	wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
+	datbox->Add(datspin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datbox->AddSpacer(5);
+
+	wxBoxSizer *cellbox = new wxBoxSizer(wxHORIZONTAL);
+	cellbox->Add(new wxStaticText(this, wxID_ANY, "Neuron"), 1, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	cellbox->Add(datneuron, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+	wxStaticBoxSizer *databox = new wxStaticBoxSizer(wxVERTICAL, this, "");
+	databox->AddSpacer(2);
+	databox->Add(cellbox, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 5);
+	databox->AddSpacer(5);
+	databox->Add(datbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 0);
+	databox->AddSpacer(5);
+	databox->Add(datagrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	databox->AddSpacer(5);
+	databox->Add(filtercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+
+	//
+	// Spike selection
+	//
+	ParamCon *fromcon = neurobox->paramset.AddNum("from", "From", 0, 0, 30); 
+	ParamCon *tocon = neurobox->paramset.AddNum("to", "To", 100, 0, 20); 
+
+	wxBoxSizer *selectpanelbox = new wxBoxSizer(wxVERTICAL);
+	selectbox[0] = new wxStaticBoxSizer(wxHORIZONTAL, this, "Selection 1");
+	selectbox[1] = new wxStaticBoxSizer(wxHORIZONTAL, this, "Selection 2");
+	wxBoxSizer *fromtobox = new wxBoxSizer(wxHORIZONTAL);
+
+	fromtobox->Add(fromcon, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	fromtobox->Add(tocon, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+
+	buttspace = 20;
+
+	for(i=0; i<selectcount; i++) {
+		addbutton[i] = neurobox->ToggleButton(100 + i, "Add", 40, selectbox[i]);	
+		selectbox[i]->AddSpacer(buttspace);
+		subbutton[i] = neurobox->ToggleButton(200 + i, "Sub", 40, selectbox[i]);	
+		selectbox[i]->AddSpacer(buttspace);
+		neurobox->AddButton(300 + i, "Clear", 40, selectbox[i]);
+		selectbox[i]->AddSpacer(buttspace);
+		neurobox->AddButton(400 + i, "Invert", 40, selectbox[i]);
+	}
+
+	for(i=0; i<selectcount; i++) selectmode[i] = 1;
+	currselect = 0;
+	addbutton[currselect]->SetValue(true);
+
+	wxBoxSizer *filterbox = new wxBoxSizer(wxHORIZONTAL);
+	neurobox->AddButton(ID_filter, "Grid Update", 80, filterbox);
+
+	wxBoxSizer *selectstorebox = new wxBoxSizer(wxVERTICAL); 
+	selectstoretag = new TagBox(mainwin, this, ID_Select, "", wxDefaultPosition, wxSize(150, -1), "selectstoretag", neurobox->mod->path);
+	selectstorebox->Add(selectstoretag, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	wxBoxSizer *selectbuttons = new wxBoxSizer(wxHORIZONTAL);
+	neurobox->AddButton(ID_selectstore, "Store", 40, selectbuttons, 2);
+	neurobox->AddButton(ID_selectload, "Load", 40, selectbuttons, 2);
+	selectstorebox->Add(selectbuttons, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	filterbox->AddSpacer(20);
+	filterbox->Add(selectstorebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
+	selectpanelbox->Add(fromtobox, 0, wxALIGN_CENTRE_HORIZONTAL);
+	selectpanelbox->AddSpacer(15);
+	selectpanelbox->Add(selectbox[0], 0);
+	selectpanelbox->AddSpacer(10);
+	selectpanelbox->Add(selectbox[1], 0);
+	selectpanelbox->AddSpacer(15);
+	selectpanelbox->Add(filterbox, 0, wxALIGN_CENTRE_HORIZONTAL);
+
+	wxBoxSizer *colbox2 = new wxBoxSizer(wxHORIZONTAL); 
+	colbox2->AddStretchSpacer();
+	colbox2->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	colbox2->AddSpacer(30);
+	//colbox2->AddStretchSpacer();
+	colbox2->Add(selectpanelbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
+	selectsizer->AddStretchSpacer();
+	selectsizer->Add(colbox2, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	selectsizer->AddStretchSpacer();
+	this->Layout();
+}
+
+
+
 NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size)
 	: ParamBox(model, title, pos, size, "cellbox", 1, false)
 	//ParamBox(model, title, pos, size, "outbox", 0, 1)
@@ -41,8 +184,10 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	//selectdata[0] = new BurstDat(true);
     //selectdata[1] = new BurstDat(true);
 
-	selectspikes[0] = new int[100000];
-	selectspikes[1] = new int[100000];
+	//selectspikes[0] = new int[100000];
+	//selectspikes[1] = new int[100000];
+	selectspikes[0].resize(100000);
+	selectspikes[1].resize(100000);
 	spikeselectLink = false;
 
 	for(i=0; i<100000; i++) {
@@ -271,8 +416,8 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(NeuroBox::OnPrev));
 	Connect(ID_Load, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnLoadData));
 
-	Connect(100, 105, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnAdd));
-	Connect(200, 205, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSub));
+	//Connect(100, 105, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnAdd));        // old code from before Add and Sub made toggle buttons
+	//Connect(200, 205, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSub));
 	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnClear));
 	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnInvert));
 
@@ -288,18 +433,164 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 }
 
 
+/*
+void NeuroBox::CellPanel()
+{
+	//
+
+	ToolPanel *selectpanel = new ToolPanel(this, tabpanel);
+	selectpanel->SetFont(boxfont);
+	wxBoxSizer *selectbox = new wxBoxSizer(wxVERTICAL);
+	selectpanel->SetSizer(selectbox);
+	activepanel = selectpanel;
+	paramset.panel = selectpanel;
+
+
+	// Neuron selection
+
+	datwidth = 50;
+	labelwidth = 70;
+	label = NumPanel(labelwidth, wxALIGN_CENTRE);
+	spikes = NumPanel(datwidth, wxALIGN_RIGHT);
+	freq = NumPanel(datwidth, wxALIGN_RIGHT);
+	//mean = NumPanel(datwidth, wxALIGN_RIGHT);
+	//sd = NumPanel(datwidth, wxALIGN_RIGHT);
+	selspikes = NumPanel(datwidth, wxALIGN_RIGHT);
+	selfreq = NumPanel(datwidth, wxALIGN_RIGHT);
+
+	wxGridSizer *datagrid = new wxGridSizer(2, 5, 5);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Name"), 0, wxALIGN_CENTRE);
+	datagrid->Add(label);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Spikes"), 0, wxALIGN_CENTRE);
+	datagrid->Add(spikes);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(freq);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Select Spikes"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(selspikes);
+	datagrid->Add(new wxStaticText(activepanel, -1, "Select Freq"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	datagrid->Add(selfreq);
+	//datagrid->Add(new wxStaticText(activepanel, -1, "Filter"), 0, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	//datagrid->Add(filtercheck);
+
+	filtercheck = SetBoxCheck(ID_filtercheck, "filter", "Filter", false);
+	//wxBoxSizer* filterbox = new wxBoxSizer(wxHORIZONTAL);
+	//filterbox->Add(filtercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
+	datneuron = new wxTextCtrl(activepanel, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
+	if(ostype == Mac)
+		datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(-1, -1), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+	else
+		datspin = new wxSpinButton(activepanel, wxID_ANY, wxDefaultPosition, wxSize(40, 17), wxSP_HORIZONTAL|wxSP_ARROW_KEYS);
+	datspin->SetRange(-1000000, 1000000);
+
+	wxBoxSizer *datbox = new wxBoxSizer(wxHORIZONTAL);
+	datbox->Add(datspin, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	datbox->AddSpacer(5);
+
+	wxBoxSizer *neurobox = new wxBoxSizer(wxHORIZONTAL);
+	neurobox->Add(new wxStaticText(activepanel, wxID_ANY, "Neuron"), 1, wxALIGN_CENTRE|wxST_NO_AUTORESIZE);
+	neurobox->Add(datneuron, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+	wxStaticBoxSizer *databox = new wxStaticBoxSizer(wxVERTICAL, activepanel, "");
+	databox->AddSpacer(2);
+	databox->Add(neurobox, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 5);
+	databox->AddSpacer(5);
+	databox->Add(datbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL| wxALL, 0);
+	databox->AddSpacer(5);
+	databox->Add(datagrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+	databox->AddSpacer(5);
+	databox->Add(filtercheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+
+	// Spike selection
+
+	paramset.AddNum("from", "From", 0, 0, 30); 
+	paramset.AddNum("to", "To", 100, 0, 20); 
+
+	wxBoxSizer *selectpanelbox = new wxBoxSizer(wxVERTICAL);
+	selectbox1 = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Selection 1");
+	selectbox2 = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Selection 2");
+	wxBoxSizer *fromtobox = new wxBoxSizer(wxHORIZONTAL);
+
+	fromtobox->Add(paramset.GetCon("from"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	fromtobox->Add(paramset.GetCon("to"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+
+	int buttspace = 20;
+
+	//AddButton(100, "Add", 40, selectbox1);
+	addbutton[0] = ToggleButton(100, "Add", 40, selectbox1);	
+	selectbox1->AddSpacer(buttspace);
+	//AddButton(200, "Sub", 40, selectbox1);
+	subbutton[0] = ToggleButton(200, "Sub", 40, selectbox1);	
+	selectbox1->AddSpacer(buttspace);
+	AddButton(300, "Clear", 40, selectbox1);
+	selectbox1->AddSpacer(buttspace);
+	AddButton(400, "Invert", 40, selectbox1);
+
+	//AddButton(101, "Add", 40, selectbox2);
+	addbutton[1] = ToggleButton(101, "Add", 40, selectbox2);	
+	selectbox2->AddSpacer(buttspace);
+	//AddButton(201, "Sub", 40, selectbox2);
+	subbutton[1] = ToggleButton(201, "Sub", 40, selectbox2);	
+	selectbox2->AddSpacer(buttspace);
+	AddButton(301, "Clear", 40, selectbox2);
+	selectbox2->AddSpacer(buttspace);
+	AddButton(401, "Invert", 40, selectbox2);
+
+	for(i=0; i<selectcount; i++) selectmode[i] = 1;
+	currselect = 0;
+	addbutton[currselect]->SetValue(true);
+
+	//filterbox = new wxStaticBoxSizer(wxHORIZONTAL, activepanel, "Filter");
+	wxBoxSizer *filterbox = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_filter, "Grid Update", 80, filterbox);
+
+	wxBoxSizer *selectstorebox = new wxBoxSizer(wxVERTICAL); 
+	//selectstorebox->Add(paramset.AddText("selectstoretag", "", "", 0, 100), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	selectstoretag = new TagBox(mainwin, activepanel, ID_Select, "", wxDefaultPosition, wxSize(150, -1), "selectstoretag", mod->path);
+	selectstorebox->Add(selectstoretag, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	wxBoxSizer *selectbuttons = new wxBoxSizer(wxHORIZONTAL);
+	AddButton(ID_selectstore, "Store", 40, selectbuttons, 2);
+	AddButton(ID_selectload, "Load", 40, selectbuttons, 2);
+	selectstorebox->Add(selectbuttons, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	filterbox->AddSpacer(20);
+	filterbox->Add(selectstorebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
+	selectpanelbox->Add(fromtobox, 0, wxALIGN_CENTRE_HORIZONTAL);
+	selectpanelbox->AddSpacer(15);
+	selectpanelbox->Add(selectbox1, 0);
+	selectpanelbox->AddSpacer(10);
+	selectpanelbox->Add(selectbox2, 0);
+	selectpanelbox->AddSpacer(15);
+	selectpanelbox->Add(filterbox, 0, wxALIGN_CENTRE_HORIZONTAL);
+
+	wxBoxSizer *colbox2 = new wxBoxSizer(wxHORIZONTAL); 
+	colbox2->AddStretchSpacer();
+	colbox2->Add(databox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	colbox2->AddSpacer(30);
+	//colbox2->AddStretchSpacer();
+	colbox2->Add(selectpanelbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+
+	selectbox->AddStretchSpacer();
+	selectbox->Add(colbox2, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
+	selectbox->AddStretchSpacer();
+	selectpanel->Layout();
+}
+*/
+
 NeuroBox::~NeuroBox()
 {
+	/*
 	if(!spikeselectLink) {
 		delete[] selectspikes[0];
 		delete[] selectspikes[1];
 	}
+	*/
 }
 
 
 void NeuroBox::OnSelectStore(wxCommandEvent& event)
 {
-	int i, cellindex;
+	int cellindex, select;
 	wxString filepath;
 	wxString filedir, filesuffix;
 	wxString text;
@@ -307,8 +598,10 @@ void NeuroBox::OnSelectStore(wxCommandEvent& event)
 	NeuroDat *cell;
 
 	if(currcell->spikecount) {
-		currcell->selectdata->spikes = selectspikes[currselect];
-		currcell->SelectScan();
+		for(select=0; select<selectcount; select++) {
+			currcell->selectdata->spikes = selectspikes[select].data();
+			currcell->SelectScan(select); 
+		}
 	}
 
 	filedir = mod->GetPath() + "/Tools";
@@ -320,46 +613,45 @@ void NeuroBox::OnSelectStore(wxCommandEvent& event)
 	if(filepath.IsEmpty()) return;
 
 	selectfile.New(filepath);
-
 	for(cellindex=0; cellindex<cellcount; cellindex++) {
 		cell = &(*cells)[cellindex];
-		for(i=1; i<=cell->numselects; i++) {
-			text.Printf("dat %s  cel %d  index %d  sta %d  end %d", cell->name, cellindex, i, cell->selectstore[i].start, cell->selectstore[i].end);	
-			selectfile.WriteLine(text);
+		for(select=0; select<selectcount; select++) {
+			diagbox->Write(text.Format("SelectStore cell %d select %d numselects %d\n", cellindex, select, cell->numselects[select]));
+			for(i=1; i<=cell->numselects[select]; i++) {
+				text.Printf("dat %s  cel %d  sel %d  index %d  sta %d  end %d", 
+					cell->name, cellindex, select, i, cell->selectstore[select][i].start, cell->selectstore[select][i].end);	
+				selectfile.WriteLine(text);
+			}
 		}
 	}
-
 	selectfile.Close();
 }
 
 
 NeuroDat *NeuroBox::GetCell(wxString name) 
 {
-	int i;
-
 	for(i=0; i<cellcount; i++) if((*cells)[i].name == name) return &(*cells)[i];
-	
 	return NULL;
 }
 
 
 void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 {
-	int i;
 	wxString filedir, filepath;
 	wxString filesuffix;
 	TextFile selectfile;
 	wxString readline;
 	int index, start, end;
-	int cellindex;
+	int cellindex, select;
 	wxString name;
 	bool diagnostic = true;
 	NeuroDat *cell;
 	
+	if(currcell->selectdata) currcell->selectdata->spikes = selectspikes[currselect].data();
 
-	if(currcell->selectdata) currcell->selectdata->spikes = selectspikes[currselect];
-
-	for(i=0; i<cellcount; i++) (*cells)[i].numselects = 0;
+	for(i=0; i<cellcount; i++) {
+		for(select=0; select<selectcount; select++) (*cells)[i].numselects[select] = 0;
+	}
 
 	filedir = mod->GetPath() + "/Tools";
 	filesuffix = "-select.dat";
@@ -385,17 +677,25 @@ void NeuroBox::OnSelectLoad(wxCommandEvent& event)
 			readline = selectfile.ReadLine();	
 			continue;
 		}
+		if(diagnostic) diagbox->Write(text.Format("index check readline %s check %d\n", readline, ParseCheck(&readline, "sel")));
+		if(ParseCheck(&readline, "sel")) select = ParseLong(&readline, 'l');
+		else select = currselect;
 		index = ParseLong(&readline, 'x');
-		cell->numselects++;
-		cell->selectstore[index].start = ParseLong(&readline, 'a');
-		cell->selectstore[index].end = ParseLong(&readline, 'd');
-		if(diagnostic) diagbox->Write(text.Format("SelectLoad  cell %d  index %d  start %d  end %d\n", cellindex, index, cell->selectstore[index].start, cell->selectstore[index].end)); 
+		cell->numselects[select]++;
+		cell->selectstore[select][index].start = ParseLong(&readline, 'a');
+		cell->selectstore[select][index].end = ParseLong(&readline, 'd');
+		if(diagnostic) diagbox->Write(text.Format("SelectLoad  cell %d  index %d  start %d  end %d\n", 
+			cellindex, index, cell->selectstore[select][index].start, cell->selectstore[select][index].end)); 
 		if(selectfile.End()) break;
 		readline = selectfile.ReadLine();	
 	}
 	
 	if(currcell->spikecount) {
-		currcell->SelectSpikes();
+		for(i=0; i<selectcount; i++) {
+			currcell->selectdata->spikes = selectspikes[i].data();
+			currcell->SelectSpikes(i);  // store current cell's select grid to NeuroDat
+		}
+		currcell->selectdata->spikes = selectspikes[currselect].data();
 		AnalyseSelection();
 		if(!currcell->colourdata) {
 			currcell->ColourSwitch(2);
@@ -493,6 +793,7 @@ void NeuroBox::OnBrowse(wxCommandEvent& event)
 }
 
 
+// OnToggle, from ToolBox, used here for Add/Sub toggle buttons
 void NeuroBox::OnToggle(wxCommandEvent& event)      
 {
 	int sel, type, i;
@@ -503,9 +804,11 @@ void NeuroBox::OnToggle(wxCommandEvent& event)
 	sel = id % 100;
 
 	AddSubToggle(sel, type);
+	SelectUpdate();
 }
 
 
+// AddSubToggle clears the Add and Sub toggle buttons for each select and sets the specified button
 void NeuroBox::AddSubToggle(int sel, int type)      
 {
 	int i;
@@ -526,6 +829,7 @@ void NeuroBox::AddSubToggle(int sel, int type)
 }
 
 
+// OnClick, from ToolBox, used here for detecting clicks in select control panels to switch between selects
 void NeuroBox::OnClick(wxPoint pos)
 {
 	wxString text;
@@ -625,7 +929,7 @@ void NeuroBox::SelectUpdate()
 {
 	if(!currcell->spikecount) return;      // use spikecount to check for spike data
 
-	currcell->selectdata->spikes = selectspikes[currselect];
+	currcell->selectdata->spikes = selectspikes[currselect].data();
 	if(!currcell->colourdata) {
 		currcell->ColourSwitch(2);
 		mainwin->scalebox->ratedata = 2;
@@ -648,16 +952,23 @@ void NeuroBox::SelectUpdate()
 }
 
 
+// OnAdd, out of use since switch to toggle button
+void NeuroBox::OnAdd(wxCommandEvent& event)
+{
+	currselect = event.GetId() - 100;
+	SelectAdd();
+
+	diagbox->Write(text.Format("\nAdd Button selection %d\n", currselect));
+}
+
+
+// OnSub, out of use since switch to toggle button
 void NeuroBox::OnSub(wxCommandEvent& event)
 {
-	int i, id, sel;
-	wxString text;
-
-	id = event.GetId();
-	sel = event.GetId() - 200;
-	currselect = sel;
-	
+	currselect = event.GetId() - 200;
 	SelectSub();
+
+	diagbox->Write(text.Format("\nSub Button selection %d\n", currselect));
 }
 
 
@@ -666,14 +977,11 @@ void NeuroBox::OnInvert(wxCommandEvent& event)
 	int i;
 	int sel = event.GetId() - 400;
 
-	//for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = (sel + 1) - selectdata[sel]->spikes[i];
-
-	//sel = event.GetId() - 00;
-	//currselect = sel;
 	for(i=0; i<currcell->spikecount; i++) selectspikes[sel][i] = (sel + 1) - selectspikes[sel][i];
 
-	//mainwin->scalebox->BurstDisp(1);
-	//AnalyseSelection();
+	currselect = sel;
+	AddSubToggle(currselect, 1);
+
 	SelectUpdate();
 }
 
@@ -683,31 +991,12 @@ void NeuroBox::OnClear(wxCommandEvent& event)
 	int i;
 	int sel = event.GetId() - 300;
 
-	//for(i=0; i<numspikes; i++) selectdata[sel]->spikes[i] = 0;
-	//sel = event.GetId() - 300;
-	//currselect = sel;
 	for(i=0; i<currcell->spikecount; i++) selectspikes[sel][i] = 0;
 
-	//mainwin->scalebox->BurstDisp(1);
-	//AnalyseSelection();
-	SelectUpdate();
-}
-
-
-void NeuroBox::OnAdd(wxCommandEvent& event)
-{
-	int i, sel, selspike;
-	int numspikes, scount;
-	double isi, timepoint;
-	double intracount, intratime;
-	wxString text;
-	BurstDat *burstdata;
-	datdouble isis;
-
-	sel = event.GetId() - 100;
 	currselect = sel;
+	AddSubToggle(currselect, 1);
 
-	SelectAdd();
+	SelectUpdate();
 }
 
 
@@ -719,7 +1008,6 @@ void NeuroBox::AnalyseSelection()
 	double isi, timepoint;
 	double intracount, intratime;
 	wxString text;
-	//BurstDat *burstdata;
 	
 	if(!currcell->selectdata) currcell->selectdata = new BurstDat();
 	currcell->selectdata->times = currcell->times.data();
@@ -814,7 +1102,11 @@ void NeuroBox::NeuroData(bool dispupdate)
     if(mainwin->soundbox) mainwin->soundbox->DataLink(currcell);
     #endif
 
-	currcell->SelectSpikes();
+	for(i=0; i<selectcount; i++) {
+		currcell->selectdata->spikes = selectspikes[i].data();
+		currcell->SelectSpikes(i);  // store current cell's select grid to NeuroDat
+	}
+	currcell->selectdata->spikes = selectspikes[currselect].data();
 	AnalyseSelection();
 	
 	if(burstbox) {
@@ -844,7 +1136,10 @@ void NeuroBox::OnPrev(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex > 0) neuroindex--;
 	else neuroindex = cellcount-1;
 
-	currcell->SelectScan();  // store current cell's select grid to NeuroDat
+	for(i=0; i<selectcount; i++) {
+		currcell->selectdata->spikes = selectspikes[i].data();
+		currcell->SelectScan(i);  // store current cell's select grid to NeuroDat
+	}
 	NeuroData();
 }
 
@@ -855,7 +1150,10 @@ void NeuroBox::OnNext(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex < cellcount-1) neuroindex++;
 	else neuroindex = 0;
 
-	currcell->SelectScan();  // store current cell's select grid to NeuroDat
+	for(i=0; i<selectcount; i++) {
+		currcell->selectdata->spikes = selectspikes[i].data();
+		currcell->SelectScan(i);  // store current cell's select grid to NeuroDat
+	}
 	NeuroData();
 }
 

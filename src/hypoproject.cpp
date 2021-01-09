@@ -60,6 +60,9 @@ void Project::Store()
 	outfile.WriteLine("box " + boxfile);
 
 	// Prefs Store
+	mod->prefstore["mainsizeX"] = mainwin->GetSize().GetX();
+	mod->prefstore["mainsizeY"] = mainwin->GetSize().GetY();
+
 	outfile.New(filepath + "/" + prefsfile);
 	for(i=0; i<mod->prefstore.size(); i++) {
 		outfile.WriteLine(text.Format("%s %.0f", mod->prefstore.gettag(i), mod->prefstore[i]));
@@ -114,6 +117,8 @@ void Project::Load()
 			readline = infile.ReadLine();
 		}
 		infile.Close();
+
+		mainwin->SetSize(wxSize(mod->prefstore["mainsizeX"], mod->prefstore["mainsizeY"]));
 
 		mainwin->numdraw_set = mod->prefstore["numdraw"];
 		mainwin->optionpanel->numdrawcon->SetValue(mainwin->numdraw_set);

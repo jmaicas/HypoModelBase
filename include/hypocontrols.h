@@ -386,7 +386,7 @@ public:
 
 	~ToolBox();
 
-	virtual void OnToggle(wxCommandEvent& event);
+	virtual void OnToggle(wxCommandEvent& event) {};
 	virtual void TextClick(wxString tag);
 	virtual void SpinClick(wxString tag);
 	virtual void BoxEnter(wxString tag);

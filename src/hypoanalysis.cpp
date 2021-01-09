@@ -828,7 +828,7 @@ void BurstDat::BurstScanFit()
 
 // SelectSpikes() : convert select store to select array
 
-void SpikeDat::SelectSpikes()
+void SpikeDat::SelectSpikes(int select)
 {
 	int i;
 
@@ -838,10 +838,10 @@ void SpikeDat::SelectSpikes()
 	for(i=0; i<spikecount; i++) selectdata->spikes[i] = 0;
 
 	for(i=0; i<spikecount; i++) {
-		if(bindex > neurodata->numselects) break;  
-		if(i == neurodata->selectstore[bindex].start) selecton = 1;
-		selectdata->spikes[i] = selecton;
-		if(i == neurodata->selectstore[bindex].end) {
+		if(bindex > neurodata->numselects[select]) break;  
+		if(i == neurodata->selectstore[select][bindex].start) selecton = 1;
+		selectdata->spikes[i] = selecton * (select + 1);
+		if(i == neurodata->selectstore[select][bindex].end) {
 			selecton = 0;
 			bindex++;
 		} 
@@ -851,7 +851,7 @@ void SpikeDat::SelectSpikes()
 
 // SelectScan() : convert select array to select store
 
-void SpikeDat::SelectScan()
+void SpikeDat::SelectScan(int select)
 {
 	int i;
 	int selecton;
@@ -860,7 +860,7 @@ void SpikeDat::SelectScan()
 	double selecttime;
 	wxString text;
 
-	int *selectspikes = selectdata->spikes;
+	//int *selectspikes = selectdata->spikes;
 
 	selecton = 0;
 	selectindex = 0;
@@ -869,17 +869,17 @@ void SpikeDat::SelectScan()
 	diagbox->Write(text.Format("SelectScan %d spikes\n", spikecount));
 
 	for(i=0; i<spikecount; i++) {                // runs one beyond spikes to catch selection that includes last spike
-		if(selectspikes[i]) {
+		if(selectdata->spikes[i]) {
 			if(!selecton) {
 				selectstart = i;
 				selecton = 1;
 			}
 		}
-		if(!selectspikes[i]) {
+		if(!selectdata->spikes[i]) {
 			if(selecton) {
 				selectindex++;		
-				neurodata->selectstore[selectindex].start = selectstart;
-				neurodata->selectstore[selectindex].end = i-1;
+				neurodata->selectstore[select][selectindex].start = selectstart;
+				neurodata->selectstore[select][selectindex].end = i-1;
 				selecton = 0;
 				selecttime += selectdata->times[i-1] - selectdata->times[selectstart]; 
 			}
@@ -889,15 +889,15 @@ void SpikeDat::SelectScan()
 	// Select at end of data
 	if(selecton) {
 		selectindex++;		
-		neurodata->selectstore[selectindex].start = selectstart;
-		neurodata->selectstore[selectindex].end = spikecount-1;
+		neurodata->selectstore[select][selectindex].start = selectstart;
+		neurodata->selectstore[select][selectindex].end = spikecount-1;
 		selecttime += selectdata->times[spikecount-1] - selectdata->times[selectstart]; 
 	}
 	
-	neurodata->numselects = selectindex;
+	neurodata->numselects[select] = selectindex;
 	selectdata->intratime = selecttime;
 
-	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numselects));
+	diagbox->Write(text.Format("SelectScan OK  numbursts %d\n", neurodata->numselects[select]));
 }
 
 

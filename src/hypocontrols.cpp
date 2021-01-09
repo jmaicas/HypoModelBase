@@ -1139,10 +1139,6 @@ wxToggleButton *ToolBox::ToggleButton(int id, wxString label, int width, wxBoxSi
 }
 
 
-void ToolBox::OnToggle(wxCommandEvent& event)
-{}
-
-
 void ToolBox::TextClick(wxString tag)
 {
 	diagbox->Write("toolbox textclick " + tag + "\n");

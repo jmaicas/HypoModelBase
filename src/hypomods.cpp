@@ -158,11 +158,12 @@ void Model::GridColumn(int col)
 {}
 
 
-void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
+void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags, int command)
 {
 	int i, gdex;
 	GraphSet *graphset;
 	wxString text;
+	GraphDat *refgraph, *newgraph;
 
 	mainwin->diagbox->Write("GSwitch call\n");
 
@@ -174,11 +175,31 @@ void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags)
 			if(!gdex) continue;
 			if(diagbox) diagbox->textbox->AppendText(text.Format("gpos %d   gcode %s   set %s   plot %d   modesum %d   sdex %d  sync %d  current %d\n", 
 				i, gcodes[i], graphset->tag, gdex, graphset->modesum, graphset->sdex, (*graphbase)[gdex]->synchx, graphset->current));
+
+			// Graph Switch commands
+			if(command == XSYNCH) {
+				refgraph = gpos[i].GetFront();
+				newgraph = (*graphbase)[gdex];
+				newgraph->xto = refgraph->xto;
+				newgraph->xfrom = refgraph->xfrom;
+			}
+
 			gpos[i].Front((*graphbase)[gdex]);
 			gpos[i].sdex = graphset->sdex;
 		}
 	}
 }
+
+/*
+refgraph = graphwin[pan1]->dispset[0]->plot[0];
+for(i=0; i<graphwin[pan2]->numdisps; i++) {
+	graph = graphwin[pan2]->dispset[i]->plot[0];
+	graph->yto = refgraph->yto;
+	graph->yfrom = refgraph->yfrom;
+	graph->xto = refgraph->xto;
+	graph->xfrom = refgraph->xfrom;
+}
+*/
 
 
 wxString Model::GetPath()

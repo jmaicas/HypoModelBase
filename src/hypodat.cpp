@@ -17,10 +17,12 @@ NeuroDat::NeuroDat()
 	//srate10.resize(maxtime);
 
 	maxselect = 100;
-	selectstore.resize(maxselect);
+	selectstore[0].resize(maxselect);
+	numselects[0] = 0;
+	selectstore[1].resize(maxselect);
+	numselects[1] = 0;
 
 	filter = 0;
-	numselects = 0;
 	burstfitmode = 0;
 }
 

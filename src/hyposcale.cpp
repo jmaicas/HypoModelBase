@@ -927,19 +927,19 @@ void ScaleBox::OnGraphButton(wxCommandEvent& event)
 	int id = event.GetId();
 	wxString tag = gflagrefs->GetRef(id);
 	int type = gflagrefs->GetType(id);
-	int mode = event.GetInt();
+	int button_command = event.GetInt();
+	int switch_command = NONE;
 
-	// 'mode' is used for linked button commands, mode=0 default normal behaviour, mode=1 switches off 
-
-	if(mode == 1 || (*gflags)[tag] == type) (*gflags)[tag] = 0;
+	// 'button_command' is used for linked button commands, command=0 default normal behaviour, command=1 forces switch off 
+	if(button_command == 1 || (*gflags)[tag] == type) (*gflags)[tag] = 0;
 	else (*gflags)[tag]++;                          // new code for multi-state cycling buttons, i.e. all/burst/select, 'type' encodes number of states
 	
-	//if((*gflags)[tag] == 0) (*gflags)[tag] = 1;
-	//else (*gflags)[tag] = 0;
+	// Custom button actions
+	if(id == ID_rateres) switch_command = XSYNCH;
 
-	mainwin->diagbox->Write(text.Format("\ngraphbutton %s %.0f  type %d  mode %d\n", tag, (*gflags)[tag], type, mode));
+	mainwin->diagbox->Write(text.Format("\ngraphbutton %s %.0f  type %d  mode %d\n", tag, (*gflags)[tag], type, button_command));
 
-	GraphSwitch();
+	GraphSwitch(switch_command);
 }
 
 
@@ -1316,10 +1316,10 @@ ParamStore *ScaleBox::GetFlags()
 }
 
 
-void ScaleBox::GraphSwitch(int disp)
+void ScaleBox::GraphSwitch(int command)
 {
 	GetFlags();
-	gmod->GSwitch(gpos, gflags);
+	gmod->GSwitch(gpos, gflags, command);
 	ScaleUpdate();
 	if(mainwin->graphbox) mainwin->graphbox->SetGraph();
 	//if(disp) GraphUpdate();
@@ -1516,15 +1516,17 @@ void ScaleBox::OnOverlay(wxCommandEvent& event)
 		mod->diagbox->Write("ScaleBox overlay ID not found\n");
 		return;
 	}	
+	// Graph panel indexes
 	pan1 = overlay->panel1;
 	pan2 = overlay->panel2;
 	
+	// Overlay, add panel1 plot(s) to panel2
 	if(!overlay->toggle) {	
 		overlay->numdisps = graphwin[pan1]->numdisps;
 		if(!overlay->numdisps) return;
-		refgraph = graphwin[pan1]->dispset[0]->plot[0];
-
+		
 		// Synchronise axis scales in panel2
+		refgraph = graphwin[pan1]->dispset[0]->plot[0];
 		for(i=0; i<graphwin[pan2]->numdisps; i++) {
 			graph = graphwin[pan2]->dispset[i]->plot[0];
 			graph->yto = refgraph->yto;
@@ -1541,6 +1543,7 @@ void ScaleBox::OnOverlay(wxCommandEvent& event)
 			graphwin[pan1]->numdisps--;
 		}
 	}
+	// Reverse overlay, return added plot(s) to panel1
 	else {
 		numdisps = graphwin[pan2]->numdisps;
 		//if(!numdisps) return;

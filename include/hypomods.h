@@ -119,7 +119,7 @@ public:
     void DiagWrite(wxString);
 	virtual void RunModel();
 	virtual void Output() {};
-	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags);
+	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags, int command=0);
 	virtual void ScaleSwitch(double xscale = 0) {};
 	virtual int ModeSum(ParamStore *gflags);
 	virtual int SoundLink(SpikeDat **, datdouble **);

@@ -14,6 +14,14 @@
 
 
 
+// Graph switch command codes
+enum {
+	NONE = 0,
+	XSYNCH = 1          // synch new plot's x-axis with previous plot
+};
+
+
+
 class GraphPanel: public wxScrolledWindow             // For testing, not in Use
 {
 public:
@@ -308,7 +316,8 @@ public:
 	void PaintBackground(wxDC& dc);
 	void GraphUpdate(int pos=-1);
 	void SetMod(Model *gmod);
-	void GraphSwitch(int disp=1);
+	//void GraphSwitch(int disp=1);
+	void GraphSwitch(int command=0);
 	wxBoxSizer *GSBox(wxString, wxPanel *storepanel=NULL);
 	void AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad = 1, int height = 0);
 	ParamStore *GetFlags();

@@ -8,6 +8,41 @@
 #include "hypopanels.h"
 
 
+
+class CellPanel: public ToolPanel
+{
+public:
+	NeuroBox *neurobox;
+	SpikeDat *currcell;
+	std::vector<NeuroDat>*cells;
+
+	int cellindex;
+	int cellcount;
+	int currselect;
+	int selectcount;
+
+	int selectmode[2];
+	std::vector<int>selectspikes[2];
+
+	wxStaticBoxSizer *selectbox[2];
+	wxToggleButton *addbutton[2];
+	wxToggleButton *subbutton[2];
+
+	wxTextCtrl *datneuron;
+	wxSpinButton *datspin;
+
+	wxStaticText *label;
+	wxStaticText *spikes;
+	wxStaticText *freq;
+	wxStaticText *selectspikecount;
+	wxStaticText *selectfreq;
+	wxCheckBox *filtercheck;
+	TagBox *selectstoretag;
+
+	CellPanel(NeuroBox *, SpikeDat *, std::vector<NeuroDat>*);
+};
+
+
 class NeuroBox: public ParamBox
 {
 public:
@@ -16,10 +51,12 @@ public:
 
 	int neuroindex;
 	int cellcount;
+
 	SpikeDat *currcell;
-	//SpikeDat *selected;
-	//NeuroDat *cells;
-	vector<NeuroDat>*cells;
+	std::vector<NeuroDat>*cells;
+	SpikeDat *currmodcell;
+	std::vector<NeuroDat>*modcells;
+
 	GridBox *gridbox;
 	BurstBox *burstbox;
 
@@ -30,14 +67,15 @@ public:
 	TextGrid *textgrid;
 
 	wxStaticBoxSizer *selectbox1, *selectbox2;  //, *filterbox;
+	wxStaticBoxSizer *selectbox3, *selectbox4;
 	wxToggleButton *addbutton[5];
 	wxToggleButton *subbutton[5];
 	int selectmode[5];
 	int selectcount;
 	int currselect;
-	//BurstDat **selectdata;
-	//BurstDat *selectdata[5];
-	int *selectspikes[2];
+	int currselectmod;
+	
+	std::vector<int>selectspikes[4];
 	bool spikeselectLink;
 
 	wxCheckBox *filtercheck;
