@@ -9,17 +9,22 @@
 
 
 
-class CellPanel: public ToolPanel
+class SpikePanel: public ToolPanel
 {
 public:
 	NeuroBox *neurobox;
-	SpikeDat *currcell;
-	std::vector<NeuroDat>*cells;
+	SpikeDat *currneuron;
+	std::vector<NeuroDat>*neurons;
 
-	int cellindex;
-	int cellcount;
+	int i;
+	wxString text;
+	bool diagnostic = true;
+
+	int neuroindex;
+	int neurocount;
 	int currselect;
 	int selectcount;
+	int cellmode;
 
 	int selectmode[2];
 	std::vector<int>selectspikes[2];
@@ -30,6 +35,8 @@ public:
 
 	wxTextCtrl *datneuron;
 	wxSpinButton *datspin;
+	ParamCon *fromcon; 
+	ParamCon *tocon;
 
 	wxStaticText *label;
 	wxStaticText *spikes;
@@ -37,9 +44,29 @@ public:
 	wxStaticText *selectspikecount;
 	wxStaticText *selectfreq;
 	wxCheckBox *filtercheck;
-	TagBox *selectstoretag;
 
-	CellPanel(NeuroBox *, SpikeDat *, std::vector<NeuroDat>*);
+	SpikePanel(NeuroBox *, SpikeDat *, std::vector<NeuroDat>*);
+
+	void PanelData(NeuroDat *data = NULL);
+	void OnNext(wxSpinEvent& event);
+	void OnPrev(wxSpinEvent& event);
+	void OnEnter(wxCommandEvent& event);
+	void NeuroData(bool dispupdate = true);
+	void OnAdd(wxCommandEvent& event);
+	void OnSub(wxCommandEvent& event);
+	void OnClear(wxCommandEvent& event);
+	void OnInvert(wxCommandEvent& event);
+	void AnalyseSelection();
+	void SetSelectRange(double, double);
+	void OnClick(wxPoint);
+	void OnToggle(wxCommandEvent& event);
+	void SelectAdd();
+	void SelectSub();
+	void SelectUpdate();
+	void AddSubToggle(int sel, int type);
+	NeuroDat *GetCell(wxString name);  
+	void SelectStore();
+	void SelectLoad();
 };
 
 
@@ -66,6 +93,8 @@ public:
 	TagBox *selectstoretag;
 	TextGrid *textgrid;
 
+	SpikePanel *cellpanel, *modpanel;
+
 	wxStaticBoxSizer *selectbox1, *selectbox2;  //, *filterbox;
 	wxStaticBoxSizer *selectbox3, *selectbox4;
 	wxToggleButton *addbutton[5];
@@ -83,42 +112,26 @@ public:
 
 	NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	~NeuroBox();
-	void NeuroData(bool dispupdate = true);
+	//void NeuroData(bool dispupdate = true);
 	//void NeuroAnalysis();
-	void PanelData(NeuroDat *data = NULL);
-	void OnNext(wxSpinEvent& event);
-	void OnPrev(wxSpinEvent& event);
-	void OnEnter(wxCommandEvent& event);
+	//void PanelData(NeuroDat *data = NULL);
+	//void OnNext(wxSpinEvent& event);
+	//void OnPrev(wxSpinEvent& event);
+	//void OnEnter(wxCommandEvent& event);
 	void OnLoadData(wxCommandEvent& event);
 	void OnBrowse(wxCommandEvent& event);
 	void LoadDataList(FileDat *);
 	void LoadNeuroData(FileDat file, int col);
 
-	void OnAdd(wxCommandEvent& event);
-	void OnSub(wxCommandEvent& event);
-	void OnClear(wxCommandEvent& event);
-	void OnInvert(wxCommandEvent& event);
-	void AnalyseSelection();
-	void SetSelectRange(double, double);
-	void OnClick(wxPoint);
-	//void OnClick(wxMouseEvent &event);
-	void OnToggle(wxCommandEvent& event);
-	void SelectAdd();
-	void SelectSub();
-	void SelectUpdate();
-	void AddSubToggle(int sel, int type);
-
-	void OnBoxCheck(wxCommandEvent& event);
 	void OnGridFilter(wxCommandEvent& event);
 	void OnSelectStore(wxCommandEvent& event);
 	void OnSelectLoad(wxCommandEvent& event);
-
-	NeuroDat *GetCell(wxString name);  
+	void OnBoxCheck(wxCommandEvent& event);
 
 
 	// Functions ported from PlotModel
 	void DataSelect(double, double);
-	void SetCell(int, GraphDat*);
+	//void SetCell(int, GraphDat*);
 	int GetCellIndex();
 	void Analysis();
 };

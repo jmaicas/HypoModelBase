@@ -59,6 +59,7 @@ public:
     void PathUpdate();
 	wxString LoadTag(wxString path, wxString suffix="");
 	wxString StoreTag(wxString path, wxString suffix="");
+	wxBoxSizer *TagCon(ToolBox *box, int storeid, int loadid, int orient=wxHORIZONTAL);
 };
 
 
@@ -94,6 +95,22 @@ public:
 	virtual void Press();
 
 	ToolButton(wxWindow *parent, wxWindowID id, wxString label, const wxPoint& pos, const wxSize& size, DiagBox *diagbox);
+};
+
+
+
+// ToolStore, attempt at separate class for packaging tag store and controls, NOT IN USE, too much parameter passing required, replaced by ToolBox::TagStoreBox()
+class ToolStore
+{
+public:
+	TagBox *tagbox;
+	wxBoxSizer *boxsizer;
+	wxString tag;
+	ToolPanel *panel;
+	ToolBox *box;
+
+	//ToolStore(ToolBox *, wxString tag, wxString path, int width=100, ToolPanel *panel=NULL);
+	ToolStore(ToolBox *, TagBox *, int storeid, int loadid);
 };
 
 
@@ -351,6 +368,7 @@ public:
 	wxNotebook *tabpanel;
 	wxBoxSizer *mainbox;
 	wxAuiManager *winman;
+	wxAuiNotebook *auitabpanel;
 	wxStaticText *status;
 	wxTextCtrl *vdu;
 	wxGauge *gauge;
@@ -379,6 +397,7 @@ public:
 	wxStaticText *StatusBar();
 	wxTextCtrl *TextInput(int width = 80, int height = -1, wxString label = "---");
 	TagBox *TextInputCombo(int width = 80, int height = -1, wxString label = "---", wxString name = "", wxString path = "");
+	//wxBoxSizer *TagStoreBox(TagBox *storetagbox, int storeid, int loadid);
 
 	//ToolBox(MainFrame *main, const wxString& title, const wxPoint& pos, const wxSize& size, int type=0, bool serve=false, bool child=false);
 	ToolBox(MainFrame *main, wxString tag, const wxString& title, const wxPoint& pos, const wxSize& size, bool close);

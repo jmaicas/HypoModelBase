@@ -775,7 +775,7 @@ void PlotBox::SetCell(int cellindex, GraphDat *graph)
 	neurobox->neuroindex = cellindex;
 	//(*graph).gname.Printf("n%d", cellindex);
 	(*graph).gname = (*neurobox->cells)[cellindex].name;
-	neurobox->NeuroData(false);
+	neurobox->cellpanel->NeuroData(false);
 }
 
 
@@ -787,7 +787,7 @@ int PlotBox::GetCellIndex()
 
 void PlotBox::DataSelect(double from, double to)
 {
-	neurobox->SetSelectRange(from, to);
+	neurobox->cellpanel->SetSelectRange(from, to);
 }
 
 

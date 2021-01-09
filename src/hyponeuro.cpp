@@ -64,7 +64,7 @@ void NeuroMod::EvoGraphs()
 
 void NeuroMod::DataSelect(double from, double to)
 {
-	neurobox->SetSelectRange(from, to);
+	neurobox->cellpanel->SetSelectRange(from, to);
 }
 
 

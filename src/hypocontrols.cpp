@@ -1571,6 +1571,54 @@ void TagBox::SetLabel(wxString label)
 	Insert(label, 0);
 }
 
+
+wxBoxSizer *TagBox::TagCon(ToolBox *box, int storeid, int loadid, int orient)
+{
+	wxBoxSizer *storesizer = new wxBoxSizer(orient);
+	wxBoxSizer *buttons = new wxBoxSizer(wxHORIZONTAL);
+
+	if(box->ostype == Mac) {
+		box->AddButton(storeid, "Store", 40, buttons);
+		box->AddButton(loadid, "Load", 40, buttons);
+	}
+	else {
+		box->AddButton(storeid, "Store", 40, buttons);
+		buttons->AddSpacer(2);
+		box->AddButton(loadid, "Load", 40, buttons);
+	}
+	storesizer->Add(this, 0, wxALIGN_CENTRE_HORIZONTAL | wxALIGN_CENTRE_VERTICAL | wxALL, 2);
+	storesizer->Add(buttons, 0, wxALIGN_CENTRE_HORIZONTAL | wxALIGN_CENTRE_VERTICAL | wxALL, 2);	
+
+	return storesizer;
+}
+
+
+
+//ToolStore::ToolStore(ToolBox *toolbox, wxString storetag, wxString path, int width, ToolPanel *toolpanel)
+
+ToolStore::ToolStore(ToolBox *toolbox, TagBox *storetagbox, int storeid, int loadid)
+{
+	box = toolbox;
+	tagbox = storetagbox;
+	panel = box->activepanel;
+
+	wxBoxSizer *storesizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *buttons = new wxBoxSizer(wxHORIZONTAL);
+
+	if(box->ostype == Mac) {
+		box->AddButton(storeid, "Store", 40, buttons);
+		box->AddButton(loadid, "Load", 40, buttons);
+	}
+	else {
+		box->AddButton(storeid, "Store", 40, buttons);
+		buttons->AddSpacer(2);
+		box->AddButton(loadid, "Load", 40, buttons);
+	}
+	storesizer->Add(tagbox, 0, wxALIGN_CENTRE_HORIZONTAL | wxALIGN_CENTRE_VERTICAL | wxALL, 2);
+	storesizer->Add(buttons, 0, wxALIGN_CENTRE_HORIZONTAL | wxALIGN_CENTRE_VERTICAL | wxALL, 2);	
+}
+
+
 /*
 void ToolBox::OnLeftDClick(wxMouseEvent& event)
 {
