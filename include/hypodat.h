@@ -406,6 +406,8 @@ public:
 	void Clear();
 	void ReSize(int);
 	void ColourSwitch(int mode);
+	void BurstInit();
+	void SelectInit();
 };
 
 
@@ -522,7 +524,7 @@ public:
 	int test;
 	int maxint;
 	
-	BurstDat(bool select=false);
+	BurstDat(SpikeDat *spikedata=NULL, bool select=false);
 	~BurstDat();
 	int spikeburst(int);
 	void IntraBurstAnalysis();

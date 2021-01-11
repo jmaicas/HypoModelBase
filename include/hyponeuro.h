@@ -41,7 +41,7 @@ public:
 	//void SpikeBox(int modmode = 0);
 	void EvoGraphs();
 	void IoDGraph(datdouble *, datdouble *, wxString, wxString, int, int barshift=0, wxString settag="");
-	void DataSelect(double, double);
+	void DataSelect(wxString gname, double from, double to);
 	virtual void ParamScan() {};
 	//virtual void DataSwitch();
 };

@@ -45,28 +45,36 @@ public:
 	wxStaticText *selectfreq;
 	wxCheckBox *filtercheck;
 
-	SpikePanel(NeuroBox *, SpikeDat *, std::vector<NeuroDat>*);
+	SpikePanel(NeuroBox *);
 
+	// Data processing and display
 	void PanelData(NeuroDat *data = NULL);
+	void NeuroData(bool dispupdate = true);
+	void AnalyseSelection();
+
+	// Button and panel commands
 	void OnNext(wxSpinEvent& event);
 	void OnPrev(wxSpinEvent& event);
 	void OnEnter(wxCommandEvent& event);
-	void NeuroData(bool dispupdate = true);
 	void OnAdd(wxCommandEvent& event);
 	void OnSub(wxCommandEvent& event);
 	void OnClear(wxCommandEvent& event);
 	void OnInvert(wxCommandEvent& event);
-	void AnalyseSelection();
-	void SetSelectRange(double, double);
 	void OnClick(wxPoint);
 	void OnToggle(wxCommandEvent& event);
+
+	// External commands
+	void SetSelectRange(double, double);
+	void SetData(SpikeDat *, std::vector<NeuroDat>*);
+
+	// Selection
 	void SelectAdd();
 	void SelectSub();
 	void SelectUpdate();
 	void AddSubToggle(int sel, int type);
-	NeuroDat *GetCell(wxString name);  
 	void SelectStore();
 	void SelectLoad();
+	NeuroDat *GetCell(wxString name);  
 };
 
 
@@ -79,10 +87,10 @@ public:
 	int neuroindex;
 	int cellcount;
 
-	SpikeDat *currcell;
-	std::vector<NeuroDat>*cells;
-	SpikeDat *currmodcell;
-	std::vector<NeuroDat>*modcells;
+	//SpikeDat *currcell;
+	//std::vector<NeuroDat>*cells;
+	//SpikeDat *currmodcell;
+	//std::vector<NeuroDat>*modcells;
 
 	GridBox *gridbox;
 	BurstBox *burstbox;
@@ -111,7 +119,7 @@ public:
 
 
 	NeuroBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
-	~NeuroBox();
+	//~NeuroBox();
 	//void NeuroData(bool dispupdate = true);
 	//void NeuroAnalysis();
 	//void PanelData(NeuroDat *data = NULL);
@@ -134,6 +142,9 @@ public:
 	//void SetCell(int, GraphDat*);
 	int GetCellIndex();
 	void Analysis();
+
+	void AddModSpikePanel(SpikeDat *, std::vector<NeuroDat>*);
+	void SetGraph(GraphWindow3 *newgraphwin=NULL);
 };
 
 

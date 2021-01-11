@@ -114,26 +114,7 @@ public:
 };
 
 
-class ToolPanel: public wxPanel
-{
-public:
-	wxString snum;
-	ToolBox *toolbox;
-	MainFrame *mainwin;
-	int controlborder;
-	
-	virtual void OnLeftClick(wxMouseEvent & event);
-	void OnLeftDClick(wxMouseEvent & event);
-	void OnRightDClick(wxMouseEvent & event);
-	void OnMouseMove(wxMouseEvent & event);
-	
-	ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size);
-	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size, long style=wxTAB_TRAVERSAL | wxNO_BORDER);
-	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
-	ToolPanel(wxNotebook *notebook, const wxPoint& pos, const wxSize& size);
-	//ToolPanel(wxAuiNotebook *notebook, ToolBox *tbox, const wxPoint& pos, const wxSize& size);
-	ToolPanel(ToolBox *tbox, wxWindow *parent);
-};
+
 
 
 class ToolSet
@@ -336,6 +317,34 @@ public:
 };
 
 
+class ToolPanel: public wxPanel
+{
+public:
+	wxString snum;
+	ToolBox *toolbox;
+	MainFrame *mainwin;
+	int controlborder;
+	wxFont boxfont, confont;
+	int buttonheight;
+
+	virtual void OnLeftClick(wxMouseEvent & event);
+	void OnLeftDClick(wxMouseEvent & event);
+	void OnRightDClick(wxMouseEvent & event);
+	void OnMouseMove(wxMouseEvent & event);
+	virtual void OnToggle(wxCommandEvent& event) {};
+	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10, wxPanel *pan = NULL);
+	void Init();
+	virtual void OnClick(wxPoint);
+
+	ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size);
+	ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size, long style=wxTAB_TRAVERSAL | wxNO_BORDER);
+	ToolPanel(wxDialog *dbox, const wxPoint& pos, const wxSize& size);
+	ToolPanel(wxNotebook *notebook, const wxPoint& pos, const wxSize& size);
+	//ToolPanel(wxAuiNotebook *notebook, ToolBox *tbox, const wxPoint& pos, const wxSize& size);
+	ToolPanel(ToolBox *tbox, wxWindow *parent);
+};
+
+
 class ToolBox: public wxFrame
 {
 public:
@@ -383,14 +392,14 @@ public:
 	void OnSize(wxSizeEvent& event);
 	void Init();
 	virtual void OnClose(wxCloseEvent& event);
-	virtual void OnClick(wxPoint);
+	//virtual void OnClick(wxPoint);
 	//void OnDClick(wxMouseEvent & event);
 	//void OnMouseMove(wxMouseEvent & event);
 	//void OnLeftClick(wxMouseEvent & event);
 
 	void AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad = 1, int height = 0, wxPanel *pan = NULL);
 	//void AddButton(int id, wxString label, int width, wxBoxSizer *box, int pad = 1);
-	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10, wxPanel *pan = NULL);
+	//wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10, wxPanel *pan = NULL);
 	wxStaticText *GridLabel(int, wxString label = "0");
 	wxStaticText *NumPanel(int width = 80, int align = wxALIGN_RIGHT, wxString label = "0");
 	wxStaticText *TextLabel(wxString);
@@ -405,7 +414,7 @@ public:
 
 	~ToolBox();
 
-	virtual void OnToggle(wxCommandEvent& event) {};
+	//virtual void OnToggle(wxCommandEvent& event) {};
 	virtual void TextClick(wxString tag);
 	virtual void SpinClick(wxString tag);
 	virtual void BoxEnter(wxString tag);

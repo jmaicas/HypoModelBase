@@ -20,15 +20,13 @@
 
 
 
-SpikePanel::SpikePanel(NeuroBox *box, SpikeDat *newneuron, std::vector<NeuroDat>*newneurons)
+SpikePanel::SpikePanel(NeuroBox *box)
 	: ToolPanel(box, box->auitabpanel)
 {
 	int i;
 	int datwidth, labelwidth, buttspace;
 
 	neurobox = box;
-	currneuron = newneuron;
-	neurons = newneurons;
 
 	selectcount = 2;
 	neuroindex = 0;
@@ -116,9 +114,9 @@ SpikePanel::SpikePanel(NeuroBox *box, SpikeDat *newneuron, std::vector<NeuroDat>
 
 	buttspace = 20;
 	for(i=0; i<selectcount; i++) {
-		addbutton[i] = neurobox->ToggleButton(100 + i, "Add", 40, selectbox[i]);	
+		addbutton[i] = ToggleButton(100 + i, "Add", 40, selectbox[i]);	
 		selectbox[i]->AddSpacer(buttspace);
-		subbutton[i] = neurobox->ToggleButton(200 + i, "Sub", 40, selectbox[i]);	
+		subbutton[i] = ToggleButton(200 + i, "Sub", 40, selectbox[i]);	
 		selectbox[i]->AddSpacer(buttspace);
 		neurobox->AddButton(300 + i, "Clear", 40, selectbox[i]);
 		selectbox[i]->AddSpacer(buttspace);
@@ -152,6 +150,18 @@ SpikePanel::SpikePanel(NeuroBox *box, SpikeDat *newneuron, std::vector<NeuroDat>
 	Connect(wxEVT_SCROLL_LINEDOWN, wxSpinEventHandler(SpikePanel::OnPrev));
 	Connect(300, 305, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SpikePanel::OnClear));
 	Connect(400, 405, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SpikePanel::OnInvert));
+}
+
+
+void SpikePanel::SetData(SpikeDat *dataneuron, std::vector<NeuroDat>*dataneurons)
+{
+	currneuron = dataneuron;
+	neurons = dataneurons;
+
+	currneuron->SelectInit();
+	currneuron->dispmodemax = 2;
+	currneuron->diagbox = neurobox->diagbox;
+
 }
 
 
@@ -335,9 +345,11 @@ void SpikePanel::SelectAdd()
 
 	if(diagnostic) neurobox->diagbox->Write(text.Format("Add %d\n", currselect));
 
-	ParamStore *selectparams = neurobox->GetParams();
-	sfrom = (*selectparams)["from"] * 1000;         // Convert from s to ms
-	sto = (*selectparams)["to"] * 1000;
+	//ParamStore *selectparams = neurobox->GetParams();
+	//sfrom = (*selectparams)["from"] * 1000;         // Convert from s to ms
+	//sto = (*selectparams)["to"] * 1000;
+	sfrom = fromcon->GetValue() * 1000;         // Convert from s to ms
+	sto = tocon->GetValue() * 1000;
 
 	//diagbox->Write(text.Format("spike count %d\n", numspikes));
 
@@ -355,9 +367,11 @@ void SpikePanel::SelectSub()
 {
 	int sfrom, sto;
 
-	ParamStore *selectparams = neurobox->GetParams();
-	sfrom = (int)(*selectparams)["from"] * 1000;
-	sto = (int)(*selectparams)["to"] * 1000;
+	//ParamStore *selectparams = neurobox->GetParams();
+	//sfrom = (int)(*selectparams)["from"] * 1000;
+	//sto = (int)(*selectparams)["to"] * 1000;
+	sfrom = fromcon->GetValue() * 1000;         // Convert from s to ms
+	sto = tocon->GetValue() * 1000;
 	
 	for(i=0; i<currneuron->spikecount; i++) {
 		if(currneuron->times[i] > sfrom && currneuron->times[i] < sto) {
@@ -613,6 +627,8 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	paramindex = 0;
 	textgrid = NULL;
 	burstbox = NULL;
+	cellpanel = NULL;
+	modpanel = NULL;
 
 	selfstore = true;
 
@@ -631,6 +647,8 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
 	//wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
 	 auitabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
+
+	 // Analysis parameters
 
 	ToolPanel *analysispanel = new ToolPanel(this, auitabpanel);
 	//ToolPanel *analysispanel = new ToolPanel(tabpanel, this, wxPoint(-1, -1), wxSize(-1, -1));
@@ -660,8 +678,10 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	analysispanel->Layout();
 
 
-	cellpanel = new SpikePanel(this, currcell, cells);
+	// Spike data panel including selection
 
+	cellpanel = new SpikePanel(this);
+	//modpanel = new SpikePanel(this);
 
 	// Data Loading - currently for batch loading 
 
@@ -703,6 +723,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	auitabpanel->Freeze();
 	auitabpanel->AddPage(cellpanel, "Cell Select" , true);
+	//if(modpanel) auitabpanel->AddPage(modpanel, "Mod Select" , false);
 	auitabpanel->AddPage(analysispanel, "Analysis" , false);
 	auitabpanel->AddPage(loadpanel, "Loading" , false);
 	auitabpanel->Thaw();
@@ -754,8 +775,15 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 }
 
 
-NeuroBox::~NeuroBox()
+void NeuroBox::AddModSpikePanel(SpikeDat *spikedata, std::vector<NeuroDat>*dataneurons)
 {
+	modpanel = new SpikePanel(this);
+	modpanel->SetData(spikedata, dataneurons);
+
+	auitabpanel->Freeze();
+	auitabpanel->InsertPage(1, modpanel, "Mod Select" , false);
+	auitabpanel->Thaw();
+	winman->Update();
 }
 
 
@@ -780,8 +808,8 @@ void NeuroBox::OnBoxCheck(wxCommandEvent &event)
 	else (*modflags)[checktag] = 0;
 
 	// Set cell for filtering
-	if(checktag == "filter") {
-		(*cells)[neuroindex].filter = (*modflags)[checktag];
+	if(checktag == "cellfilter") {
+		(*cellpanel->neurons)[neuroindex].filter = (*modflags)[checktag];
 	}
 }
 
@@ -805,7 +833,7 @@ void NeuroBox::Analysis()           // Specific to generating histogram and haza
 	wxString text;
 
 	ParamStore *calcparams = GetParams();
-	currcell->normscale = (*calcparams)["normscale"];
+	cellpanel->currneuron->normscale = (*calcparams)["normscale"];
 	timerange = (*calcparams)["histrange"];
 	//binsize = (*calcparams)["binsize"];
 	if(timerange < 0) timerange = 0;
@@ -1136,6 +1164,25 @@ int NeuroBox::GetCellIndex()
 void NeuroBox::DataSelect(double from, double to)
 {
 	cellpanel->SetSelectRange(from, to);
+}
+
+
+void NeuroBox::SetGraph(GraphWindow3 *graphwin)
+{
+	int i, type;
+	wxString tag;
+	double pval;
+	GraphDat *graph;
+
+	//if(newgraphwin) graphwin = newgraphwin;            // default newgraphwin=NULL for updating panel without changing graph window
+	graph = graphwin->dispset[0]->plot[0];
+
+	if(graph->gname.Contains("Cell")) {
+		auitabpanel->SetSelection(0);
+	}
+	if(graph->gname.Contains("Model")) {	
+		auitabpanel->SetSelection(1);
+	}
 }
 
 

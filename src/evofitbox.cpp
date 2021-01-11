@@ -408,7 +408,7 @@ void EvoFitBox::CreatePanels()
 	wxBoxSizer *fitweightbox2 = new wxBoxSizer(wxVERTICAL);
 	fitweightbox2->Add(fitweightbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	fitweightbox2->AddSpacer(5);
-	burstToggle = ToggleButton(ID_Burst, "Burst", 40, fitweightbox2);
+	burstToggle = fitnesspanel->ToggleButton(ID_Burst, "Burst", 40, fitweightbox2);
 	//fitweightbox2->Add(burstToggle, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 
 	/*

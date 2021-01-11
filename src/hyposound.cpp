@@ -20,8 +20,14 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	: ParamBox(model, title, pos, size, "soundbox")
 {
 	int i;
-	short stype;
+	//short stype;
+
 	spikedata = sdat;
+	if(spikedata) spikecount = spikedata->spikecount;
+	else spikecount = 0;
+
+	wavedata = NULL;
+
 	soundon = 0;
 	soundgen = NULL;
 	soundmutex = new wxMutex;
@@ -74,9 +80,9 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	mainbox->AddSpacer(5);
 	panel->Layout();
 
-	stype = mod->SoundLink(&spikedata, &wavedata);
-	if(spikedata != NULL) snum.Printf("%d", spikedata->spikecount); else snum.Printf("bad %d", stype);
-	numspikes->SetLabel(snum);
+	//stype = mod->SoundLink(&spikedata, &wavedata);
+	//if(spikedata != NULL) snum.Printf("%d", spikedata->spikecount); else snum.Printf("bad %d", stype);
+	//numspikes->SetLabel(snum);
 	if(selfstore) Load();   // load self-stored tool parameter values
 
 	Connect(ID_Go, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SoundBox::OnGo));
@@ -93,6 +99,28 @@ SoundBox::SoundBox(Model *model, const wxString& title, const wxPoint& pos, cons
 SoundBox::~SoundBox()
 {
 	delete soundmutex;
+}
+
+
+void SoundBox::SetSpikeData(SpikeDat *data)
+{
+	spikedata = data;
+	//int spikecount = mod->SoundLink(&spikedata, &wavedata);
+	if(spikedata != NULL) {
+		spikecount = spikedata->spikecount;
+		snum.Printf("%d", spikedata->spikecount); 
+	}
+	else {
+		spikecount = 0;
+		snum.Printf("bad %d", 0);
+	}
+	numspikes->SetLabel(snum);
+}
+
+
+void SoundBox::SetWaveData(datdouble *data)
+{
+	wavedata = data;
 }
 
 

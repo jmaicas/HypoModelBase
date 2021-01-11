@@ -359,6 +359,8 @@ void GraphWindow3::OnLeftDown(wxMouseEvent &event)
 	wxPoint pos = event.GetPosition();
 	mousedown = pos;
 
+	if(mainwin->neurobox) mainwin->neurobox->SetGraph(this);
+
 	double xdiff = graph->xto - graph->xfrom;
 	double xscale = xdiff / xplot;
 	double xgraph = (mousedown.x - xbase) * xscale + graph->xfrom;
@@ -461,7 +463,7 @@ void GraphWindow3::OnLeftUp(wxMouseEvent &event)
 		}
 
 		// Data Select
-		mod->DataSelect(xgraphFrom, xgraphTo);
+		mod->DataSelect(graph->gname, xgraphFrom, xgraphTo);
 
 		// Diagnostic display
 		xplaces = numplaces(xdiff);

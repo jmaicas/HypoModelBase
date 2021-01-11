@@ -62,9 +62,19 @@ void NeuroMod::EvoGraphs()
 }
 
 
-void NeuroMod::DataSelect(double from, double to)
+void NeuroMod::DataSelect(wxString gname, double from, double to)
 {
-	neurobox->cellpanel->SetSelectRange(from, to);
+	wxString text; 
+
+	diagbox->Write(text.Format("DataSelect graph %s from %.2f to %.2f\n", gname, from, to));
+	if(gname.BeforeFirst(' ') == "Cell" && neurobox->cellpanel) {
+		neurobox->cellpanel->SetSelectRange(from, to);
+		neurobox->auitabpanel->SetSelection(0);
+	}
+	if(gname.BeforeFirst(' ') == "Model" && neurobox->modpanel) {
+		neurobox->modpanel->SetSelectRange(from, to);
+		neurobox->auitabpanel->SetSelection(1);
+	}
 }
 
 

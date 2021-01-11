@@ -215,6 +215,18 @@ void SpikeDat::ColourSwitch(int mode)
 }
 
 
+void SpikeDat::BurstInit()
+{
+	if(!burstdata) burstdata = new BurstDat(this);
+}
+
+
+void SpikeDat::SelectInit()
+{
+	if(!selectdata) selectdata = new BurstDat(this, true);
+}
+
+
 void SpikeDat::Clear()
 {
 	int i;
@@ -308,8 +320,9 @@ SpikeDatTest::~SpikeDatTest()
 }
 
 
-BurstDat::BurstDat(bool select)
+BurstDat::BurstDat(SpikeDat *data, bool select)
 {
+	spikedata = data;
 	selectmode = select; 
 
 	burstdisp = 0;

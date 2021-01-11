@@ -122,11 +122,12 @@ public:
 	virtual void GSwitch(GraphDisp *gpos, ParamStore *gflags, int command=0);
 	virtual void ScaleSwitch(double xscale = 0) {};
 	virtual int ModeSum(ParamStore *gflags);
-	virtual int SoundLink(SpikeDat **, datdouble **);
+	//virtual int SoundLink(SpikeDat **, datdouble **);
+	virtual int SoundLink(SoundBox *);
 	virtual void SoundOn() {}; 
 	virtual void ModStore();
 	virtual void ModLoad();
-	virtual void DataSelect(double, double) {};
+	virtual void DataSelect(wxString, double, double) {};
 	//virtual void GStore(wxComboBox *);
 	//virtual void GLoad(wxComboBox *);
 	virtual void GHistStore();

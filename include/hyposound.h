@@ -50,6 +50,7 @@ class SoundBox : public ParamBox
 {
 public:
 	SpikeDat *spikedata;
+	int spikecount;
 	datdouble *wavedata;
 	//VasoModel *vasomod;
 	wxStaticText *numspikes;
@@ -73,4 +74,6 @@ public:
 	void OnData(wxCommandEvent& event);
 	void OnTrace(wxCommandEvent& event);
 	void OnClear(wxCommandEvent& event);
+	void SetSpikeData(SpikeDat *);
+	void SetWaveData(datdouble *);
 };

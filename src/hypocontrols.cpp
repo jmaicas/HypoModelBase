@@ -645,7 +645,7 @@ void ToolText::OnLeftClick(wxMouseEvent& event)
 {
 	if(toolbox) {
 		toolbox->diagbox->Write("text click\n");
-		toolbox->OnClick(event.GetPosition());
+		toolbox->activepanel->OnClick(event.GetPosition());
 		toolbox->TextClick(tag);
 	}
 }
@@ -664,11 +664,7 @@ ToolPanel::ToolPanel(ToolBox *tbox, wxWindow *parent)
 {
 	toolbox = tbox;
 	mainwin = toolbox->mainwin;
-	controlborder = 2;
-
-	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
-	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
-	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+	Init();
 }
 
 
@@ -677,25 +673,8 @@ ToolPanel::ToolPanel(wxNotebook *book, const wxPoint& pos, const wxSize& size)
 {
 	toolbox = NULL;
 	mainwin = NULL;
-	controlborder = 2;
-
-	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
-	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
-	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
+	Init();
 }
-
-
-/*ToolPanel::ToolPanel(wxAuiNotebook *book, ToolBox *tbox, const wxPoint& pos, const wxSize& size)
-	: wxPanel(book, wxID_ANY, pos, size)
-{
-	toolbox = tbox;
-	mainwin = NULL;
-	controlborder = 2;
-
-	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
-	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
-	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
-}*/
 
 
 ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
@@ -703,12 +682,7 @@ ToolPanel::ToolPanel(wxDialog *box, const wxPoint& pos, const wxSize& size)
 {
 	toolbox = NULL;
 	mainwin = NULL;
-	controlborder = 2;
-
-	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
-	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
-	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
-	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
+	Init();
 }
 
 
@@ -717,16 +691,7 @@ ToolPanel::ToolPanel(ToolBox *tbox, const wxPoint& pos, const wxSize& size)
 {
 	toolbox = tbox;
 	mainwin = toolbox->mainwin;
-	controlborder = 2;
-
-	//if(mainwin->diagbox) mainwin->diagbox->Write("ToolPanel init\n");
-
-	//pinmode = 0;
-
-	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
-	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
-	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
-	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
+	Init();
 }
 
 
@@ -735,12 +700,48 @@ ToolPanel::ToolPanel(MainFrame *main, const wxPoint& pos, const wxSize& size, lo
 {
 	toolbox = NULL;
 	mainwin = main;
+	Init();
+}
+
+
+void ToolPanel::Init() {
 	controlborder = 2;
+
+	if(GetSystem() == Mac) {
+		buttonheight = 25;
+		boxfont = wxFont(wxFontInfo(12).FaceName("Tahoma"));
+		confont = wxFont(wxFontInfo(10).FaceName("Tahoma"));
+	}
+	else {
+		buttonheight = 23;
+		boxfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+		confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	}
 
 	Connect(wxEVT_LEFT_UP, wxMouseEventHandler(ToolPanel::OnLeftClick));
 	Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(ToolPanel::OnLeftDClick));
 	Connect(wxEVT_RIGHT_DCLICK, wxMouseEventHandler(ToolPanel::OnRightDClick));
 	//Connect(wxEVT_MOTION, wxMouseEventHandler(ToolPanel::OnMouseMove));
+}
+
+
+void ToolPanel::OnClick(wxPoint pos)
+{
+	wxString text;
+	mainwin->SetStatusText(text.Format("toolpanel click x %d y %d", pos.x, pos.y));
+}
+
+
+wxToggleButton *ToolPanel::ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point, wxPanel *pan)
+{
+	if(!pan) pan = this;
+	confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
+	if(GetSystem() == Mac) confont = wxFont(wxFontInfo(point).FaceName("Tahoma"));
+	wxToggleButton *button = new wxToggleButton(this, id, label, wxDefaultPosition, wxSize(width, buttonheight), 0);
+	button->SetFont(confont);
+	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
+	Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(ToolPanel::OnToggle));
+	return button;
 }
 
 
@@ -770,7 +771,7 @@ void ToolPanel::OnLeftClick(wxMouseEvent& event)
 	//snum.Printf("Tool LClick");
 	if(mainwin) mainwin->SetStatusText("Tool Click");
 
-	if(toolbox) toolbox->OnClick(event.GetPosition());
+	OnClick(event.GetPosition());
 
 	//mainwin->SetStatusText("Tool Panel Click");
 }
@@ -1120,24 +1121,6 @@ void ScaleBox::AddButton(int id, wxString label, int width, wxBoxSizer *box, int
 }
  */
 
-wxToggleButton *ToolBox::ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point, wxPanel *pan)
-{
-	if(pan == NULL) pan = activepanel;
-    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
-    //8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-    //wxFont f(wxFontInfo(12).Underlined().FaceName("Courier"));
-    //confont = wxFont(8, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-    
-    confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
-	//if(ostype == Mac) confont = wxFont(point, wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL, false, "Tahoma");
-    if(ostype == Mac) confont = wxFont(wxFontInfo(point).FaceName("Tahoma"));
-	wxToggleButton *button = new wxToggleButton(pan, id, label, wxDefaultPosition, wxSize(width, buttonheight), 0);
-	button->SetFont(confont);
-	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
-	Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(ToolBox::OnToggle));
-	return button;
-}
-
 
 void ToolBox::TextClick(wxString tag)
 {
@@ -1222,17 +1205,6 @@ wxPoint ToolBox::SetPosition()
 	Move(mainpos.x + mainsize.x + mpos.x, mainpos.y + mpos.y + 5);
 	oldpos = GetPosition();
 	return wxPoint(mainpos.x + mainsize.x + mpos.x, mainpos.y + mpos.y + 5);
-}
-
-
-
-void ToolBox::OnClick(wxPoint pos)
-{
-	wxString text;
-
-	//mainwin->SetStatusText(text.Format("box click x %d y d%", pos.x, pos.y));
-
-	mainwin->SetStatusText(text.Format("toolbox click x %d y %d", pos.x, pos.y));
 }
 
 

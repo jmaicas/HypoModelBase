@@ -536,10 +536,10 @@ void Model::ModLoad()
 }
 
 
-int Model::SoundLink(SpikeDat **dataref, datdouble **waveref)
+int Model::SoundLink(SoundBox *soundbox)
 {
-	dataref = NULL;
-	waveref = NULL;
+	soundbox->spikedata = NULL;
+	soundbox->wavedata = NULL;
 	return -1;
 }
 

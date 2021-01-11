@@ -774,7 +774,7 @@ void PlotBox::SetCell(int cellindex, GraphDat *graph)
 {
 	neurobox->neuroindex = cellindex;
 	//(*graph).gname.Printf("n%d", cellindex);
-	(*graph).gname = (*neurobox->cells)[cellindex].name;
+	(*graph).gname = (*neurobox->cellpanel->neurons)[cellindex].name;
 	neurobox->cellpanel->NeuroData(false);
 }
 
