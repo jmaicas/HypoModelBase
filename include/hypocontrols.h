@@ -40,7 +40,7 @@ class TagBox: public wxComboBox
 {
 public:
 	wxString name, tagpath, tagfilepath, tagfilename;
-    wxString modpath, text;
+    wxString boxpath, text;
 	wxString redtag;
 	bool labelset, histmode;
 	DiagBox *diagbox;

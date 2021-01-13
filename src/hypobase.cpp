@@ -68,6 +68,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 	toolset->AddBox(diagbox, true);
     
     tagset = new TagSet();   // TagBox list for OSX mod path update
+
+	if(mainpath.IsEmpty()) initpath = "Init";
+	else initpath = mainpath + "/Init";
+
+	MainLoad();     // main window tool configuration
 }
 
 
@@ -90,13 +95,9 @@ void MainFrame::MainLoad()
 	wxPoint pos;
     wxSize size;
 
-	//filepath = GetPath();
-	filepath = mainpath + "Init/";
-
 	// Box Load
-	filename = "mainbox.ini";
-
-	check = infile.Open(filepath + filename);
+	filepath = initpath + "/mainbox.ini";
+	check = infile.Open(filepath);
 	if(!check) return;
 	readline = infile.ReadLine();
 	//tofp.WriteLine(readline);

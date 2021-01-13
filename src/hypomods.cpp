@@ -190,18 +190,8 @@ void Model::GSwitch(GraphDisp *gpos, ParamStore *gflags, int command)
 	}
 }
 
+
 /*
-refgraph = graphwin[pan1]->dispset[0]->plot[0];
-for(i=0; i<graphwin[pan2]->numdisps; i++) {
-	graph = graphwin[pan2]->dispset[i]->plot[0];
-	graph->yto = refgraph->yto;
-	graph->yfrom = refgraph->yfrom;
-	graph->xto = refgraph->xto;
-	graph->xfrom = refgraph->xfrom;
-}
-*/
-
-
 wxString Model::GetPath()
 {
 	wxString fullpath, text;
@@ -217,6 +207,27 @@ wxString Model::GetPath()
 
 	if(!wxDirExists(fullpath)) wxMkdir(fullpath);
     mainwin->diagbox->Write(text.Format("Model GetPath %s\n", fullpath));
+
+	return fullpath;
+}
+*/
+
+
+wxString Model::GetPath()
+{
+	wxString fullpath, text;
+
+	if(mainwin->modpath == "") {
+		if(path != "") fullpath = path;
+		else fullpath = mainwin->initpath;
+	}
+	else {
+		if(path != "") fullpath = mainwin->modpath + "/" + path;
+		else fullpath = mainwin->modpath;
+	}
+
+	if(!wxDirExists(fullpath)) wxMkdir(fullpath);
+	mainwin->diagbox->Write(text.Format("Model GetPath %s\n", fullpath));
 
 	return fullpath;
 }

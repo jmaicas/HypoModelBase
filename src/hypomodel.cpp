@@ -57,7 +57,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	xstretch = 50;
 	modpath = "";
 
-
+	// Fonts
 	fontset = TypeSet();
 	fontset.Add("Helvetica", 0);
 	fontset.Add("Arial", 1);
@@ -67,12 +67,11 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	fontset.Add("Calibri", 5);
 
 	
-    
     // OSX Path Check
     if(ostype == Mac) {
         homepath = getenv("HOME");
         diagbox->Write(text.Format("homepath %s\n", homepath));
-        hypopath = homepath + "/Library/Application Support/HypoMod/";
+        hypopath = homepath + "/Library/Application Support/HypoMod";
         diagbox->Write(text.Format("hypopath %s\n", hypopath));
         
         if(wxDirExists(hypopath)) {
@@ -90,14 +89,23 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	//startmod = modPlot; // modVMN;   // fix model for PLOS release   25/6/18
 	//ViewLoad();
 
-
 	numdraw_set = numdraw;
     
-	toolpath = mainpath + "Tools";
-    //if(modpath == "") modpath = mainpath;
-    diagbox->Write("modpath " + modpath + "\n");
+	if(mainpath.IsEmpty()) {
+		toolpath = "Tools";
+		// modpath is unchanged from OptionLoad()
+	}
+	else {
+		toolpath = mainpath + "/Tools";
+		modpath = mainpath + "/" + modpath;
+	}
 
-	MainLoad();     // main window tool configuration
+	diagbox->Write("toolpath " + toolpath + "\n");
+	diagbox->Write("modpath " + modpath + "\n");
+
+
+    //if(modpath == "") modpath = mainpath;
+   
 
 	spikedisp = 0;   // spike display mode   0 = plain   1 = burst   2 = hazard filter
 
@@ -1089,16 +1097,16 @@ void HypoMain::ViewLoad()
 
 void HypoMain::OptionStore()
 {
-	wxString filename;
+	wxString filepath;
 	wxString outline;
     
-    initpath = mainpath + "Init/";
+    //initpath = mainpath + "Init/";
     if(!wxDirExists(initpath)) wxMkdir(initpath);
 
-	filename = initpath + "hypoprefs.ini";
+	filepath = initpath + "/hypoprefs.ini";
 
 	TextFile opfile;
-	opfile.New(filename);
+	opfile.New(filepath);
 
 	opfile.WriteLine(outline.Format("startmod %d", startmod));
 
@@ -1122,8 +1130,8 @@ void HypoMain::OptionStore()
 
 	opfile.Close();
 
-	filename = initpath + "hypopaths.ini";
-	opfile.New(filename);
+	filepath = initpath + "/hypopaths.ini";
+	opfile.New(filepath);
 	opfile.WriteLine(datapath);
 	opfile.WriteLine(parampath);
 	opfile.WriteLine(outpath);
@@ -1136,17 +1144,16 @@ void HypoMain::OptionLoad()
 {
 	long numdat;
 	int check;
-	wxString filename;
+	wxString filepath;
 	wxString readline, numstring, tag;
-    
-    initpath = mainpath + "Init/";
+
     if(!wxDirExists(initpath)) {
         diagbox->Write("Init not found, no option load fail\n");
     };
 
-	filename = initpath + "hypoprefs.ini";
+	filepath = initpath + "/hypoprefs.ini";
 
-	wxTextFile opfile(filename);
+	wxTextFile opfile(filepath);
 
 	if(!opfile.Exists()) {
 		startmod = 13;
@@ -1187,9 +1194,9 @@ void HypoMain::OptionLoad()
 		diagnostic = prefstore["diagnostic"];
 	}
 
-	filename = initpath + "hypopaths.ini";
+	filepath = initpath + "/hypopaths.ini";
 	TextFile infile;
-	check = infile.Open(filename);
+	check = infile.Open(filepath);
 
 	if(!check) {
 		datapath = "Data";
@@ -1236,10 +1243,10 @@ bool HypoApp::OnInit()
     CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingUTF8);
     CFRelease(main_bundle_URL);
     CFRelease(cf_string_ref);
-    respath = path + string("/Contents/Resources/");
+    respath = path + string("/Contents/Resources");
     
     homepath = getenv("HOME");
-    hypopath = homepath + "/Library/Application Support/HypoMod/";
+    hypopath = homepath + "/Library/Application Support/HypoMod";
     if(wxDirExists(hypopath)) mainpath = hypopath;
     else mainpath = respath;
 #endif // OSX
@@ -1253,7 +1260,7 @@ bool HypoApp::OnInit()
 	if(x > screensize.GetX()) x = screensize.GetX() - 50;
 	if(y > screensize.GetY()) y = screensize.GetY() - 50;
 
-	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y), respath);   // 850   // 920
+	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y), mainpath);   // 850   // 920   // respath
 	mainwin->SetTransparent(254);
 	mainwin->Show();
 	SetTopWindow(mainwin);
@@ -1265,12 +1272,13 @@ bool HypoApp::OnInit()
 void HypoApp::LoadPrefs()
 {
 	long numdat;
-	wxString filename;
+	wxString filepath;
 	wxString readline, numstring;
 
-	filename = mainpath + "Init/hypoprefs.ini";
+	if(mainpath.IsEmpty()) filepath = "Init/hypoprefs.ini";
+	else filepath = mainpath + "/Init/hypoprefs.ini";
 
-	wxTextFile opfile(filename);
+	wxTextFile opfile(filepath);
 
 	if(!opfile.Exists()) {
 		viewheight = 920;

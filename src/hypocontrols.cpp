@@ -728,7 +728,7 @@ void ToolPanel::Init() {
 void ToolPanel::OnClick(wxPoint pos)
 {
 	wxString text;
-	mainwin->SetStatusText(text.Format("toolpanel click x %d y %d", pos.x, pos.y));
+	if(mainwin) mainwin->SetStatusText(text.Format("toolpanel click x %d y %d", pos.x, pos.y));
 }
 
 
@@ -1301,7 +1301,7 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	: wxComboBox(panel, id, label, wxDefaultPosition, size)
 {
     mainwin = main;
-    modpath = path;
+    boxpath = path;
 	redtag = "";
     
     mainwin->tagset->AddTag(boxtag, this);
@@ -1309,13 +1309,31 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
     //if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
     //else tagpath = mainwin->modpath + modpath + "/Tags/";
 
-	if(mainwin->modpath == "") tagpath = mainwin->mainpath + "/Tags/";
-	else {
-		if(mainwin->ostype == Mac) tagpath = mainwin->modpath + modpath + "/Tags/";
-		else tagpath = mainwin->modpath + "/" + modpath + "/Tags/";
+	PathUpdate();
+
+	/*
+	if(boxpath.IsEmpty()) {
+		if(mainwin->modpath.IsEmpty()) tagpath = "Tags";
+		else tagpath = mainwin->modpath + "/Tags";
 	}
+	else {
+		if(mainwin->modpath.IsEmpty()) tagpath = boxpath + "/Tags";
+		else tagpath = mainwin->modpath + "/" + boxpath + "/Tags";
+	}*/
+
+	/*
+	if(mainwin->modpath == "") {
+		if(mainwin->mainpath == "") tagpath = "Tags";
+		else tagpath = mainwin->mainpath + "/Tags";
+	}
+	else {
+		//if(mainwin->ostype == Mac) tagpath = mainwin->modpath + modpath + "/Tags/";
+		//else tagpath = mainwin->modpath + "/" + modpath + "/Tags/";
+		tagpath = mainwin->modpath + "/" + modpath + "/Tags";
+	}
+	*/
     
-    mainwin->diagbox->Write(text.Format("TagBox tagpath %s modpath %s\n", tagpath, modpath));
+    mainwin->diagbox->Write(text.Format("TagBox tagpath %s boxpath %s\n", tagpath, boxpath));
 	
 	name = boxtag;
 	diagbox = NULL;
@@ -1323,12 +1341,13 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	bool check;
 	TextFile opfile, tagfile;
 	wxString readline;
+	wxString opfilepath, tagfilepath;
 
-	tagfilename = "";
+	//tagfilename = "";
 
 	if(!wxDirExists(tagpath)) wxMkdir(tagpath);
 
-	check = opfile.Open(tagpath + name + "op.ini");
+	check = opfile.Open(tagpath + "/" + name + "op.ini");
 	if(!check) {
 		if(diagbox) diagbox->Write("No tagpath found, setting default\n");
 		tagfilename = name + "tags.ini";
@@ -1411,12 +1430,20 @@ wxString TagBox::StoreTag(wxString dir, wxString suffix)
 
 void TagBox::PathUpdate()
 {
-    if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
-    else tagpath = mainwin->modpath + modpath + "/Tags/";
-    
-    diagbox->Write(text.Format("TagBox tagpath %s\n", tagpath));
-       
+    //if(mainwin->modpath == "") tagpath = mainwin->mainpath + modpath + "/Tags/";
+    //else tagpath = mainwin->modpath + modpath + "/Tags/";   
     //if(!wxDirExists(tagpath)) wxMkdir(tagpath);
+
+	if(boxpath.IsEmpty()) {
+		if(mainwin->modpath.IsEmpty()) tagpath = "Tags";
+		else tagpath = mainwin->modpath + "/Tags";
+	}
+	else {
+		if(mainwin->modpath.IsEmpty()) tagpath = boxpath + "/Tags";
+		else tagpath = mainwin->modpath + "/" + boxpath + "/Tags";
+	}
+
+	mainwin->diagbox->Write(text.Format("TagBox PathUpdate() tagpath %s\n", tagpath));
 }
 
 
@@ -1436,7 +1463,7 @@ void TagBox::HistStore()
 
 	// Tag history
 	if(tagfilename == "") return;
-	tagfile.New(tagpath + tagfilename);
+	tagfile.New(tagpath + "/" + tagfilename);
 	for(i=GetCount()-1; i>=0; i--) {
 		outline.Printf("tag %s", GetString(i));
 		tagfile.WriteLine(outline);
@@ -1444,7 +1471,7 @@ void TagBox::HistStore()
 	tagfile.Close();
 
 	// Fixed location option file, directs to selectable tagfile location
-	opfile.New(tagpath + name + "op.ini");
+	opfile.New(tagpath + "/" + name + "op.ini");
 	opfile.WriteLine(tagfilename);
 	opfile.Close();
 }
@@ -1464,7 +1491,7 @@ void TagBox::HistLoad()
 		mainwin->diagbox->Write("Tag file not set\n");
 		return;
 	}
-	check = tagfile.Open(tagpath + tagfilename);
+	check = tagfile.Open(tagpath + "/" + tagfilename);
 	if(!check) {
 		mainwin->diagbox->Write("No tag history\n");
 		return;
