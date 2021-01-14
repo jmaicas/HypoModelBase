@@ -167,22 +167,5 @@ void Project::Load()
 			readline = infile.ReadLine(); 
 		}
 	}
+	mainwin->scalebox->GLoad();
 }
-
-
-
-/*
-Project::Project(Model *model, wxString projtag)
-{
-mod = model;
-protag = projtag;
-path = mod->GetPath();
-
-tagcount = 0;
-
-boxfile = mod->modname + "-" + protag + "-box.ini";
-graphfile = mod->modname + "-" + protag + "-graph.ini";
-tagfile = mod->modname + "-" + protag + "-tag.ini";
-projectfile = mod->modname + "-" + protag + "-project.ini";
-}
-*/
