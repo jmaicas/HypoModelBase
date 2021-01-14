@@ -178,6 +178,13 @@ GraphWindow3::~GraphWindow3()
 }
 
 
+void GraphWindow3::SetScroll(int xpos)
+{
+	//scrollbar->SetScrollbar(xpos, 40, xplot, 40);
+	scrollbar->SetThumbPosition(xpos);
+}
+
+
 void GraphWindow3::OnDrawTest(wxCommandEvent& event)
 {
 	bool testdraw = true;

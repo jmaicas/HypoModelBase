@@ -23,12 +23,15 @@ ScaleBox::ScaleBox(HypoMain *main, const wxSize& size, int gnum, GraphDisp *gdis
 	gpos = gdisp;
 	graphwin = gwin;
 	numgraphs = gnum;
+	maxgraphs = 10;
 	//startgraph = start; 
 	startgraph = 0;
 	gmod = model;
 	mod = model;
     
     wxString iconpath = main->respath + "Init/";
+
+	mainwin->diagbox->Write(text.Format("ScaleBox init numgraphs %d\n", numgraphs));
 
 	SetDoubleBuffered(true);
 
@@ -195,10 +198,10 @@ ScaleBox::ScaleBox(HypoMain *main, const wxSize& size, int gnum, GraphDisp *gdis
 	//Connect(ID_rateres, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnRateRes));
 	Connect(ID_data, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnData));
 	Connect(ID_intern, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnIntern));
-	Connect(1000+startgraph, 1000+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomIn));
-	Connect(1010+startgraph, 1010+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomOut));
-	Connect(1100+startgraph, 1100+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomIn));
-	Connect(1110+startgraph, 1110+startgraph+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomOut));
+	Connect(1000+startgraph, 1000+startgraph+maxgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomIn));
+	Connect(1010+startgraph, 1010+startgraph+maxgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomOut));
+	Connect(1100+startgraph, 1100+startgraph+maxgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomIn));
+	Connect(1110+startgraph, 1110+startgraph+maxgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomOut));
 	//Connect(1000, 1000+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomIn));
 	//Connect(1010, 1010+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnYZoomOut));
 	//Connect(1100, 1100+numgraphs-1, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXZoomIn));

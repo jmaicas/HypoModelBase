@@ -124,6 +124,7 @@ public:
 	wxRealPoint GraphPos(wxPoint);
 	void Highlight(double xpos, double width=0);              // new 28/5/20
 	void HighlightTime(double start, double stop);
+	void SetScroll(int xpos);
 };
 
 
@@ -195,6 +196,7 @@ public:
 	//wxFrame *drawframe;
 	int buttonheight;
 	int numgraphs, startgraph, modesum;
+	int maxgraphs;
 	int hazmode1, hazmode2, binrestog1, binrestog2;
 	int overtog, overtog2;
 	int timeres;

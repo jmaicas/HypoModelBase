@@ -200,6 +200,8 @@ void SpikePanel::OnNext(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex < neurocount-1) neuroindex++;
 	else neuroindex = 0;
 
+	//neurobox->mainwin->graphwin[0]->SetScroll(0); 
+
 	for(int i=0; i<selectcount; i++) {
 		currneuron->selectdata->spikes = selectspikes[i].data();
 		currneuron->SelectScan(i);  // store current cell's select grid to NeuroDat
