@@ -191,7 +191,7 @@ ScaleBox::ScaleBox(HypoMain *main, const wxSize& size, int gnum, GraphDisp *gdis
 
 	Connect(ID_xscale, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnXScale));
 
-	Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSpikes));
+	//Connect(ID_spikes, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnSpikes));
 	//Connect(ID_rateres, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnRateRes));
 	Connect(ID_data, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnData));
 	Connect(ID_intern, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnIntern));
@@ -625,8 +625,8 @@ void ScaleBox::OnGStore(wxCommandEvent& event)
 
 	outfile.WriteLine("");
 	for(i=0; i<gflagrefs->numrefs; i++) {
-		outline.Printf("%.0f", (*gflags)[gflagrefs->refbase[i].label]);  
-		outfile.WriteLine(gflagrefs->refbase[i].label + " " + outline);
+		outline.Printf("%.0f", (*gflags)[gflagrefs->refbase[i].tag]);  
+		outfile.WriteLine(gflagrefs->refbase[i].tag + " " + outline);
 	}
 
 	outfile.Close();
@@ -914,7 +914,7 @@ ToolButton *ScaleBox::ScaleButton(int id, wxString label, int width, wxBoxSizer 
 ToolButton *ScaleBox::GraphButton(wxString tag, int state, int id, wxString label, int width, wxBoxSizer *box, int type, int point)
 {
 	(*gflags)[tag] = state;
-	gflagrefs->AddRef(id, tag, type);
+	while(!gflagrefs->AddRef(id, tag, type)) id++;
 	Connect(id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ScaleBox::OnGraphButton));
 
 	return ScaleButton(id, label, width, box, point);
@@ -1170,6 +1170,7 @@ void ScaleBox::OnDendMode(wxCommandEvent& WXUNUSED(event))
 }
 
 
+/*
 void ScaleBox::OnSpikes(wxCommandEvent& WXUNUSED(event))
 {
 	if(timeres == 0) timeres = 1;
@@ -1177,6 +1178,7 @@ void ScaleBox::OnSpikes(wxCommandEvent& WXUNUSED(event))
 	GraphSwitch();
 	//GraphUpdate();
 }
+*/
 
 
 void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
@@ -1290,7 +1292,7 @@ ParamStore *ScaleBox::GetFlags()
 
 	(*gflags)["cortflag"] = cortflag;
 	//(*gflags)["rateres"] = rateres;
-	(*gflags)["timeres"] = timeres;
+	//(*gflags)["timeres"] = timeres;
 	//(*gflags)["nettog"] = nettog;
 	(*gflags)["expdatflag"] = expdatflag;
 	//(*gflags)["burstmode"] = burstmode;

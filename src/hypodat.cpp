@@ -21,6 +21,7 @@ NeuroDat::NeuroDat()
 	numselects[0] = 0;
 	selectstore[1].resize(maxselect);
 	numselects[1] = 0;
+	currselect = 0;
 
 	filter = 0;
 	burstfitmode = 0;
@@ -29,6 +30,13 @@ NeuroDat::NeuroDat()
 
 NeuroDat::~NeuroDat()
 {
+}
+
+
+bool NeuroDat::Selected()
+{
+	if(numselects[currselect]) return true;
+	return false;
 }
 
 

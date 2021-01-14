@@ -406,7 +406,7 @@ void HypoMain::CleanUp() {
 void HypoMain::SetMenuFlag(int id, wxString flagname, wxString flagtext, int state, wxMenu *menu)
 {
 	(*hypoflags)[flagname] = state;
-	flagrefs->AddRef(id, flagname);
+	while(!flagrefs->AddRef(id, flagname)) id++;         // AddRef returns false if id is already used
 	menu->Append(id, flagtext, "Toggle " + flagtext, wxITEM_CHECK);
 	menu->Check(id, state);
 	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(HypoMain::OnFlag));

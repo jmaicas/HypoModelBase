@@ -247,6 +247,8 @@ public:
 	ToolButton *databutton;
 	ToolButton *burstbutton;
 	ToolButton *selectbutton;
+	//ToolButton *spikesbutton;
+	//ToolButton *ratebutton;
 
 	wxCheckBox *gsync[10];
 	wxBoxSizer *consolebox[10];
@@ -269,18 +271,18 @@ public:
 	void OnBinRes1(wxCommandEvent& event);
 	void OnBinRes2(wxCommandEvent& event);
 	void OnNetMode(wxCommandEvent& event);
-	void OnNorm(wxCommandEvent& event);
-	void OnAllBurst(wxCommandEvent& event);
+	//void OnNorm(wxCommandEvent& event);
+	//void OnAllBurst(wxCommandEvent& event);
 	void OnProfMode(wxCommandEvent& event);
 	void OnExpMode(wxCommandEvent& event);
 	void OnSecMode(wxCommandEvent& event);
 	void OnDendMode(wxCommandEvent& event);
 	void OnOverlay(wxCommandEvent& event);
 	void OnPosition(wxCommandEvent& event);
-	void OnSpikes(wxCommandEvent& event);
+	//void OnSpikes(wxCommandEvent& event);
 	void OnData(wxCommandEvent& event);
 	void OnIntern(wxCommandEvent& event);
-	void OnRateRes(wxCommandEvent& event);
+	//void OnRateRes(wxCommandEvent& event);
 	void OnYZoomIn(wxCommandEvent& event);
 	void OnYZoomOut(wxCommandEvent& event);
 	void OnXZoomIn(wxCommandEvent& event);

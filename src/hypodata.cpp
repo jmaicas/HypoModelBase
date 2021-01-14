@@ -71,7 +71,7 @@ SpikePanel::SpikePanel(NeuroBox *box)
 	datagrid->Add(selectfreq);
 
 	// need to fix this for multiple use
-	filtercheck = neurobox->SetBoxCheck(ID_filtercheck, "filter", "Filter", false);
+	filtercheck = neurobox->SetBoxCheck(ID_filtercheck, "cellfilter", "Filter", false);
 	
 	datneuron = new wxTextCtrl(this, ID_Neuron, "---", wxDefaultPosition, wxSize(50, -1), wxALIGN_LEFT|wxBORDER_SUNKEN|wxST_NO_AUTORESIZE|wxTE_PROCESS_ENTER);
 	if(neurobox->ostype == Mac) 
@@ -239,7 +239,7 @@ void SpikePanel::NeuroData(bool dispupdate)
 	if(mainwin->soundbox) mainwin->soundbox->DataLink(currneuron);
 #endif
 
-	for(int i=0; i<selectcount; i++) {
+	for(i=0; i<selectcount; i++) {
 		currneuron->selectdata->spikes = selectspikes[i].data();
 		currneuron->SelectSpikes(i);  // store current cell's select grid to NeuroDat
 	}
@@ -248,6 +248,7 @@ void SpikePanel::NeuroData(bool dispupdate)
 
 	if(cellmode) {
 		if(neurobox->burstbox) {
+			neurobox->diagbox->Write(text.Format("SpikePanel NeuroData() numselects %d\n", currneuron->neurodata->numselects[currselect]));
 			neurobox->burstbox->ExpDataScan(currneuron);
 			//burstbox->SetExpGrid();
 		}
@@ -468,10 +469,11 @@ void SpikePanel::AnalyseSelection()
 	if(!currneuron->selectdata) currneuron->selectdata = new BurstDat();
 	currneuron->selectdata->times = currneuron->times.data();
 
-	currneuron->SelectScan();
+	//currneuron->SelectScan();
+	currneuron->SelectScan(currselect);
 
 	currneuron->selectdata->IntraBurstAnalysis();
-	if(currneuron->neurodata->numselects) {
+	if(currneuron->neurodata->Selected()) {
 		currneuron->SelectFitAnalysis();
 		currneuron->IoDfit = currneuron->selectdata->IoDdata.data.data();
 		if(diagnostic) neurobox->diagbox->Write("NeuroBox select fit mode\n");
@@ -623,7 +625,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	mod = model;
 	diagbox = mod->diagbox;
-	cellcount = 0;
+	//cellcount = 0;
 	paramindex = 0;
 	textgrid = NULL;
 	burstbox = NULL;
@@ -632,17 +634,17 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	selfstore = true;
 
-	selectcount = 2;
-	neuroindex = 0;
+	//selectcount = 2;
+	//neuroindex = 0;
 	
-	selectspikes[0].resize(100000);
-	selectspikes[1].resize(100000);
+	//selectspikes[0].resize(100000);
+	//selectspikes[1].resize(100000);
 	spikeselectLink = false;
 
-	for(i=0; i<100000; i++) {
-		selectspikes[0][i] = 0;
-		selectspikes[1][i] = 0;
-	}
+	//for(i=0; i<100000; i++) {
+	//	selectspikes[0][i] = 0;
+	//	selectspikes[1][i] = 0;
+	//}
 
 	long notestyle = wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS;
 	//wxAuiNotebook *tabpanel = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, notestyle);
@@ -681,6 +683,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	// Spike data panel including selection
 
 	cellpanel = new SpikePanel(this);
+	cellpanel->cellmode = true;
 	//modpanel = new SpikePanel(this);
 
 	// Data Loading - currently for batch loading 
@@ -807,9 +810,11 @@ void NeuroBox::OnBoxCheck(wxCommandEvent &event)
 	if((*modflags)[checktag] == 0) (*modflags)[checktag] = 1;
 	else (*modflags)[checktag] = 0;
 
+	diagbox->Write(text.Format("NeuroBox OnBoxCheck id %d\n", id));
+
 	// Set cell for filtering
 	if(checktag == "cellfilter") {
-		(*cellpanel->neurons)[neuroindex].filter = (*modflags)[checktag];
+		(*cellpanel->neurons)[cellpanel->neuroindex].filter = (*modflags)[checktag];
 	}
 }
 
@@ -1157,7 +1162,7 @@ void NeuroBox::SetCell(int cellindex, GraphDat* graph)
 
 int NeuroBox::GetCellIndex()
 {
-	return neuroindex;
+	return cellpanel->neuroindex;
 }
 
 
@@ -2405,7 +2410,7 @@ void GridBox::NeuroGridFilter()
 
 	for(i=0; i<numcols; i++) colflag[i] = 0;
 
-	for(i=0; i<neurobox->cellcount; i++) {
+	for(i=0; i<neurobox->cellpanel->neurocount; i++) {
 		col = (*celldata)[i].gridcol;
 		colflag[col] = (*celldata)[i].filter;
 	}

@@ -15,7 +15,9 @@ enum {
 	ID_Synth,
 	ID_Proto,
 	ID_storereset,
-	ID_diffusion
+	ID_diffusion,
+	ID_cellfiltercheck,
+	ID_modfiltercheck
 };
 
 

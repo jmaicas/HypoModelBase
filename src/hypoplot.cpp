@@ -772,7 +772,7 @@ void PlotBox::PlotLoad(wxString filetag)
 
 void PlotBox::SetCell(int cellindex, GraphDat *graph)
 {
-	neurobox->neuroindex = cellindex;
+	neurobox->cellpanel->neuroindex = cellindex;
 	//(*graph).gname.Printf("n%d", cellindex);
 	(*graph).gname = (*neurobox->cellpanel->neurons)[cellindex].name;
 	neurobox->cellpanel->NeuroData(false);
@@ -781,7 +781,7 @@ void PlotBox::SetCell(int cellindex, GraphDat *graph)
 
 int PlotBox::GetCellIndex()
 {
-	return neurobox->neuroindex;
+	return neurobox->cellpanel->neuroindex;
 }
 
 

@@ -148,7 +148,7 @@ public:
 	//std::vector<int> srate;
 	//std::vector<int> srate10;
 
-	int maxselect;
+	int maxselect, currselect;
 	int numselects[2];
 	std::vector <burst> selectstore[2];  // selection store using burst type
 	int burstfitmode;
@@ -176,6 +176,7 @@ public:
 	void ratecalc(std::vector<int> &srate);
 	void ratereset();
 	void diagstore(); // expand default storage for diagnostics
+	bool Selected();  // check for data selection
 };
 
 

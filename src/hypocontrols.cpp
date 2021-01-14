@@ -35,6 +35,7 @@ void ToolButton::OnLeftDClick(wxMouseEvent& event)
 void ToolButton::OnLeftUp(wxMouseEvent& event)
 {
 	wxCommandEvent linkpress(wxEVT_COMMAND_BUTTON_CLICKED, linkID);
+
 	if(linkID) {
 		linkpress.SetInt(1);
 		AddPendingEvent(linkpress);

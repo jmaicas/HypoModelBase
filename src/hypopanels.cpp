@@ -1014,11 +1014,12 @@ void ParamBox::OnFocus(wxFocusEvent& event)
 }
 
 
-// Copied from SetModCheck, not currently in use
+// Copied from SetModCheck, not currently in use - now in use 14/1/21
 wxCheckBox *ParamBox::SetBoxCheck(int id, wxString checktag, wxString checktext, int state)
 {
 	wxCheckBox *newcheck;
 	(*modflags)[checktag] = state;
+	while(checkrefs->CheckID(id)) id++;
 	newcheck = new wxCheckBox(activepanel, id, checktext);
 	newcheck->SetFont(confont);
 	newcheck->SetValue(state);
@@ -1033,6 +1034,8 @@ wxCheckBox *ParamBox::SetModCheck(int id, wxString checktag, wxString checktext,
 {
 	wxCheckBox *newcheck;
 	(*modflags)[checktag] = state;
+	//while(!checkrefs->AddRef(id, checktag, 1, newcheck)) id++;
+	while(checkrefs->CheckID(id)) id++;
 	newcheck = new wxCheckBox(activepanel, id, checktext);
 	newcheck->SetFont(confont);
 	newcheck->SetValue(state);
@@ -1047,7 +1050,7 @@ void ParamBox::SetModFlag(int id, wxString flagname, wxString flagtext, int stat
 {
 	if(menu == NULL) menu = menuModel;
 	(*modflags)[flagname] = state;
-	flagrefs->AddRef(id, flagname);
+	while(!flagrefs->AddRef(id, flagname)) id++;
 	menu->Append(id, flagtext, "Toggle " + flagtext, wxITEM_CHECK);
 	menu->Check(id, state);
 	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnFlag));
@@ -1058,7 +1061,7 @@ void ParamBox::SetConFlag(int id, wxString flagname, wxString flagtext, int stat
 {
 	if(menu == NULL) menu = menuControls;
 	(*conflags)[flagname] = state;
-	conflagrefs->AddRef(id, flagname);
+	while(!conflagrefs->AddRef(id, flagname)) id++;
 	menu->Append(id, flagtext, "Toggle " + flagtext, wxITEM_CHECK);
 	menu->Check(id, state);
 	Connect(id, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(ParamBox::OnFlag));
@@ -1545,13 +1548,13 @@ void ParamBox::StoreParam(wxString filetag)
 	}
 	paramfile.AddLine("");
 	for(i=0; i<flagrefs->numrefs; i++) {
-		outline.Printf("%.0f", (*modflags)[flagrefs->refbase[i].label]);  
-		paramfile.AddLine(flagrefs->refbase[i].label + " " + outline);
+		outline.Printf("%.0f", (*modflags)[flagrefs->refbase[i].tag]);  
+		paramfile.AddLine(flagrefs->refbase[i].tag + " " + outline);
 	}
 	paramfile.AddLine("");
 	for(i=0; i<checkrefs->numrefs; i++) {
-		outline.Printf("%.0f", (*modflags)[checkrefs->refbase[i].label]);  
-		paramfile.AddLine(checkrefs->refbase[i].label + " " + outline);
+		outline.Printf("%.0f", (*modflags)[checkrefs->refbase[i].tag]);  
+		paramfile.AddLine(checkrefs->refbase[i].tag + " " + outline);
 	}
 	paramfile.Write();
 	paramfile.Close();

@@ -773,8 +773,9 @@ public:
 
 class RefEntry{
 public:
-	int id;
-	wxString label;
+	int id;   // supplied ID
+	//int ID;   // RefStore generated ID 
+	wxString tag;
 	wxControl *box;
 	ToolBox *tool;
 	int type;
@@ -783,20 +784,28 @@ public:
 
 class RefStore{
 	int i;
+	//int nextID;
 	
 public:
 	int numrefs;
 	//RefEntry refbase[100];
 	std::vector <RefEntry> refbase;
 	
-	RefStore() {
+	RefStore(int startID=100) {
+		//nextID = startID;
 		numrefs = 0;
 		refbase.resize(100);
 	};
+
+	bool CheckID(int id) {
+		for(i=0; i<numrefs; i++)
+			if(refbase[i].id == id) return true;
+		return false;
+	}
 	
 	wxString GetRef(int id) {
 		for(i=0; i<numrefs; i++)
-			if(refbase[i].id == id) return refbase[i].label;
+			if(refbase[i].id == id) return refbase[i].tag;
 		return "";
 	};
     
@@ -818,24 +827,28 @@ public:
 		return 0;
 	};
 	
-	int GetID(wxString label) {
+	int GetID(wxString tag) {
 		for(i=0; i<numrefs; i++)
-			if(refbase[i].label == label) return refbase[i].id;
+			if(refbase[i].tag == tag) return refbase[i].id;
 		return 0;
 	};
 	
-	void AddRef(int id, wxString label, int type = 1, wxControl *box = NULL) {
+	bool AddRef(int id, wxString tag, int type = 1, wxControl *box = NULL) {
+		if(CheckID(id)) return false;
 		refbase[numrefs].id = id;
-		refbase[numrefs].label = label;
+		refbase[numrefs].tag = tag;
 		refbase[numrefs].box = box;
 		refbase[numrefs].type = type;
 		numrefs++;
+		return true;
 	};
 
-	void AddTool(int id, ToolBox *tool) {
+	bool AddTool(int id, ToolBox *tool) {
+		if(CheckID(id)) return false;
 		refbase[numrefs].id = id;
 		refbase[numrefs].tool = tool;
 		numrefs++;
+		return true;
 	};
 };
 

@@ -184,7 +184,7 @@ public:
 	void SetModFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	void SetConFlag(int, wxString, wxString, int state=0, wxMenu *menu=NULL); 
 	wxCheckBox *SetModCheck(int, wxString, wxString, int state=0); 
-	wxCheckBox *SetBoxCheck(int, wxString, wxString, int state=0); 
+	wxCheckBox *SetBoxCheck(int, wxString tag, wxString label, int state=0); 
 	void ModData();
 	wxBoxSizer *StoreBox(wxString label="", wxPanel *storepanel=NULL);
 	wxBoxSizer *StoreBoxSync(wxString label="", wxPanel *storepanel=NULL);

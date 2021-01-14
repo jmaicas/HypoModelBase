@@ -84,8 +84,8 @@ public:
 	Model *mod;
 	DiagBox *diagbox;
 
-	int neuroindex;
-	int cellcount;
+	//int neuroindex;
+	//int cellcount;
 
 	//SpikeDat *currcell;
 	//std::vector<NeuroDat>*cells;
@@ -95,24 +95,24 @@ public:
 	GridBox *gridbox;
 	BurstBox *burstbox;
 
-	wxTextCtrl *datneuron;
-	wxSpinButton *datspin;
+	//wxTextCtrl *datneuron;
+	//wxSpinButton *datspin;
 	TagBox *neurodatatag;
 	TagBox *selectstoretag;
 	TextGrid *textgrid;
 
 	SpikePanel *cellpanel, *modpanel;
 
-	wxStaticBoxSizer *selectbox1, *selectbox2;  //, *filterbox;
-	wxStaticBoxSizer *selectbox3, *selectbox4;
-	wxToggleButton *addbutton[5];
-	wxToggleButton *subbutton[5];
-	int selectmode[5];
-	int selectcount;
-	int currselect;
-	int currselectmod;
+	//wxStaticBoxSizer *selectbox1, *selectbox2;  //, *filterbox;
+	//wxStaticBoxSizer *selectbox3, *selectbox4;
+	//wxToggleButton *addbutton[5];
+	//wxToggleButton *subbutton[5];
+	//int selectmode[5];
+	//int selectcount;
+	//int currselect;
+	//int currselectmod;
 	
-	std::vector<int>selectspikes[4];
+	//std::vector<int>selectspikes[4];
 	bool spikeselectLink;
 
 	wxCheckBox *filtercheck;

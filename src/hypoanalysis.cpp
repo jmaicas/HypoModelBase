@@ -861,6 +861,7 @@ void SpikeDat::SelectScan(int select)
 	wxString text;
 
 	//int *selectspikes = selectdata->spikes;
+	neurodata->currselect = select;
 
 	selecton = 0;
 	selectindex = 0;
@@ -954,7 +955,7 @@ void SpikeDat::BurstScan(BurstBox *burstbox)
 	}
 
 	// check for data selection
-	if(neurodata && neurodata->numselects) {
+	if(neurodata && neurodata->Selected()) {
 		diagbox->Write("BurstScan selectmode\n");
 		selectmode = true;
 		selectspikes = selectdata->spikes;
