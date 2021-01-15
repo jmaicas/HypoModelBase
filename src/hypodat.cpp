@@ -22,9 +22,11 @@ NeuroDat::NeuroDat()
 	selectstore[1].resize(maxselect);
 	numselects[1] = 0;
 	currselect = 0;
+	xscrollpos = 0;
 
 	filter = 0;
 	burstfitmode = 0;
+	xscrollpos = 0;
 }
 
 

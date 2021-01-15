@@ -56,6 +56,7 @@ public:
 	int ostype;
 	int gsynch;
 	int xstretch;
+	int xscrollpos;
 	wxPoint mousedown;
 	//wxOverlay *overlay;
 	wxFont textfont, smallfont;
@@ -125,6 +126,7 @@ public:
 	void Highlight(double xpos, double width=0);              // new 28/5/20
 	void HighlightTime(double start, double stop);
 	void SetScroll(int xpos);
+	void ScrollX(int scrollpos);
 };
 
 

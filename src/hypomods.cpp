@@ -47,6 +47,7 @@ Model::Model(int type, wxString name, HypoMain *main)
 	xscaletoggle = 0;
 	burstmode = 0;
 	projmode = 0;  // 0 for old model based prefs and box store, 1 for new Project store
+	gmax = 10;  // maximum number of graph panels
     
     runflag = false;   // Set to indicate model thread is running
     runmute = new wxMutex;
@@ -66,6 +67,14 @@ Model::~Model()
 	delete graphbase;
 	delete modeflags;
 	delete toolflags;
+}
+
+
+GraphWindow3 *Model::GetGraphWin(wxString settag)
+{
+	for(int i=0; i<gcount; i++)
+		if(gcodes[i] == settag) return mainwin->graphwin[i];
+	return NULL;
 }
 
 

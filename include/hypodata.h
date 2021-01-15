@@ -45,6 +45,9 @@ public:
 	wxStaticText *selectfreq;
 	wxCheckBox *filtercheck;
 
+	wxString ratetag;
+	GraphWindow3 *graphwin;  // used to link the spike rate graph panel
+
 	SpikePanel(NeuroBox *);
 
 	// Data processing and display

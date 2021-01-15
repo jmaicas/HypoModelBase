@@ -663,10 +663,25 @@ void GraphWindow3::UpdateScroll(int pos)
 	//	//mainwin->SetStatusText(snum);
 	//}
 
+	/*
 	xdiff = graph->xto - graph->xfrom;
 	scrollxto = max * graph->binsize - (int)xdiff;
-	section = xdiff / 10;
+	//section = xdiff / 10;
+	section = 
 	scrollbar->SetScrollbar(graph->scrollpos, section, scrollxto + section + xdiff/5, section);
+	*/
+
+	xdiff = graph->xto - graph->xfrom;
+	scrollxto = max * graph->binsize;
+	//section = ((xdiff * graph->binsize) / max) * scrollxto;
+	//section = (xdiff  / max) * scrollxto;
+	section = xdiff;
+	if(section > scrollxto) {
+		graph->scrollpos = 0;
+		graph->xfrom = 0;
+		graph->xto = xdiff;
+	}
+	scrollbar->SetScrollbar(graph->scrollpos, section, scrollxto, section);
 
 	Refresh();
 	overlay.Reset();
@@ -874,40 +889,41 @@ void GraphWindow3::ReSize(int newxplot, int newyplot)
 	//Layout();
 
 	UpdateScroll();
-
 	overlay.Reset();
 	Refresh();
 }
 
 
-void GraphWindow3::OnScroll(wxScrollEvent &event)
+void GraphWindow3::ScrollX(int xpos)
 {
-	int scrollpos;
-	wxString snum;
-	double xmax;
 	double xdiff;
-	int datatype;
 	int plotindex;
 
-	scrollpos = event.GetPosition();
-	//snum.Printf("graph scroll = %d", scrollpos);
-	//mainwin->SetStatusText(snum);	
+	xscrollpos = xpos;
 
 	for(plotindex=0; plotindex<numdisps; plotindex++) {
 		graph = dispset[plotindex]->plot[0];
 		xdiff = graph->xto - graph->xfrom;
-		graph->xfrom = scrollpos;
-		graph->xto = scrollpos + xdiff;
+		graph->xfrom = xpos;
+		graph->xto = xpos + xdiff;
 		snum.Printf("%.1f", graph->xfrom);
 		xf->SetValue(snum);
 		snum.Printf("%.1f", graph->xto);
 		xt->SetValue(snum);
-		graph->scrollpos = scrollpos;
+		graph->scrollpos = xpos;
 	}
-	//scalebox->UpdateScale();
-	if(gsynch) scalebox->ScrollUpdate(graphindex, scrollpos);
+	if(gsynch) scalebox->ScrollUpdate(graphindex, xpos);
 	else Refresh();
-	//Refresh();
+}
+
+
+void GraphWindow3::OnScroll(wxScrollEvent &event)
+{
+	xscrollpos = event.GetPosition();
+	//snum.Printf("graph scroll = %d", scrollpos);
+	//mainwin->SetStatusText(snum);	
+	
+	ScrollX(xscrollpos);
 }
 
 
@@ -940,7 +956,6 @@ void GraphWindow3::DrawLine(wxDC& dc, wxGraphicsContext *gc, int xstart, int yst
 void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 {
 	wxBufferedPaintDC dc(this);
-	//dc = new wxBufferedPaintDC(this);
 
 	int gdex, gpar, gtype;
 	int i, j, k, dir;

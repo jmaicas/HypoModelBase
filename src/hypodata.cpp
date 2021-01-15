@@ -23,7 +23,6 @@
 SpikePanel::SpikePanel(NeuroBox *box)
 	: ToolPanel(box, box->auitabpanel)
 {
-	int i;
 	int datwidth, labelwidth, buttspace;
 
 	neurobox = box;
@@ -32,6 +31,9 @@ SpikePanel::SpikePanel(NeuroBox *box)
 	neuroindex = 0;
 	neurocount = 0;
 	cellmode = 0;
+
+	ratetag = "";
+	graphwin = NULL;
 
 	selectspikes[0].resize(100000);
 	selectspikes[1].resize(100000);
@@ -161,7 +163,6 @@ void SpikePanel::SetData(SpikeDat *dataneuron, std::vector<NeuroDat>*dataneurons
 	currneuron->SelectInit();
 	currneuron->dispmodemax = 2;
 	currneuron->diagbox = neurobox->diagbox;
-
 }
 
 
@@ -186,6 +187,11 @@ void SpikePanel::OnPrev(wxSpinEvent& WXUNUSED(event))
 	if(neuroindex > 0) neuroindex--;
 	else neuroindex = neurocount-1;
 
+	// Store rate X-axis position
+	graphwin = neurobox->mod->GetGraphWin(ratetag);
+	if(graphwin) currneuron->neurodata->xscrollpos = graphwin->xscrollpos;
+
+	// Store select grids
 	for(int i=0; i<selectcount; i++) {
 		currneuron->selectdata->spikes = selectspikes[i].data();
 		currneuron->SelectScan(i);  // store current cell's select grid to NeuroDat
@@ -202,10 +208,16 @@ void SpikePanel::OnNext(wxSpinEvent& WXUNUSED(event))
 
 	//neurobox->mainwin->graphwin[0]->SetScroll(0); 
 
+	// Store rate X-axis position
+	graphwin = neurobox->mod->GetGraphWin(ratetag);
+	if(graphwin) currneuron->neurodata->xscrollpos = graphwin->xscrollpos;
+
+	// Store select grids
 	for(int i=0; i<selectcount; i++) {
 		currneuron->selectdata->spikes = selectspikes[i].data();
 		currneuron->SelectScan(i);  // store current cell's select grid to NeuroDat
 	}
+
 	NeuroData();
 }
 
@@ -256,6 +268,9 @@ void SpikePanel::NeuroData(bool dispupdate)
 		}
 		neurobox->mod->SpikeDataSwitch(currneuron);   // Switch evo fitting data source
 	}
+
+	// Restore rate plot scroll position
+	if(graphwin) graphwin->ScrollX(currneuron->neurodata->xscrollpos);
 
 	if(dispupdate) {
 		PanelData();
@@ -682,10 +697,12 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	analysispanel->Layout();
 
 
-	// Spike data panel including selection
+	// Spike data panel (including selection)
 
 	cellpanel = new SpikePanel(this);
 	cellpanel->cellmode = true;
+	cellpanel->ratetag = "cellspikes";
+
 	//modpanel = new SpikePanel(this);
 
 	// Data Loading - currently for batch loading 

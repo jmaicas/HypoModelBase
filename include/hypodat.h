@@ -163,6 +163,7 @@ public:
 	 
 	int filter;
 	int gridcol;
+	int xscrollpos;
 
 	int maxtime;
 	int maxspikes;

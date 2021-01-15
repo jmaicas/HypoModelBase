@@ -94,6 +94,7 @@ public:
 	ParamStore prefstore;
 	ToolSet modtools;
 	wxString gcodes[10], gtags[10];
+	int gmax;
 	ScaleBox *scalebox;
 	GraphWindow3 **graphwin;
 
@@ -147,6 +148,7 @@ public:
     virtual void OnModThreadCompletion(wxThreadEvent&);
 	virtual void DataOutput() {};
     void OnDiagWrite(wxThreadEvent&);
+	GraphWindow3 *GetGraphWin(wxString settag);
 };
 
 
