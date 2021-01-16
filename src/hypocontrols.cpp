@@ -1304,6 +1304,7 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
     mainwin = main;
     boxpath = path;
 	redtag = "";
+	diagnostic = false;
     
     mainwin->tagset->AddTag(boxtag, this);
     
@@ -1334,7 +1335,7 @@ TagBox::TagBox(MainFrame *main, ToolPanel *panel, wxWindowID id, const wxString&
 	}
 	*/
     
-    mainwin->diagbox->Write(text.Format("TagBox tagpath %s boxpath %s\n", tagpath, boxpath));
+    if(diagnostic) mainwin->diagbox->Write(text.Format("TagBox tagpath %s boxpath %s\n", tagpath, boxpath));
 	
 	name = boxtag;
 	diagbox = NULL;
@@ -1379,7 +1380,7 @@ wxString TagBox::LoadTag(wxString dir, wxString suffix)
 	//if(!dir.IsEmpty()) filepath = tagpath + filetag;       // placeholder 6/1/21
 	filepath = dir + "/" + filetag + suffix;
 
-	mainwin->diagbox->Write(text.Format("TagBox Load filepath %s\n", filepath));
+	if(diagnostic) mainwin->diagbox->Write(text.Format("TagBox Load filepath %s\n", filepath));
 
 	if(!wxFileExists(filepath)) {
 		SetValue("Not found");
@@ -1406,7 +1407,7 @@ wxString TagBox::StoreTag(wxString dir, wxString suffix)
 	filetag = GetValue();
 	filepath = dir + "/" + filetag + suffix;
 
-	mainwin->diagbox->Write(text.Format("TagBox filepath %s\n", filepath));
+	if(diagnostic) mainwin->diagbox->Write(text.Format("TagBox filepath %s\n", filepath));
 
 	tagpos = FindString(filetag);
 	if(tagpos != wxNOT_FOUND) Delete(tagpos);
@@ -1444,7 +1445,7 @@ void TagBox::PathUpdate()
 		else tagpath = mainwin->modpath + "/" + boxpath + "/Tags";
 	}
 
-	mainwin->diagbox->Write(text.Format("TagBox PathUpdate() tagpath %s\n", tagpath));
+	if(diagnostic) mainwin->diagbox->Write(text.Format("TagBox PathUpdate() tagpath %s\n", tagpath));
 }
 
 
@@ -1498,7 +1499,7 @@ void TagBox::HistLoad()
 		return;
 	}
 
-	mainwin->diagbox->Write("Reading tag history " + filename + "\n");
+	if(diagnostic) mainwin->diagbox->Write("Reading tag history " + filename + "\n");
 
 	readline = tagfile.ReadLine();
 
@@ -1514,7 +1515,7 @@ void TagBox::HistLoad()
 
 	tagfile.Close();	
 	SetLabel(tag);
-	mainwin->diagbox->Write(name + " " + tag + "\n");
+	if(diagnostic) mainwin->diagbox->Write(name + " " + tag + "\n");
 	if(tag != "") labelset = true;
 }
 

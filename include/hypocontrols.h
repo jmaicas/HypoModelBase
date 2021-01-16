@@ -45,6 +45,7 @@ public:
 	bool labelset, histmode;
 	DiagBox *diagbox;
 	MainFrame *mainwin;
+	bool diagnostic;
 
 	TagBox(MainFrame *mainwin, ToolPanel *panel, wxWindowID id, const wxString& label, const wxPoint& pos, const wxSize& size, wxString name, wxString path);
 	~TagBox();

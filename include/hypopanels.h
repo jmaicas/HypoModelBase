@@ -326,6 +326,7 @@ public:
 	SpikeDat *spikedata;
 	SpikeDat *loaddata;
 	SpikeDat *moddata;
+	SpikeDat *evodata;
 	ParamStore *burstparams;
 	BurstPanel *datburst;
 	BurstPanel *modburst;
@@ -362,7 +363,8 @@ public:
 	wxStaticText *datstatus;
 	wxRadioButton *filerad, *gridrad;
 
-	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst", bool evomode = false, int mode = 1);
+	//BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *spikedat=NULL, wxString intratag ="Intra Burst", bool evomode = false, int mode = 1);
+	BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *moddata, bool evomode = false);
 	void BurstDataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void DataDisp(SpikeDat *dispdata=NULL, BurstPanel *datpanel=NULL);
 	void BurstDataPanel(BurstPanel *);

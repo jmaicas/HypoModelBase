@@ -648,6 +648,8 @@ void GraphWindow3::UpdateScroll(int pos)
 	max = 1440;
 
 	graph = dispset[0]->plot[0];
+	if(!graph) return;
+
 	if(graph->gparam == -3) max = graph->gdatav->max / graph->xscale;
 	//else if(graph->gparam == -4) max = graph->gdatadv->maxindex / graph->xscale;
 	else if(graph->gparam == -4) max = graph->gdatadv->max / graph->xscale;

@@ -699,8 +699,10 @@ void ScaleBox::GLoad(wxString tag)
 		if(gbase->GraphExists(stag) || gbase->SetExists(stag)) gmod->gcodes[gindex] = stag;
 		else gmod->diagbox->Write(text.Format("GLoad graph/set %s not found\n", stag));
 		gtag = readline.AfterFirst(' ');
-		if(gbase->GraphExists(gtag)) gmod->gtags[gindex] = gtag;
-		gbase->GetSet(stag)->subplot[gindex] = gbase->tagindex[gtag];
+		if(gbase->GraphExists(gtag)) {
+			gmod->gtags[gindex] = gtag;
+			if(gbase->SetExists(stag)) gbase->GetSet(stag)->subplot[gindex] = gbase->tagindex[gtag];
+		}
 		readline = infile.ReadLine();
 	}
 
@@ -1186,7 +1188,8 @@ void ScaleBox::OnSpikes(wxCommandEvent& WXUNUSED(event))
 
 void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 {
-	graph = gpos[0].plot[0]; 
+	GraphDat *graph0 = gpos[0].plot[0];    // should replace this with something that specifically detects spike rate data panels but works for now 16/1/21
+	GraphDat *graph1 = gpos[1].plot[0];
 
 	//if((*gflags)[tag] == type) (*gflags)[tag] = 0;
 	//else (*gflags)[tag]++;  
@@ -1204,7 +1207,8 @@ void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 	//ratedata = 1 - ratedata;
 	(*gflags)["ratedata"] = ratedata;
 
-	graph->spikedata->ColourSwitch(ratedata);
+	if(graph0->spikedata) graph0->spikedata->ColourSwitch(ratedata);
+	if(graph1->spikedata) graph1->spikedata->ColourSwitch(ratedata);
 
 	GraphSwitch();
 }

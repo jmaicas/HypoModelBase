@@ -378,9 +378,10 @@ void InfoBox::OnDatLoad(wxCommandEvent& event)
 }
 
 
-// BurstBox - now used as general spike time data loading and analysis box - December 2020 return to more specific with grid based data loading
+// BurstBox - now used as general spike time data loading and analysis box - December 2020 return to more burst specific with grid based data loading
 
-BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode, int mode)
+//BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *sdat, wxString intratag, bool evomode, int mode)
+BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size, SpikeDat *modeldata, bool evomode)
 	: ToolBox(model->mainwin, "burstbox", title, pos, size)
 {
 	int numwidth = 50;
@@ -393,11 +394,18 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	mainwin = model->mainwin;
 	mod = model;
-	burstmode = mode;
+	//burstmode = mode;
 	burstparams = new ParamStore;
-	spikedata = sdat;
-	moddata = sdat;
-	if(!moddata) modmode = false;
+	//spikedata = sdat;
+
+	moddata = modeldata;
+	
+	if(!moddata) {
+		diagbox->Write("BurstBox no mod data at setup\n");
+		modmode = false;
+	}
+	else modmode = true;
+		
 
 	blankevent = new wxCommandEvent();
 	
@@ -454,102 +462,100 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	hbox2->Add(databox, 1, wxALIGN_CENTRE_VERTICAL);
 
 	// Burst Scan and Analysis
-	if(burstmode) {
-		paramset.AddNum("maxint", "Max Interval", 1500, 0); 
-		paramset.AddNum("minspikes", "Min Spikes", 25, 0); 
-		paramset.AddNum("maxspikes", "Max Spikes", 0, 0); 
-		paramset.AddNum("startspike", "Start", 0, 0); 
-		paramset.AddNum("endspike", "End", 0, 0); 
+	//if(burstmode) {
+	paramset.AddNum("maxint", "Max Interval", 1500, 0); 
+	paramset.AddNum("minspikes", "Min Spikes", 25, 0); 
+	paramset.AddNum("maxspikes", "Max Spikes", 0, 0); 
+	paramset.AddNum("startspike", "Start", 0, 0); 
+	paramset.AddNum("endspike", "End", 0, 0); 
 
-		for(i=0; i<paramset.numparams; i++) {
-			parambox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
-			parambox->AddSpacer(5);
-		}
-
-		datburst = new BurstPanel();
-		BurstDataPanel(datburst);
-		burstpanset[0] = datburst;
-		numpan = 1;
-
-		if(modmode) { 
-			modburst = new BurstPanel();
-			BurstDataPanel(modburst);
-			burstpanset[numpan] = modburst;
-			numpan++;
-		}
-
-		if(evomode) { 
-			evoburst = new BurstPanel();
-			BurstDataPanel(evoburst);
-			burstpanset[numpan] = evoburst;
-			numpan++;
-		}
-
-		wxFlexGridSizer *intragrid = new wxFlexGridSizer(numpan+1, 3, 3);
-		intragrid->Add(GridLabel(gridwidth, "Spikes"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraspikes);
-
-		intragrid->Add(GridLabel(gridwidth, "Freq"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intrafreq);
-	
-		intragrid->Add(GridLabel(gridwidth, "Mean"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraisimean);
-
-		intragrid->Add(GridLabel(gridwidth, "SD"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraisisd);
-
-		wxStaticBoxSizer *intrabox = new wxStaticBoxSizer(wxVERTICAL, panel, intratag);
-		//intrabox->Add(TextLabel("Intra Burst"), 0, wxALIGN_CENTRE);
-		if(ostype == Windows) intrabox->AddSpacer(5);
-		intrabox->Add(intragrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
-
-		wxFlexGridSizer *burstgrid = new wxFlexGridSizer(numpan+1, 3, 5);
-		if(ostype == Mac) gridwidth = 80; else gridwidth = 65;
-		burstgrid->Add(GridLabel(45, "Bursts"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->numbursts);
-
-		burstgrid->Add(GridLabel(gridwidth, "Mean Spikes"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->meanspikes);
-
-		burstgrid->Add(GridLabel(gridwidth, "Mean Length"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->meanlength);
-
-		burstgrid->Add(GridLabel(gridwidth, "Length SD"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->sdlength);
-
-		burstgrid->Add(GridLabel(gridwidth, "Mean Silence"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->meansilence);
-
-		burstgrid->Add(GridLabel(gridwidth, "Silence SD"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->sdsilence);
-
-		burstgrid->Add(GridLabel(gridwidth, "Activity Q"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->actQ);
-
-		burstgrid->Add(GridLabel(gridwidth, "Mode Time"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->modetime);
-
-		burstgrid->Add(GridLabel(gridwidth, "Mode Rate"), 0, wxALIGN_CENTRE);
-		for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->moderate);
-
-		rightbox->Add(burstgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
-
-		hbox2->AddSpacer(20);
-		hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL);
-
-		if(ostype == Mac) {
-			AddButton(ID_scan, "Burst Scan", 90, parambox);
-			AddButton(ID_datoutput, "Output Data", 100, parambox);
-		}
-		else {
-			//parambox->AddSpacer(5);
-			AddButton(ID_scan, "Burst Scan", 70, parambox);
-			parambox->AddSpacer(10);
-			AddButton(ID_datoutput, "Output Data", 70, parambox);
-		}
+	for(i=0; i<paramset.numparams; i++) {
+		parambox->Add(paramset.con[i], 1, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+		parambox->AddSpacer(5);
 	}
 
+	datburst = new BurstPanel();
+	BurstDataPanel(datburst);
+	burstpanset[0] = datburst;
+	numpan = 1;
 
+	if(modmode) { 
+		modburst = new BurstPanel();
+		BurstDataPanel(modburst);
+		burstpanset[numpan] = modburst;
+		numpan++;
+	}
+
+	if(evomode) { 
+		evoburst = new BurstPanel();
+		BurstDataPanel(evoburst);
+		burstpanset[numpan] = evoburst;
+		numpan++;
+	}
+
+	wxFlexGridSizer *intragrid = new wxFlexGridSizer(numpan+1, 3, 3);
+	intragrid->Add(GridLabel(gridwidth, "Spikes"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraspikes);
+
+	intragrid->Add(GridLabel(gridwidth, "Freq"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intrafreq);
+	
+	intragrid->Add(GridLabel(gridwidth, "Mean"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraisimean);
+
+	intragrid->Add(GridLabel(gridwidth, "SD"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) intragrid->Add(burstpanset[i]->intraisisd);
+
+	wxStaticBoxSizer *intrabox = new wxStaticBoxSizer(wxVERTICAL, panel, "Intra Burst");
+	//intrabox->Add(TextLabel("Intra Burst"), 0, wxALIGN_CENTRE);
+	if(ostype == Windows) intrabox->AddSpacer(5);
+	intrabox->Add(intragrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 2);
+
+	wxFlexGridSizer *burstgrid = new wxFlexGridSizer(numpan+1, 3, 5);
+	if(ostype == Mac) gridwidth = 80; else gridwidth = 65;
+	burstgrid->Add(GridLabel(45, "Bursts"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->numbursts);
+
+	burstgrid->Add(GridLabel(gridwidth, "Mean Spikes"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->meanspikes);
+
+	burstgrid->Add(GridLabel(gridwidth, "Mean Length"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->meanlength);
+
+	burstgrid->Add(GridLabel(gridwidth, "Length SD"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->sdlength);
+
+	burstgrid->Add(GridLabel(gridwidth, "Mean Silence"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->meansilence);
+
+	burstgrid->Add(GridLabel(gridwidth, "Silence SD"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->sdsilence);
+
+	burstgrid->Add(GridLabel(gridwidth, "Activity Q"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->actQ);
+
+	burstgrid->Add(GridLabel(gridwidth, "Mode Time"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->modetime);
+
+	burstgrid->Add(GridLabel(gridwidth, "Mode Rate"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->moderate);
+
+	rightbox->Add(burstgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
+	hbox2->AddSpacer(20);
+	hbox2->Add(intrabox, 1, wxALIGN_CENTRE_VERTICAL);
+
+	if(ostype == Mac) {
+		AddButton(ID_scan, "Burst Scan", 90, parambox);
+		AddButton(ID_datoutput, "Output Data", 100, parambox);
+	}
+	else {
+		//parambox->AddSpacer(5);
+		AddButton(ID_scan, "Burst Scan", 70, parambox);
+		parambox->AddSpacer(10);
+		AddButton(ID_datoutput, "Output Data", 70, parambox);
+	}
+	//}
 
 
 

@@ -329,9 +329,9 @@ HypoMain::~HypoMain()
 
 void HypoMain::ToolLoad(Model *mod)
 {
-	if((*mod->toolflags)["burstbox"]) BurstModule(mod, 2); 
+	if((*mod->toolflags)["burstbox"]) BurstModule(mod); 
 
-	if((*mod->toolflags)["spikebox"]) BurstModule(mod, 1); 
+	//if((*mod->toolflags)["spikebox"]) BurstModule(mod, 1); 
 
 	if((*mod->toolflags)["soundbox"]) SoundModule(mod); 
 }
@@ -543,10 +543,10 @@ void HypoMain::OnEnter(wxCommandEvent& WXUNUSED(event))
 //burstbox = new BurstBox(this, "Burst Analysis", wxPoint(320, 455), wxSize(330, 355), currvaso);
 
 
-void HypoMain::BurstModule(Model *model, int mode)
+void HypoMain::BurstModule(Model *model, SpikeDat *moddata, bool evomode)
 {
 	int boxwidth, boxheight;
-	int modmode = mode;
+	//int modmode = mode;
 
 	//wxString tag;
 
@@ -561,18 +561,20 @@ void HypoMain::BurstModule(Model *model, int mode)
 		boxheight = 500;
 	}
 
-	diagbox->Write(text.Format("Burst box init type %d\n", modmode));
+	//diagbox->Write(text.Format("Burst box init type %d\n", modmode));
 
 
-	if(modmode == 2) burstbox = new BurstBox(model, "Burst Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), NULL, "Intra Burst");
+	//if(modmode == 2) 
+		
+	burstbox = new BurstBox(model, "Burst Analysis", wxPoint(0, 500), wxSize(boxwidth, boxheight), moddata, evomode);
 
-	if(modmode == 1) burstbox = new BurstBox(model, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), NULL, "Selected", false, 0);
+	//if(modmode == 1) burstbox = new BurstBox(model, "Spike Data", wxPoint(0, 500), wxSize(boxwidth, boxheight), NULL, "Selected", false, 0);
 	//mainpos = GetPosition();
 
 	//burstbox = new BurstBox(this, "Analysis", wxPoint(320, 485), wxSize(330, 430), 0, "Selected");
 	//burstbox->loaddata = expdata;
 
-	diagbox->Write(text.Format("BurstModule modmode %d\n", modmode));
+	//diagbox->Write(text.Format("BurstModule modmode %d\n", modmode));
 
 	//if(!expdata->graphs) {
 	//	SpikeModule(mod);
