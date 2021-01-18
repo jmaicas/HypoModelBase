@@ -408,8 +408,9 @@ void EvoFitBox::CreatePanels()
 	wxBoxSizer *fitweightbox2 = new wxBoxSizer(wxVERTICAL);
 	fitweightbox2->Add(fitweightbox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 	fitweightbox2->AddSpacer(5);
-	burstToggle = fitnesspanel->ToggleButton(ID_Burst, "Burst", 40, fitweightbox2);
-	//fitweightbox2->Add(burstToggle, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
+	burstcheck = SetModCheck(ID_burstcheck, "burstmode", "Burst", false);
+	//burstToggle = fitnesspanel->ToggleButton(ID_Burst, "Burst", 40, fitweightbox2, 10, this);
+	fitweightbox2->Add(burstcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 0);
 
 	/*
 	evopanel = new FitPanel();
@@ -663,15 +664,19 @@ void EvoFitBox::SetToggle(bool state, int ID)
 }
 
 
-void EvoFitBox::OnToggle(wxCommandEvent& event)
+void EvoFitBox::OnCheck(wxCommandEvent& event)
 {
-	if(event.GetId() == ID_Burst) {
+	if(event.GetId() == ID_burstcheck) {
 		burstfitmode = 1 - burstfitmode;
 		diagbox->Write("burst fit toggle\n");
 	}
 
 	expdata->burstfitmode = burstfitmode;
 	if(expdata->neurodata) expdata->neurodata->burstfitmode = burstfitmode;
+
+	diagbox->Write("EvoFitBox OnCheck()\n");
+
+	ParamBox::OnCheck(event);
 }
 
 

@@ -332,8 +332,11 @@ public:
 	void OnLeftDClick(wxMouseEvent & event);
 	void OnRightDClick(wxMouseEvent & event);
 	void OnMouseMove(wxMouseEvent & event);
-	virtual void OnToggle(wxCommandEvent& event) {};
-	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10, wxPanel *pan = NULL);
+	virtual void OnToggle(wxCommandEvent& event) {
+		event.Skip();
+};
+	//wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point = 10, wxPanel *pan = NULL);
+	wxToggleButton *ToggleButton(int id, wxString label, int width, wxBoxSizer *sizer, int point = 10, ToolBox *box = NULL);
 	void Init();
 	virtual void OnClick(wxPoint);
 
@@ -415,7 +418,7 @@ public:
 
 	~ToolBox();
 
-	//virtual void OnToggle(wxCommandEvent& event) {};
+	virtual void OnToggle(wxCommandEvent& event) {};
 	virtual void TextClick(wxString tag);
 	virtual void SpinClick(wxString tag);
 	virtual void BoxEnter(wxString tag);

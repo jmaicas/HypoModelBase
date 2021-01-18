@@ -169,7 +169,7 @@ public:
 	void HistStore();
 	void HistLoad();
 	void OnFlag(wxCommandEvent& event);
-	void OnCheck(wxCommandEvent& event);
+	virtual void OnCheck(wxCommandEvent& event);
 	virtual void OnBoxCheck(wxCommandEvent& event);
 	void OnPanel(wxCommandEvent& event);
 	void SetCheck(wxCheckBox *, bool state);
@@ -196,6 +196,7 @@ public:
 	ParamCon *GetCon(wxString);
 	wxBoxSizer *RunBox();
 	void CopyParams(ParamStore *);   // copy parameters to panel from ParamStore
+	bool GetFlag(wxString tag);
 };
 
 

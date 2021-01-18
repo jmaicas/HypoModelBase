@@ -165,6 +165,7 @@ enum {
 	ID_cellcheck,
 	ID_unicheck,
 	ID_seedcheck,
+	ID_burstcheck,
 	ID_initcheck,
 	ID_filtercheck,
 	ID_netstore,

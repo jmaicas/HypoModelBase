@@ -733,15 +733,17 @@ void ToolPanel::OnClick(wxPoint pos)
 }
 
 
-wxToggleButton *ToolPanel::ToggleButton(int id, wxString label, int width, wxBoxSizer *box, int point, wxPanel *pan)
+//wxToggleButton *ToolPanel::ToggleButton(int id, wxString label, int width, wxBoxSizer *sizer, int point, wxPanel *pan)
+wxToggleButton *ToolPanel::ToggleButton(int id, wxString label, int width, wxBoxSizer *sizer, int point, ToolBox *box)
 {
-	if(!pan) pan = this;
+	//if(!pan) pan = this;
 	confont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
 	if(GetSystem() == Mac) confont = wxFont(wxFontInfo(point).FaceName("Tahoma"));
 	wxToggleButton *button = new wxToggleButton(this, id, label, wxDefaultPosition, wxSize(width, buttonheight), 0);
 	button->SetFont(confont);
-	box->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
-	Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(ToolPanel::OnToggle));
+	sizer->Add(button, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxTOP|wxBOTTOM, 1);
+	if(box) box->Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(ToolBox::OnToggle));
+	else Connect(id, wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(ToolPanel::OnToggle));
 	return button;
 }
 

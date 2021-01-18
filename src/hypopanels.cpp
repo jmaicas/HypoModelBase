@@ -1092,6 +1092,8 @@ void ParamBox::OnCheck(wxCommandEvent &event)
 
 	if((*modflags)[checktag] == 0) (*modflags)[checktag] = 1;
 	else (*modflags)[checktag] = 0;
+
+	//event.Skip();
 }
 
 
@@ -1114,6 +1116,12 @@ void ParamBox::OnFlag(wxCommandEvent& event)
 	else (*modflags)[flag] = 0;
 
 	if(autorun) OnRun(event);
+}
+
+
+bool ParamBox::GetFlag(wxString tag)
+{
+	return (*modflags)[tag];
 }
 
 

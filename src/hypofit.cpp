@@ -220,7 +220,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	//// Burst Profile Analysis
 
 	if(burstmode) {
-
+	
 		burstdata->BurstScanFit();
 		if(burstdata->numbursts > 0) burstdata->BurstProfileFit();
 		else {

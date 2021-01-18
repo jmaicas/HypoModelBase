@@ -169,6 +169,7 @@ public:
 	wxStaticText *intrafreq;
 	wxStaticText *spikes;
 	wxCheckBox *seedcheck;
+	wxCheckBox *burstcheck;
 
 	// Data Panel
 	wxStaticText *expspikes;
@@ -228,7 +229,8 @@ public:
 	EvoFitBox(Model *mod, EvoChrome *, const wxString& title, const wxPoint& pos, const wxSize& size, bool burstmode = false);	
 	void OnFitScore(wxCommandEvent& event);
 	void OnEvoRun(wxCommandEvent& event);
-	void OnToggle(wxCommandEvent& event);
+	//void OnToggle(wxCommandEvent& event);
+	void OnCheck(wxCommandEvent& event);
 
 	wxFlexGridSizer *FitScorePanel(FitPanel *);
 	wxFlexGridSizer *FitDataPanel(FitSet *, DatPanel *);

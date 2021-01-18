@@ -1196,7 +1196,7 @@ void ScaleBox::OnData(wxCommandEvent& WXUNUSED(event))
 
 	// Used for both switching data plot (cell/model) and switching data colour mode (normal/burst/select)
 
-	if(ratedata == graph->spikedata->dispmodemax) ratedata = 0;
+	if(ratedata == graph0->spikedata->dispmodemax) ratedata = 0;
 	else ratedata++;
 
 	// Dynamic button
