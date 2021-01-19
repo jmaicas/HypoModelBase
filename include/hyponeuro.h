@@ -39,6 +39,7 @@ public:
 	// Boxes
 	NeuroMod(int, wxString, HypoMain *);
 	virtual ~NeuroMod();
+	BurstBox *burstbox;
 
 	//void SpikeBox(int modmode = 0);
 	void EvoGraphs();

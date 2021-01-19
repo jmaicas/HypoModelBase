@@ -379,6 +379,7 @@ public:
 
 	void BurstScan();   // New scan call function, replacing data director role of OnScan()   DM 5/9/19
 	void ExpDataScan(SpikeDat *data=NULL);
+	void ModDataScan(SpikeDat *data=NULL);
 	void SetExpGrid();
 
 	//void OnClose(wxCloseEvent& event);

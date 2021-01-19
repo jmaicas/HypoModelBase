@@ -710,6 +710,20 @@ void BurstBox::ExpDataScan(SpikeDat *data)
 }
 
 
+void BurstBox::ModDataScan(SpikeDat *data)
+{
+	if(data != NULL) moddata = data;
+	if(!loaddata) return;
+
+	diagbox->Write("ModDataScan call\n");
+
+	moddata->BurstScan(this);
+	if(moddata->burstdata->numbursts > 0) moddata->BurstProfile();
+	BurstDataDisp(moddata, modburst);
+	//SpikeDataDisp(loaddata);
+}
+
+
 void BurstBox::OnDatRadio(wxCommandEvent& event)
 {
 	if(event.GetId() == ID_s) units = 1000;
@@ -750,12 +764,12 @@ void BurstBox::OnScan(wxCommandEvent& WXUNUSED(event))
 {
 	BurstScan();
 	mod->BurstUpdate();
-	if(loaddata) {
-		loaddata->ColourSwitch(dispburst);
+	if(loaddata || moddata) {
+		if(loaddata) loaddata->ColourSwitch(dispburst);
+		if(moddata) moddata->ColourSwitch(dispburst);
 		mainwin->scalebox->ratedata = dispburst;
 		mainwin->scalebox->databutton->SetLabel("Burst");
 	}
-	//Store();
 }
 
 
