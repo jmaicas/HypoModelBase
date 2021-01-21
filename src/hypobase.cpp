@@ -328,8 +328,10 @@ void TextFile::New(wxString name)
 {
 	file = new wxTextFile(name);
 	if(!file->Exists()) file->Create();
-	file->Open();
-	file->Clear();
+	else {
+		file->Open();
+		file->Clear();
+	}
 	readonly = false;
 }
 
