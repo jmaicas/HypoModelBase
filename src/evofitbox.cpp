@@ -71,6 +71,7 @@ EvoFitBox::EvoFitBox(Model *model, EvoChrome *chrome, const wxString& title, con
 		fitset->AddMeasure("BurstSilenceSD", "SilenceSD", 5);
 		fitset->AddMeasure("BurstIntraFreq", "BurstIntraFreq", 20);	
 		fitset->AddMeasure("RMSBurstIoD", "BurstIoD", 20);	
+		fitset->AddMeasure("RMSBurstPeak", "BurstPeak", 20);	
 	}
 	
 	// Fit measure parameters
@@ -227,6 +228,10 @@ wxFlexGridSizer *EvoFitBox::FitScorePanel(FitPanel *datpanel)
 	fitdatagrid->Add(GridLabel(gridwidth, "Burst Intra Freq"), 0, wxALIGN_CENTRE);
 	datpanel->burstintrafreq = NumPanel(numwidth);
 	fitdatagrid->Add(datpanel->burstintrafreq);
+
+	fitdatagrid->Add(GridLabel(gridwidth, "Burst Peak Mean"), 0, wxALIGN_CENTRE);
+	datpanel->burstpeakmean = NumPanel(numwidth);
+	fitdatagrid->Add(datpanel->burstpeakmean);
 
 	fitdatagrid->Add(GridLabel(0, ""));
 	fitdatagrid->Add(GridLabel(0, ""));

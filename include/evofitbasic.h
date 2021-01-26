@@ -124,6 +124,7 @@ public:
 	wxStaticText *burstsilencemean;
 	wxStaticText *burstsilencesd;
 	wxStaticText *burstintrafreq;
+	wxStaticText *burstpeakmean;
 
 	wxStaticText *lengthmean;
 	wxStaticText *silencemean;

@@ -14,6 +14,7 @@ void BurstDat::BurstProfileFit()
 	int i, j, burst;
 	int start, end;
 	double stime;
+	int peakrate;
 
 	int protime, oldtime;
 	FILE* ofp;
@@ -32,12 +33,13 @@ void BurstDat::BurstProfileFit()
 
 	stime = 0;
 	oldtime = 0;
-	for (i = 0; i < 500; i++) {
+	for(i=0; i<500; i++) {
 		prosum[i] = 0;
 		procount[i] = 0;
 	}
+	meanpeak = 0;
 
-	for (burst = 1; burst <= numbursts; burst++) {
+	for(burst=1; burst<=numbursts; burst++) {
 		start = bustore[burst].start;
 		end = bustore[burst].end;
 
@@ -46,25 +48,34 @@ void BurstDat::BurstProfileFit()
 		stime = 0;
 		oldtime = 0;
 		procount[0]++;
-		if (diagnostic) fprintf(ofp, "\nburst %d  start %d  end %d\n", burst, start, end);
+		for(j=0; j<500; j++) burstrate[j] = 0;
+		peakrate = 0;
+	
+		if(diagnostic) fprintf(ofp, "\nburst %d  start %d  end %d\n", burst, start, end);
 
-		while (i <= end && stime < 500) {
+		while(i<=end && stime<500) {
 			stime = (times[i] - times[start]) / 1000;
-			if (diagnostic) fprintf(ofp, "burst %d  spike %d  stime %.2f\n", burst, i, stime);
+			if(diagnostic) fprintf(ofp, "burst %d  spike %d  stime %.2f\n", burst, i, stime);
 			protime = (int)stime;
-			if (protime > oldtime) {
+			if(protime > oldtime) {
 				procount[protime]++;
 				oldtime = protime;
 			}
 			prosum[protime]++;
+			burstrate[protime]++;
+			if(burstrate[protime] > peakrate) peakrate = burstrate[protime];
 			i++;
 		}
+		meanpeak += peakrate;
+		bustore[burst].peak = peakrate;
 	}
 
-	for (i = 0; i < 500; i++) {
-		if (procount[i] > 0) profilefit[i + 1] = (double)prosum[i] / procount[i];
+	meanpeak = meanpeak / numbursts;
+
+	for(i=0; i<500; i++) {
+		if(procount[i] > 0) profilefit[i + 1] = (double)prosum[i] / procount[i];
 		else profilefit[i] = 0;
-		if (diagnostic) fprintf(ofp, "btime %d  rate sum %.2f  count %d  mean %.2f\n", i, profilefit[i], procount[i], profilefit[i]);
+		if(diagnostic) fprintf(ofp, "btime %d  rate sum %.2f  count %d  mean %.2f\n", i, profilefit[i], procount[i], profilefit[i]);
 		bursthaz[i] = 100 * procount[i] / numbursts;
 	}
 
@@ -75,11 +86,11 @@ void BurstDat::BurstProfileFit()
 	int wincount;
 	int bscount = 0;
 
-	for (i = 0; i < profmax; i++) {
+	for(i=0; i<profmax; i++) {
 		profilesmfit[i] = 0;
 		wincount = 0;
-		for (j = i - 2; j < i + 3; j++) {
-			if ((j > -1) & (j < profmax)) {
+		for(j=i-2; j<i+3; j++) {
+			if((j > -1) & (j < profmax)) {
 				profilesmfit[i] += profilefit[j];
 				wincount++;
 			}
@@ -92,14 +103,14 @@ void BurstDat::BurstProfileFit()
 	// find mode
 	int pmode = 0;
 	pnzcount = 0;
-	for (i = 0; i < profmax; i++) {
-		if (profilesmfit[i] > profilesmfit[pmode]) pmode = i;
-		if (profilesmfit[i] > 0) pnzcount = i;
+	for(i=0; i<profmax; i++) {
+		if(profilesmfit[i] > profilesmfit[pmode]) pmode = i;
+		if(profilesmfit[i] > 0) pnzcount = i;
 	}
 	pmodetime = pmode;
 	pmoderate = profilesmfit[pmode];
 
-	if (diagnostic) {
+	if(diagnostic) {
 		spikedata->diagbox->Write(text.Format("modetime %.2f  moderate %.2f\n\n", pmodetime, pmoderate));
 		fclose(ofp);
 	}
@@ -111,6 +122,7 @@ void SpikeDat::BurstProfile()
 	int i, j, burst;
 	int start, end;
 	double stime;
+	int peakrate;
 	
 	int protime, oldtime;
 	FILE *ofp;
@@ -134,6 +146,7 @@ void SpikeDat::BurstProfile()
 		prosumtail[i] = 0;
 		procounttail[i] = 0;
 	}
+	burstdata->meanpeak = 0;
 
 	for(burst=1; burst<=burstdata->numbursts; burst++) {
 		start = burstdata->bustore[burst].start;
@@ -145,6 +158,8 @@ void SpikeDat::BurstProfile()
 		oldtime = 0;
 		procount[0]++;
 		if(diagnostic) fprintf(ofp, "\nburst %d  start %d  end %d\n", burst, start, end);
+		for(j=0; j<500; j++) burstdata->burstrate[j] = 0;
+		peakrate = 0;
 		
 		while(i <= end && stime < 500) {
 			stime = (times[i] - times[start]) / 1000; 
@@ -155,8 +170,12 @@ void SpikeDat::BurstProfile()
 				oldtime = protime;
 			}
 			prosum[protime]++;
+			burstdata->burstrate[protime]++;
+			if(burstdata->burstrate[protime] > peakrate) peakrate = burstdata->burstrate[protime];
 			i++;
 		}
+		burstdata->meanpeak += peakrate;
+		burstdata->bustore[burst].peak = peakrate;
 		
 		// Tail based profile
 		if(tailmode) {
@@ -175,9 +194,10 @@ void SpikeDat::BurstProfile()
 				prosumtail[protime]++;
 				i--;
 			}
-		}
-		
+		}	
 	}
+
+	burstdata->meanpeak = burstdata->meanpeak / burstdata->numbursts;
 
 	for(i=0; i<500; i++) {
 		if(procount[i] > 0) burstdata->profile[i+1] = (double)prosum[i] / procount[i];
@@ -672,6 +692,7 @@ void BurstDat::BurstScanFit()
 	double burstfreq;
 	double silencetime, silencevar;
 	bool scandiag;
+	int silence;
 
 	// Parameter transfer
 	//ParamStore *burstparams = burstbox->GetParams();
@@ -769,7 +790,7 @@ void BurstDat::BurstScanFit()
 	}
 
 	bindex = 1;
-	int silence = 0;
+	silence = 0;
 
 	for(i=0; i<numspikes; i++) spikes[i] = 0;
 

@@ -423,6 +423,7 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	startspike = 0;
 	endspike = 0;
 
+	spikedata = NULL;
 	loaddata = NULL;
 	datburst = NULL;
 	modburst = NULL;
@@ -539,6 +540,9 @@ BurstBox::BurstBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	burstgrid->Add(GridLabel(gridwidth, "Mode Rate"), 0, wxALIGN_CENTRE);
 	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->moderate);
+
+	burstgrid->Add(GridLabel(gridwidth, "Mean Peak"), 0, wxALIGN_CENTRE);
+	for(i=0; i<numpan; i++) burstgrid->Add(burstpanset[i]->meanpeak);
 
 	rightbox->Add(burstgrid, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 
@@ -682,6 +686,7 @@ void BurstBox::BurstDataPanel(BurstPanel *datpanel)
 	datpanel->actQ = NumPanel(50);
 	datpanel->modetime = NumPanel(50);
 	datpanel->moderate = NumPanel(50);
+	datpanel->meanpeak = NumPanel(50);
 
 	datpanel->intraspikes = NumPanel(numwidth);
 	datpanel->intrafreq = NumPanel(numwidth);
@@ -853,6 +858,8 @@ void BurstBox::BurstDataDisp(SpikeDat *dispdata, BurstPanel *datpanel)
 
 	datpanel->modetime->SetLabel(numtext(dispdata->burstdata->pmodetime, 3));
 	datpanel->moderate->SetLabel(numtext(dispdata->burstdata->pmoderate, 3));
+	
+	datpanel->meanpeak->SetLabel(numtext(dispdata->burstdata->meanpeak, 2));
 
 	snum.Printf("%d", dispdata->burstdata->intraspikes);
 	datpanel->intraspikes->SetLabel(snum);

@@ -293,6 +293,7 @@ public:
 	wxStaticText *actQ;
 	wxStaticText *modetime;
 	wxStaticText *moderate;
+	wxStaticText *meanpeak;
 
 	wxStaticText *intraspikes;
 	wxStaticText *intrafreq;

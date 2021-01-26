@@ -262,11 +262,11 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 			testrate = testdata->burstdata->profilesm[i] - AvSum;
 			datarate = burstdata->profilesmfit[i] - AvSum;
 
-			if (testrate > datarate) { Big = testrate; Small = datarate; }
+			if(testrate > datarate) { Big = testrate; Small = datarate; }
 			else { Big = datarate; Small = testrate; }
 
 			//If both are less than the cutoff then use alternate rules
-			if ((Big < CutOff) && (Big > -CutOff)) Error = (Big - Small) * 20.0;
+			if((Big < CutOff) && (Big > -CutOff)) Error = (Big - Small) * 20.0;
 			else Error = abs((Big - Small) / Big) * 100.0;
 
 			RMSError += Error * Error;
@@ -299,6 +299,8 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 	
 		fitdat->burstintrafreq = (abs(testdata->burstdata->freq - burstdata->freq) / testdata->burstdata->freq) * 100.0;
 		//fitdat->scores["BurstIntraFreq"] = fitdat->burstintrafreq;
+
+		fitdat->RMSBurstPeak = (abs(testdata->burstdata->meanpeak - burstdata->meanpeak) / testdata->burstdata->meanpeak) * 100.0;
 	}
 	else {
 		fitdat->RMSBurstHead = 0;
@@ -308,6 +310,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		fitdat->burstsilencemean = 0;
 		fitdat->burstsilencesd = 0;
 		fitdat->burstintrafreq = 0;
+		fitdat->RMSBurstPeak = 0;
 	}
 
 	int IoDcount = 7;
@@ -414,6 +417,7 @@ void SpikeDat::FitScoreVasoFast(SpikeDat *testdata, FitDat *fitdat, FitSet *fits
 		score += fitset->measures[10].weight * fitdat->burstsilencesd;
 		score += fitset->measures[11].weight * fitdat->burstintrafreq;
 		score += fitset->measures[12].weight * fitdat->RMSBurstIoD;
+		score += fitset->measures[13].weight * fitdat->RMSBurstPeak;
 	}
 	
 	int measureCount = fitset->measureCount;

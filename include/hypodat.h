@@ -113,6 +113,7 @@ public:
 	double RMSBurstHead;
 	double RMSBurstIoD;
 	double RMSHazHead;
+	double RMSBurstPeak;
 	
 	double burstmode;
 	double burstlengthmean;
@@ -139,6 +140,7 @@ public:
 	int numpulse;
 	double pmax;
 	int length;
+	double peak;
 };
 
 
@@ -487,6 +489,7 @@ public:
 	double prosum[1000];
 	int procount[1000];
 	int spikerate[10000];
+	int burstrate[1000];
 
 	double *profilesmfit;
 	double *profilefit;
@@ -525,6 +528,7 @@ public:
 	int pnzcount;
 	int test;
 	int maxint;
+	double meanpeak;    // mean peak spike rate, usually at head of burst
 	
 	BurstDat(SpikeDat *spikedata=NULL, bool select=false);
 	~BurstDat();
