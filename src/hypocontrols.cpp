@@ -340,10 +340,11 @@ void ParamCon::SetValue(wxString text)
 }
 
 
-void ParamCon::SetMinMax(double newmin, double newmax)
+void ParamCon::SetMinMax(double newmin, double newmax, bool newcycle)
 {
 	min = newmin;
 	max = newmax;
+	cycle = newcycle;
 	//if(type == spincon) spin->SetRange(min, max);
 }
 
@@ -419,10 +420,12 @@ void ParamCon::OnSpinUp(wxSpinEvent& WXUNUSED(event))
 
 	numbox->GetValue().ToDouble(&value);
 	newvalue = value + numstep;
-	if(newvalue <= max) {
-		snum = numstring(value + numstep, decimals);
-		numbox->SetValue(snum);
+	if(newvalue > max) {
+		if(cycle) newvalue = min + (newvalue - max) - 1;
+		else return;
 	}
+	snum = numstring(newvalue, decimals);
+	numbox->SetValue(snum);
 }
 
 
@@ -430,14 +433,16 @@ void ParamCon::OnSpinDown(wxSpinEvent& WXUNUSED(event))
 {
 	double value, newvalue;
 
-	if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("spin down\n");
+	//if(mainwin && mainwin->diagnostic) mainwin->diagbox->textbox->AppendText("spin down\n");
 
 	numbox->GetValue().ToDouble(&value);
 	newvalue = value - numstep;
-	if(newvalue >= min) {
-		snum = numstring(value - numstep, decimals);
-		numbox->SetValue(snum);
+	if(newvalue < min) {
+		if(cycle) newvalue = max + (newvalue - min) + 1;
+		else return;
 	}
+	snum = numstring(newvalue, decimals);
+	numbox->SetValue(snum);
 }
 
 

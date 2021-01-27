@@ -109,7 +109,7 @@ public:
 	// Data Storage
 	SpikeDat *expdata;
 	datdouble testhist[5], testhistx[5];
-	datdouble datahist[5], datahistx[5];
+	datdouble datahist[10], datahistx[10];
 
 
 	Model(int, wxString, HypoMain *);

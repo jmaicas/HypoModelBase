@@ -235,6 +235,7 @@ public:
 	double numstep;
 	int decimals;
 	double min, max;
+	bool cycle;
 	
 	ParamCon(ToolPanel *panel, int type, wxString name, wxString labelname, double initval, double step, int places, int labelwidth=60, int numwidth=45);
 	ParamCon(ToolPanel *panel, wxString name, wxString labelname, wxString initval, int labelwidth, int textwidth);
@@ -247,7 +248,7 @@ public:
 	void SetValue(double val);
 	void SetPen(wxColour);
 	void SetValue(wxString);
-	void SetMinMax(double min, double max);
+	void SetMinMax(double min, double max, bool cycle=false);
 	void Select();
 	
 protected:

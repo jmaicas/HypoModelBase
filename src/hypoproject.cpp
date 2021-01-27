@@ -100,6 +100,7 @@ void Project::Load()
 	bool check;
 	wxPoint pos;
 	wxSize size;
+	TagBox *box;
 
 	filepath = path + "/" + projectfile;
 
@@ -163,7 +164,8 @@ void Project::Load()
 			tagboxfile = readline.AfterFirst(' ');
 			tagboxfile.Trim();
 			//mainwin->diagbox->Write(text.Format("Project Load Tag %d %s %s\n", i, tag, tagboxfile));
-			tagset->GetBox(tag)->SetFile(tagboxfile);
+			box = tagset->GetBox(tag);
+			if(box) box->SetFile(tagboxfile);
 			readline = infile.ReadLine(); 
 		}
 	}
