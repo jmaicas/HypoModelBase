@@ -1662,6 +1662,7 @@ void FitDat::ScoreConvert()
 	scores["BurstSilenceSD"] = burstsilencesd;
 	scores["BurstIntraFreq"] = burstintrafreq;
 	scores["RMSBurstIoD"] = RMSBurstIoD;
+	scores["RMSBurstPeak"] = RMSBurstPeak;
 }
 
 

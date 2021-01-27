@@ -177,7 +177,9 @@ wxFlexGridSizer *EvoFitBox::FitConPanel(FitConSet *conset)
 }
 
 
-wxFlexGridSizer *EvoFitBox::FitScorePanel(FitPanel *datpanel)
+
+
+wxFlexGridSizer *EvoFitBox::FitScorePanel(FitPanel *datpanel)        // not in use, replaced by FitConPanel()
 {
 	int numwidth = 60;
 	int gridwidth;
@@ -802,7 +804,7 @@ void EvoFitBox::FitDispNew(FitDat *data, DatPanel *datapanel)
 	for(i=0; i<fitset->measureCount; i++) {
 		tag = fitset->tags[i];
 		datapanel->datset[i]->SetLabel(numtext(data->scores[tag], places));
-		//diagbox->Write(text.Format("Measure %s  Score %.4f\n", tag, data->scores[tag]));
+		diagbox->Write(text.Format("Measure %s  Score %.4f\n", tag, data->scores[tag]));
 	}
 
 	datapanel->GetDat("weightscore")->SetLabel(numtext(data->score, places));

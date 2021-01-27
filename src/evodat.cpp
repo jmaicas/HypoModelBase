@@ -156,7 +156,7 @@ void EvoChrome::Output(TextFile *ofp, int mode)
 		//outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f\t", fithead, fittail, fithaz, fitIoD);
 		outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t", fitdata.RMSFirstNBins, fitdata.RMSBinRange, fitdata.RMSHaz, fitdata.RMSHazHead, fitdata.RMSBurstHead);
 		outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f\t", fitdata.burstmode, fitdata.burstlengthmean, fitdata.burstlengthsd, fitdata.burstsilencemean);
-		outline += text.Format("%.2f\t%.2f\t%.2f", fitdata.burstsilencesd, fitdata.burstintrafreq, fitdata.RMSBurstIoD);
+		outline += text.Format("%.2f\t%.2f\t%.2f\t%.2f", fitdata.burstsilencesd, fitdata.burstintrafreq, fitdata.RMSBurstIoD, fitdata.RMSBurstPeak);
 		//outline += text.Format(" %d", index);
 		ofp->WriteLine(outline);
 	}
