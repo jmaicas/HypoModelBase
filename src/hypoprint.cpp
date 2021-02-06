@@ -125,16 +125,15 @@ void GraphWindow3::MultiEPS()
 	wxString celltext;
 	double celldata;
 
-
 	// Read panel data from OutBox
-	textgrid = mod->gridbox->currgrid;
+	//textgrid = mod->gridbox->currgrid;
+	textgrid = mod->gridbox->layoutgrid;
 
-	//celltext = textgrid->GetCell(0, 0);
-	//celltext.Trim(); 
-	//celltext.ToDouble(&celldata);
 	panelcount = (int)textgrid->ReadDouble(0, 0);
-	if(!panelcount) return;
-
+	if(!panelcount) {
+		mod->diagbox->Write("MultiEPS no panel count found\n");
+		return;
+	}
 	for(i=0; i<panelcount; i++) {
 		celltext = textgrid->GetCell(i+1, 0);
 		celltext.Trim(); 

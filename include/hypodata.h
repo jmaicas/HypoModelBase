@@ -232,6 +232,7 @@ public:
 	TextGrid *datagrid;
 	TextGrid *outputgrid;
 	TextGrid *paramgrid;
+	TextGrid *layoutgrid;
 
 	GridBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size, int rows=100, int cols=20, bool bookmode=true, bool vdumode=true);
 
@@ -252,7 +253,7 @@ public:
 	void OnButton(wxCommandEvent& event);
 
 	int ColumnData(int, datdouble *);
-	void AddGrid(wxString label, wxSize size);
+	TextGrid *AddGrid(wxString label, wxSize size);
 	void SetCurrentGrid();
 	void ParamButton();
 	void NeuroButton();

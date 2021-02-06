@@ -1244,6 +1244,7 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	datagrid = NULL;
 	outputgrid = NULL;
 	paramgrid = NULL;
+	layoutgrid = NULL;
 
 	//InitMenu();
 	//SetModFlag(ID_FileIO, "ioflag", "IO Mode", 0); 
@@ -1263,13 +1264,10 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 
 	if(bookmode) {
 		notebook = new wxNotebook(panel, -1, wxPoint(-1,-1), wxSize(-1, 400), wxNB_TOP);
-		AddGrid("Data", wxSize(gridrows, gridcols));
-		AddGrid("Output", wxSize(gridrows, gridcols));
-		AddGrid("Params", wxSize(20, 20));
-		//textgrid[0] = new TextGrid(notebook, wxSize(gridrows, gridcols));
-		//notebook->AddPage(textgrid[0], text.Format("Data"));
-		//textgrid[1] = new TextGrid(notebook, wxSize(gridrows, gridcols));
-		//notebook->AddPage(textgrid[1], text.Format("Output"));
+		datagrid = AddGrid("Data", wxSize(gridrows, gridcols));
+		outputgrid = AddGrid("Output", wxSize(gridrows, gridcols));
+		paramgrid = AddGrid("Params", wxSize(20, 20));
+		layoutgrid = AddGrid("Layout", wxSize(20, 20));
 	}
 	else AddGrid("", wxSize(gridrows, gridcols));
 
@@ -1348,7 +1346,7 @@ void GridBox::OnGridSelect(wxBookCtrlEvent& event) {
 // AddGrid() in (now default) notebook mode adds a new TextGrid and wxNotebook page
 // initialises grid and links to output controls
 
-void GridBox::AddGrid(wxString label, wxSize size) {
+TextGrid *GridBox::AddGrid(wxString label, wxSize size) {
 
 	// Initialise
 	if(notebook) {
@@ -1369,7 +1367,7 @@ void GridBox::AddGrid(wxString label, wxSize size) {
 	textgrid[numgrids]->SetDefaultColSize(60, true);
 	textgrid[numgrids]->SetRowLabelSize(50); 
 
-	numgrids++;
+	return textgrid[numgrids++];
 }
 
 
