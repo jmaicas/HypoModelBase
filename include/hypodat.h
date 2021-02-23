@@ -158,6 +158,7 @@ public:
 	int srate100[10000];
 	int count;
 	int spikecount;
+	int spikecount2;  // extra spikecount that keeps counting after maxspikes data limit is reached
 	int isicount;
 	int netflag;
 	int type;
