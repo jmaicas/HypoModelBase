@@ -338,6 +338,7 @@ enum {
 	ID_EndRun,
 	ID_Dend,
 	ID_realtime,
+	ID_analysis,
 	ID_realupdate,
 	ID_Disp,
 	ID_Highlight,
