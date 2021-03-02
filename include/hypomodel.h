@@ -174,7 +174,7 @@ public:
 	// New Model Modules
 	Model *mod;
 
-	HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path="");
+	HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size, wxString rpath="", wxString mpath ="");
 	~HypoMain();
 
 	//void OnPaint2(wxPaintEvent& event);

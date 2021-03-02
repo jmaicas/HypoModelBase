@@ -15,7 +15,7 @@
 
 // Main window base class
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString rpath, wxString mpath)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
 	ostype = GetSystem();
@@ -31,9 +31,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     diagbox = new DiagBox(this, "Diagnostic", wxPoint(0, 0), wxSize(400, 500));
 	diagbox->Write("Diagnostic Box OK\n\n");
     
-    respath = path;  // defaults to "" for Windows, bundle resource path for OSX
-    diagbox->Write("respath " + respath + "\n");
-    mainpath = respath;
+    respath = rpath;  // defaults to "" for Windows, bundle resource path for OSX
+    diagbox->Write("MainFrame respath " + respath + "\n");
+    mainpath = mpath;
     modpath = "";
 
 	graphbox = NULL;
@@ -71,6 +71,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 	if(mainpath.IsEmpty()) initpath = "Init";
 	else initpath = mainpath + "/Init";
+    
+    diagbox->Write("MainFrame initpath " + initpath + "\n");
 
 	MainLoad();     // main window tool configuration
 }
@@ -136,7 +138,7 @@ void MainFrame::MainStore()
 	wxString outline, text;
 	TextFile outfile, opfile;
 
-	initpath = mainpath + "Init/";
+	initpath = mainpath + "/Init/";
     if(!wxDirExists(initpath)) wxMkdir(initpath);
 
 	// box store

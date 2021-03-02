@@ -15,8 +15,8 @@ IMPLEMENT_APP(HypoApp)
 MainFrame *mainframe;
 
 
-HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path)
-	: MainFrame(title, pos, size, path)
+HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size, wxString rpath, wxString mpath)
+	: MainFrame(title, pos, size, rpath, mpath)
 {
 	wxIcon icon;
 	wxColour backcolour, panelcolour;
@@ -82,7 +82,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
             diagbox->Write("HypoMod directory not found, using default resources\n");
             mainpath = respath;
         }
-        diagbox->Write(text.Format("mainpath %s\n", mainpath));
+        diagbox->Write(text.Format("HypoMain mainpath %s\n", mainpath));
     }
     
 	OptionLoad();      // basic configuration
@@ -97,7 +97,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 	}
 	else {
 		toolpath = mainpath + "/Tools";
-		modpath = mainpath + "/" + modpath;
+		if(modpath.IsEmpty()) modpath = mainpath;
 	}
 
 	diagbox->Write("toolpath " + toolpath + "\n");
@@ -226,7 +226,7 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		//if(diagnostic) mod->diagbox->textbox->AppendText("scalebox call ok\n");
 		if(mod->graphload) scalebox->GLoad("default");
 
-		if (mod->gsync) {
+		if(mod->gsync) {
 			scalebox->gsynch = 1;
 			if(ostype != Mac) scalebox->syncbutton->SetValue(true);
 		}
@@ -240,27 +240,34 @@ HypoMain::HypoMain(const wxString& title, const wxPoint& pos, const wxSize& size
 		mainsizer->Add(graphsizer, 7, wxEXPAND);    
     }
     
+    
+    // Create config folders on OSX first run
+    
     if(ostype == Mac && !wxDirExists(hypopath)) {
         diagbox->Write("No HypoMod directory, creating\n");
         wxMkdir(hypopath);
         mainpath = hypopath;
+        modpath = hypopath;
         tagset->UpdatePath();
+        initpath = hypopath + "/Init/";
         if(mod) {
-            wxMkdir(hypopath + mod->path);
+            wxMkdir(hypopath + "/" + mod->path);
             mod->DataCopy(respath, hypopath);
         }
     }
     diagbox->Write(text.Format("mainpath %s\n", mainpath));
     
     //if(modpath == "") modpath = mainpath;
-    //diagbox->Write("modpath " + modpath + "\n");
+    diagbox->Write("modpath " + modpath + "\n");
 
 	optionpanel = new OptionPanel(this, "System Panel");
 	tag = optionpanel->projecttag->GetValue();
 
-	project->TagSetDisp();
-	project->Init(tag);
-	project->Load();
+    if(mod && mod->projmode) {
+        project->TagSetDisp();
+        project->Init(tag);
+        project->Load();
+    }
     
 	SetSizer(mainsizer);
 	Layout();
@@ -834,9 +841,9 @@ void HypoMain::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
 	wxString message;
 
-	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2020\n\nSystem: %s", wxGetOsDescription());
-	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2020\n\nSystem: %s", wxGetOsDescription());
-	else message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2020\n\nSystem: %s", wxGetOsDescription());
+	if(basic) message.Printf("GH Model (teaching version)\n\nDuncan MacGregor 2021\n\nSystem: %s", wxGetOsDescription());
+	else if(user) message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2021\n\nSystem: %s", wxGetOsDescription());
+	else message.Printf("HypoMod Modelling Toolkit\n\nDuncan MacGregor 2010-2021\n\nSystem: %s", wxGetOsDescription());
 
 	wxMessageBox(message, "About Hypo Model", wxOK | wxICON_INFORMATION, this);
 }
@@ -1102,7 +1109,6 @@ void HypoMain::OptionStore()
 	wxString filepath;
 	wxString outline;
     
-    //initpath = mainpath + "Init/";
     if(!wxDirExists(initpath)) wxMkdir(initpath);
 
 	filepath = initpath + "/hypoprefs.ini";
@@ -1236,6 +1242,8 @@ bool HypoApp::OnInit()
 	else pos = wxDefaultPosition;
     
     mainpath = "";
+    respath = "";
+    
 #ifdef OSX
     CFBundleRef mainBundle;
     char *path = new char[1024];
@@ -1262,7 +1270,7 @@ bool HypoApp::OnInit()
 	if(x > screensize.GetX()) x = screensize.GetX() - 50;
 	if(y > screensize.GetY()) y = screensize.GetY() - 50;
 
-	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y), mainpath);   // 850   // 920   // respath
+	HypoMain *mainwin = new HypoMain("HypoMod", pos, wxSize(x, y), respath, mainpath);   // 850   // 920   // respath
 	mainwin->SetTransparent(254);
 	mainwin->Show();
 	SetTopWindow(mainwin);

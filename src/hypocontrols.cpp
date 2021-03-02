@@ -1452,7 +1452,8 @@ void TagBox::PathUpdate()
 		else tagpath = mainwin->modpath + "/" + boxpath + "/Tags";
 	}
 
-	if(diagnostic) mainwin->diagbox->Write(text.Format("TagBox PathUpdate() tagpath %s\n", tagpath));
+	//if(diagnostic)
+    mainwin->diagbox->Write(text.Format("TagBox PathUpdate() tagpath %s\n", tagpath));
 }
 
 

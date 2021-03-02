@@ -469,7 +469,7 @@ public:
 	int diagnostic;
 	int ostype;
     
-	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString path);
+	MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, wxString rpath, wxString mpath);
 	~MainFrame();
 	virtual void MainLoad();
 	virtual void MainStore();

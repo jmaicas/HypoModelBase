@@ -117,8 +117,8 @@ void Model::DataCopy(wxString oldpath, wxString newpath)
     wxString filepath;
     wxFileName filename;
     
-    oldparampath = oldpath + path + "/Params/";
-    parampath = newpath + path + "/Params/";
+    oldparampath = oldpath + "/" + path + "/Params/";
+    parampath = newpath + "/" + path + "/Params/";
     wxMkdir(parampath);
     filepath = wxFindFirstFile(oldparampath + "*.*");
     while(!filepath.empty()) {
@@ -129,8 +129,8 @@ void Model::DataCopy(wxString oldpath, wxString newpath)
         filepath = wxFindNextFile();
     }
     
-    oldgraphpath = oldpath + path + "/Graphs/";
-    graphpath = newpath + path + "/Graphs/";
+    oldgraphpath = oldpath + "/" + path + "/Graphs/";
+    graphpath = newpath + "/" + path + "/Graphs/";
     wxMkdir(graphpath);
     filepath = wxFindFirstFile(oldgraphpath + "*.*");
     while(!filepath.empty()) {
@@ -139,8 +139,8 @@ void Model::DataCopy(wxString oldpath, wxString newpath)
         filepath = wxFindNextFile();
     }
     
-    oldgridpath = oldpath + path + "/Grids/";
-    gridpath = newpath + path + "/Grids/";
+    oldgridpath = oldpath + "/" + path + "/Grids/";
+    gridpath = newpath + "/" + path + "/Grids/";
     wxMkdir(gridpath);
     filepath = wxFindFirstFile(oldgridpath + "*.*");
     while(!filepath.empty()) {

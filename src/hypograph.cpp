@@ -108,8 +108,8 @@ GraphWindow3::GraphWindow3(HypoMain *main, wxFrame *parent, Model *model, wxPoin
 	if(mainwin->diagbox) mainwin->diagbox->Write(text.Format("\ngraphwindow %d\n", graphindex));
 
 	wxImage::AddHandler(new wxPNGHandler);
-	radio_on = wxBitmap(mainwin->respath + "Init/radio_on-18.png", wxBITMAP_TYPE_PNG);
-	radio_off = wxBitmap(mainwin->respath + "Init/radio_off-18.png", wxBITMAP_TYPE_PNG);
+	radio_on = wxBitmap(mainwin->respath + "/Init/radio_on-18.png", wxBITMAP_TYPE_PNG);
+	radio_off = wxBitmap(mainwin->respath + "/Init/radio_off-18.png", wxBITMAP_TYPE_PNG);
 
 	SetBackgroundColour("WHITE");
 
