@@ -29,7 +29,10 @@ ScaleBox::ScaleBox(HypoMain *main, const wxSize& size, int gnum, GraphDisp *gdis
 	gmod = model;
 	mod = model;
     
-    wxString iconpath = main->respath + "/Init/";
+    wxString iconpath;
+	
+	if(mainwin->respath.IsEmpty()) iconpath = "Init/";
+	else iconpath = main->respath + "/Init/";
 
     mainwin->diagbox->Write(text.Format("ScaleBox iconpath %s", iconpath));
 	mainwin->diagbox->Write(text.Format("ScaleBox init numgraphs %d\n", numgraphs));
