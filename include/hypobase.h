@@ -330,6 +330,7 @@ enum {
 	ID_file,
 	ID_grid,
 	ID_filter,
+	ID_keep,
 	ID_subplot,
 	ID_GridBox,
 	ID_Gavage,

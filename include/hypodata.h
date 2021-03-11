@@ -265,7 +265,7 @@ public:
 	virtual void OnPlot(wxCommandEvent& event);
 	void OnGridSelect(wxBookCtrlEvent& event);
 
-	void NeuroGridFilter();
+	void NeuroGridFilter(int mode=0);
 	void NeuroScan();
 
 	virtual void OnCellChange(wxGridEvent& event);

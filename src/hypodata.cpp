@@ -766,7 +766,9 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 
 	//wxBoxSizer *filterbox = new wxBoxSizer(wxHORIZONTAL);
 	selectstorebox->AddSpacer(20);
-	AddButton(ID_filter, "Grid Update", 80, selectstorebox);
+	AddButton(ID_filter, "Grid Remove", 70, selectstorebox);
+	selectstorebox->AddSpacer(5);
+	AddButton(ID_keep, "Grid Keep", 60, selectstorebox);
 
 	//filterbox->AddSpacer(20);
 	//filterbox->Add(selectstorebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
@@ -788,6 +790,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	//Connect(200, 205, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnSub));
 
 	Connect(ID_filter, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnGridFilter));
+	Connect(ID_keep, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnGridFilter));
 
 	Connect(ID_PathBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
 	Connect(ID_FileBrowse, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NeuroBox::OnBrowse));
@@ -840,9 +843,12 @@ void NeuroBox::OnBoxCheck(wxCommandEvent &event)
 
 void NeuroBox::OnGridFilter(wxCommandEvent &event)
 {
+	int filtermode = 0;
+
 	diagbox->Write("Grid filter clicked\n");
 
-	gridbox->NeuroGridFilter();
+	if(event.GetId() == ID_keep) filtermode = 1;
+	gridbox->NeuroGridFilter(filtermode);
 	gridbox->NeuroScan();
 }
 
@@ -2416,12 +2422,15 @@ void GridBox::ColumnSelect(int col)
 
 
 
-void GridBox::NeuroGridFilter()
+void GridBox::NeuroGridFilter(int mode)
 {
 	int i;
 	int col;
 	int newcol[1000];
 	int numcols, newnumcols;
+
+	// mode = 0   remove selected cells
+	// mode = 1   keep selected cells
 	
 	numcols = currgrid->GetNumberCols();
 
@@ -2429,7 +2438,8 @@ void GridBox::NeuroGridFilter()
 
 	for(i=0; i<neurobox->cellpanel->neurocount; i++) {
 		col = (*celldata)[i].gridcol;
-		colflag[col] = (*celldata)[i].filter;
+		if(mode == 1) colflag[col] = 1 - (*celldata)[i].filter;
+		else colflag[col] = (*celldata)[i].filter;
 	}
 
 	// Mark columns with their replacement
