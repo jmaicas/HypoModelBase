@@ -78,6 +78,7 @@ public:
 	void SelectStore();
 	void SelectLoad();
 	NeuroDat *GetCell(wxString name);  
+	void NextCell();
 };
 
 

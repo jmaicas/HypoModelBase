@@ -497,6 +497,7 @@ void EvoFitBox::CreatePanels()
 	paramset.AddNum("evomutprob", "Mutation", 0.05, 3, labelwidth, numwidth); 
 	paramset.AddNum("blocksize", "Block N", 32, 0, labelwidth, numwidth); 
 	paramset.AddNum("numruns", "Num Runs", 1, 0, labelwidth, numwidth); 
+	paramset.AddNum("numcells", "Num Cells", 1, 0, labelwidth, numwidth); 
 	paramset.AddNum("fitmode", "Fit Mode", 0, 0, labelwidth, numwidth); 
 	paramset.AddNum("runindex", "Run Index", 1, 0, labelwidth, numwidth); 
 	paramset.AddNum("chromediag", "Diag", 32, 0, labelwidth, numwidth); 

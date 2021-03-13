@@ -202,6 +202,12 @@ void SpikePanel::OnPrev(wxSpinEvent& WXUNUSED(event))
 
 void SpikePanel::OnNext(wxSpinEvent& WXUNUSED(event))
 {
+	NextCell();
+}
+
+
+void SpikePanel::NextCell()
+{
 	if(!neurocount) return;
 	if(neuroindex < neurocount-1) neuroindex++;
 	else neuroindex = 0;

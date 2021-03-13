@@ -283,6 +283,7 @@ public:
 	int generations;
 	//int numparams;
 	int numruns;
+	int numcells;
 	double mutateprob;
 	double dualfit;
 	bool burstmode;
@@ -296,7 +297,7 @@ public:
 	int gpuparams, maxparams;
 	float runtime;
 	int *threaddata;
-	bool multirun, batchrun;
+	bool multirun, batchrun, multicell;
 	int gpudevice;
 	int scorethreads;
 
