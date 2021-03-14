@@ -1763,7 +1763,7 @@ void SpikeDat::neurocalc(NeuroDat *datneuron, ParamStore *calcparams)
 		if(times[i]/100 < 100000) srate100[(int)(times[i]/100 + 0.5)]++;
 		if(times[i]/10000 < 100000) srate10s[(int)(times[i] + 0.5)/10000]++;
 		if(times[i]/100000 < 100000) srate100s[(int)(times[i] + 0.5)/100000]++;
-		if(times[i]/30000 < 20000) srate30s[(int)(times[i] + 0.5)/30000]++;
+		if(times[i]/30000 < 20000) srate30s[(int)(times[i] + 0.5 + binoffset)/30000]++;
 		if(times[i]/300000 < 20000) srate300s[(int)(times[i] + 0.5)/300000]++;
 		if(times[i]/600000 < 20000) srate600s[(int)(times[i] + 0.5)/600000]++;
 		//if(spikediag && mainwin) mainwin->diagbox->Write(text.Format("srate1 i=%d time %.2f bin %d\n", i, times[i], (int)(times[i] + 0.5)));

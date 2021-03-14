@@ -336,6 +336,7 @@ public:
 	//int graphindex;
 
 	int normscale;
+	double binoffset;
 	int binsize;
 	
 	int id;

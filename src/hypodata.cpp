@@ -251,6 +251,8 @@ void SpikePanel::NeuroData(bool dispupdate)
 	ParamStore *calcparams = neurobox->GetParams();
 
 	currneuron->normscale = (*calcparams)["normscale"];
+	currneuron->binoffset = (*calcparams)["binoffset"];
+
 	currneuron->neurocalc(&(*neurons)[neuroindex]);
 	currneuron->id = neuroindex;
 	currneuron->name = (*neurons)[neuroindex].name;
@@ -687,6 +689,7 @@ NeuroBox::NeuroBox(Model *model, const wxString& title, const wxPoint& pos, cons
 	paramset.AddNum("normscale", "Norm Scale", 10000, 0, 70, 50);
 	paramset.AddNum("histrange", "Hist Range", 1000, 0, 70, 50);
 	paramset.AddNum("filterthresh", "ISI Filter", 5, 0, 70, 50);
+	paramset.AddNum("binoffset", "30s Bin Offset", 0, 2, 70, 50);
 	//paramset.AddNum("binsize", "Bin Size", 5, 0, 70, 50);
 	PanelParamLayout(histparambox);
 
