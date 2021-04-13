@@ -236,7 +236,7 @@ wxString Model::GetPath()
 	}
 
 	if(!wxDirExists(fullpath)) wxMkdir(fullpath);
-	mainwin->diagbox->Write(text.Format("Model GetPath %s\n", fullpath));
+	//mainwin->diagbox->Write(text.Format("Model GetPath %s\n", fullpath));
 
 	return fullpath;
 }
