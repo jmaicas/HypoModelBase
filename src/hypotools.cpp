@@ -465,6 +465,10 @@ void TextGrid::OnLeftClick(wxGridEvent& event)
 
 	if(diagbox) diagbox->Write(text.Format("grid click row %d col %d\n", row, col));
 
+	//GoToCell(row, col);
+
+	//SetGridCursor(row, col);
+
 	/*
 	if(event.GetRow() == r && event.GetCol() == c) 
 	EnableCellEditControl();

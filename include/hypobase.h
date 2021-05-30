@@ -40,7 +40,7 @@
 //#include <crtdbg.h>
 
 #ifdef VLD
-#include <vld.h>
+//#include <vld.h>
 #endif
 
 #ifndef OSXClip

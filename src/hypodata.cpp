@@ -1895,8 +1895,10 @@ void GridBox::GridLoadAll()
 
 	cellcount = 0;
 	while(getline(infile, line)) {
-		//diagbox->Write(text.Format(" line length %d first %d\n", (int)line.length(), (char)line[0]));
-		wxString readline(line);
+		diagbox->Write(text.Format(" line length %d first %d\n", (int)line.length(), (char)line[0]));
+		//wxString readline(line);
+		readline = StringConvert(line);
+		diagbox->Write("readline: " + readline + "\n");
 
 		if(readline.IsEmpty() || !readline[0]) break;
 
