@@ -154,6 +154,8 @@ void MainFrame::MainStore()
 }
 
 
+// Text file parsing
+
 long ReadNextData(wxString *readline)
 {
 	long numdat;
@@ -166,6 +168,19 @@ long ReadNextData(wxString *readline)
 	return numdat;
 }
 
+
+wxString ReadNextString(wxString *readline)
+{
+	wxString text;
+
+	*readline = readline->AfterFirst(' ');
+	text = readline->BeforeFirst(' ');
+	
+	return text;
+}
+
+
+// String formatting
 
 wxString numtext(double number, int places)
 {

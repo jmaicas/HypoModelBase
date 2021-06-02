@@ -601,12 +601,20 @@ void HypoMain::PlotModule(Model *model)
 {
 	wxSize boxsize;
 	if(ostype == Mac) boxsize = wxSize(600, 400);
-	else boxsize = wxSize(600, 400);
+	else boxsize = wxSize(450, 300);
 
 	if(!plotbox) {
 		plotbox = new PlotBox(model, "Plot Box", wxPoint(320, 455), boxsize);
 		toolset->AddBox(plotbox);
 	}
+
+	// GridBox link
+	if(gridbox) {
+		gridbox->plotbox = plotbox; 
+		plotbox->gridbox = gridbox; 
+	}
+
+	model->modtools.AddBox(plotbox, true);
 	plotbox->Show(true);
 }
 

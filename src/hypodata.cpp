@@ -1248,6 +1248,8 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	vdu = NULL;
 	gauge = NULL;
 
+	plotbox = NULL;
+
 	textdata.resize(1000);
 	//textdatagrid.max = 1000;
 	textdatagrid.grow = 10;
@@ -1304,8 +1306,8 @@ GridBox::GridBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	buttonbox = new wxBoxSizer(wxHORIZONTAL);
 	buttonbox->Add(storebox, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL);
 	AddButton(ID_Undo, "Undo", 40, buttonbox);
-	buttonbox->AddSpacer(2);
-	AddButton(ID_Copy, "Copy", 40, buttonbox);
+	//buttonbox->AddSpacer(2);
+	//AddButton(ID_Copy, "Copy", 40, buttonbox);
 
 	wxBoxSizer *leftbox = new wxBoxSizer(wxVERTICAL);
 	leftbox->Add(buttonbox, 0);  
@@ -1452,6 +1454,8 @@ void GridBox::OnPlot(wxCommandEvent& event)
 	//mod->RangePlot(textgrid);
 	WriteVDU("Plot\n");
 	//diagbox->Write("param scan\n");
+
+	if(!plotbox) mainwin->PlotModule(mod);
 }
 
 
@@ -1590,6 +1594,7 @@ void GridBox::ColumnSelect(int col)
 	WriteVDU(text.Format("Column Select %d\n", col));
 
 	mod->GridColumn(col);
+	if(plotbox) plotbox->SetColumn(col);
 }
 
 

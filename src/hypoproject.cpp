@@ -100,7 +100,10 @@ void Project::Load()
 	bool check;
 	wxPoint pos;
 	wxSize size;
+	wxString boxtag;
+	bool visible;
 	TagBox *box;
+	ToolBox *toolbox;
 
 	filepath = path + "/" + projectfile;
 
@@ -140,11 +143,24 @@ void Project::Load()
 			pos.y = ReadNextData(&readline);
 			size.x = ReadNextData(&readline);
 			size.y = ReadNextData(&readline);
-			if(mod->modtools.box[boxindex]->servant) mod->modtools.box[boxindex]->visible = (bool)ReadNextData(&readline);
-			else mod->modtools.box[boxindex]->visible = true;
-			if(pos.x >= -5000 && pos.x < 5000 && pos.y >= -5000 && pos.y < 5000) mod->modtools.box[boxindex]->mpos = pos;
-			if(size.x >= 50 && size.x < 2000 && size.y >= 50 && size.y < 2000) mod->modtools.box[boxindex]->boxsize = size;
+			visible = (bool)ReadNextData(&readline);
+			boxtag = ReadNextString(&readline);
+			toolbox = mod->modtools.GetBox(boxtag);
+			if(!toolbox) {
+				readline = infile.ReadLine();
+				break;
+			}
+			if(toolbox->servant) toolbox->visible = visible;
+			else toolbox->visible = true;
+			if(pos.x >= -5000 && pos.x < 5000 && pos.y >= -5000 && pos.y < 5000) toolbox->mpos = pos;
+			if(size.x >= 50 && size.x < 2000 && size.y >= 50 && size.y < 2000) toolbox->boxsize = size;
+
+			//if(mod->modtools.box[boxindex]->servant) mod->modtools.box[boxindex]->visible = visible;
+			//else mod->modtools.box[boxindex]->visible = true;
+			//if(pos.x >= -5000 && pos.x < 5000 && pos.y >= -5000 && pos.y < 5000) mod->modtools.box[boxindex]->mpos = pos;
+			//if(size.x >= 50 && size.x < 2000 && size.y >= 50 && size.y < 2000) mod->modtools.box[boxindex]->boxsize = size;
 			readline = infile.ReadLine();  // Read next line										
+
 		}
 		infile.Close();
 		for(i=0; i<mod->modtools.numtools; i++) {

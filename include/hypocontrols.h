@@ -121,14 +121,14 @@ public:
 class ToolSet
 {
 public:
-	int i, numtools;
+	int i, numtools, maxtools;
 	ToolBox *box[50];
-	//Model *mod;
 	ParamStore tagindex;
+	wxString tags[50];
 	
 	ToolSet() {
 		numtools = 0;
-		//mod = NULL;
+		maxtools = 50;
 	};
 	
 	void AddBox(ToolBox *newbox, bool serve=false, bool child=false); 
@@ -136,6 +136,10 @@ public:
 	void RemoveBox(int index) {
 		box[index] = NULL;
 	};
+
+	int GetIndex(wxString tag);
+	wxString GetTag(int index);
+	ToolBox *GetBox(wxString tag);
 
 	//void RemoveBox(wxString tag) {
 

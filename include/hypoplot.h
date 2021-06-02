@@ -36,11 +36,12 @@ public:
 	vector<datdouble>ycoldata;
 	vector<datdouble>xcoldata;
 	int plotsetindex;
-	PlotSet *plotset;
+	//PlotSet *plotset;
 
 	int plotcount;
 	int plotlayer;
 	int graphindex;
+	int dispindex;
 	wxString coltag;
 
 	PlotBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);

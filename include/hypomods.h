@@ -100,6 +100,7 @@ public:
 
 	DatStore *recdata;
 	GridBox *gridbox;
+	PlotBox *plotbox;
 
 	NeuroBox *neurobox;
 	SoundBox *soundbox;
@@ -110,6 +111,7 @@ public:
 	SpikeDat *expdata;
 	datdouble testhist[5], testhistx[5];
 	datdouble datahist[10], datahistx[10];
+	datdouble gridplot[10], gridplotx[10], gridploterr[10];
 
 
 	Model(int, wxString, HypoMain *);

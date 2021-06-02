@@ -927,25 +927,13 @@ public:
 
 class GraphDisp{             // used for multiple layered plots for simultaneous display
 public:
-	/*int data;
-	wxTextCtrl *yf;
-	wxTextCtrl *yt;
-	wxTextCtrl *xf;
-	wxTextCtrl *xt;
-	wxBitmapButton *yzoomout;
-	wxBitmapButton *yzoomin;
-	wxBitmapButton *xzoomout;
-	wxBitmapButton *xzoomin;
-	int ypos;
-	int xpos;*/
 	GraphDat *plot[10];
+	PlotSet plotset;
 	static const int maxplots = 10;
 	int numplots;
 	int currentplot;
 	int spikedisp;
 	int gdex, sdex;
-	//BurstDat *burstdata;
-	PlotSet *plotset;
 	
 	GraphDisp();
 	void Add(GraphDat *);

@@ -9,7 +9,6 @@
 #include <wx/filedlg.h>
 
 
-
 PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const wxSize& size)
 	: ParamBox(model, title, pos, size, "plotbox", 0, 1)
 {
@@ -17,14 +16,13 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	boxtag = "Plot";
 	mod = model;
 	bool v1mode = false;
-	bool dicemode = true;
+	bool dicemode = false;
 
 	wxStaticBoxSizer* dicepanel;
 	wxStaticBoxSizer* v1datapanel;
 
-	InitMenu();
-
-	SetModFlag(ID_plotflag, "plotflag", "Plot Example Flag", 0); 
+	//InitMenu();
+	//SetModFlag(ID_plotflag, "plotflag", "Plot Example Flag", 0); 
 
 	//paramstoretag->SetLabel("default");
 	defstore = true;
@@ -35,6 +33,9 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	gridbox = mainwin->gridbox;
 	//plotset = mainwin->plotset;
 	neurobox = mainwin->neurobox;
+
+	dispindex = 0;
+	graphdisp = &mainwin->gpos[dispindex];
 
 
 	// Parameter controls
@@ -151,7 +152,7 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 		conbox->Add(v1datapanel, 0, wxEXPAND | wxALL, 5);
 	}
 
-	if (dicemode) {
+	if(dicemode) {
 		conbox->AddSpacer(10);
 		conbox->Add(dicepanel, 0, wxEXPAND | wxALL, 5);
 	}
@@ -255,12 +256,9 @@ void PlotBox::DataEdit(int col)          // Update plots in response to edit in 
 	int i;
 	int xcol, ycol;
 
-	PlotSet *plotset = graphdisp->plotset;
-	if(!plotset) return;
-
-	for(i=0; i<plotset->plotcount; i++) {
-		xcol = plotset->plotdata[i].xcol;
-		ycol = plotset->plotdata[i].ycol;
+	for(i=0; i<graphdisp->plotset.plotcount; i++) {
+		xcol = graphdisp->plotset.plotdata[i].xcol;
+		ycol = graphdisp->plotset.plotdata[i].ycol;
 		if(xcol == col || ycol == col) {
 			graph = graphdisp->plot[i];
 			gridbox->ColumnData(ycol, graph->gdatadv);
@@ -283,8 +281,8 @@ void PlotBox::SetLayer()
 	}
 	plotlayer = layer;
 
-	xcol = graphdisp->plotset->plotdata[plotlayer].xcol;
-	ycol = graphdisp->plotset->plotdata[plotlayer].ycol;
+	xcol = graphdisp->plotset.plotdata[plotlayer].xcol;
+	ycol = graphdisp->plotset.plotdata[plotlayer].ycol;
 
 	diagbox->Write(text.Format("SetLayer %d xcol %d ycol %d\n", plotlayer, xcol, ycol));
 
@@ -353,9 +351,6 @@ void PlotBox::OnNeuroDice(wxCommandEvent& event)
 }
 
 
-
-
-
 void PlotBox::OnSelect(wxCommandEvent& event)
 {
 	wxString tag, text;
@@ -370,18 +365,14 @@ void PlotBox::OnSelect(wxCommandEvent& event)
 
 void PlotBox::SetGraph(GraphWindow3 *graphwin)
 {
+	wxString text; 
+
 	graphdisp = graphwin->dispset[0];
 	graphindex = graphwin->graphindex;
 
-	//if(mainwin->graphbox) layer = mainwin->graphbox->paramset.GetValue("plotlayer");
-	//graph = graphdisp->plot[layer];
-	//if(mainwin->graphbox) graph = mainwin->graphbox->graph;
-	//else graph = graphdisp->plot[plotlayer];
+	graph = graphdisp->plot[plotlayer];
 
-	//graph = graphdisp->plot[plotlayer];
-	diagbox->Write(text.Format("PlotBox Set Graph %d %s\n", graphindex, graph->gname));
-
-	//GraphUpdate();
+	mainwin->diagbox->Write(text.Format("PlotBox Set Graph %d %s\n", graphindex, graph->gname));
 }
 
 
@@ -408,14 +399,13 @@ void PlotBox::OnBrowse(wxCommandEvent& event)
 
 void PlotBox::OnRemovePlot(wxCommandEvent& event)
 {
-	PlotSet *plotset;
 	int check;
 
 	ParamStore *params = GetParams();
 	plotlayer = (*params)["plotlayer"];
 
-	plotset = graphdisp->plotset;
-	check = plotset->RemovePlot(plotlayer);
+	
+	check = graphdisp->plotset.RemovePlot(plotlayer);
 	if(!check) return;
 
 	graphdisp->Remove(plotlayer);
@@ -438,8 +428,9 @@ void PlotBox::OnPlotXY(wxCommandEvent& event)
 	ycol = (*params)["ycol"];
 	xcol = (*params)["xcol"];
 
-	if(!graphdisp->plotset) graphdisp->plotset = plotset;      // currently only manages a single plotset for one graph panel   // *18/12/20 FIX THIS*
-	plotset = graphdisp->plotset;
+	//if(!graphdisp->plotset) graphdisp->plotset = plotset;      // currently only manages a single plotset for one graph panel   // *18/12/20 FIX THIS*
+	//if(!graphdisp->plotset) plotset = new PlotSet();
+	plotset = &graphdisp->plotset;
 	plotcount = plotset->plotcount;
 
 	plotlayer = 0; // temp
@@ -698,8 +689,8 @@ void PlotBox::PlotStore(wxString filetag)
 	filename = "plot-" + filetag + ".dat";
 
 	outfile.New(filepath + "/" + filename);
-	for(i=0; i<plotset->plotcount; i++) {
-		outfile.WriteLine(plotset->plotdata[i].StoreDat(i));
+	for(i=0; i<graphdisp->plotset.plotcount; i++) {
+		outfile.WriteLine(graphdisp->plotset.plotdata[i].StoreDat(i));
 	}
 	outfile.Close();
 }
@@ -712,10 +703,10 @@ void PlotBox::PlotLoad(wxString filetag)
 	wxString readline, filename, filepath;
 	wxString text;
 	wxString gtag;
-	int dispindex;
+
 	int gtype, xcol, ycol;
 	int version;
-	GraphDisp *graphdisp;
+	//GraphDisp *graphdisp;
 	GraphDat *graph;
 
 	diagbox->Write(text.Format("Loading plot set\n"));
@@ -727,7 +718,7 @@ void PlotBox::PlotLoad(wxString filetag)
 		return;
 	}
 
-	plotset->plotcount = 0;          // reset plotset
+	graphdisp->plotset.plotcount = 0;          // reset plotset
 
 	readline = infile.ReadLine();
 
@@ -744,7 +735,7 @@ void PlotBox::PlotLoad(wxString filetag)
 		ycol = ParseLong(&readline, 'l');
 
 		// Add plotdat to plotset
-		plotset->AddPlot(PlotDat(gtag, gtype, xcol, ycol));
+		graphdisp->plotset.AddPlot(PlotDat(gtag, gtype, xcol, ycol));
 
 		// Check for end of file and read next line
 		if(infile.End()) break;
@@ -754,18 +745,18 @@ void PlotBox::PlotLoad(wxString filetag)
 
 	dispindex = 0;
 	graphdisp = &mainwin->gpos[dispindex];
-	for(i=0; i<plotset->plotcount; i++) {
+	for(i=0; i<graphdisp->plotset.plotcount; i++) {
 		// Set up graph from plotdat
-		graph = mainwin->graphbase->GetGraph(plotset->plotdata[i].gtag); 
-		graph->plotdata = &plotset->plotdata[i];
-		graph->type = plotset->plotdata[i].gtype;
-		gridbox->ColumnData(plotset->plotdata[i].ycol, graph->gdatadv);
-		graph->xcount = gridbox->ColumnData(plotset->plotdata[i].xcol, graph->gdatax);
+		graph = mainwin->graphbase->GetGraph(graphdisp->plotset.plotdata[i].gtag); 
+		graph->plotdata = &graphdisp->plotset.plotdata[i];
+		graph->type = graphdisp->plotset.plotdata[i].gtype;
+		gridbox->ColumnData(graphdisp->plotset.plotdata[i].ycol, graph->gdatadv);
+		graph->xcount = gridbox->ColumnData(graphdisp->plotset.plotdata[i].xcol, graph->gdatax);
 		// Insert graph into graphdisp 
 		if(graphdisp->numplots <= i) graphdisp->Add(graph);
 		else graphdisp->plot[i] = graph;
 	}
-	graphdisp->plotset = plotset;
+	//graphdisp->plotset = plotset;
 	mainwin->scalebox->GraphUpdate();
 }
 

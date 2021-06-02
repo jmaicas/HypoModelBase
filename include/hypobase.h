@@ -519,6 +519,8 @@ public:
 
 long ReadNextData(wxString *readline);
 
+wxString ReadNextString(wxString *readline);
+
 
 // Fast File I/O
 

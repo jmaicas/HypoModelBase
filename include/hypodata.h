@@ -222,6 +222,9 @@ public:
 	NeuroBox *neurobox;
 	vector<NeuroDat>* celldata;   
 
+	// PlotBox link
+	PlotBox *plotbox; 
+
 	// Grid data vectors for large grids, currently not in use 
 	vector<GridNumDat> numdata;
 	DataGrid numdatagrid;

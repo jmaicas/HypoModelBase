@@ -1068,7 +1068,7 @@ GraphDisp::GraphDisp()
 	numplots = 0;
 	currentplot = 0;
 	spikedisp = 0;
-	plotset = NULL;
+	//plotset = NULL;
 }
 
 
