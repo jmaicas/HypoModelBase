@@ -1060,6 +1060,9 @@ void GraphDat::Init()
 	labelfont = 0;  //default Helvetica
 	fillmode = 1;
 	fillstroke = 0;
+
+	errmode = 0;
+	gdataerr = NULL;
 }
 
 

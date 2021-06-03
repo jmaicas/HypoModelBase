@@ -360,30 +360,6 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 		// Draw graph data
 		out->WriteLine(text.Format("%.2f setlinewidth", plotstroke));
 
-		if(gtype == 7) {                             // scaled width bars
-			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 7, scaled bars\n"));
-			for(i=0; i<(xto - xfrom); i++) {
-				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
-				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
-				if(y == 0) continue;
-				xpos = i * xrange + xbase;
-				out->WriteLine("newpath");
-				out->MoveTo(xpos, ybase);
-				out->LineTo(xpos, ybase + yrange * (y - yfrom));
-				out->LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
-				out->LineTo(xpos + xrange, ybase);
-				out->WriteLine("closepath");
-				out->WriteLine("fill");
-				out->WriteLine("newpath");
-				out->MoveTo(xpos, ybase);
-				out->LineTo(xpos, ybase + yrange * (y - yfrom));
-				out->LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
-				out->LineTo(xpos + xrange, ybase);
-				out->WriteLine("closepath");
-				out->WriteLine("stroke");
-			}
-		}
-
 		if(gtype == 1) {                             // scaled width bars, Histogram    
 			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 1, histogram  xrange %.4f\n", xrange));
 			if(bargap) histbargap = bargap;
@@ -425,6 +401,50 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 				out.LineTo(xpos + xrange - bargap, ybase);
 				out.WriteLine("closepath");*/
 				out->WriteLine("stroke");
+			}
+		}
+
+		if(gtype == 2 && graph->gdatax) {		                 // line graph with X data
+
+			if(graph->linemode) {
+				out->WriteLine("newpath");
+				out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
+				oldx = xbase;
+				oldy = ybase;
+				//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
+				for(i=0; i<graph->xcount; i+=xsample) {
+					xval = (*graph->gdatax)[i];
+					if(xval >= xfrom && xval <= xto) {
+						xpos = (xval - xfrom) * xrange;
+						y = (*gdatadv)[i];
+						//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
+						if(i > 0) out->DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));        // First point sets start position																									  
+						oldx = xpos + xbase + xoffset;
+						oldy = ybase + yrange * (y - yfrom);
+					}
+				}
+				out->WriteLine("stroke");
+			}
+
+			if(graph->scattermode) {
+				out->WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+				for(i=0; i<graph->xcount; i++) {
+					xval = (*graph->gdatax)[i];
+					if(xval >= xfrom && xval <= xto) {
+						xpos = (xval - xfrom) * xrange;
+						y = (*gdatadv)[i];		
+						out->WriteLine("newpath");
+						if(graph->fillstroke) out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
+						out->WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
+						if(graph->fillmode) {
+							out->WriteLine("gsave");
+							out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
+							out->WriteLine("fill");
+							out->WriteLine("grestore");
+						}
+						out->WriteLine("stroke");
+					}
+				}
 			}
 		}
 
@@ -497,6 +517,39 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 			}	
 		}
 
+		if(gtype == 4 || gtype == 5) {                         // line graph
+			xoffset = 0;
+			out->WriteLine("newpath");
+			out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
+
+			if(gpar == -3) yval = (*gdatav)[(int)xfrom];
+			if(gpar == -4) yval = (*gdatadv)[(int)xfrom];
+
+			oldx = xbase;
+			oldy = ybase + yrange * (yval - yfrom);            // TODO proper start coordinates
+
+			for(i=1; i<=(xto - xfrom) / xsample; i++) {		
+				xindex = i * xsample + xfrom;
+				xpos = (xindex - xfrom) * xrange;
+
+				//yval = (*gdatadv)[xindex];
+				if(gpar == -3) yval = (*gdatav)[xindex];
+				if(gpar == -4) yval = (*gdatadv)[xindex];
+
+				if(graph->yscalemode == 1 && yfrom > 0) {
+					ypos = (int)((double)yplot * (log(yval / yfrom) / log(graph->ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
+					if(yval < yfrom) ypos = -yfrom * yrange;     // set below range values to xfrom
+				}
+				else ypos = yrange * (yval - yfrom);
+
+				//y = (*gdatadv)[xindex];
+				out->DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + ypos);
+				oldx = xpos + xbase + xoffset;
+				oldy = ybase + ypos;
+			}
+			out->WriteLine("stroke");
+		}
+
 		//sample = 60;
 		if(gtype == 6 || gtype == 8) {                         // line with sampling (6), line and scatter with sampling (8)
 			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Sample rate %d\n", sample));
@@ -544,83 +597,33 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 			}
 		}
 
+		if(gtype == 7) {                             // scaled width bars
+			if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Drawing type 7, scaled bars\n"));
+			for(i=0; i<(xto - xfrom); i++) {
+				if(gpar == -3) y = (*gdatav)[i + (int)xfrom];
+				if(gpar == -4) y = (*gdatadv)[i + (int)xfrom];
+				if(y == 0) continue;
+				xpos = i * xrange + xbase;
+				out->WriteLine("newpath");
+				out->MoveTo(xpos, ybase);
+				out->LineTo(xpos, ybase + yrange * (y - yfrom));
+				out->LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+				out->LineTo(xpos + xrange, ybase);
+				out->WriteLine("closepath");
+				out->WriteLine("fill");
+				out->WriteLine("newpath");
+				out->MoveTo(xpos, ybase);
+				out->LineTo(xpos, ybase + yrange * (y - yfrom));
+				out->LineTo(xpos + xrange, ybase + yrange * (y - yfrom));
+				out->LineTo(xpos + xrange, ybase);
+				out->WriteLine("closepath");
+				out->WriteLine("stroke");
+			}
+		}
+
 		//xsample = 1;
 
-		if(gtype == 4 || gtype == 5) {                         // line graph
-			xoffset = 0;
-			out->WriteLine("newpath");
-			out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
-
-			if(gpar == -3) yval = (*gdatav)[(int)xfrom];
-			if(gpar == -4) yval = (*gdatadv)[(int)xfrom];
-
-			oldx = xbase;
-			oldy = ybase + yrange * (yval - yfrom);            // TODO proper start coordinates
-
-			for(i=1; i<=(xto - xfrom) / xsample; i++) {		
-				xindex = i * xsample + xfrom;
-				xpos = (xindex - xfrom) * xrange;
-
-				//yval = (*gdatadv)[xindex];
-				if(gpar == -3) yval = (*gdatav)[xindex];
-				if(gpar == -4) yval = (*gdatadv)[xindex];
-
-				if(graph->yscalemode == 1 && yfrom > 0) {
-					ypos = (int)((double)yplot * (log(yval / yfrom) / log(graph->ylogbase)) / ylogmax);  // log scaled y-axis  March 2018
-					if(yval < yfrom) ypos = -yfrom * yrange;     // set below range values to xfrom
-				}
-				else ypos = yrange * (yval - yfrom);
-
-				//y = (*gdatadv)[xindex];
-				out->DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + ypos);
-				oldx = xpos + xbase + xoffset;
-				oldy = ybase + ypos;
-			}
-			out->WriteLine("stroke");
-		}
-
-		if(gtype == 2 && graph->gdatax) {		                 // line graph with X data
-			out->WriteLine("newpath");
-			out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->strokecolour))); 
-			oldx = xbase;
-			oldy = ybase; // - yrange * (yfrom);
-			//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
-			for(i=0; i<graph->xcount; i+=xsample) {
-				xval = (*graph->gdatax)[i];
-				if(xval >= xfrom && xval <= xto) {
-					xpos = (xval - xfrom) * xrange;
-					y = (*gdatadv)[i];
-					//mainwin->diagbox->Write(text.Format("\n XY graph line X %.4f Y %.4f\n", xval, y));
-					if(i > 0) out->DrawLine(oldx, oldy, xpos + xbase + xoffset, ybase + yrange * (y - yfrom));        // First point sets start position
-					//dc.SetPen(colourpen[black]);
-					//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
-					oldx = xpos + xbase + xoffset;
-					oldy = ybase + yrange * (y - yfrom);
-				}
-			}
-			out->WriteLine("stroke");
-
-			if(graph->scattermode) {
-				out->WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
-				for(i=0; i<graph->xcount; i++) {
-					xval = (*graph->gdatax)[i];
-					if(xval >= xfrom && xval <= xto) {
-						xpos = (xval - xfrom) * xrange;
-						y = (*gdatadv)[i];		
-						out->WriteLine("newpath");
-						if(graph->fillstroke) out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
-						out->WriteLine(text.Format("%.2f pu %.2f pu %.2f pu 0 360 arc", xpos + xbase + xoffset, ybase + yrange * (y - yfrom), graph->scattersize));
-						if(graph->fillmode) {
-							out->WriteLine("gsave");
-							out->WriteLine(text.Format("%s setrgbcolor", ColourString(graph->fillcolour))); 
-							out->WriteLine("fill");
-							out->WriteLine("grestore");
-						}
-						out->WriteLine("stroke");
-					}
-				}
-			}
-		}
+		
 
 		double xmin, xmax, ymin, ymax, xmid, ymid;
 		int scatterfield = graph->scatterfield;

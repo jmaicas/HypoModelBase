@@ -1291,8 +1291,13 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 			}
 
 
-			if(gtype == 2 && graph->gdatax) {				                            // line graph with X data
-		   																		//mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d\n", graph->xcount, xrange, xplot));
+			double drawscatter = graph->scattersize * 2;
+			double errval;
+
+			if(gtype == 2 && graph->gdatax) {	
+				// line graph with X data
+				mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d errmode %d\n", graph->xcount, xrange, xplot, graph->errmode));
+
 				oldx = xbase + xoffset;
 				oldy = (int)(yplot + ybase - yrange * (yfrom));
 				//mainwin->diagbox->Write(text.Format("\n XY graph maxindex %d xcount %d\n", graph->gdatax->maxindex, graph->xcount));
@@ -1302,6 +1307,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 					if(xval >= xfrom && xval <= xto) {
 						xpos = (int)((xval - xfrom) * xrange);
 						y = (*gdatadv)[i];
+
 						/*
 						xposnext = (int)((*graph->gdatax)[i+1] - xfrom) * xrange;                  // proto code for scaling dense data for screen display 25/5/16
 						while(xposnext == xpos) {
@@ -1312,12 +1318,25 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 						//mainwin->diagbox->Write(text.Format("\n X %d val %.2f pos %d\n", i, xval, xpos));
 						//mainwin->diagbox->Write(text.Format("XY graph line X %.4f Y %.4f\n", xval, y));
 
-						gc->SetPen(colourpen[colour]);
-						DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
-						gc->SetPen(colourpen[black]);
-						//if(graph->scattermode) dc.DrawCircle((int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)), graph->scattersize);
+						//gc->SetPen(colourpen[colour]);
+						if(graph->linemode) {
+							gc->SetPen(graph->strokecolour);
+							if(i > 0) DrawLine(dc, gc, oldx, oldy, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom)));
+						}
+						if(graph->fillstroke) gc->SetPen(graph->fillcolour);
+						else gc->SetPen(colourpen[black]);
+						if(graph->fillmode) gc->SetBrush(graph->fillcolour);
+
 						if(graph->scattermode) 
-							gc->DrawEllipse((int)(xpos + xbase + xoffset - graph->scattersize/2), (int)(yplot + ybase - graph->scattersize/2 - yrange * (y - yfrom)), graph->scattersize, graph->scattersize);
+							gc->DrawEllipse((int)(xpos + xbase + xoffset - drawscatter/2), (int)(yplot + ybase - drawscatter/2 - yrange * (y - yfrom)), drawscatter, drawscatter);
+
+						if(graph->errmode) {
+							errval = (*graph->gdataerr)[i] * yrange;
+							gc->SetPen(colourpen[black]);
+							DrawLine(dc, gc, (int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom) + errval), 
+								(int)(xpos + xbase + xoffset), (int)(yplot + ybase - yrange * (y - yfrom) - errval));
+						}
+
 						oldx = xpos + xbase + xoffset;
 						oldy = (int)(yplot + ybase - yrange * (y - yfrom));
 					}

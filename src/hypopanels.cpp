@@ -27,7 +27,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	wxString text;
 
 	ostype = GetSystem();
-	autosynch = true;
+	autosynch = false;
 
 	buttonheight = 23;
     boxfont = wxFont(wxFontInfo(8).FaceName("Tahoma"));
@@ -214,7 +214,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	//plotgrid->Add(paramset.GetCon("scattersize"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxST_NO_AUTORESIZE);
 	//plotgrid->Add(scattercheck, 0, wxALIGN_CENTRE_VERTICAL);
 
-	strokepicker = new wxColourPickerCtrl(panel, 0, graph->strokecolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL);
+	strokepicker = new wxColourPickerCtrl(panel, 0, graph->strokecolour, wxDefaultPosition, wxSize(70, 25));
 	paramset.AddNum("plotstroke", "Stroke", graph->plotstroke, 2, labelwidth);
 	wxBoxSizer *strokebox = new wxBoxSizer(wxHORIZONTAL);
 	//wxStaticText *label = new wxStaticText(panel, wxID_ANY, "Stroke");
@@ -230,7 +230,7 @@ GraphBox::GraphBox(GraphWindow3 *graphw, const wxString & title)
 	fillstrokecheck->SetValue(graph->fillstroke);
 	strokebox->Add(fillstrokecheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
 
-	fillpicker = new wxColourPickerCtrl(panel, 0, graph->fillcolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_USE_TEXTCTRL|wxCLRP_SHOW_ALPHA);
+	fillpicker = new wxColourPickerCtrl(panel, 0, graph->fillcolour, wxDefaultPosition, wxSize(70, 25), wxCLRP_SHOW_ALPHA);
 	paramset.AddNum("scattersize", "Scatter Size", graph->scattersize, 2, labelwidth);
 	wxBoxSizer *fillbox = new wxBoxSizer(wxHORIZONTAL);
 	fillbox->Add(paramset.con[paramset.GetID("scattersize")], wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
@@ -678,7 +678,7 @@ void GraphBox::OnOK(wxCommandEvent& WXUNUSED(event))
 
 	if(autosynch) SynchLayers();
 
-	for(g=0; g<graphwin->numdisps; g++) SetParamsCopy(graphwin->dispset[g]->plot[0]);
+	//for(g=0; g<graphwin->numdisps; g++) SetParamsCopy(graphwin->dispset[g]->plot[0]);
 
 	//graph = graphwin->dispset[0]->plot[0];      // not sure if this is needed 7/3/16
 	SetParams();

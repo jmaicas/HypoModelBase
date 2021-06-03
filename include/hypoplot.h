@@ -44,6 +44,8 @@ public:
 	int dispindex;
 	wxString coltag;
 
+	wxCheckBox *errcheck;
+
 	PlotBox(Model *mod, const wxString& title, const wxPoint& pos, const wxSize& size);
 	//~PlotBox();
 	void OnPlotXY(wxCommandEvent& event);

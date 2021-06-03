@@ -52,6 +52,17 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	paramset.AddCon("xcol", "X Column", 0, 1, 0, 60, 40); 
 	xcolbox->Add(paramset.GetCon("xcol"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 
+	//errcheck = new wxCheckBox(panel, ID_err, "");
+	//errcheck->SetFont(confont);
+	//errcheck->SetValue(0);
+
+	errcheck = SetModCheck(ID_errcheck, "errmode", "", false);
+
+	wxBoxSizer *errcolbox = new wxBoxSizer(wxHORIZONTAL);
+	paramset.AddCon("errcol", "Err Column", 0, 1, 0, 60, 40); 
+	errcolbox->Add(paramset.GetCon("errcol"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
+	errcolbox->Add(errcheck, 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
+
 	wxBoxSizer *layerbox = new wxBoxSizer(wxHORIZONTAL);
 	paramset.AddCon("plotlayer", "Layer", 0, 1, 0, 60, 40); 
 	layerbox->Add(paramset.GetCon("plotlayer"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxALL, 5);
@@ -59,6 +70,7 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	wxStaticBoxSizer *dataplotbox = new wxStaticBoxSizer(wxVERTICAL, panel, "Data Plot");
 	dataplotbox->Add(xcolbox, 0);
 	dataplotbox->Add(ycolbox, 0);
+	dataplotbox->Add(errcolbox, 0);
 	dataplotbox->Add(layerbox, 0);
 	dataplotbox->AddSpacer(5);
 	wxBoxSizer *buttonbox = new wxBoxSizer(wxHORIZONTAL);
@@ -158,6 +170,7 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	}
 
 	wxBoxSizer *storebox = StoreBoxSync();
+	//wxBoxSizer *storebox = StoreBox();
 
 	delete parambox;
 
@@ -215,8 +228,10 @@ void PlotBox::OnParamLoad(wxCommandEvent& event)
 	if(synccheck->GetValue()) {
 		filetag = paramstoretag->GetValue();
 		gridbox->paramstoretag->SetValue(filetag);
-		gridbox->GridLoad();
+		//gridbox->GridLoad();
 		//gridbox->GridLoadFast();
+		//gridbox->GridLoadAll();
+		gridbox->OnGridLoad(event);
 	}
 	ParamBox::ParamLoad();	
 
@@ -417,6 +432,7 @@ void PlotBox::OnRemovePlot(wxCommandEvent& event)
 void PlotBox::OnPlotXY(wxCommandEvent& event) 
 {
 	int xcol, ycol;
+	int errcol, errmode;
 	int xcount;
 	int plotindex;
 	int basetype;
@@ -427,6 +443,8 @@ void PlotBox::OnPlotXY(wxCommandEvent& event)
 	ParamStore *params = GetParams();
 	ycol = (*params)["ycol"];
 	xcol = (*params)["xcol"];
+	errcol = (*params)["errcol"];
+	errmode = errcheck->GetValue();
 
 	//if(!graphdisp->plotset) graphdisp->plotset = plotset;      // currently only manages a single plotset for one graph panel   // *18/12/20 FIX THIS*
 	//if(!graphdisp->plotset) plotset = new PlotSet();
@@ -439,7 +457,7 @@ void PlotBox::OnPlotXY(wxCommandEvent& event)
 
 	if(event.GetId() == ID_AddPlot) {
 		diagbox->Write(text.Format("\nAdd Plot numplots %d\n", graphdisp->numplots));
-		graph = mod->graphbase->GetGraph(tag.Format("coldata%d", plotcount++));
+		graph = mod->graphbase->GetGraph(tag.Format("gridplot%d", plotcount++));
 		graph->type = graphdisp->plot[0]->type;
 		plotindex = plotcount;
 		graphdisp->Add(graph);
@@ -449,9 +467,11 @@ void PlotBox::OnPlotXY(wxCommandEvent& event)
 
 	gridbox->ColumnData(ycol, graph->gdatadv);
 	graph->xcount = gridbox->ColumnData(xcol, graph->gdatax);
+	if(graph->gdataerr) gridbox->ColumnData(errcol, graph->gdataerr);
+	graph->errmode = errmode;
 
-	if(plotset->plotcount <= plotindex) plotset->AddPlot(PlotDat(graph->gtag, graph->type, xcol, ycol));
-	else plotset->SetPlot(plotindex, PlotDat(graph->gtag, graph->type, xcol, ycol));
+	if(plotset->plotcount <= plotindex) plotset->AddPlot(PlotDat(graph->gtag, graph->type, xcol, ycol, errcol, errmode));
+	else plotset->SetPlot(plotindex, PlotDat(graph->gtag, graph->type, xcol, ycol, errcol, errmode));
 
 	diagbox->Write(text.Format("Plot xcol %d ycol %d\n", xcol , ycol));
 
@@ -703,10 +723,9 @@ void PlotBox::PlotLoad(wxString filetag)
 	wxString readline, filename, filepath;
 	wxString text;
 	wxString gtag;
-
 	int gtype, xcol, ycol;
+	int errcol, errmode;
 	int version;
-	//GraphDisp *graphdisp;
 	GraphDat *graph;
 
 	diagbox->Write(text.Format("Loading plot set\n"));
@@ -734,8 +753,17 @@ void PlotBox::PlotLoad(wxString filetag)
 		xcol = ParseLong(&readline, 'l');
 		ycol = ParseLong(&readline, 'l');
 
+		if(version >= 2) {
+			errcol = ParseLong(&readline, 'l');
+			errmode = ParseLong(&readline, 'd');
+		}
+		else {
+			errcol = 0;
+			errmode = 0;
+		}
+
 		// Add plotdat to plotset
-		graphdisp->plotset.AddPlot(PlotDat(gtag, gtype, xcol, ycol));
+		graphdisp->plotset.AddPlot(PlotDat(gtag, gtype, xcol, ycol, errcol, errmode));
 
 		// Check for end of file and read next line
 		if(infile.End()) break;
@@ -747,11 +775,13 @@ void PlotBox::PlotLoad(wxString filetag)
 	graphdisp = &mainwin->gpos[dispindex];
 	for(i=0; i<graphdisp->plotset.plotcount; i++) {
 		// Set up graph from plotdat
-		graph = mainwin->graphbase->GetGraph(graphdisp->plotset.plotdata[i].gtag); 
+		graph = mod->graphbase->GetGraph(graphdisp->plotset.plotdata[i].gtag); 
 		graph->plotdata = &graphdisp->plotset.plotdata[i];
 		graph->type = graphdisp->plotset.plotdata[i].gtype;
 		gridbox->ColumnData(graphdisp->plotset.plotdata[i].ycol, graph->gdatadv);
 		graph->xcount = gridbox->ColumnData(graphdisp->plotset.plotdata[i].xcol, graph->gdatax);
+		gridbox->ColumnData(graphdisp->plotset.plotdata[i].errcol, graph->gdataerr);
+		graph->errmode = graphdisp->plotset.plotdata[i].errmode;
 		// Insert graph into graphdisp 
 		if(graphdisp->numplots <= i) graphdisp->Add(graph);
 		else graphdisp->plot[i] = graph;

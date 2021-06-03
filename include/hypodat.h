@@ -658,9 +658,11 @@ public:
 	wxString gtag;
 	int ycol;
 	int xcol;
+	int errcol;
+	int errmode;
 	int gtype;
 
-	PlotDat(wxString, int, int, int);
+	PlotDat(wxString, int type, int xc, int yc, int ec, int em);
 	wxString StoreDat(int);
 };
 
@@ -700,6 +702,7 @@ public:
 	datdouble *gdatadv;
 	datint *gdatav;
 	datdouble *gdatax;
+	datdouble *gdataerr;
 	PlotDat *plotdata;
 	int datatype;    // proposed replacement for gparam, not yet implemented 11/7/18
 
@@ -768,6 +771,7 @@ public:
 	int labelfont;  // 0 for Helvetica, 1 for Arial
 	wxString labelfontstring; 
 	int fillmode, fillstroke;
+	int errmode;  // error bars mode, currently 0 off, 1 on
 
 	BurstDat *burstdata;
 	SpikeDat *spikedata;

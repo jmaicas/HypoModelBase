@@ -300,6 +300,7 @@ enum {
 	ID_fillmode,
 	ID_fillstroke,
 	ID_line,
+	ID_errcheck,
 	ID_Load,
 	ID_Browse,
 	ID_Select,
