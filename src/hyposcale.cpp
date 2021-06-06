@@ -1053,6 +1053,7 @@ void ScaleBox::OnOK(wxCommandEvent& WXUNUSED(event))
 		graphwin[i]->xt->GetValue().ToDouble(&(graphwin[i]->dispset[0]->plot[0]->xto));
 		if(graphwin[i]->dispset[0]->plot[0]->xfrom < xmin || graphwin[i]->dispset[0]->plot[0]->xfrom > xmax) {
 			mainwin->SetStatusText("X From, value out of range, max 100000");
+			mainwin->diagbox->Write(text.Format("ScaleBox X out of range, value %.2f xmin %d\n", graphwin[i]->dispset[0]->plot[0]->xfrom, xmin));
 			graphwin[i]->dispset[0]->plot[0]->xfrom = oldxfrom;
 			//graphwin[i]->xf->SetValue(
 			if(graph->xto < 1) graphwin[i]->xf->SetValue(text.Format("%.2f", oldxfrom));
@@ -1064,15 +1065,15 @@ void ScaleBox::OnOK(wxCommandEvent& WXUNUSED(event))
 		}
 		graphwin[i]->XYSynch();
 	}
-	snum.Printf("start %d num %d", startgraph, numgraphs);
-	if(mainwin->diagnostic) mainwin->SetStatusText(snum);
+	//snum.Printf("start %d num %d", startgraph, numgraphs);
+	//if(mainwin->diagnostic) mainwin->SetStatusText(snum);
 	fontname = boxfont.GetNativeFontInfoUserDesc();
 	panelsize = GetSize();
 	sizetext.Printf(" Size x %d y %d", panelsize.x, panelsize.y);
 	ostext.Printf(" OS type %d", ostype);
 	//mainwin->SetStatusText(boxfont.GetFaceName());
 	//mainwin->SetStatusText(boxfont.GetNativeFontInfoUserDesc());
-	if(mainwin->diagnostic) mainwin->SetStatusText("Font: " + fontname + sizetext + ostext);
+	//if(mainwin->diagnostic) mainwin->SetStatusText("Font: " + fontname + sizetext + ostext);
 
 	ScaleUpdate();
 	//XSynch();

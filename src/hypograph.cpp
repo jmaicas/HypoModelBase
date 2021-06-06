@@ -1296,7 +1296,7 @@ void GraphWindow3::OnPaintGC(wxPaintEvent& WXUNUSED(event))
 
 			if(gtype == 2 && graph->gdatax) {	
 				// line graph with X data
-				mainwin->diagbox->Write(text.Format("Graph Type 2  xcount %d xrange %.4f xplot %d errmode %d\n", graph->xcount, xrange, xplot, graph->errmode));
+				mainwin->diagbox->Write(text.Format("OnPaintGC Graph Type 2  xcount %d xrange %.4f xplot %d errmode %d\n", graph->xcount, xrange, xplot, graph->errmode));
 
 				oldx = xbase + xoffset;
 				oldy = (int)(yplot + ybase - yrange * (yfrom));

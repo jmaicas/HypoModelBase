@@ -670,13 +670,13 @@ public:
 class PlotSet
 {
 public:
-	int plotcount;
+	int count;
 	std::vector<PlotDat>plotdata;
 	int dispindex;
 
 	PlotSet() {
 		dispindex = 0;
-		plotcount = 0;
+		count = 0;
 	};
 
 	void AddPlot(PlotDat);

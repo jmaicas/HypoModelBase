@@ -26,7 +26,7 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 
 	//paramstoretag->SetLabel("default");
 	defstore = true;
-	plotcount = 1;
+	plotcount = 0;
 	plotlayer = 0;
 	coltag = "ycol";
 
@@ -52,11 +52,11 @@ PlotBox::PlotBox(Model *model, const wxString& title, const wxPoint& pos, const 
 	paramset.AddCon("xcol", "X Column", 0, 1, 0, 60, 40); 
 	xcolbox->Add(paramset.GetCon("xcol"), 0, wxALIGN_CENTRE_HORIZONTAL|wxALIGN_CENTRE_VERTICAL|wxRIGHT|wxLEFT, 5);
 
-	//errcheck = new wxCheckBox(panel, ID_err, "");
-	//errcheck->SetFont(confont);
-	//errcheck->SetValue(0);
+	errcheck = new wxCheckBox(panel, ID_errcheck, "");
+	errcheck->SetFont(confont);
+	errcheck->SetValue(0);
 
-	errcheck = SetModCheck(ID_errcheck, "errmode", "", false);
+	//errcheck = SetModCheck(ID_errcheck, "errmode", "", false);
 
 	wxBoxSizer *errcolbox = new wxBoxSizer(wxHORIZONTAL);
 	paramset.AddCon("errcol", "Err Column", 0, 1, 0, 60, 40); 
@@ -236,6 +236,7 @@ void PlotBox::OnParamLoad(wxCommandEvent& event)
 	ParamBox::ParamLoad();	
 
 	PlotLoad(filetag);
+	SetLayer();
 }
 
 
@@ -271,7 +272,7 @@ void PlotBox::DataEdit(int col)          // Update plots in response to edit in 
 	int i;
 	int xcol, ycol;
 
-	for(i=0; i<graphdisp->plotset.plotcount; i++) {
+	for(i=0; i<graphdisp->plotset.count; i++) {
 		xcol = graphdisp->plotset.plotdata[i].xcol;
 		ycol = graphdisp->plotset.plotdata[i].ycol;
 		if(xcol == col || ycol == col) {
@@ -286,23 +287,35 @@ void PlotBox::DataEdit(int col)          // Update plots in response to edit in 
 
 void PlotBox::SetLayer()
 {
-	int xcol, ycol, layer;
+	int xcol, ycol;
+	int errcol, errmode;
+	int dispcount;
 
-	layer = paramset.GetCon("plotlayer")->GetValue();
+	plotlayer = paramset.GetCon("plotlayer")->GetValue();
+	dispcount = graphdisp->plotset.count;
 
-	if(layer >= graphdisp->numplots) {
-		paramset.GetCon("plotlayer")->SetValue(graphdisp->numplots-1);
-		layer = graphdisp->numplots-1;
+	if(dispcount == 0) {
+		plotlayer = 0;
+		xcol = 0;
+		ycol = 0;
+		errcol = 0;
+		errmode = 0;
 	}
-	plotlayer = layer;
-
-	xcol = graphdisp->plotset.plotdata[plotlayer].xcol;
-	ycol = graphdisp->plotset.plotdata[plotlayer].ycol;
+	else {
+		if(plotlayer >= dispcount) plotlayer = dispcount - 1;
+		xcol = graphdisp->plotset.plotdata[plotlayer].xcol;
+		ycol = graphdisp->plotset.plotdata[plotlayer].ycol;
+		errcol = graphdisp->plotset.plotdata[plotlayer].errcol;
+		errmode = graphdisp->plotset.plotdata[plotlayer].errmode;
+	}
 
 	diagbox->Write(text.Format("SetLayer %d xcol %d ycol %d\n", plotlayer, xcol, ycol));
 
+	paramset.GetCon("plotlayer")->SetValue(plotlayer);
 	paramset.GetCon("xcol")->SetValue(xcol);
 	paramset.GetCon("ycol")->SetValue(ycol);
+	paramset.GetCon("errcol")->SetValue(errcol);
+	errcheck->SetValue(errmode);
 }
 
 
@@ -385,6 +398,7 @@ void PlotBox::SetGraph(GraphWindow3 *graphwin)
 	graphdisp = graphwin->dispset[0];
 	graphindex = graphwin->graphindex;
 
+	SetLayer();
 	graph = graphdisp->plot[plotlayer];
 
 	mainwin->diagbox->Write(text.Format("PlotBox Set Graph %d %s\n", graphindex, graph->gname));
@@ -445,24 +459,29 @@ void PlotBox::OnPlotXY(wxCommandEvent& event)
 	xcol = (*params)["xcol"];
 	errcol = (*params)["errcol"];
 	errmode = errcheck->GetValue();
+	plotlayer = (*params)["plotlayer"];
 
 	//if(!graphdisp->plotset) graphdisp->plotset = plotset;      // currently only manages a single plotset for one graph panel   // *18/12/20 FIX THIS*
 	//if(!graphdisp->plotset) plotset = new PlotSet();
 	plotset = &graphdisp->plotset;
-	plotcount = plotset->plotcount;
+	//plotcount = plotset->count;
 
-	plotlayer = 0; // temp
-	graph = graphdisp->plot[plotlayer];
-	plotindex = plotlayer;
+	//plotlayer = 0; // temp
 
-	if(event.GetId() == ID_AddPlot) {
+	if(graphdisp->numplots > plotset->count) graphdisp->Remove(0);   // clear existing graph on new GraphDisp
+
+	if(plotset->count == 0 || event.GetId() == ID_AddPlot) {
 		diagbox->Write(text.Format("\nAdd Plot numplots %d\n", graphdisp->numplots));
 		graph = mod->graphbase->GetGraph(tag.Format("gridplot%d", plotcount++));
-		graph->type = graphdisp->plot[0]->type;
-		plotindex = plotcount;
 		graphdisp->Add(graph);
 		graphdisp->XYSynch();
+		graph->type = graphdisp->plot[0]->type;
+		plotindex = plotset->count;
 		diagbox->Write(text.Format("Add Plot numplots %d OK\n", graphdisp->numplots));
+	}
+	else {
+		graph = graphdisp->plot[plotlayer];
+		plotindex = plotlayer;
 	}
 
 	gridbox->ColumnData(ycol, graph->gdatadv);
@@ -470,7 +489,7 @@ void PlotBox::OnPlotXY(wxCommandEvent& event)
 	if(graph->gdataerr) gridbox->ColumnData(errcol, graph->gdataerr);
 	graph->errmode = errmode;
 
-	if(plotset->plotcount <= plotindex) plotset->AddPlot(PlotDat(graph->gtag, graph->type, xcol, ycol, errcol, errmode));
+	if(plotset->count <= plotindex) plotset->AddPlot(PlotDat(graph->gtag, graph->type, xcol, ycol, errcol, errmode));
 	else plotset->SetPlot(plotindex, PlotDat(graph->gtag, graph->type, xcol, ycol, errcol, errmode));
 
 	diagbox->Write(text.Format("Plot xcol %d ycol %d\n", xcol , ycol));
@@ -709,7 +728,7 @@ void PlotBox::PlotStore(wxString filetag)
 	filename = "plot-" + filetag + ".dat";
 
 	outfile.New(filepath + "/" + filename);
-	for(i=0; i<graphdisp->plotset.plotcount; i++) {
+	for(i=0; i<graphdisp->plotset.count; i++) {
 		outfile.WriteLine(graphdisp->plotset.plotdata[i].StoreDat(i));
 	}
 	outfile.Close();
@@ -737,10 +756,13 @@ void PlotBox::PlotLoad(wxString filetag)
 		return;
 	}
 
-	graphdisp->plotset.plotcount = 0;          // reset plotset
+	graphdisp->plotset.count = 0;          // reset plotset
+	plotcount = 0;
+
+
+	// Load plot data into current graph panel (GraphDisp) PlotSet
 
 	readline = infile.ReadLine();
-
 	while(!readline.IsEmpty()) {
 
 		// Version check
@@ -765,15 +787,20 @@ void PlotBox::PlotLoad(wxString filetag)
 		// Add plotdat to plotset
 		graphdisp->plotset.AddPlot(PlotDat(gtag, gtype, xcol, ycol, errcol, errmode));
 
+		plotcount++;
+
 		// Check for end of file and read next line
 		if(infile.End()) break;
 		readline = infile.ReadLine();		
 	}
 	infile.Close();
 
+
+	// Generate plots from loaded data
+
 	dispindex = 0;
 	graphdisp = &mainwin->gpos[dispindex];
-	for(i=0; i<graphdisp->plotset.plotcount; i++) {
+	for(i=0; i<graphdisp->plotset.count; i++) {
 		// Set up graph from plotdat
 		graph = mod->graphbase->GetGraph(graphdisp->plotset.plotdata[i].gtag); 
 		graph->plotdata = &graphdisp->plotset.plotdata[i];
@@ -786,7 +813,7 @@ void PlotBox::PlotLoad(wxString filetag)
 		if(graphdisp->numplots <= i) graphdisp->Add(graph);
 		else graphdisp->plot[i] = graph;
 	}
-	//graphdisp->plotset = plotset;
+
 	mainwin->scalebox->GraphUpdate();
 }
 
@@ -819,4 +846,49 @@ void PlotBox::WheelBin(int binsize)
 	datacount = 100000;
 	for(i=0; i<100000; i++) bindata[i] = 0;  
 	for(i=0; i<datacount; i++) bindata[i/binsize] += wheeldata[i];   
+}
+
+
+
+PlotDat::PlotDat(wxString tag, int type, int xc, int yc, int ec, int em)
+{
+	gtag = tag;
+	gtype = type;
+	xcol = xc;
+	ycol = yc;
+	errcol = ec;
+	errmode = em;
+}
+
+
+wxString PlotDat::StoreDat(int index)
+{
+	wxString ptext;
+
+	//return ptext.Format("v1 index %d tag %s type %d xcol %d ycol %d", index, gtag, gtype, xcol, ycol); 
+	return ptext.Format("v2 index %d tag %s type %d xcol %d ycol %d errcol %d errmod %d", index, gtag, gtype, xcol, ycol, errcol, errmode); 
+}
+
+
+void PlotSet::AddPlot(PlotDat plot)
+{
+	count++;
+	plotdata.push_back(plot);
+}
+
+
+int PlotSet::RemovePlot(int index)
+{
+	if(index >= count) return 0;
+	plotdata.erase(plotdata.begin() + index);
+	count--;
+	return 1;
+}
+
+
+int PlotSet::SetPlot(int index, PlotDat plot)
+{
+	if(index < 0 || index > count) return 0;
+	plotdata[index] = plot;
+	return 1;
 }

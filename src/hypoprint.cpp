@@ -229,6 +229,7 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 	double xlogmax, ylogmax;    
 	double logbase = 2.71828182845904523536028747135266250;   // 3;
 	double xticklength, yticklength;
+	double errval;
 
 	if(mod->diagbox) mod->diagbox->textbox->AppendText(text.Format("Graph EPS %d\n", graphindex));
 
@@ -442,6 +443,21 @@ void GraphWindow3::PrintEPS(double xb, double yb, TextFile *ofp)
 							out->WriteLine("fill");
 							out->WriteLine("grestore");
 						}
+						out->WriteLine("stroke");
+					}
+				}
+			}
+
+			if(graph->errmode) {
+				out->WriteLine(text.Format("%s setrgbcolor", ColourString(colourpen[black]))); 
+				for(i=0; i<graph->xcount; i++) {
+					xval = (*graph->gdatax)[i];
+					if(xval >= xfrom && xval <= xto) {
+						xpos = (xval - xfrom) * xrange;
+						y = (*gdatadv)[i];		
+						errval = (*graph->gdataerr)[i] * yrange;
+						out->WriteLine("newpath");
+						out->DrawLine(xpos + xbase + xoffset, ybase + yrange * (y - yfrom) - errval, xpos + xbase + xoffset, ybase + yrange * (y - yfrom) + errval);
 						out->WriteLine("stroke");
 					}
 				}
