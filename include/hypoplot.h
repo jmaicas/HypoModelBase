@@ -30,7 +30,7 @@ public:
 	GraphDisp *graphdisp;
 
 	GridBox *gridbox;
-	//PlotSet *plotset;
+	PlotSet plotset;
 	NeuroBox *neurobox;
 
 	vector<datdouble>ycoldata;

@@ -9,6 +9,8 @@
 //#include <vector>
 
 
+class GraphDat;
+
 
 class ModDat{
 public:
@@ -661,8 +663,10 @@ public:
 	int errcol;
 	int errmode;
 	int gtype;
+	GraphDat *graph;
+	int dispindex;
 
-	PlotDat(wxString, int type, int xc, int yc, int ec, int em);
+	PlotDat(int disp, wxString, int type, int xc, int yc, int ec, int em);
 	wxString StoreDat(int);
 };
 
@@ -673,15 +677,21 @@ public:
 	int count;
 	std::vector<PlotDat>plotdata;
 	int dispindex;
+	int dispcount[10];
 
 	PlotSet() {
 		dispindex = 0;
 		count = 0;
+		for(int i=0; i<10; i++) dispcount[i] = 0;
 	};
 
-	void AddPlot(PlotDat);
-	int RemovePlot(int);
-	int SetPlot(int, PlotDat);
+	int AddPlot(PlotDat);
+	int RemovePlot(int plotindex);
+	int SetPlot(int plotindex, PlotDat);
+	//int DispCount(int dispindex);
+	PlotDat *GetPlot(int dispindex, int layer);
+	int GetIndex(int dispindex, int layer);
+	void Reset();
 };
 
 
@@ -932,7 +942,7 @@ public:
 class GraphDisp{             // used for multiple layered plots for simultaneous display
 public:
 	GraphDat *plot[10];
-	PlotSet plotset;
+	//PlotSet plotset;
 	static const int maxplots = 10;
 	int numplots;
 	int currentplot;
