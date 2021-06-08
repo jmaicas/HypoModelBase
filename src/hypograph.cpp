@@ -641,7 +641,7 @@ void GraphWindow3::FrontGraph(GraphDisp *newgraph)
 void GraphWindow3::UpdateScroll(int pos)
 {
 	double xdiff;
-	wxString snum;
+	wxString snum, text;
 	int max, scrollxto;
 	int section;
 
@@ -657,6 +657,12 @@ void GraphWindow3::UpdateScroll(int pos)
 		mod->diagbox->Write("plot " + graph->gname + " no data\n");
 		return;
 	}
+
+	if(graph->type == 2) max = graph->gdatax->max;
+
+	mod->diagbox->Write(text.Format("UpdateScroll plot %s datamax %d xscale %.2f\n", graph->gname, graph->gdatadv->max, graph->xscale));
+
+
 	//if(pos >= 0) graph->scrollpos = pos;
 	//graph->scrollpos = 100;
 
@@ -680,8 +686,8 @@ void GraphWindow3::UpdateScroll(int pos)
 	section = xdiff;
 	if(section > scrollxto) {
 		graph->scrollpos = 0;
-		graph->xfrom = 0;
-		graph->xto = xdiff;
+		//graph->xfrom = 0;            // remove 8/6/21 to fix non-zero xfrom behaviour in grid plots, need to redetermine original purpose and refine
+		//graph->xto = xdiff;
 	}
 	scrollbar->SetScrollbar(graph->scrollpos, section, scrollxto, section);
 

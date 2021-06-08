@@ -1457,8 +1457,8 @@ void ScaleBox::ScrollUpdate(int index, int pos)
 void ScaleBox::ScaleUpdate()
 {
 	XSynch();
-	PanelUpdate();
 	GraphUpdate();
+	PanelUpdate();
 }
 
 

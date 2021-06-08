@@ -1611,10 +1611,11 @@ void GridBox::RowSelect(int row)
 int GridBox::ColumnData(int col, datdouble *data)
 {
 	int row, count;
-	double value;
+	double value, max;
 	wxString celltext;
 
 	count = 0;
+	max = 0;
 	for(row=0; row<currgrid->GetNumberRows(); row++) {
 		celltext = currgrid->GetCellValue(row, col);
 		if(celltext != "") {
@@ -1623,7 +1624,9 @@ int GridBox::ColumnData(int col, datdouble *data)
 		}
 		else value = 0;
 		(*data)[row] = value;
+		if(value > max) max = value;
 	}
+	data->max = max;
 	return count;
 }
 

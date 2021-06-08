@@ -754,7 +754,8 @@ void PlotBox::PlotLoad(wxString filetag)
 	wxString gtag;
 	int gtype, xcol, ycol;
 	int errcol, errmode;
-	int disp;
+	int disp, dispplot;
+	int dispcount[10];
 	int version;
 	GraphDat *graph;
 
@@ -769,6 +770,7 @@ void PlotBox::PlotLoad(wxString filetag)
 
 	plotset.Reset();          // reset plotset
 	plotcount = 0;
+	for(i=0; i<10; i++) dispcount[i] = 0;
 
 
 	// Load plot data into current graph panel (GraphDisp) PlotSet
@@ -817,10 +819,18 @@ void PlotBox::PlotLoad(wxString filetag)
 		graph->xcount = gridbox->ColumnData(plotset.plotdata[i].xcol, graph->gdatax);
 		gridbox->ColumnData(plotset.plotdata[i].errcol, graph->gdataerr);
 		graph->errmode = plotset.plotdata[i].errmode;
-		// Insert graph into graphdisp 
-		graphdisp = &mainwin->gpos[plotset.plotdata[i].dispindex];
-		if(graphdisp->numplots <= i) graphdisp->Add(graph);
-		else graphdisp->plot[i] = graph;
+		// Insert graph into graphdisp
+		dispindex = plotset.plotdata[i].dispindex;
+		graphdisp = &mainwin->gpos[dispindex];
+		dispplot = dispcount[dispindex]++;
+		if(graphdisp->numplots <= dispplot) {
+			graphdisp->Add(graph);
+			//mainwin->diagbox->Write(text.Format("PlotLoad Add plotset %d disp %d plot %d\n", i, dispindex, dispplot));
+		}
+		else {
+			graphdisp->plot[dispplot] = graph;
+			//mainwin->diagbox->Write(text.Format("PlotLoad Set plotset %d disp %d plot %d\n", i, dispindex, dispplot));
+		}
 	}
 
 	mainwin->scalebox->GraphUpdate();
@@ -856,7 +866,6 @@ void PlotBox::WheelBin(int binsize)
 	for(i=0; i<100000; i++) bindata[i] = 0;  
 	for(i=0; i<datacount; i++) bindata[i/binsize] += wheeldata[i];   
 }
-
 
 
 PlotDat::PlotDat(int disp, wxString tag, int type, int xc, int yc, int ec, int em)
